@@ -1,0 +1,364 @@
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Statistiche</title>
+<!-- Carica d3.js & color scale -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+</head>
+<body>
+<table align="center" border="1" cellpadding="10" cellspacing="1" style="height:50px;width:100%;">
+<tbody>
+<tr><th style="height: 40px; text-align: center;">Codice Agente</th><th style="height: 40px; text-align: center;">Ragione Sociale</th>
+<th style="height: 40px; text-align: center;">Dalla data</th><th style="height: 40px; text-align: center;">Alla data</th></tr>
+<tr><td style="height: 40px;">631.00238</td><td style="height: 40px;">CARABOT NATALINO                                            </td>
+<td style="height: 40px;">01/01/2025</td><td style="height: 40px;">17/08/2025</td></tr>
+</tbody></table>
+<br><br>Verifica Obiettivi<br>
+<table align="center" border="1" cellpadding="10" cellspacing="1" style="height:50px;width:100%;">
+<tbody>
+<tr><th style="height: 40px; text-align: center;">Provincia</th>
+<th style="height: 40px; text-align: center;">Anno Prec.</th>
+<th style="height: 40px; text-align: center;">Anno Corr.</th>
+<th style="height: 40px; text-align: center;">Obiettivo</th>
+<th style="height: 40px; text-align: center;">% su obiet.</th>
+<th style="height: 40px; text-align: center;">Clienti Anno Prec.</th>
+<th style="height: 40px; text-align: center;">Clienti Anno Corr.</th>
+<th style="height: 40px; text-align: center;">Obiettivo</th>
+<th style="height: 40px; text-align: center;">% su obiet.</th></tr>
+<tr><td style="height: 40px;">Generale</td><td style="height: 40px;">      80.238,72</td><td style="height: 40px;">      90.159,79</td><td style="height: 40px;"></td><td style="height: 40px;"></td>
+<td style="height: 40px;">         352</td><td style="height: 40px;">          20</td><td style="height: 40px;"></td><td style="height: 40px;"></td></tr>
+<tr><td style="height: 40px;">LT</td><td style="height: 40px;">      79.029,16</td><td style="height: 40px;">      82.389,23</td>
+<td style="height: 40px;">     155.000,00</td><td style="height: 40px;">38, %</td><td style="height: 40px;">          23</td><td style="height: 40px;">          18</td>
+<td style="height: 40px;"> 35</td><td style="height: 40px;">51, %</td></tr>
+</tbody></table>
+<br>Riepilogo Clienti Serviti per per Provincia<br>
+<table align="center" border="1" cellpadding="10" cellspacing="1" style="height:50px;width:100%;">
+<tbody>
+<tr><th style="height: 40px; text-align: center;">Provincia</th>
+<th style="height: 40px; text-align: center;">Clienti Serviti</th>
+<th style="height: 40px; text-align: center;">Fatturato</th></tr>
+<tr><td style="height: 40px;">LT    </td><td style="height: 40px;">    18</td><td style="height: 40px;">      60.437,22</td></tr>
+<tr><td style="height: 40px;">RM    </td><td style="height: 40px;">     2</td><td style="height: 40px;">       7.770,56</td></tr>
+</tbody></table>
+<br><b>Ripartizione Fatturato<br>
+Pieni e Coppi=   54.909,62 - Altro=   35.250,17<div id="grafico_donut"></div>
+<script>
+var width = 450
+height = 450
+margin = 100
+var radius = Math.min(width, height) / 2 - margin
+var svg = d3.select("#grafico_donut")
+.append("svg")
+.attr("width", width)
+.attr("height", height)
+.append("g")
+.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+var data = {Pieni_e_Coppi: 60, Altro: 39}
+var color = d3.scaleOrdinal()
+.domain(["Pieni_e_Coppi", "Altro"])
+.range(d3.schemeDark2);
+var pie = d3.pie()
+.sort(null)
+.value(function(d) {return d.value; })
+var data_ready = pie(d3.entries(data))
+var arc = d3.arc()
+.innerRadius(radius * 0.5)
+.outerRadius(radius * 0.8)
+var outerArc = d3.arc()
+.innerRadius(radius * 0.9)
+.outerRadius(radius * 0.9)
+svg
+.selectAll('allSlices')
+.data(data_ready)
+.enter()
+.append('path')
+.attr('d', arc)
+.attr('fill', function(d){ return(color(d.data.key)) })
+.attr("stroke", "white")
+.style("stroke-width", "2px")
+.style("opacity", 0.7)
+svg
+.selectAll('allPolylines')
+.data(data_ready)
+.enter()
+.append('polyline')
+.attr("stroke", "black")
+.style("fill", "none")
+.attr("stroke-width", 1)
+.attr('points', function(d) {
+var posA = arc.centroid(d)
+var posB = outerArc.centroid(d)
+var posC = outerArc.centroid(d);
+var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1);
+return [posA, posB, posC]
+})
+svg
+.selectAll('allLabels')
+.data(data_ready)
+.enter()
+.append('text')
+.text( function(d) { console.log(d.data.key) ; return d.data.key } )
+.attr('transform', function(d) {
+var pos = outerArc.centroid(d);
+var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
+return 'translate(' + pos + ')';
+})
+.style('text-anchor', function(d) {
+var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+return (midangle < Math.PI ? 'start' : 'end')
+})
+</script>
+</body>
+<table align="center" border="1" cellpadding="10" cellspacing="1" style="height:50px;width:100%;">
+<tbody>
+<tr><th style="height: 40px; text-align: center;">Provincia</th>
+<th style="height: 40px; text-align: center;">Ragione Sociale Cliente</th>
+<th style="height: 40px; text-align: center;">Categoria ARTICOLI</th>
+<th style="height: 40px; text-align: center;">Fatturato</th></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILIZIA SETINA S.R.L.                                      </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       1.512,00</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILIZIA SETINA S.R.L.                                      </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">       1.665,62</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">ROSSETTI EDILIZIA SRL                                       </td>
+<td style="height: 40px;">FACCIAVISTA                             </td><td style="height: 40px;">         583,78</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">ROSSETTI EDILIZIA SRL                                       </td>
+<td style="height: 40px;">LINEA ARCHEO                            </td><td style="height: 40px;">         743,00</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">ROSSETTI EDILIZIA SRL                                       </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">         151,20</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">ROSSETTI EDILIZIA SRL                                       </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">         416,40</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">F.LLI TORA SRL                                              </td>
+<td style="height: 40px;">COPERTURE                               </td><td style="height: 40px;">           3,36</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">F.LLI TORA SRL                                              </td>
+<td style="height: 40px;">LINEA ARCHEO                            </td><td style="height: 40px;">           1,74</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">F.LLI TORA SRL                                              </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       3.110,40</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">F.LLI TORA SRL                                              </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">       1.382,40</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">ADDESSI COMMERCIALE SRL                                     </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       3.693,60</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">ADDESSI COMMERCIALE SRL                                     </td>
+<td style="height: 40px;">OUTLET                                  </td><td style="height: 40px;">           0,01</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">ADDESSI COMMERCIALE SRL                                     </td>
+<td style="height: 40px;">PIASTRELLE                              </td><td style="height: 40px;">       1.240,95</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">CENTRO EDILE DE GREGORIS SRL                                </td>
+<td style="height: 40px;">CORRIM.COPRIM.                          </td><td style="height: 40px;">          73,26</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">CENTRO EDILE DE GREGORIS SRL                                </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       7.776,00</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">CENTRO EDILE DE GREGORIS SRL                                </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">           8,67</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">CENTRO EDILE DE GREGORIS SRL                                </td>
+<td style="height: 40px;">REFRATTARI RETTIFICATI                  </td><td style="height: 40px;">       1.281,60</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">STENI SRL                                                   </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">         547,20</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">STENI SRL                                                   </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">         984,96</td></tr>
+<tr><td style="height: 40px;">RM  </td><td style="height: 40px;">DOVAL SRL                                                   </td>
+<td style="height: 40px;">REFRATTARI                              </td><td style="height: 40px;">       1.019,82</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">ROSANCOS SRL                                                </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       1.528,80</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">ROSANCOS SRL                                                </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">         604,80</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILCERAMICA SAS DI VEGLIA CRISTIAN & C.                    </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       1.440,00</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS              </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       3.744,00</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS              </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">         832,81</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">DIMED SRL                                                   </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       1.326,96</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C              </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       1.209,60</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C              </td>
+<td style="height: 40px;">REFRATTARI                              </td><td style="height: 40px;">         900,83</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C              </td>
+<td style="height: 40px;">REFRATTARI RETTIFICATI                  </td><td style="height: 40px;">       1.935,58</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILIM SRL                                                  </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       1.370,88</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILIM SRL                                                  </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">         984,96</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC             </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       3.456,00</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC             </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">       2.230,80</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">L'EMPORIO DI IOZZI SONIA                                    </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">         957,60</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">L'EMPORIO DI IOZZI SONIA                                    </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">         984,96</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDIL PONTINA SRLS                                           </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">         864,00</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDIL PONTINA SRLS                                           </td>
+<td style="height: 40px;">REFRATTARI                              </td><td style="height: 40px;">         379,47</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDIL PONTINA SRLS                                           </td>
+<td style="height: 40px;">REFRATTARI RETTIFICATI                  </td><td style="height: 40px;">         819,98</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">FER.COM. COSTRUZIONI SRL                                    </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">       2.695,68</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">FER.COM. COSTRUZIONI SRL                                    </td>
+<td style="height: 40px;">REFRATTARI                              </td><td style="height: 40px;">         640,35</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">FER.COM. COSTRUZIONI SRL                                    </td>
+<td style="height: 40px;">REFRATTARI RETTIFICATI                  </td><td style="height: 40px;">         460,34</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILIZIA PRIMAVERA SRL                                      </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">         933,12</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILIZIA PRIMAVERA SRL                                      </td>
+<td style="height: 40px;">REFRATTARI                              </td><td style="height: 40px;">       1.969,92</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">EDILIZIA PRIMAVERA SRL                                      </td>
+<td style="height: 40px;">REFRATTARI RETTIFICATI                  </td><td style="height: 40px;">         870,33</td></tr>
+<tr><td style="height: 40px;">RM  </td><td style="height: 40px;">COLANTUONO 1918 SRL                                         </td>
+<td style="height: 40px;">LINEA ARCHEO                            </td><td style="height: 40px;">           1,94</td></tr>
+<tr><td style="height: 40px;">RM  </td><td style="height: 40px;">COLANTUONO 1918 SRL                                         </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">       5.150,40</td></tr>
+<tr><td style="height: 40px;">RM  </td><td style="height: 40px;">COLANTUONO 1918 SRL                                         </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">       1.598,40</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">LATINA BETON SERVIZI SRL                                    </td>
+<td style="height: 40px;">FACCIAVISTA                             </td><td style="height: 40px;">       1.007,62</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">LATINA BETON SERVIZI SRL                                    </td>
+<td style="height: 40px;">MATTONE PIENO                           </td><td style="height: 40px;">         720,00</td></tr>
+<tr><td style="height: 40px;">LT  </td><td style="height: 40px;">LATINA BETON SERVIZI SRL                                    </td>
+<td style="height: 40px;">PAVIMENTAZIONE POLIS                    </td><td style="height: 40px;">         362,88</td></tr>
+</tbody></table>
+<br>
+<table align="center" border="1" cellpadding="10" cellspacing="1" style="height:50px;width:100%;">
+<tbody>
+<tr><th style="height: 40px; text-align: center;">Categoria</th>
+<th style="height: 40px; text-align: center;">Importo</th>
+<th style="height: 40px; text-align: center;">Prov1</th><th style="height: 40px; text-align: center;">Clienti</th>
+<th style="height: 40px; text-align: center;">Prov2</th><th style="height: 40px; text-align: center;">Clienti</th>
+<th style="height: 40px; text-align: center;">Prov3</th><th style="height: 40px; text-align: center;">Clienti</th>
+<th style="height: 40px; text-align: center;">Prov4</th><th style="height: 40px; text-align: center;">Clienti</th>
+<th style="height: 40px; text-align: center;">Prov5</th><th style="height: 40px; text-align: center;">Clienti</th>
+<th style="height: 40px; text-align: center;">Prov6</th><th style="height: 40px; text-align: center;">Clienti</th>
+<th style="height: 40px; text-align: center;">Prov7</th><th style="height: 40px; text-align: center;">Clienti</th></tr>
+<tr><td style="height: 40px;">COPERTURE                     </td><td style="height: 40px;">          3,36</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">  1</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">CORRIM.COPRIM.                </td><td style="height: 40px;">         73,26</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">  1</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">COTTO A MANO ANTICHE TERRE    </td><td style="height: 40px;">          0,00</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">FACCIAVISTA                   </td><td style="height: 40px;">      1.591,40</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">  2</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">GANCI E ACCESSO               </td><td style="height: 40px;">          0,00</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">LINEA ARCHEO                  </td><td style="height: 40px;">        746,68</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">  2</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">  1</td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">MATTONE PIENO                 </td><td style="height: 40px;">     38.558,64</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;"> 16</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">  1</td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">OUTLET                        </td><td style="height: 40px;">          0,01</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">  1</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">PAVIMENTAZIONE POLIS          </td><td style="height: 40px;">     15.686,46</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;"> 13</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">  1</td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">PEZ.SPEC.COPPI                </td><td style="height: 40px;">          0,00</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">PIASTRELLE                    </td><td style="height: 40px;">      1.240,95</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">  1</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">PRODOTTI FORNO                </td><td style="height: 40px;">          0,00</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">TAVELLONI                     </td><td style="height: 40px;">          0,00</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">REFRATTARI                    </td><td style="height: 40px;">      4.910,39</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">  4</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">  1</td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">REFRATTARI RETTIFICATI        </td><td style="height: 40px;">      5.367,83</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">  5</td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td style="height: 40px;">PROMOZIONALI                  </td><td style="height: 40px;">          0,00</td>
+<td style="height: 40px;">LT </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">RM </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td>
+<td style="height: 40px;">   </td><td style="height: 40px;">   </td></tr>
+<tr><td></td><td style="height: 40px;">     68.178,98</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table>
+</html>
