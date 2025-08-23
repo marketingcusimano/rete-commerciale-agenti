@@ -3,16 +3,24 @@ on:
   push:
     branches: [ main ]
   schedule:
-    - cron: '0 6 * * *'  # Ogni giorno alle 6:00
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  update-dashboard:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
     
     steps:
     - name: Checkout
@@ -40,5 +48,6 @@ jobs:
       with:
         path: './dashboard'
     
-    - name: Deploy to Pages
+    - name: Deploy to GitHub Pages
+      id: deployment
       uses: actions/deploy-pages@v4
