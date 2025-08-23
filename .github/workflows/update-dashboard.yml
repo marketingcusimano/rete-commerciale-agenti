@@ -1,0 +1,44 @@
+name: Update Dashboard
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 6 * * *'  # Ogni giorno alle 6:00
+  workflow_dispatch:
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Parse HTML data
+      run: npm run parse
+    
+    - name: Generate dashboard
+      run: npm run generate
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+    
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dashboard'
+    
+    - name: Deploy to Pages
+      uses: actions/deploy-pages@v4
