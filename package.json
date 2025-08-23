@@ -1,0 +1,14 @@
+{
+  "name": "rete-commerciale-agenti",
+  "version": "1.0.0",
+  "description": "Dashboard automatico per agenti commerciali",
+  "main": "index.js",
+  "scripts": {
+    "parse": "node scripts/parseData.js",
+    "generate": "node scripts/generateDashboard.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "fs-extra": "^11.1.1"
+  }
+}
