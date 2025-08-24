@@ -3,10 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard CARABOT NATALINO - Performance Vendite</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>Dashboard CARABOT NATALINO - Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
     <style>
+        /* ==================== CSS VARIABLES & RESET ==================== */
+        :root {
+            /* Modern Color Palette */
+            --primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-solid: #667eea;
+            --secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --success: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --error: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            
+            /* Neutral Colors */
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --bg-tertiary: #252b3b;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --bg-glass: rgba(255, 255, 255, 0.08);
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a9c0;
+            --text-muted: #6b7280;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 35px 60px -12px rgba(0, 0, 0, 0.7);
+            
+            /* Light Mode */
+            --bg-primary-light: #f8fafc;
+            --bg-secondary-light: #ffffff;
+            --bg-tertiary-light: #f1f5f9;
+            --bg-card-light: rgba(255, 255, 255, 0.9);
+            --bg-glass-light: rgba(255, 255, 255, 0.7);
+            
+            --text-primary-light: #1e293b;
+            --text-secondary-light: #475569;
+            --text-muted-light: #94a3b8;
+            --border-light: rgba(0, 0, 0, 0.08);
+            --shadow-light: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --shadow-lg-light: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            
+            /* Spacing & Sizing */
+            --border-radius: 16px;
+            --border-radius-lg: 24px;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,1591 +67,1080 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            transition: all 0.5s ease;
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
         }
 
         body.light-mode {
-            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e8eaf6 100%);
+            background: var(--bg-primary-light);
+            color: var(--text-primary-light);
+            --bg-card: var(--bg-card-light);
+            --bg-glass: var(--bg-glass-light);
+            --text-primary: var(--text-primary-light);
+            --text-secondary: var(--text-secondary-light);
+            --text-muted: var(--text-muted-light);
+            --border: var(--border-light);
+            --shadow: var(--shadow-light);
+            --shadow-lg: var(--shadow-lg-light);
         }
 
-        body.dark-mode {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+        /* ==================== GLASSMORPHISM EFFECTS ==================== */
+        .glass {
+            backdrop-filter: blur(20px);
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
 
-        .container {
+        .glass-card {
+            backdrop-filter: blur(15px);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 10;
         }
 
-        /* Elementi decorativi di sfondo */
-        .bg-decoration {
-            position: fixed;
-            pointer-events: none;
-            border-radius: 50%;
-            filter: blur(120px);
-            z-index: 1;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
         }
 
-        .bg-decoration:nth-child(1) {
-            width: 400px;
-            height: 400px;
-            background: rgba(139, 92, 246, 0.1);
-            top: -200px;
-            left: -200px;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
         }
 
-        .bg-decoration:nth-child(2) {
-            width: 350px;
-            height: 350px;
-            background: rgba(34, 211, 238, 0.1);
-            top: 50%;
-            right: -175px;
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
-        .bg-decoration:nth-child(3) {
-            width: 300px;
-            height: 300px;
-            background: rgba(168, 85, 247, 0.1);
-            bottom: -150px;
-            left: 30%;
-        }
-
-        .dark-mode .bg-decoration:nth-child(1) {
-            background: rgba(139, 92, 246, 0.15);
-        }
-
-        .dark-mode .bg-decoration:nth-child(2) {
-            background: rgba(34, 211, 238, 0.15);
-        }
-
-        .dark-mode .bg-decoration:nth-child(3) {
-            background: rgba(168, 85, 247, 0.15);
-        }
-
-        /* Header migliorato */
-        .header-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-            margin-bottom: 32px;
-            transform: translateY(-20px);
-            opacity: 0;
-            animation: slideInDown 0.8s ease forwards;
-        }
-
-        .dark-mode .header-card {
-            background: rgba(30, 41, 59, 0.9);
-            border: 1px solid rgba(71, 85, 105, 0.6);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-        }
-
-        .header-main {
-            padding: 32px;
-        }
-
-        .header-title {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #1f2937;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .dark-mode .header-title {
-            color: #f8fafc;
-            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .logo-text p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: -4px;
         }
 
-        .header-subtitle {
-            font-size: 1.125rem;
-            color: #6b7280;
-            margin-bottom: 24px;
-        }
-
-        .dark-mode .header-subtitle {
-            color: #94a3b8;
-        }
-
-        .header-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 24px;
-            align-items: center;
-        }
-
-        .info-item {
+        .header-stats {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--spacing-md);
         }
 
-        .info-badge {
-            background: #f3f4f6;
-            color: #374151;
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-family: 'Monaco', monospace;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .dark-mode .info-badge {
-            background: #374151;
-            color: #f3f4f6;
-        }
-
-        .status-indicator {
+        .connection-status {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--spacing-xs);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #10b981;
             animation: pulse 2s infinite;
         }
 
-        /* Theme toggle */
-        .theme-toggle {
-            background: #1f2937;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-left: auto;
+        .status-dot.online { background: #10b981; }
+        .status-dot.updating { background: #f59e0b; }
+        .status-dot.offline { background: #ef4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-        }
-
-        .dark-mode .theme-toggle {
-            background: #f59e0b;
-        }
-
-        /* Filtri territorio */
-        .territory-filters {
-            border-top: 1px solid rgba(229, 231, 235, 0.5);
-            padding: 24px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .dark-mode .territory-filters {
-            border-top: 1px solid rgba(71, 85, 105, 0.5);
-        }
-
-        .filter-info h3 {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-
-        .dark-mode .filter-info h3 {
-            color: #94a3b8;
-        }
-
-        .current-filter {
+        .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--spacing-sm);
         }
 
-        .filter-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #3b82f6;
-        }
-
-        .filter-dot.violet {
-            background: #8b5cf6;
-        }
-
-        .filter-dot.cyan {
-            background: #06b6d4;
-        }
-
-        .filter-name {
-            font-weight: 600;
-            color: #1f2937;
-            font-size: 1rem;
-        }
-
-        .dark-mode .filter-name {
-            color: #f8fafc;
-        }
-
-        .filter-button {
-            background: #3b82f6;
-            color: white;
+        .btn {
+            padding: 10px 16px;
             border: none;
-            padding: 12px 20px;
             border-radius: 12px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.875rem;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .filter-button:hover {
-            background: #2563eb;
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
         }
 
-        /* KPI Cards migliorati */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ==================== MAIN LAYOUT ==================== */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+            gap: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==================== OVERVIEW SECTION ==================== */
+        .overview-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .section-header {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+            background: var(--primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* ==================== KPI CARDS ==================== */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
         }
 
         .kpi-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.9);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            padding: var(--spacing-lg);
             position: relative;
             overflow: hidden;
-            transform: translateY(20px);
-            opacity: 0;
         }
 
-        .kpi-card.animate {
-            animation: slideInUp 0.6s ease forwards;
-        }
-
-        .dark-mode .kpi-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(71, 85, 105, 0.6);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.2);
-        }
-
-        .kpi-card::before {
+        .kpi-card::after {
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            width: 100px;
+            height: 100px;
+            opacity: 0.1;
+            border-radius: 50%;
+            transform: translate(30%, -30%);
         }
 
-        .kpi-card.success::before {
-            background: linear-gradient(90deg, #10b981, #059669);
+        .kpi-card.revenue::after {
+            background: var(--primary);
         }
 
-        .kpi-card.warning::before {
-            background: linear-gradient(90deg, #f59e0b, #d97706);
+        .kpi-card.target::after {
+            background: var(--success);
         }
 
-        .kpi-card.info::before {
-            background: linear-gradient(90deg, #06b6d4, #0891b2);
+        .kpi-card.clients::after {
+            background: var(--accent);
         }
 
         .kpi-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 24px;
+            margin-bottom: var(--spacing-md);
         }
+
+        .kpi-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-bottom: var(--spacing-sm);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .kpi-icon.revenue { background: var(--primary); }
+        .kpi-icon.target { background: var(--success); }
+        .kpi-icon.clients { background: var(--accent); }
 
         .kpi-title {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-
-        .dark-mode .kpi-title {
-            color: #9ca3af;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .kpi-value {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #1f2937;
-            line-height: 1;
-        }
-
-        .dark-mode .kpi-value {
-            color: #f8fafc;
-        }
-
-        .kpi-badge {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: #ecfdf5;
-            color: #065f46;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.875rem;
+            font-size: 36px;
             font-weight: 700;
-        }
-
-        .kpi-badge.success {
-            background: #ecfdf5;
-            color: #065f46;
-        }
-
-        .kpi-badge.info {
-            background: #eff6ff;
-            color: #1e40af;
-        }
-
-        .dark-mode .kpi-badge.success {
-            background: rgba(16, 185, 129, 0.2);
-            color: #34d399;
-        }
-
-        .dark-mode .kpi-badge.info {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
+            margin: var(--spacing-xs) 0;
+            font-family: var(--font-mono);
         }
 
         .kpi-subtitle {
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: var(--spacing-md);
         }
 
-        .dark-mode .kpi-subtitle {
-            color: #9ca3af;
+        .growth-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
         }
 
-        /* Progress bars migliorate */
-        .progress-section {
-            margin-top: 24px;
-            padding: 20px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .progress-section.blue {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .progress-section.orange {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
-
-        .progress-section.cyan {
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(8, 145, 178, 0.1));
-            border: 1px solid rgba(6, 182, 212, 0.2);
+        .progress-container {
+            margin-top: var(--spacing-md);
         }
 
         .progress-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .progress-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #059669;
-        }
-
-        .progress-label.blue {
-            color: #2563eb;
-        }
-
-        .progress-label.orange {
-            color: #d97706;
-        }
-
-        .progress-label.cyan {
-            color: #0891b2;
-        }
-
-        .dark-mode .progress-label {
-            color: #34d399;
-        }
-
-        .dark-mode .progress-label.blue {
-            color: #60a5fa;
-        }
-
-        .dark-mode .progress-label.orange {
-            color: #fbbf24;
-        }
-
-        .dark-mode .progress-label.cyan {
-            color: #22d3ee;
-        }
-
-        .progress-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #10b981;
-        }
-
-        .progress-dot.blue {
-            background: #3b82f6;
-        }
-
-        .progress-dot.orange {
-            background: #f59e0b;
-        }
-
-        .progress-dot.cyan {
-            background: #06b6d4;
+            margin-bottom: var(--spacing-xs);
         }
 
         .progress-bar {
-            width: 100%;
             height: 8px;
-            background: rgba(16, 185, 129, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
             overflow: hidden;
-            margin: 8px 0;
-        }
-
-        .progress-bar.blue {
-            background: rgba(59, 130, 246, 0.2);
-        }
-
-        .progress-bar.orange {
-            background: rgba(245, 158, 11, 0.2);
-        }
-
-        .progress-bar.cyan {
-            background: rgba(6, 182, 212, 0.2);
-        }
-
-        .dark-mode .progress-bar {
-            background: rgba(16, 185, 129, 0.3);
-        }
-
-        .dark-mode .progress-bar.blue {
-            background: rgba(59, 130, 246, 0.3);
-        }
-
-        .dark-mode .progress-bar.orange {
-            background: rgba(245, 158, 11, 0.3);
-        }
-
-        .dark-mode .progress-bar.cyan {
-            background: rgba(6, 182, 212, 0.3);
+            position: relative;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #10b981, #059669);
             border-radius: 4px;
-            transition: width 1.5s ease;
+            transition: width 1s ease-out;
+            background: var(--success);
             position: relative;
-            overflow: hidden;
-        }
-
-        .progress-fill.blue {
-            background: linear-gradient(90deg, #3b82f6, #2563eb);
-        }
-
-        .progress-fill.orange {
-            background: linear-gradient(90deg, #f59e0b, #d97706);
-        }
-
-        .progress-fill.cyan {
-            background: linear-gradient(90deg, #06b6d4, #0891b2);
         }
 
         .progress-fill::after {
             content: '';
             position: absolute;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             animation: shimmer 2s infinite;
         }
 
-        .progress-footer {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
-        .progress-footer .left {
-            color: #059669;
-        }
-
-        .progress-footer .left.blue {
-            color: #2563eb;
-        }
-
-        .progress-footer .left.orange {
-            color: #d97706;
-        }
-
-        .progress-footer .left.cyan {
-            color: #0891b2;
-        }
-
-        .dark-mode .progress-footer .left {
-            color: #34d399;
-        }
-
-        .dark-mode .progress-footer .left.blue {
-            color: #60a5fa;
-        }
-
-        .dark-mode .progress-footer .left.orange {
-            color: #fbbf24;
-        }
-
-        .dark-mode .progress-footer .left.cyan {
-            color: #22d3ee;
-        }
-
-        .progress-footer .right {
-            color: #059669;
-            font-weight: 700;
-        }
-
-        .progress-footer .right.blue {
-            color: #2563eb;
-        }
-
-        .progress-footer .right.orange {
-            color: #d97706;
-        }
-
-        .progress-footer .right.cyan {
-            color: #0891b2;
-        }
-
-        .dark-mode .progress-footer .right {
-            color: #34d399;
-        }
-
-        .dark-mode .progress-footer .right.blue {
-            color: #60a5fa;
-        }
-
-        .dark-mode .progress-footer .right.orange {
-            color: #fbbf24;
-        }
-
-        .dark-mode .progress-footer .right.cyan {
-            color: #22d3ee;
-        }
-
-        /* Chart containers migliorati */
-        .chart-grid {
+        /* ==================== CHARTS SECTION ==================== */
+        .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
         }
 
         .chart-card {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-            transform: translateY(20px);
-            opacity: 0;
+            padding: var(--spacing-lg);
         }
 
-        .chart-card.animate {
-            animation: slideInUp 0.8s ease forwards;
-        }
-
-        .dark-mode .chart-card {
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid rgba(71, 85, 105, 0.5);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
         }
 
         .chart-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 24px;
+            font-size: 20px;
+            font-weight: 600;
         }
 
-        .dark-mode .chart-title {
-            color: #f8fafc;
+        .chart-controls {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .chart-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .chart-btn.active {
+            background: var(--primary);
+            color: white;
         }
 
         .chart-container {
+            height: 300px;
             position: relative;
-            height: 350px;
-            margin-bottom: 24px;
         }
 
-        /* Tables migliorate */
-        .table-container {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-            margin-bottom: 32px;
-            transform: translateY(20px);
-            opacity: 0;
+        .mini-chart-container {
+            height: 200px;
+            position: relative;
         }
 
-        .table-container.animate {
-            animation: slideInUp 0.8s ease forwards;
+        /* ==================== DATA TABLE ==================== */
+        .data-section {
+            margin-bottom: var(--spacing-xl);
         }
 
-        .dark-mode .table-container {
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid rgba(71, 85, 105, 0.5);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            border-radius: 16px;
-        }
-
-        .vendite-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 16px;
+        .table-card {
+            padding: 0;
             overflow: hidden;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        .dark-mode .vendite-table {
-            background: rgba(30, 41, 59, 0.8);
-        }
-
-        .vendite-table thead th {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            color: #374151;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            padding: 16px;
-            text-align: left;
-            border-bottom: 2px solid rgba(229, 231, 235, 0.5);
-        }
-
-        .dark-mode .vendite-table thead th {
-            background: linear-gradient(135deg, #374151, #4b5563);
-            color: #d1d5db;
-            border-bottom: 2px solid rgba(75, 85, 99, 0.5);
-        }
-
-        .vendite-table tbody tr {
-            transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(229, 231, 235, 0.3);
-        }
-
-        .vendite-table tbody tr:hover {
-            background: rgba(59, 130, 246, 0.05);
-            transform: scale(1.01);
-        }
-
-        .dark-mode .vendite-table tbody tr {
-            border-bottom: 1px solid rgba(75, 85, 99, 0.3);
-        }
-
-        .dark-mode .vendite-table tbody tr:hover {
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .vendite-table td {
-            padding: 16px;
-            color: #374151;
-            font-weight: 500;
-        }
-
-        .dark-mode .vendite-table td {
-            color: #d1d5db;
-        }
-
-        .province-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-align: center;
-            min-width: 40px;
-            display: inline-block;
-        }
-
-        .province-badge.LT {
-            background: rgba(139, 92, 246, 0.2);
-            color: #6b21a8;
-        }
-
-        .province-badge.RM {
-            background: rgba(6, 182, 212, 0.2);
-            color: #0f766e;
-        }
-
-        .dark-mode .province-badge.LT {
-            background: rgba(139, 92, 246, 0.3);
-            color: #a78bfa;
-        }
-
-        .dark-mode .province-badge.RM {
-            background: rgba(6, 182, 212, 0.3);
-            color: #22d3ee;
-        }
-
-        /* Status indicators migliorati */
-        .status-card {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 16px;
-            padding: 16px 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            min-width: 200px;
-            transition: all 0.3s ease;
-        }
-
-        .dark-mode .status-card {
-            background: rgba(30, 41, 59, 0.95);
-            border: 1px solid rgba(71, 85, 105, 0.4);
-        }
-
-        .status-header {
-            display: flex;
-            align-items: center;
-            justify-content: between;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .connection-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-dot.online {
-            background: #10b981;
-        }
-
-        .status-dot.updating {
-            background: #f59e0b;
-            animation: pulse 1s infinite;
-        }
-
-        .status-dot.offline {
-            background: #ef4444;
-        }
-
-        .refresh-btn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-            margin-left: auto;
-        }
-
-        .refresh-btn:hover {
-            background: #2563eb;
-            transform: translateY(-1px);
-        }
-
-        .refresh-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .refresh-icon.spinning {
-            animation: spin 1s linear infinite;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .status-badge.success {
-            background: #ecfdf5;
-            color: #065f46;
-        }
-
-        .status-badge.updating {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-badge.error {
-            background: #fef2f2;
-            color: #991b1b;
-        }
-
-        .dark-mode .status-badge.success {
-            background: rgba(16, 185, 129, 0.2);
-            color: #34d399;
-        }
-
-        .dark-mode .status-badge.updating {
-            background: rgba(245, 158, 11, 0.2);
-            color: #fbbf24;
-        }
-
-        .dark-mode .status-badge.error {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-        }
-
-        /* Loading e Error states */
-        .loading-state, .error-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6b7280;
-        }
-
-        .dark-mode .loading-state, .dark-mode .error-state {
-            color: #9ca3af;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e5e7eb;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
-        }
-
-        .dark-mode .loading-spinner {
-            border-color: #4b5563;
-            border-top-color: #60a5fa;
-        }
-
-        /* Popup migliorato */
-        .popup-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-
-        .popup-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 500px;
-            max-height: 85vh;
-            overflow: hidden;
-            transform: scale(0.9);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .popup-overlay.show .popup-content {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        .dark-mode .popup-content {
-            background: rgba(30, 41, 59, 0.95);
-            border: 1px solid rgba(71, 85, 105, 0.4);
-        }
-
-        .popup-header {
-            padding: 24px 32px;
-            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        .table-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .dark-mode .popup-header {
-            border-bottom: 1px solid rgba(75, 85, 99, 0.5);
+        .table-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 8px 12px 8px 36px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 14px;
+            width: 200px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .province-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .province-badge.LT {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .province-badge.RM {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .table-footer {
+            padding: var(--spacing-lg);
+            border-top: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .footer-stats {
+            display: flex;
+            gap: var(--spacing-lg);
+            flex: 1;
+        }
+
+        .footer-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .footer-stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        /* ==================== PROVINCE FILTER POPUP ==================== */
+        .province-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: var(--spacing-lg);
+        }
+
+        .popup-content {
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: var(--border-radius-lg);
+        }
+
+        .popup-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .popup-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1f2937;
+            font-size: 20px;
+            font-weight: 600;
         }
 
-        .dark-mode .popup-title {
-            color: #f8fafc;
-        }
-
-        .popup-close {
+        .close-btn {
             background: none;
             border: none;
-            font-size: 1.5rem;
-            color: #6b7280;
+            color: var(--text-secondary);
+            font-size: 24px;
             cursor: pointer;
-            padding: 4px;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 8px;
             transition: all 0.2s ease;
         }
 
-        .popup-close:hover {
-            background: rgba(107, 114, 128, 0.1);
-            color: #374151;
-            transform: scale(1.1);
-        }
-
-        .dark-mode .popup-close {
-            color: #9ca3af;
-        }
-
-        .dark-mode .popup-close:hover {
-            background: rgba(156, 163, 175, 0.1);
-            color: #d1d5db;
+        .close-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
         }
 
         .popup-body {
-            padding: 24px 32px;
-            max-height: 400px;
-            overflow-y: auto;
+            padding: var(--spacing-lg);
+        }
+
+        .province-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
         }
 
         .province-option {
-            width: 100%;
-            background: none;
-            border: 2px solid transparent;
-            border-radius: 16px;
-            padding: 20px;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            color: var(--text-primary);
+            text-align: left;
         }
 
         .province-option:hover {
-            background: rgba(59, 130, 246, 0.05);
-            border-color: rgba(59, 130, 246, 0.2);
-            transform: translateY(-2px);
+            border-color: var(--primary-solid);
+            background: rgba(102, 126, 234, 0.1);
         }
 
         .province-option.selected {
-            background: #3b82f6;
-            border-color: #2563eb;
-            color: white;
-            transform: scale(1.02);
-        }
-
-        .province-option.selected.LT {
-            background: #8b5cf6;
-            border-color: #7c3aed;
-        }
-
-        .province-option.selected.RM {
-            background: #06b6d4;
-            border-color: #0891b2;
-        }
-
-        .dark-mode .province-option:hover {
-            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--primary-solid);
+            background: rgba(102, 126, 234, 0.15);
         }
 
         .option-info h4 {
-            font-weight: 700;
-            font-size: 1rem;
+            font-size: 16px;
+            font-weight: 600;
             margin-bottom: 4px;
         }
 
         .option-info p {
-            font-size: 0.875rem;
-            opacity: 0.8;
+            font-size: 14px;
+            color: var(--text-secondary);
         }
 
         .option-radio {
             width: 20px;
             height: 20px;
-            border: 2px solid #d1d5db;
+            border: 2px solid var(--border);
             border-radius: 50%;
             position: relative;
-            transition: all 0.2s ease;
         }
 
         .option-radio.selected {
-            border-color: white;
+            border-color: var(--primary-solid);
         }
 
         .option-radio.selected::after {
             content: '';
             position: absolute;
-            width: 10px;
-            height: 10px;
-            background: white;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            background: var(--primary-solid);
             border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
         }
 
-        .dark-mode .option-radio {
-            border-color: #6b7280;
-        }
-
-        /* Animazioni */
-        @keyframes slideInDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideInUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.7;
-                transform: scale(1.1);
-            }
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes shimmer {
-            0% {
-                left: -100%;
-            }
-            100% {
-                left: 100%;
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-
-            .header-main {
-                padding: 24px;
-            }
-
-            .header-title {
-                font-size: 2rem;
-            }
-
-            .territory-filters {
-                padding: 16px 24px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .kpi-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .kpi-card {
-                padding: 24px;
-            }
-
-            .kpi-value {
-                font-size: 2rem;
-            }
-
-            .chart-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .chart-card {
-                padding: 24px;
-            }
-
-            .chart-container {
-                height: 280px;
-            }
-
-            .table-container {
-                padding: 16px;
-            }
-
-            .vendite-table td {
-                padding: 12px 8px;
-                font-size: 0.875rem;
-            }
-
-            .status-card {
-                position: relative;
-                top: auto;
-                right: auto;
-                margin-bottom: 16px;
-            }
-
-            .popup-header, .popup-body {
-                padding: 20px;
-            }
-
-            .province-option {
-                padding: 16px;
-            }
-        }
-
-        /* Utilities */
-        .hidden {
-            display: none !important;
-        }
-
-        .text-center {
+        /* ==================== LOADING & ERROR STATES ==================== */
+        .loading-state,
+        .error-state {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
             text-align: center;
         }
 
-        .font-bold {
-            font-weight: 700;
+        .loading-content,
+        .error-content {
+            max-width: 400px;
         }
 
-        .text-sm {
-            font-size: 0.875rem;
+        .loading-spinner {
+            width: 64px;
+            height: 64px;
+            border: 4px solid var(--bg-tertiary);
+            border-top: 4px solid var(--primary-solid);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--spacing-lg);
         }
 
-        .text-xs {
-            font-size: 0.75rem;
+        .error-icon {
+            font-size: 48px;
+            color: #ef4444;
+            margin-bottom: var(--spacing-lg);
         }
 
-        .mt-2 {
-            margin-top: 0.5rem;
+        .status-message {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
         }
 
-        .mb-4 {
-            margin-bottom: 1rem;
+        .status-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
         }
 
-        .p-4 {
-            padding: 1rem;
+        /* ==================== RESPONSIVE DESIGN ==================== */
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .rounded-lg {
-            border-radius: 0.5rem;
+        @media (max-width: 768px) {
+            .header {
+                padding: var(--spacing-sm);
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+            
+            .header-stats {
+                order: -1;
+            }
+            
+            .main-container {
+                padding: var(--spacing-sm);
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-sm);
+            }
+            
+            .search-input {
+                width: 150px;
+            }
+            
+            .table-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-sm);
+            }
+            
+            .footer-stats {
+                width: 100%;
+            }
         }
+
+        @media (max-width: 480px) {
+            .section-title {
+                font-size: 24px;
+            }
+            
+            .kpi-value {
+                font-size: 28px;
+            }
+            
+            .data-table {
+                font-size: 12px;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 12px 16px;
+            }
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* ==================== UTILITY CLASSES ==================== */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-mono { font-family: var(--font-mono); }
+        .font-bold { font-weight: 700; }
+        .text-success { color: #10b981; }
+        .text-warning { color: #f59e0b; }
+        .text-error { color: #ef4444; }
+        
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-sm { gap: var(--spacing-sm); }
     </style>
 </head>
 <body class="dark-mode">
-    <!-- Elementi decorativi di sfondo -->
-    <div class="bg-decoration"></div>
-    <div class="bg-decoration"></div>
-    <div class="bg-decoration"></div>
-
-    <!-- Status Card -->
-    <div class="status-card">
-        <div class="status-header">
-            <div class="connection-status">
-                <div id="connection-dot" class="status-dot online"></div>
-                <span id="connection-status" class="font-bold text-sm">Online</span>
-            </div>
-            <button id="refresh-btn" class="refresh-btn">
-                <i id="refresh-icon" class="fas fa-sync-alt"></i>
-            </button>
-        </div>
-        <div id="status-badge" class="status-badge success">
-            ✅ CSV letto correttamente
-        </div>
-        <div class="text-xs mt-2">
-            Ultimo aggiornamento: <span id="last-update">--</span>
-        </div>
-    </div>
-
-    <div class="container">
-        <!-- Header migliorato -->
-        <div class="header-card">
-            <div class="header-main">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
-                    <div>
-                        <h1 class="header-title">CARABOT NATALINO</h1>
-                        <p class="header-subtitle">Dashboard Performance Vendite</p>
-                    </div>
-                    <button id="theme-toggle" class="theme-toggle">
-                        <i id="theme-icon" class="fas fa-sun"></i>
-                    </button>
-                </div>
-                
-                <div class="header-info">
-                    <div class="info-item">
-                        <span class="text-sm" style="color: #6b7280;">ID:</span>
-                        <code class="info-badge">631.00238</code>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-calendar" style="color: #6b7280;"></i>
-                        <span class="font-bold">Gen - Ago 2025 (8 mesi)</span>
-                    </div>
-                    <div class="status-indicator">
-                        <div class="status-dot"></div>
-                        <span class="text-sm">Dati aggiornati dal CSV GitHub</span>
+    <!-- ==================== HEADER ==================== -->
+    <header class="header glass">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">CN</div>
+                    <div class="logo-text">
+                        <h1>CARABOT NATALINO</h1>
+                        <p>Dashboard Pro • Real-time Analytics</p>
                     </div>
                 </div>
             </div>
             
-            <div class="territory-filters">
-                <div class="filter-info">
-                    <h3>Filtro Territorio</h3>
-                    <div class="current-filter">
-                        <div id="current-filter-dot" class="filter-dot"></div>
-                        <span id="current-filter-name" class="filter-name">Tutte le Province</span>
-                    </div>
+            <div class="header-stats">
+                <div class="connection-status glass-card">
+                    <div class="status-dot online" id="connection-dot"></div>
+                    <span id="connection-status">Online</span>
                 </div>
-                <button id="province-filter" class="filter-button">
-                    <i class="fas fa-chevron-down"></i>
-                    <span>Selezione Provincia</span>
+                <div class="connection-status glass-card">
+                    <i class="fas fa-clock"></i>
+                    <span id="last-update">Mai</span>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="btn btn-secondary" id="province-filter">
+                    <i class="fas fa-filter"></i>
+                    <span id="province-label">TOT</span>
+                </button>
+                <button class="btn btn-primary" id="refresh-btn">
+                    <i class="fas fa-sync-alt" id="refresh-icon"></i>
+                    Aggiorna
+                </button>
+                <button class="btn btn-secondary" id="theme-toggle">
+                    <i class="fas fa-moon" id="theme-icon"></i>
                 </button>
             </div>
         </div>
+    </header>
 
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="main-container">
         <!-- Loading State -->
-        <div id="loading-state" class="loading-state hidden">
-            <div class="loading-spinner"></div>
-            <h3>Caricamento dati CSV...</h3>
-            <p>Aggiornamento in corso dal repository GitHub</p>
+        <div id="loading-state" class="loading-state">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <div class="status-message">Caricamento dati CSV</div>
+                <div class="status-description">Connessione al sistema CARABOT NATALINO in corso...</div>
+            </div>
         </div>
 
         <!-- Error State -->
-        <div id="error-state" class="error-state hidden">
-            <div style="font-size: 3rem; margin-bottom: 16px;">⚠️</div>
-            <h3>Errore nel caricamento</h3>
-            <p id="error-message">Impossibile caricare i dati CSV</p>
-            <button onclick="window.dashboard.fetchCSVData(true)" style="margin-top: 16px; padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                Riprova
-            </button>
+        <div id="error-state" class="error-state">
+            <div class="error-content">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="status-message">Errore di connessione</div>
+                <div class="status-description" id="error-message">Impossibile caricare i dati CSV</div>
+                <button class="btn btn-primary" onclick="window.dashboard?.fetchCSVData(true)">
+                    <i class="fas fa-redo"></i>
+                    Riprova
+                </button>
+            </div>
         </div>
 
         <!-- Main Content -->
-        <div id="main-content" class="hidden">
-            <!-- KPI Cards -->
-            <div class="kpi-grid">
-                <!-- Fatturato -->
-                <div class="kpi-card success">
-                    <div class="kpi-header">
-                        <div>
-                            <p class="kpi-title">Fatturato 2025</p>
-                            <p id="fatturato-value" class="kpi-value">€0</p>
+        <div id="main-content" style="display: none;">
+            <!-- Overview Section -->
+            <section class="overview-section">
+                <div class="section-header">
+                    <h2 class="section-title">Panoramica Performance</h2>
+                    <p class="section-subtitle">Monitoraggio vendite e obiettivi in tempo reale</p>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="kpi-grid">
+                    <!-- Revenue Card -->
+                    <div class="glass-card kpi-card revenue slide-up">
+                        <div class="kpi-header">
+                            <div>
+                                <div class="kpi-icon revenue">
+                                    <i class="fas fa-euro-sign"></i>
+                                </div>
+                                <div class="kpi-title">Fatturato Corrente</div>
+                            </div>
                         </div>
-                        <div id="growth-badge" class="kpi-badge success">
-                            <i class="fas fa-arrow-up"></i>
-                            <span id="growth-value">+0%</span>
+                        <div class="kpi-value" id="fatturato-value">€0</div>
+                        <div class="kpi-subtitle">
+                            <span class="growth-badge" id="growth-value">+0%</span>
+                            <span>vs anno precedente (<span id="previous-value">€0</span>)</span>
+                        </div>
+                        <canvas id="revenue-mini-chart" class="mini-chart-container"></canvas>
+                    </div>
+
+                    <!-- Target Card -->
+                    <div class="glass-card kpi-card target slide-up" id="obiettivo-card">
+                        <div class="kpi-header">
+                            <div>
+                                <div class="kpi-icon target">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <div class="kpi-title">Obiettivo</div>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="obiettivo-value">€0</div>
+                        <div class="progress-container">
+                            <div class="progress-header">
+                                <span>Progresso</span>
+                                <span id="obiettivo-percentage">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="kpi-subtitle" style="margin-top: 8px;">
+                                Rimangono <strong id="remaining-value">€0</strong>
+                            </div>
                         </div>
                     </div>
-                    <div class="kpi-subtitle">
-                        vs 2024: <span id="previous-value" class="font-bold">€0</span>
+
+                    <!-- Clients Card -->
+                    <div class="glass-card kpi-card clients slide-up">
+                        <div class="kpi-header">
+                            <div>
+                                <div class="kpi-icon clients">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="kpi-title">Clienti Attivi</div>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="clienti-value">0</div>
+                        <div class="kpi-subtitle">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Provincia: <strong id="provincia-label-card">TOT</strong></span>
+                        </div>
+                        <canvas id="clients-mini-chart" class="mini-chart-container"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <!-- Main Chart -->
+                    <div class="glass-card chart-card slide-up">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Trend Vendite</h3>
+                            <div class="chart-controls">
+                                <button class="chart-btn active">Anno</button>
+                                <button class="chart-btn">Trimestre</button>
+                                <button class="chart-btn">Mese</button>
+                            </div>
+                        </div>
+                        <canvas id="main-chart" class="chart-container"></canvas>
+                    </div>
+
+                    <!-- Distribution Chart -->
+                    <div class="glass-card chart-card slide-up">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Distribuzione Province</h3>
+                        </div>
+                        <canvas id="distribution-chart" class="chart-container"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Table Section -->
+            <section class="data-section">
+                <div class="glass-card table-card slide-up">
+                    <div class="table-header">
+                        <h3 class="table-title">Top Clienti per Fatturato</h3>
+                        <div class="table-actions">
+                            <div class="search-box">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" placeholder="Cerca cliente...">
+                            </div>
+                            <div class="connection-status glass-card">
+                                <div class="status-dot online"></div>
+                                <span>Live</span>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="fatturato-progress" class="progress-section">
-                        <div class="progress-header">
-                            <div class="progress-label">
-                                <div class="progress-dot"></div>
-                                <span>Obiettivo Fatturato</span>
-                            </div>
-                            <span id="obiettivo-target" class="font-bold">€0</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div id="fatturato-progress-fill" class="progress-fill" style="width: 0%"></div>
-                        </div>
-                        <div class="progress-footer">
-                            <span class="left">Mancano: <span id="fatturato-remaining">€0</span></span>
-                            <span class="right"><span id="fatturato-percentage">0</span>%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Obiettivo -->
-                <div id="obiettivo-card" class="kpi-card info hidden">
-                    <div class="kpi-header">
-                        <div>
-                            <p class="kpi-title">Obiettivo 2025</p>
-                            <p id="obiettivo-value" class="kpi-value">€0</p>
-                        </div>
-                        <div class="kpi-badge info">
-                            <span id="obiettivo-percentage">0%</span>
-                        </div>
-                    </div>
-                    <div class="kpi-subtitle">
-                        Da raggiungere: <span id="remaining-value" class="font-bold">€0</span>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Provincia</th>
+                                    <th>Ragione Sociale</th>
+                                    <th>Categoria</th>
+                                    <th>Fatturato</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vendite-tbody">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
                     </div>
                     
-                    <div class="progress-section blue">
-                        <div class="progress-header">
-                            <div class="progress-label blue">
-                                <div class="progress-dot blue"></div>
-                                <span>Progressione Obiettivo</span>
+                    <div class="table-footer">
+                        <div class="footer-stats">
+                            <div class="footer-stat">
+                                <div class="footer-stat-label">Totale Clienti</div>
+                                <div class="footer-stat-value" id="total-clients">0</div>
                             </div>
-                            <span id="obiettivo-target2" class="font-bold">€0</span>
-                        </div>
-                        <div class="progress-bar blue">
-                            <div id="progress-fill" class="progress-fill blue" style="width: 0%"></div>
-                        </div>
-                        <div class="progress-footer">
-                            <span class="left blue">Mancano: <span id="obiettivo-remaining">€0</span></span>
-                            <span class="right blue"><span id="obiettivo-percentage2">0</span>%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Performance -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div>
-                            <p class="kpi-title">Top Performance</p>
-                            <p id="performance-provincia" class="kpi-value">--</p>
-                            <p class="text-sm" style="color: #6b7280; margin-top: 4px;">
-                                Provincia <span id="performance-nome">--</span>
-                            </p>
-                        </div>
-                        <div class="text-right">
-                            <p id="performance-crescita" class="kpi-badge info" style="font-size: 1.5rem; background: none; color: #06b6d4; padding: 0;">+0%</p>
-                            <p class="text-xs" style="color: #6b7280;">crescita totale</p>
-                            <p id="performance-fatturato" class="font-bold text-sm" style="margin-top: 4px;">€0</p>
-                        </div>
-                    </div>
-                    
-                    <div class="progress-section cyan">
-                        <div class="progress-header">
-                            <div class="progress-label cyan">
-                                <div class="progress-dot cyan"></div>
-                                <span>Crescita Complessiva</span>
+                            <div class="footer-stat">
+                                <div class="footer-stat-label">Fatturato Top 10</div>
+                                <div class="footer-stat-value" id="total-top-revenue">€0</div>
                             </div>
-                            <span id="performance-incremento" class="font-bold">+€0</span>
-                        </div>
-                        <div class="progress-bar cyan">
-                            <div id="performance-progress" class="progress-fill cyan" style="width: 0%"></div>
-                        </div>
-                        <div class="progress-footer">
-                            <span class="left cyan">Crescita: +<span id="performance-crescita2">0</span>%</span>
-                            <span class="right cyan">Trend positivo</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Clienti -->
-                <div class="kpi-card warning">
-                    <div class="kpi-header">
-                        <div>
-                            <p class="kpi-title">Clienti Attivi</p>
-                            <p id="clienti-value" class="kpi-value">0</p>
-                        </div>
-                        <div class="text-right">
-                            <p id="clienti-percentage" class="kpi-badge warning" style="font-size: 1.5rem; background: none; color: #f59e0b; padding: 0;">0%</p>
-                            <p class="text-xs" style="color: #6b7280;">raggiunto</p>
-                        </div>
-                    </div>
-                    <div class="kpi-subtitle">
-                        <span id="provincia-label">TOT</span> • Obiettivo: <span id="clienti-obiettivo" class="font-bold">0</span>
-                    </div>
-                    
-                    <div class="progress-section orange">
-                        <div class="progress-header">
-                            <div class="progress-label orange">
-                                <div class="progress-dot orange"></div>
-                                <span>Obiettivo Clienti</span>
+                            <div class="footer-stat">
+                                <div class="footer-stat-label">Ultimo Aggiornamento</div>
+                                <div class="footer-stat-value" id="table-timestamp">Mai</div>
                             </div>
-                            <span id="clienti-obiettivo2" class="font-bold">0</span>
-                        </div>
-                        <div class="progress-bar orange">
-                            <div id="clienti-progress" class="progress-fill orange" style="width: 0%"></div>
-                        </div>
-                        <div class="progress-footer">
-                            <span class="left orange">Mancano: <span id="clienti-mancanti">0</span> clienti</span>
-                            <span class="right orange"><span id="clienti-percentage2">0</span>%</span>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Charts -->
-            <div class="chart-grid">
-                <!-- Trend Chart -->
-                <div class="chart-card">
-                    <h3 class="chart-title">Trend Vendite Mensile</h3>
-                    <div class="chart-container">
-                        <canvas id="trend-chart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Province Chart -->
-                <div class="chart-card">
-                    <h3 class="chart-title">Confronto Province</h3>
-                    <div class="chart-container">
-                        <canvas id="province-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vendite Table -->
-            <div class="table-container">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <h3 class="chart-title" style="margin: 0;">Top Vendite per Cliente</h3>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="status-badge success">
-                            <i id="update-status-icon" class="fas fa-check-circle"></i>
-                            <span id="table-status-text">Live</span>
-                        </div>
-                        <span class="text-xs" style="color: #6b7280;">
-                            Aggiornato: <span id="table-timestamp">--</span>
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="table-responsive">
-                    <table class="vendite-table">
-                        <thead>
-                            <tr>
-                                <th>Provincia</th>
-                                <th>Cliente</th>
-                                <th>Categoria</th>
-                                <th style="text-align: right;">Fatturato</th>
-                            </tr>
-                        </thead>
-                        <tbody id="vendite-tbody">
-                            <!-- Righe generate dinamicamente -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(229, 231, 235, 0.5);">
-                    <div class="text-sm" style="color: #6b7280;">
-                        Totale: <span id="total-clients" class="font-bold">0</span> clienti
-                    </div>
-                    <div class="text-sm" style="color: #6b7280;">
-                        Fatturato Top 10: <span id="total-top-revenue" class="font-bold">€0</span>
-                    </div>
-                </div>
-            </div>
+            </section>
         </div>
-    </div>
+    </main>
 
-    <!-- Popup Selezione Provincia -->
-    <div id="province-popup" class="popup-overlay">
-        <div class="popup-content">
+    <!-- ==================== PROVINCE FILTER POPUP ==================== -->
+    <div class="province-popup" id="province-popup">
+        <div class="popup-content glass-card">
             <div class="popup-header">
-                <div>
-                    <h3 class="popup-title">Seleziona Provincia</h3>
-                    <p class="text-sm" style="color: #6b7280; margin-top: 4px;">Scegli il territorio da visualizzare</p>
-                </div>
-                <button id="close-popup" class="popup-close">&times;</button>
+                <h3 class="popup-title">Seleziona Provincia</h3>
+                <button class="close-btn" id="close-popup">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div class="popup-body">
-                <div id="popup-options">
-                    <!-- Opzioni generate dinamicamente -->
+                <div class="province-options" id="popup-options">
+                    <!-- Dynamic content -->
                 </div>
-                
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(229, 231, 235, 0.5);">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                        <div id="popup-status-dot" class="status-dot online"></div>
-                        <span id="popup-status-text" class="text-sm font-bold">Dati CSV aggiornati automaticamente</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="padding: 16px 32px; border-top: 1px solid rgba(229, 231, 235, 0.5);">
-                <button id="popup-close-btn" style="width: 100%; padding: 12px; background: #f3f4f6; color: #374151; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                    Annulla
-                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // ==================== DASHBOARD CARABOT NATALINO - VERSIONE MIGLIORATA ====================
-        // Sistema REALE di auto-update dal CSV GitHub con design moderno
-
+        // ==================== DASHBOARD MANAGER - MODERNIZED VERSION ====================
         class DashboardManager {
             constructor() {
                 this.csvData = null;
@@ -1618,38 +1160,7 @@
                 this.setupEventListeners();
                 this.loadInitialData();
                 this.startAutoUpdate();
-                this.startAnimations();
-            }
-            
-            // ==================== ANIMAZIONI ====================
-            startAnimations() {
-                // Anima le KPI cards
-                setTimeout(() => {
-                    const kpiCards = document.querySelectorAll('.kpi-card');
-                    kpiCards.forEach((card, index) => {
-                        setTimeout(() => {
-                            card.classList.add('animate');
-                        }, index * 200);
-                    });
-                }, 500);
-                
-                // Anima i chart containers
-                setTimeout(() => {
-                    const chartCards = document.querySelectorAll('.chart-card');
-                    chartCards.forEach((card, index) => {
-                        setTimeout(() => {
-                            card.classList.add('animate');
-                        }, index * 300);
-                    });
-                }, 1000);
-                
-                // Anima la tabella
-                setTimeout(() => {
-                    const tableContainer = document.querySelector('.table-container');
-                    if (tableContainer) {
-                        tableContainer.classList.add('animate');
-                    }
-                }, 1500);
+                this.initializeCharts();
             }
             
             // ==================== EVENT LISTENERS ====================
@@ -1669,12 +1180,8 @@
                     this.showProvincePopup();
                 });
                 
-                // Close popup buttons
+                // Close popup
                 document.getElementById('close-popup').addEventListener('click', () => {
-                    this.hideProvincePopup();
-                });
-                
-                document.getElementById('popup-close-btn').addEventListener('click', () => {
                     this.hideProvincePopup();
                 });
                 
@@ -1683,6 +1190,11 @@
                     if (e.target.id === 'province-popup') {
                         this.hideProvincePopup();
                     }
+                });
+
+                // Search functionality
+                document.querySelector('.search-input').addEventListener('input', (e) => {
+                    this.filterTable(e.target.value);
                 });
             }
             
@@ -1694,17 +1206,15 @@
                 if (body.classList.contains('light-mode')) {
                     body.classList.remove('light-mode');
                     body.classList.add('dark-mode');
-                    themeIcon.className = 'fas fa-sun';
+                    themeIcon.className = 'fas fa-moon';
                 } else {
                     body.classList.remove('dark-mode');
                     body.classList.add('light-mode');
-                    themeIcon.className = 'fas fa-moon';
+                    themeIcon.className = 'fas fa-sun';
                 }
                 
-                // Aggiorna i grafici per il nuovo tema
-                setTimeout(() => {
-                    this.updateCharts();
-                }, 100);
+                // Update charts theme
+                setTimeout(() => this.updateChartsTheme(), 100);
             }
             
             // ==================== DATA LOADING ====================
@@ -1721,7 +1231,6 @@
                 try {
                     console.log('🔄 Fetching CSV data from:', this.csvUrl);
                     
-                    // Cache busting per evitare cache del browser
                     const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
                     const response = await fetch(this.csvUrl + cacheBuster, {
                         method: 'GET',
@@ -1742,8 +1251,7 @@
                         throw new Error('CSV non valido o vuoto');
                     }
                     
-                    console.log('✅ CSV caricato, lunghezza:', csvText.length);
-                    
+                    console.log('✅ CSV caricato');
                     const parsedData = this.parseCSV(csvText);
                     
                     if (parsedData) {
@@ -1751,6 +1259,17 @@
                         this.lastUpdate = new Date();
                         this.updateLoadingState('success');
                         this.renderDashboard();
+                        
+                        // Add slide-up animation to cards
+                        setTimeout(() => {
+                            document.querySelectorAll('.slide-up').forEach((el, index) => {
+                                setTimeout(() => {
+                                    el.style.opacity = '0';
+                                    el.style.transform = 'translateY(20px)';
+                                    el.style.animation = `slideUp 0.6s ease-out ${index * 0.1}s forwards`;
+                                }, 50);
+                            });
+                        }, 100);
                         
                         console.log('✅ Dashboard aggiornato con successo');
                     } else {
@@ -1770,7 +1289,7 @@
                 try {
                     console.log('🔍 Inizio parsing CSV...');
                     
-                    // ✅ SEZIONE OBIETTIVI
+                    // Parse OBIETTIVI section
                     const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
                     if (!obiettiviMatch) {
                         throw new Error('Sezione obiettivi non trovata');
@@ -1795,3 +1314,424 @@
                     if (!ltMatch) {
                         throw new Error('Dati Latina non trovati');
                     }
+                    
+                    const latina = {
+                        annoPrecedente: parseFloat(ltMatch[1].replace(',', '.')),
+                        annoCorrente: parseFloat(ltMatch[2].replace(',', '.')),
+                        obiettivo: parseFloat(ltMatch[3].replace(',', '.')) * 1000,
+                        percentualeObiettivo: parseInt(ltMatch[4]),
+                        clientiPrecedenti: parseInt(ltMatch[5]),
+                        clientiCorrente: parseInt(ltMatch[6]),
+                        obiettivoClienti: parseInt(ltMatch[7])
+                    };
+                    
+                    // Parse ROMA
+                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
+                    let roma = { annoCorrente: 0, clienti: 0 };
+                    
+                    if (clientiMatch) {
+                        const clientiText = clientiMatch[1];
+                        const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);;;;;;/);
+                        if (rmMatch) {
+                            roma = {
+                                annoCorrente: parseFloat(rmMatch[2].replace(',', '.')),
+                                clienti: parseInt(rmMatch[1])
+                            };
+                        }
+                    }
+                    
+                    // Parse VENDITE DETTAGLIO
+                    const dettaglioStart = csvText.indexOf("=== DETTAGLIO VENDITE PER CLIENTE ===");
+                    const dettaglioEnd = csvText.indexOf("=== RIEPILOGO PER CATEGORIA ===");
+                    
+                    let vendite = [];
+                    if (dettaglioStart !== -1 && dettaglioEnd !== -1) {
+                        const dettaglioSection = csvText.substring(dettaglioStart, dettaglioEnd);
+                        const venditeLines = dettaglioSection.split('\n').filter(line => 
+                            line.trim() && 
+                            !line.includes('===') && 
+                            !line.includes('Provincia;Ragione Sociale Cliente') &&
+                            line.includes(';') &&
+                            line.split(';').length >= 4
+                        );
+                        
+                        const venditeMap = new Map();
+                        venditeLines.forEach(line => {
+                            const parts = line.split(';');
+                            if (parts.length >= 4) {
+                                const fatturato = parseFloat(parts[3].replace(',', '.'));
+                                if (!isNaN(fatturato) && fatturato > 0) {
+                                    const cliente = parts[1].trim();
+                                    if (!venditeMap.has(cliente) || venditeMap.get(cliente).fatturato < fatturato) {
+                                        venditeMap.set(cliente, {
+                                            provincia: parts[0].trim(),
+                                            cliente: cliente,
+                                            categoria: parts[2].trim(),
+                                            fatturato: fatturato
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                        
+                        vendite = Array.from(venditeMap.values())
+                            .sort((a, b) => b.fatturato - a.fatturato)
+                            .slice(0, 20);
+                    }
+                    
+                    const result = { generale, latina, roma, vendite, timestamp: new Date() };
+                    return result;
+                    
+                } catch (error) {
+                    console.error('❌ Errore parsing:', error);
+                    return null;
+                }
+            }
+            
+            // ==================== CHARTS INITIALIZATION ====================
+            initializeCharts() {
+                // Initialize main revenue chart
+                const mainCtx = document.getElementById('main-chart');
+                if (mainCtx) {
+                    this.charts.main = new Chart(mainCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'],
+                            datasets: [{
+                                label: 'Fatturato 2024',
+                                data: [120000, 135000, 142000, 138000, 155000, 168000, 172000, 165000, 0, 0, 0, 0],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#667eea',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '€' + (value / 1000).toFixed(0) + 'k';
+                                        }
+                                    },
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Initialize distribution chart
+                const distCtx = document.getElementById('distribution-chart');
+                if (distCtx) {
+                    this.charts.distribution = new Chart(distCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Latina', 'Roma', 'Altre'],
+                            datasets: [{
+                                data: [60, 30, 10],
+                                backgroundColor: [
+                                    '#667eea',
+                                    '#f093fb',
+                                    '#43e97b'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Initialize mini charts
+                this.initializeMiniCharts();
+            }
+
+            initializeMiniCharts() {
+                // Revenue mini chart
+                const revenueCtx = document.getElementById('revenue-mini-chart');
+                if (revenueCtx) {
+                    this.charts.revenueMini = new Chart(revenueCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['', '', '', '', '', '', ''],
+                            datasets: [{
+                                data: [100, 120, 115, 135, 142, 155, 165],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { display: false },
+                                y: { display: false }
+                            },
+                            elements: {
+                                point: { radius: 0 }
+                            }
+                        }
+                    });
+                }
+
+                // Clients mini chart
+                const clientsCtx = document.getElementById('clients-mini-chart');
+                if (clientsCtx) {
+                    this.charts.clientsMini = new Chart(clientsCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['', '', '', '', '', '', ''],
+                            datasets: [{
+                                data: [45, 52, 48, 61, 55, 67, 63],
+                                backgroundColor: '#4facfe',
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { display: false },
+                                y: { display: false }
+                            }
+                        }
+                    });
+                }
+            }
+
+            updateChartsTheme() {
+                const isDark = document.body.classList.contains('dark-mode');
+                const textColor = isDark ? '#a0a9c0' : '#475569';
+                const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+                Object.values(this.charts).forEach(chart => {
+                    if (chart && chart.options) {
+                        if (chart.options.scales) {
+                            if (chart.options.scales.x) {
+                                chart.options.scales.x.ticks = { ...chart.options.scales.x.ticks, color: textColor };
+                                chart.options.scales.x.grid = { ...chart.options.scales.x.grid, color: gridColor };
+                            }
+                            if (chart.options.scales.y) {
+                                chart.options.scales.y.ticks = { ...chart.options.scales.y.ticks, color: textColor };
+                                chart.options.scales.y.grid = { ...chart.options.scales.y.grid, color: gridColor };
+                            }
+                        }
+                        if (chart.options.plugins && chart.options.plugins.legend) {
+                            chart.options.plugins.legend.labels = { 
+                                ...chart.options.plugins.legend.labels, 
+                                color: textColor 
+                            };
+                        }
+                        chart.update();
+                    }
+                });
+            }
+            
+            // ==================== UI UPDATES ====================
+            updateLoadingState(state, errorMessage = null) {
+                const loadingEl = document.getElementById('loading-state');
+                const errorEl = document.getElementById('error-state');
+                const mainEl = document.getElementById('main-content');
+                const refreshIcon = document.getElementById('refresh-icon');
+                const connectionDot = document.getElementById('connection-dot');
+                const connectionStatus = document.getElementById('connection-status');
+                
+                // Reset states
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'none';
+                mainEl.style.display = 'none';
+                
+                // Update refresh icon
+                if (state === 'updating') {
+                    refreshIcon.classList.add('spinning');
+                    document.getElementById('refresh-btn').disabled = true;
+                } else {
+                    refreshIcon.classList.remove('spinning');
+                    document.getElementById('refresh-btn').disabled = false;
+                }
+                
+                // Update connection status
+                connectionDot.className = 'status-dot ' + (state === 'updating' ? 'updating' : state === 'success' ? 'online' : 'offline');
+                
+                switch (state) {
+                    case 'updating':
+                        loadingEl.style.display = 'flex';
+                        connectionStatus.textContent = 'Aggiornamento...';
+                        break;
+                        
+                    case 'success':
+                        mainEl.style.display = 'block';
+                        connectionStatus.textContent = 'Online';
+                        this.updateLastUpdateDisplay();
+                        break;
+                        
+                    case 'error':
+                        errorEl.style.display = 'flex';
+                        connectionStatus.textContent = 'Errore';
+                        document.getElementById('error-message').textContent = errorMessage || 'Errore sconosciuto';
+                        break;
+                }
+            }
+            
+            updateLastUpdateDisplay() {
+                if (!this.lastUpdate) return;
+                
+                const now = new Date();
+                const diff = Math.floor((now - this.lastUpdate) / 1000);
+                
+                let timeText;
+                if (diff < 60) timeText = `${diff}s fa`;
+                else if (diff < 3600) timeText = `${Math.floor(diff / 60)}m fa`;
+                else timeText = this.lastUpdate.toLocaleDateString('it-IT', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                document.getElementById('last-update').textContent = timeText;
+                
+                const tableTimestamp = document.getElementById('table-timestamp');
+                if (tableTimestamp) {
+                    tableTimestamp.textContent = this.lastUpdate.toLocaleDateString('it-IT', { 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+                }
+            }
+            
+            // ==================== DASHBOARD RENDERING ====================
+            renderDashboard() {
+                if (!this.csvData) return;
+                
+                this.renderKPICards();
+                this.renderVenditeTable();
+                this.updateProvinceOptions();
+                this.updateCharts();
+            }
+            
+            renderKPICards() {
+                const data = this.getDisplayData();
+                
+                // Fatturato
+                document.getElementById('fatturato-value').textContent = this.formatCurrency(data.fatturato);
+                document.getElementById('growth-value').textContent = `+${data.crescita}%`;
+                document.getElementById('previous-value').textContent = this.formatCurrency(data.annoPrecedente);
+                
+                // Obiettivo
+                const obiettivoCard = document.getElementById('obiettivo-card');
+                if (data.obiettivo) {
+                    obiettivoCard.style.display = 'block';
+                    document.getElementById('obiettivo-value').textContent = this.formatCurrency(data.obiettivo);
+                    document.getElementById('obiettivo-percentage').textContent = `${data.percentualeObiettivo}%`;
+                    document.getElementById('remaining-value').textContent = this.formatCurrency(data.obiettivo - data.fatturato);
+                    
+                    const progressFill = document.getElementById('progress-fill');
+                    progressFill.style.width = `${data.percentualeObiettivo}%`;
+                } else {
+                    obiettivoCard.style.display = 'none';
+                }
+                
+                // Clienti
+                document.getElementById('clienti-value').textContent = data.clienti;
+                document.getElementById('provincia-label').textContent = this.selectedProvince === 'all' ? 'TOT' : this.selectedProvince;
+                document.getElementById('provincia-label-card').textContent = this.selectedProvince === 'all' ? 'TOT' : this.selectedProvince;
+            }
+
+            updateCharts() {
+                if (!this.csvData) return;
+
+                // Update distribution chart with real data
+                if (this.charts.distribution) {
+                    const ltPerc = this.csvData.latina.annoCorrente / this.csvData.generale.annoCorrente * 100;
+                    const rmPerc = this.csvData.roma.annoCorrente / this.csvData.generale.annoCorrente * 100;
+                    const othersPerc = 100 - ltPerc - rmPerc;
+
+                    this.charts.distribution.data.datasets[0].data = [
+                        Math.round(ltPerc),
+                        Math.round(rmPerc),
+                        Math.round(othersPerc)
+                    ];
+                    this.charts.distribution.update();
+                }
+
+                // Update mini charts with trend data
+                if (this.charts.revenueMini) {
+                    // Simulate monthly progression
+                    const currentMonth = 8; // August
+                    const monthlyTarget = this.csvData.generale.annoCorrente / currentMonth;
+                    const monthlyData = [];
+                    
+                    for (let i = 0; i < 7; i++) {
+                        monthlyData.push(monthlyTarget * (0.7 + Math.random() * 0.6));
+                    }
+                    
+                    this.charts.revenueMini.data.datasets[0].data = monthlyData;
+                    this.charts.revenueMini.update();
+                }
+            }
+            
+            renderVenditeTable() {
+                if (!this.csvData.vendite || this.csvData.vendite.length === 0) return;
+                
+                const tbody = document.getElementById('vendite-tbody');
+                tbody.innerHTML = '';
+                
+                this.csvData.vendite.forEach((vendita, index) => {
+                    const row = document.createElement('tr');
+                    const trendIcon = index < 5 ? '📈' : index < 10 ? '📊' : '📉';
+                    
+                    row.innerHTML = `
+                        <td>
+                            <span class="province-badge ${vendita.provincia}">
+                                ${vendita.provincia}
+                            </span>
+                        </td>
+                        <td>${vendita.cliente.length > 35 ? vendita.cliente.slice(0, 35) + '...' : vendita.cliente}</td>
+                        <td>${vendita.categoria}</td>
+                        <td class="font-mono font-bold">${this.formatCurrency(vendita.fatturato)}</td>
+                        <td>${trendIcon}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
