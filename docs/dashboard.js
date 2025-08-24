@@ -157,9 +157,9 @@ class DashboardManager {
             }
             
             const generale = {
-                annoPrecedente: parseFloat(generaleMatch[1].replace(',', '.')),
-                annoCorrente: parseFloat(generaleMatch[2].replace(',', '.')),
-                clienti: parseInt(generaleMatch[4])
+                annoPrecedente: this.parseNumber(generaleMatch[1]),
+                annoCorrente:   this.parseNumber(generaleMatch[2]),
+                clienti:        parseInt(generaleMatch[4], 10)
             };
             
             console.log('🌍 GENERALE:', generale);
@@ -170,14 +170,17 @@ class DashboardManager {
                 throw new Error('Dati Latina non trovati');
             }
             
+            const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
+            const latinaObiettivoEuro = latinaObiettivoRaw * 1000; // Converti in euro se il CSV è in "migliaia"
+            
             const latina = {
-                annoPrecedente: parseFloat(ltMatch[1].replace(',', '.')),
-                annoCorrente: parseFloat(ltMatch[2].replace(',', '.')),
-                obiettivo: parseFloat(ltMatch[3].replace(',', '.')) * 1000, // Converti in euro
-                percentualeObiettivo: parseInt(ltMatch[4]),
-                clientiPrecedenti: parseInt(ltMatch[5]),
-                clientiCorrente: parseInt(ltMatch[6]),
-                obiettivoClienti: parseInt(ltMatch[7])
+                annoPrecedente:       this.parseNumber(ltMatch[1]),
+                annoCorrente:         this.parseNumber(ltMatch[2]),
+                obiettivo:            latinaObiettivoEuro,
+                percentualeObiettivo: parseInt(ltMatch[4], 10),
+                clientiPrecedenti:    parseInt(ltMatch[5], 10),
+                clientiCorrente:      parseInt(ltMatch[6], 10),
+                obiettivoClienti:     parseInt(ltMatch[7], 10)
             };
             
             console.log('🏛️ LATINA:', latina);
@@ -191,8 +194,8 @@ class DashboardManager {
                 const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);;;;;;/);
                 if (rmMatch) {
                     roma = {
-                        annoCorrente: parseFloat(rmMatch[2].replace(',', '.')),
-                        clienti: parseInt(rmMatch[1])
+                        annoCorrente: this.parseNumber(rmMatch[2]),
+                        clienti:      parseInt(rmMatch[1], 10)
                     };
                     console.log('🏛️ ROMA:', roma);
                 }
@@ -217,7 +220,7 @@ class DashboardManager {
                 venditeLines.forEach(line => {
                     const parts = line.split(';');
                     if (parts.length >= 4) {
-                        const fatturato = parseFloat(parts[3].replace(',', '.'));
+                        const fatturato = this.parseNumber(parts[3]);
                         if (!isNaN(fatturato) && fatturato > 0) {
                             const cliente = parts[1].trim();
                             if (!venditeMap.has(cliente) || venditeMap.get(cliente).fatturato < fatturato) {
@@ -343,7 +346,7 @@ class DashboardManager {
     renderKPICards() {
         const data = this.getDisplayData();
         
-        // Fatturato
+        // Fatturato (rimane in EUR pieno)
         document.getElementById('fatturato-value').textContent = this.formatCurrency(data.fatturato);
         document.getElementById('growth-value').textContent = `+${data.crescita}%`;
         document.getElementById('previous-value').textContent = this.formatCurrency(data.annoPrecedente);
@@ -424,7 +427,7 @@ class DashboardManager {
         // Tutte le province
         const allOption = this.createProvinceOption('all', {
             title: 'Tutte le Province',
-            description: `${this.formatCompactCurrency(this.csvData.generale.annoCorrente)} • ${this.csvData.generale.clienti} clienti`,
+            description: `${this.formatK3(this.csvData.generale.annoCorrente)} • ${this.csvData.generale.clienti} clienti`,
             className: ''
         });
         popupOptions.appendChild(allOption);
@@ -432,7 +435,7 @@ class DashboardManager {
         // Latina
         const ltOption = this.createProvinceOption('LT', {
             title: 'Latina (LT)',
-            description: `${this.formatCompactCurrency(this.csvData.latina.annoCorrente)} • ${this.csvData.latina.clientiCorrente} clienti • Obiettivo: ${this.csvData.latina.percentualeObiettivo}%`,
+            description: `${this.formatK3(this.csvData.latina.annoCorrente)} • ${this.csvData.latina.clientiCorrente} clienti • Obiettivo: ${this.csvData.latina.percentualeObiettivo}%`,
             className: 'LT'
         });
         popupOptions.appendChild(ltOption);
@@ -440,7 +443,7 @@ class DashboardManager {
         // Roma
         const rmOption = this.createProvinceOption('RM', {
             title: 'Roma (RM)',
-            description: `${this.formatCompactCurrency(this.csvData.roma.annoCorrente)} • ${this.csvData.roma.clienti} clienti`,
+            description: `${this.formatK3(this.csvData.roma.annoCorrente)} • ${this.csvData.roma.clienti} clienti`,
             className: 'RM'
         });
         popupOptions.appendChild(rmOption);
@@ -486,19 +489,25 @@ class DashboardManager {
         }
         
         if (this.selectedProvince === 'all') {
+            const prev = this.csvData.generale.annoPrecedente || 0;
+            const curr = this.csvData.generale.annoCorrente || 0;
+            const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : 0;
             return {
-                fatturato: this.csvData.generale.annoCorrente,
-                annoPrecedente: this.csvData.generale.annoPrecedente,
-                crescita: ((this.csvData.generale.annoCorrente - this.csvData.generale.annoPrecedente) / this.csvData.generale.annoPrecedente * 100).toFixed(1),
+                fatturato: curr,
+                annoPrecedente: prev,
+                crescita,
                 clienti: this.csvData.generale.clienti,
                 obiettivo: null,
                 percentualeObiettivo: null
             };
         } else if (this.selectedProvince === 'LT') {
+            const prev = this.csvData.latina.annoPrecedente || 0;
+            const curr = this.csvData.latina.annoCorrente || 0;
+            const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : 0;
             return {
-                fatturato: this.csvData.latina.annoCorrente,
-                annoPrecedente: this.csvData.latina.annoPrecedente,
-                crescita: ((this.csvData.latina.annoCorrente - this.csvData.latina.annoPrecedente) / this.csvData.latina.annoPrecedente * 100).toFixed(1),
+                fatturato: curr,
+                annoPrecedente: prev,
+                crescita,
                 clienti: this.csvData.latina.clientiCorrente,
                 obiettivo: this.csvData.latina.obiettivo,
                 percentualeObiettivo: this.csvData.latina.percentualeObiettivo
@@ -518,19 +527,67 @@ class DashboardManager {
     }
     
     // ==================== UTILITY FUNCTIONS ====================
+    // Parser robusto per numeri in formato italiano: "123.456,78" -> 123456.78
+    parseNumber(input) {
+        if (typeof input === 'number') return input;
+        if (input === null || input === undefined) return 0;
+        const cleaned = String(input)
+            .replace(/\s+/g, '')    // spazi
+            .replace(/€/g, '')      // simbolo euro
+            .replace(/\./g, '')     // punto (migliaia)
+            .replace(/,/g, '.');    // virgola (decimali)
+        const n = Number(cleaned);
+        return Number.isFinite(n) ? n : 0;
+    }
+
+    // Formattatore EUR completo (per KPI e tabella vendite)
     formatCurrency(value) {
         return new Intl.NumberFormat('it-IT', { 
             style: 'currency', 
             currency: 'EUR', 
             minimumFractionDigits: 0, 
             maximumFractionDigits: 0 
-        }).format(value);
+        }).format(value || 0);
     }
     
+    // Compatto classico (lasciato per eventuale uso altrove)
     formatCompactCurrency(value) {
-        if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
-        if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
-        return this.formatCurrency(value);
+        const v = Number(value) || 0;
+        if (v >= 1_000_000) return `€${(v / 1_000_000).toFixed(1)}M`;
+        if (v >= 1_000)    return `€${(v / 1_000).toFixed(0)}k`;
+        return this.formatCurrency(v);
+    }
+
+    // ==================== NUOVO: "k" con max 3 cifre ====================
+    // Esempi: 987  -> "1k"; 1.234 -> "1,23k"; 12.345 -> "12,3k"; 123.456 -> "123k"; 1.234.567 -> "1.235k"
+    // Regole: sempre in "migliaia", con 2/1/0 decimali per mantenere max 3 cifre significative.
+    formatK3(value) {
+        const num = Number(value) || 0;
+        const sign = num < 0 ? '-' : '';
+        const v = Math.abs(num);
+        const k = v / 1000;
+
+        // Scegli i decimali per avere al massimo 3 cifre significative
+        let outNum;
+        if (k >= 100) {
+            // 100–999 -> intero (es. 123k)
+            outNum = Math.round(k).toString();
+        } else if (k >= 10) {
+            // 10–99.9 -> una cifra decimale (es. 12,3k)
+            outNum = this._formatItDecimals(Math.round(k * 10) / 10, 1);
+        } else {
+            // 0–9.99 -> due cifre decimali (es. 1,23k)
+            outNum = this._formatItDecimals(Math.round(k * 100) / 100, 2);
+        }
+
+        return `${sign}${outNum}k`;
+    }
+
+    // Supporto: converte decimali in stile IT e rimuove zeri finali superflui
+    _formatItDecimals(n, decimals) {
+        const s = n.toFixed(decimals).replace('.', ',');
+        // rimuovi zeri e l'eventuale virgola finale
+        return s.replace(/,?0+$/, '');
     }
     
     // ==================== AUTO UPDATE ====================
