@@ -157,9 +157,9 @@ class DashboardManager {
             }
             
             const generale = {
-                annoPrecedente: parseFloat(generaleMatch[1].replace(',', '.')),
-                annoCorrente: parseFloat(generaleMatch[2].replace(',', '.')),
-                clienti: parseInt(generaleMatch[4])
+                annoPrecedente: this.parseNumber(generaleMatch[1]),
+                annoCorrente:   this.parseNumber(generaleMatch[2]),
+                clienti:        parseInt(generaleMatch[4], 10)
             };
             
             console.log('🌍 GENERALE:', generale);
@@ -170,14 +170,17 @@ class DashboardManager {
                 throw new Error('Dati Latina non trovati');
             }
             
+            const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
+            const latinaObiettivoEuro = latinaObiettivoRaw * 1000; // Converti in euro se il CSV è in "migliaia"
+            
             const latina = {
-                annoPrecedente: parseFloat(ltMatch[1].replace(',', '.')),
-                annoCorrente: parseFloat(ltMatch[2].replace(',', '.')),
-                obiettivo: parseFloat(ltMatch[3].replace(',', '.')) * 1000, // Converti in euro
-                percentualeObiettivo: parseInt(ltMatch[4]),
-                clientiPrecedenti: parseInt(ltMatch[5]),
-                clientiCorrente: parseInt(ltMatch[6]),
-                obiettivoClienti: parseInt(ltMatch[7])
+                annoPrecedente:       this.parseNumber(ltMatch[1]),
+                annoCorrente:         this.parseNumber(ltMatch[2]),
+                obiettivo:            latinaObiettivoEuro,
+                percentualeObiettivo: parseInt(ltMatch[4], 10),
+                clientiPrecedenti:    parseInt(ltMatch[5], 10),
+                clientiCorrente:      parseInt(ltMatch[6], 10),
+                obiettivoClienti:     parseInt(ltMatch[7], 10)
             };
             
             console.log('🏛️ LATINA:', latina);
@@ -191,8 +194,8 @@ class DashboardManager {
                 const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);;;;;;/);
                 if (rmMatch) {
                     roma = {
-                        annoCorrente: parseFloat(rmMatch[2].replace(',', '.')),
-                        clienti: parseInt(rmMatch[1])
+                        annoCorrente: this.parseNumber(rmMatch[2]),
+                        clienti:      parseInt(rmMatch[1], 10)
                     };
                     console.log('🏛️ ROMA:', roma);
                 }
@@ -217,7 +220,7 @@ class DashboardManager {
                 venditeLines.forEach(line => {
                     const parts = line.split(';');
                     if (parts.length >= 4) {
-                        const fatturato = parseFloat(parts[3].replace(',', '.'));
+                        const fatturato = this.parseNumber(parts[3]);
                         if (!isNaN(fatturato) && fatturato > 0) {
                             const cliente = parts[1].trim();
                             if (!venditeMap.has(cliente) || venditeMap.get(cliente).fatturato < fatturato) {
@@ -486,19 +489,25 @@ class DashboardManager {
         }
         
         if (this.selectedProvince === 'all') {
+            const prev = this.csvData.generale.annoPrecedente || 0;
+            const curr = this.csvData.generale.annoCorrente || 0;
+            const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : 0;
             return {
-                fatturato: this.csvData.generale.annoCorrente,
-                annoPrecedente: this.csvData.generale.annoPrecedente,
-                crescita: ((this.csvData.generale.annoCorrente - this.csvData.generale.annoPrecedente) / this.csvData.generale.annoPrecedente * 100).toFixed(1),
+                fatturato: curr,
+                annoPrecedente: prev,
+                crescita,
                 clienti: this.csvData.generale.clienti,
                 obiettivo: null,
                 percentualeObiettivo: null
             };
         } else if (this.selectedProvince === 'LT') {
+            const prev = this.csvData.latina.annoPrecedente || 0;
+            const curr = this.csvData.latina.annoCorrente || 0;
+            const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : 0;
             return {
-                fatturato: this.csvData.latina.annoCorrente,
-                annoPrecedente: this.csvData.latina.annoPrecedente,
-                crescita: ((this.csvData.latina.annoCorrente - this.csvData.latina.annoPrecedente) / this.csvData.latina.annoPrecedente * 100).toFixed(1),
+                fatturato: curr,
+                annoPrecedente: prev,
+                crescita,
                 clienti: this.csvData.latina.clientiCorrente,
                 obiettivo: this.csvData.latina.obiettivo,
                 percentualeObiettivo: this.csvData.latina.percentualeObiettivo
@@ -518,19 +527,33 @@ class DashboardManager {
     }
     
     // ==================== UTILITY FUNCTIONS ====================
+    // Parser robusto per numeri in formato italiano: "123.456,78" -> 123456.78
+    parseNumber(input) {
+        if (typeof input === 'number') return input;
+        if (input === null || input === undefined) return 0;
+        const cleaned = String(input)
+            .replace(/\s+/g, '')    // spazi
+            .replace(/€/g, '')      // simbolo euro
+            .replace(/\./g, '')     // punto (migliaia)
+            .replace(/,/g, '.');    // virgola (decimali)
+        const n = Number(cleaned);
+        return Number.isFinite(n) ? n : 0;
+    }
+
     formatCurrency(value) {
         return new Intl.NumberFormat('it-IT', { 
             style: 'currency', 
             currency: 'EUR', 
             minimumFractionDigits: 0, 
             maximumFractionDigits: 0 
-        }).format(value);
+        }).format(value || 0);
     }
     
     formatCompactCurrency(value) {
-        if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
-        if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
-        return this.formatCurrency(value);
+        const v = Number(value) || 0;
+        if (v >= 1_000_000) return `€${(v / 1_000_000).toFixed(1)}M`;
+        if (v >= 1_000)    return `€${(v / 1_000).toFixed(0)}k`;
+        return this.formatCurrency(v);
     }
     
     // ==================== AUTO UPDATE ====================
