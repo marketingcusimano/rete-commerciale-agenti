@@ -53,6 +53,14 @@ class DashboardManager {
                 this.hideProvincePopup();
             }
         });
+        
+        // Retry button in error state
+        const retryBtn = document.getElementById('retry-btn');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                this.fetchCSVData(true);
+            });
+        }
     }
     
     // ==================== THEME MANAGEMENT ====================
@@ -258,6 +266,7 @@ class DashboardManager {
         const connectionDot = document.getElementById('connection-dot');
         const connectionStatus = document.getElementById('connection-status');
         const statusBadge = document.getElementById('status-badge');
+        const autoUpdateInfo = document.getElementById('auto-update-info');
         
         // Reset states
         loadingEl.style.display = 'none';
@@ -279,25 +288,29 @@ class DashboardManager {
         switch (state) {
             case 'updating':
                 loadingEl.style.display = 'block';
-                connectionStatus.textContent = 'Aggiornamento...';
+                connectionStatus.textContent = 'Aggiornamento in corso...';
                 statusBadge.className = 'status-badge updating';
-                statusBadge.textContent = '🔄 Caricamento dati reali...';
+                statusBadge.innerHTML = '<div class="badge-icon"><i class="fas fa-spinner fa-spin"></i></div><span>🔄 Caricamento dati CSV...</span>';
+                autoUpdateInfo.style.display = 'none';
                 break;
                 
             case 'success':
                 mainEl.style.display = 'block';
-                connectionStatus.textContent = 'Online';
+                connectionStatus.textContent = 'Online - CSV sincronizzato';
                 statusBadge.className = 'status-badge success';
-                statusBadge.textContent = '✅ CSV letto correttamente';
+                statusBadge.innerHTML = '<div class="badge-icon"><i class="fas fa-check-circle"></i></div><span>✅ CSV GitHub collegato</span>';
+                autoUpdateInfo.style.display = 'flex';
                 this.updateLastUpdateDisplay();
+                this.showNotification('Dati aggiornati con successo!', 'Nuovi dati caricati dal CSV GitHub');
                 break;
                 
             case 'error':
                 errorEl.style.display = 'block';
-                connectionStatus.textContent = 'Errore';
+                connectionStatus.textContent = 'Errore di connessione';
                 statusBadge.className = 'status-badge error';
-                statusBadge.textContent = '⚠️ Errore CSV';
-                document.getElementById('error-message').textContent = errorMessage || 'Errore sconosciuto';
+                statusBadge.innerHTML = '<div class="badge-icon"><i class="fas fa-exclamation-triangle"></i></div><span>⚠️ Errore CSV GitHub</span>';
+                autoUpdateInfo.style.display = 'none';
+                document.getElementById('error-message').textContent = errorMessage || 'Impossibile caricare i dati dal CSV GitHub';
                 break;
         }
     }
@@ -515,6 +528,27 @@ class DashboardManager {
         }
         
         return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
+    }
+    
+    // ==================== NOTIFICATION SYSTEM ====================
+    showNotification(title, message) {
+        const toast = document.getElementById('notification-toast');
+        const titleEl = toast.querySelector('h4');
+        const messageEl = toast.querySelector('p');
+        
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        
+        toast.style.display = 'block';
+        
+        // Auto-hide after 4 seconds
+        setTimeout(() => {
+            toast.style.animation = 'toast-slide-out 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+            setTimeout(() => {
+                toast.style.display = 'none';
+                toast.style.animation = '';
+            }, 400);
+        }, 4000);
     }
     
     // ==================== UTILITY FUNCTIONS ====================
