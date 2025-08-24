@@ -3,49 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 CARABOT NATALINO - Dashboard Performance</title>
+    <title>Dashboard CARABOT NATALINO - Auto Update</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <meta name="description" content="Dashboard performance vendite CARABOT NATALINO con auto-update dal CSV GitHub">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="light-mode">
-    <!-- Animated Background Elements -->
-    <div class="bg-decoration bg-decoration-1"></div>
-    <div class="bg-decoration bg-decoration-2"></div>
-    <div class="bg-decoration bg-decoration-3"></div>
-    
     <div id="dashboard-container">
         
-        <!-- NOTIFICATION TOAST -->
-        <div id="notification-toast" class="notification-toast" style="display: none;">
-            <div class="toast-content">
-                <div class="toast-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="toast-text">
-                    <h4>Dati Aggiornati!</h4>
-                    <p>Nuovi dati caricati dal CSV GitHub</p>
-                </div>
-            </div>
-        </div>
-        
         <!-- HEADER -->
-        <header class="dashboard-header glass-card">
+        <header class="dashboard-header">
             <div class="header-content">
                 <div class="agent-info">
-                    <h1 class="gradient-text">CARABOT NATALINO</h1>
-                    <p class="subtitle">Dashboard Performance Vendite • Auto Update dal CSV GitHub</p>
+                    <h1>CARABOT NATALINO</h1>
+                    <p>Dashboard Performance Vendite - Auto Update dal CSV GitHub</p>
                 </div>
                 
                 <div class="header-controls">
-                    <button id="refresh-btn" class="control-btn primary" title="Aggiorna dati">
+                    <button id="refresh-btn" class="control-btn">
                         <i class="fas fa-sync-alt" id="refresh-icon"></i>
                     </button>
-                    <button id="theme-toggle" class="control-btn secondary" title="Cambia tema">
+                    <button id="theme-toggle" class="control-btn">
                         <i class="fas fa-moon" id="theme-icon"></i>
                     </button>
                 </div>
@@ -53,96 +31,48 @@
             
             <div class="status-info">
                 <div class="status-item">
-                    <div class="status-icon">
-                        <i class="fas fa-id-badge"></i>
-                    </div>
-                    <span class="label">ID Agente:</span>
-                    <code class="agent-code">631.00238</code>
+                    <span class="label">ID:</span>
+                    <code>631.00238</code>
                 </div>
-                
                 <div class="status-item">
-                    <div class="status-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <span>Gen - Ago 2025 • 8 mesi</span>
+                    <i class="fas fa-calendar"></i>
+                    <span>Gen - Ago 2025</span>
                 </div>
-                
-                <div class="status-item connection-status">
+                <div class="status-item">
                     <div class="status-dot" id="connection-dot"></div>
-                    <span id="connection-status">Inizializzazione...</span>
+                    <span id="connection-status">Caricamento...</span>
                 </div>
-                
                 <div class="status-item">
-                    <div class="status-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <span>Ultimo: <span id="last-update" class="time-highlight">Mai</span></span>
+                    <span>Ultimo: <span id="last-update">Mai</span></span>
                 </div>
             </div>
             
             <div class="status-bar">
-                <div class="status-section">
-                    <div class="status-badge" id="status-badge">
-                        <div class="badge-icon">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                        <span>🔄 Caricamento dati reali...</span>
-                    </div>
-                    
-                    <div class="auto-update-info" id="auto-update-info" style="display: none;">
-                        <i class="fas fa-bolt"></i>
-                        <span>Prossimo controllo: <span id="next-update">2min</span></span>
-                    </div>
+                <div class="status-badge" id="status-badge">
+                    🔄 Caricamento dati...
                 </div>
-                
                 <button id="province-filter" class="filter-btn">
-                    <div class="filter-icon">
-                        <i class="fas fa-filter"></i>
-                    </div>
+                    <i class="fas fa-filter"></i>
                     <span>Filtro Provincia</span>
-                    <div class="filter-arrow">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
                 </button>
             </div>
         </header>
 
         <!-- LOADING STATE -->
-        <div id="loading-state" class="loading-container glass-card">
+        <div id="loading-state" class="loading-container">
             <div class="loading-content">
-                <div class="loading-animation">
-                    <div class="loading-spinner">
-                        <i class="fas fa-sync-alt"></i>
-                    </div>
-                    <div class="loading-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-                <h3>Caricamento Dashboard</h3>
-                <p>Connessione al CSV GitHub in corso...</p>
-                <div class="loading-progress">
-                    <div class="progress-bar-loading">
-                        <div class="progress-fill-loading"></div>
-                    </div>
-                </div>
+                <i class="fas fa-sync-alt loading-spinner"></i>
+                <p>Caricamento dati REALI dal CSV GitHub...</p>
             </div>
         </div>
 
         <!-- ERROR STATE -->
-        <div id="error-state" class="error-container glass-card" style="display: none;">
+        <div id="error-state" class="error-container" style="display: none;">
             <div class="error-content">
-                <div class="error-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="error-text">
-                    <h3>Errore di Connessione</h3>
-                    <p id="error-message">Impossibile caricare i dati dal CSV GitHub</p>
-                    <button id="retry-btn" class="retry-btn">
-                        <i class="fas fa-redo"></i>
-                        <span>Riprova</span>
-                    </button>
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <h3>Errore di connessione</h3>
+                    <p id="error-message"></p>
                 </div>
             </div>
         </div>
@@ -154,134 +84,80 @@
             <div class="kpi-grid" id="kpi-grid">
                 
                 <!-- Fatturato Card -->
-                <div class="kpi-card glass-card" id="fatturato-card">
+                <div class="kpi-card" id="fatturato-card">
                     <div class="kpi-header">
                         <div class="kpi-info">
-                            <div class="kpi-label">
-                                <i class="fas fa-euro-sign kpi-icon"></i>
-                                <span>Fatturato 2025</span>
-                            </div>
-                            <div class="kpi-value gradient-text" id="fatturato-value">€0</div>
+                            <p class="kpi-label">Fatturato 2025</p>
+                            <p class="kpi-value" id="fatturato-value">€0</p>
                         </div>
-                        <div class="kpi-badge growth-badge">
+                        <div class="kpi-badge">
                             <i class="fas fa-arrow-up"></i>
                             <span id="growth-value">+0%</span>
                         </div>
                     </div>
                     <div class="kpi-footer">
-                        <div class="footer-item">
-                            <i class="fas fa-chart-line"></i>
-                            <span>vs 2024: <strong id="previous-value">€0</strong></span>
-                        </div>
+                        <span>vs 2024: </span>
+                        <span id="previous-value">€0</span>
                     </div>
                 </div>
 
                 <!-- Obiettivo Card (condizionale) -->
-                <div class="kpi-card glass-card" id="obiettivo-card" style="display: none;">
+                <div class="kpi-card" id="obiettivo-card" style="display: none;">
                     <div class="kpi-header">
                         <div class="kpi-info">
-                            <div class="kpi-label">
-                                <i class="fas fa-bullseye kpi-icon"></i>
-                                <span>Obiettivo 2025</span>
-                            </div>
-                            <div class="kpi-value gradient-text" id="obiettivo-value">€0</div>
+                            <p class="kpi-label">Obiettivo 2025</p>
+                            <p class="kpi-value" id="obiettivo-value">€0</p>
                         </div>
                         <div class="kpi-percentage">
-                            <span class="percentage-value" id="obiettivo-percentage">0%</span>
-                            <span class="percentage-label">completato</span>
+                            <span id="obiettivo-percentage">0%</span>
                         </div>
                     </div>
                     <div class="progress-container">
                         <div class="progress-bar">
                             <div class="progress-fill" id="progress-fill"></div>
-                            <div class="progress-glow"></div>
                         </div>
                     </div>
                     <div class="kpi-footer">
-                        <div class="footer-item">
-                            <i class="fas fa-target"></i>
-                            <span>Mancante: <strong id="remaining-value">€0</strong></span>
-                        </div>
+                        <span>Da raggiungere: </span>
+                        <span id="remaining-value">€0</span>
                     </div>
                 </div>
 
                 <!-- Clienti Card -->
-                <div class="kpi-card glass-card" id="clienti-card">
+                <div class="kpi-card" id="clienti-card">
                     <div class="kpi-header">
                         <div class="kpi-info">
-                            <div class="kpi-label">
-                                <i class="fas fa-users kpi-icon"></i>
-                                <span>Clienti Attivi</span>
-                            </div>
-                            <div class="kpi-value gradient-text" id="clienti-value">0</div>
+                            <p class="kpi-label">Clienti Attivi</p>
+                            <p class="kpi-value" id="clienti-value">0</p>
                         </div>
-                        <div class="kpi-badge secondary-badge">
-                            <i class="fas fa-map-marker-alt"></i>
+                        <div class="kpi-badge secondary">
                             <span id="provincia-label">TOT</span>
-                        </div>
-                    </div>
-                    <div class="kpi-footer">
-                        <div class="footer-item">
-                            <i class="fas fa-handshake"></i>
-                            <span>Territorio attivo</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- TOP VENDITE TABLE -->
-            <div class="table-container glass-card" id="table-container">
+            <div class="table-container" id="table-container">
                 <div class="table-header">
-                    <div class="table-title">
-                        <h3 class="gradient-text">
-                            <i class="fas fa-trophy table-icon"></i>
-                            Top Vendite per Cliente
-                        </h3>
-                        <span class="table-subtitle">Dati in tempo reale dal CSV GitHub</span>
-                    </div>
-                    
-                    <div class="table-controls">
-                        <div class="table-info">
-                            <span id="table-update">Aggiornato: <span id="table-timestamp" class="time-highlight">-</span></span>
-                        </div>
-                        <div class="status-badge small live-badge" id="table-status-badge">
-                            <div class="live-indicator">
-                                <span class="live-dot"></span>
-                                <span class="live-pulse"></span>
-                            </div>
-                            <span>LIVE</span>
+                    <h3>Top Vendite per Cliente (Dati Reali CSV)</h3>
+                    <div class="table-status">
+                        <span id="table-update">Aggiornato: <span id="table-timestamp">-</span></span>
+                        <div class="status-badge small" id="table-status-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Live</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="table-wrapper">
-                    <table id="vendite-table" class="modern-table">
+                    <table id="vendite-table">
                         <thead>
                             <tr>
-                                <th>
-                                    <div class="th-content">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>Provincia</span>
-                                    </div>
-                                </th>
-                                <th>
-                                    <div class="th-content">
-                                        <i class="fas fa-building"></i>
-                                        <span>Cliente</span>
-                                    </div>
-                                </th>
-                                <th>
-                                    <div class="th-content">
-                                        <i class="fas fa-tags"></i>
-                                        <span>Categoria</span>
-                                    </div>
-                                </th>
-                                <th class="text-right">
-                                    <div class="th-content">
-                                        <i class="fas fa-euro-sign"></i>
-                                        <span>Fatturato</span>
-                                    </div>
-                                </th>
+                                <th>Provincia</th>
+                                <th>Cliente</th>
+                                <th>Categoria</th>
+                                <th>Fatturato</th>
                             </tr>
                         </thead>
                         <tbody id="vendite-tbody">
@@ -292,44 +168,21 @@
                 
                 <div class="table-footer">
                     <div class="footer-stats">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-info">
-                                <span class="stat-value" id="total-clients">0</span>
-                                <span class="stat-label">Top Clienti</span>
-                            </div>
+                        <div class="stat">
+                            <span class="stat-value" id="total-clients">0</span>
+                            <span class="stat-label">Top Clienti</span>
                         </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-euro-sign"></i>
-                            </div>
-                            <div class="stat-info">
-                                <span class="stat-value" id="total-top-revenue">€0</span>
-                                <span class="stat-label">Fatturato Top</span>
-                            </div>
+                        <div class="stat">
+                            <span class="stat-value" id="total-top-revenue">€0</span>
+                            <span class="stat-label">Fatturato Top</span>
                         </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon status-icon">
-                                <span id="update-status-icon">✅</span>
-                            </div>
-                            <div class="stat-info">
-                                <span class="stat-value">Online</span>
-                                <span class="stat-label">Status CSV</span>
-                            </div>
+                        <div class="stat">
+                            <span class="stat-value" id="update-status-icon">✅</span>
+                            <span class="stat-label">Status</span>
                         </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-bolt"></i>
-                            </div>
-                            <div class="stat-info">
-                                <span class="stat-value">2min</span>
-                                <span class="stat-label">Auto Update</span>
-                            </div>
+                        <div class="stat">
+                            <span class="stat-value">2min</span>
+                            <span class="stat-label">Auto Update</span>
                         </div>
                     </div>
                 </div>
@@ -338,14 +191,11 @@
 
         <!-- PROVINCE FILTER POPUP -->
         <div id="province-popup" class="popup-overlay" style="display: none;">
-            <div class="popup-content glass-card">
+            <div class="popup-content">
                 <div class="popup-header">
-                    <div class="popup-title">
-                        <h3 class="gradient-text">
-                            <i class="fas fa-filter"></i>
-                            Seleziona Provincia
-                        </h3>
-                        <p>Filtra i dati per territorio specifico</p>
+                    <div>
+                        <h3>Seleziona Provincia</h3>
+                        <p>Filtra i dati per territorio</p>
                     </div>
                     <button id="close-popup" class="close-btn">
                         <i class="fas fa-times"></i>
@@ -358,15 +208,10 @@
                 
                 <div class="popup-footer">
                     <div class="popup-status">
-                        <div class="popup-status-indicator">
-                            <div class="status-dot" id="popup-status-dot"></div>
-                            <span id="popup-status-text">Dati CSV aggiornati automaticamente</span>
-                        </div>
+                        <div class="status-dot" id="popup-status-dot"></div>
+                        <span id="popup-status-text">Dati CSV aggiornati automaticamente</span>
                     </div>
-                    <button id="popup-close-btn" class="popup-btn">
-                        <i class="fas fa-check"></i>
-                        <span>Chiudi</span>
-                    </button>
+                    <button id="popup-close-btn" class="popup-btn">Chiudi</button>
                 </div>
             </div>
         </div>
