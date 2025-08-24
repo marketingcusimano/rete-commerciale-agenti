@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard CARABOT NATALINO - Auto Update</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="light-mode">
+    <div id="dashboard-container">
+        
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="agent-info">
+                    <h1>CARABOT NATALINO</h1>
+                    <p>Dashboard Performance Vendite - Auto Update dal CSV GitHub</p>
+                </div>
+                
+                <div class="header-controls">
+                    <button id="refresh-btn" class="control-btn">
+                        <i class="fas fa-sync-alt" id="refresh-icon"></i>
+                    </button>
+                    <button id="theme-toggle" class="control-btn">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="status-info">
+                <div class="status-item">
+                    <span class="label">ID:</span>
+                    <code>631.00238</code>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Gen - Ago 2025</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot" id="connection-dot"></div>
+                    <span id="connection-status">Caricamento...</span>
+                </div>
+                <div class="status-item">
+                    <span>Ultimo: <span id="last-update">Mai</span></span>
+                </div>
+            </div>
+            
+            <div class="status-bar">
+                <div class="status-badge" id="status-badge">
+                    🔄 Caricamento dati...
+                </div>
+                <button id="province-filter" class="filter-btn">
+                    <i class="fas fa-filter"></i>
+                    <span>Filtro Provincia</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- LOADING STATE -->
+        <div id="loading-state" class="loading-container">
+            <div class="loading-content">
+                <i class="fas fa-sync-alt loading-spinner"></i>
+                <p>Caricamento dati REALI dal CSV GitHub...</p>
+            </div>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div id="error-state" class="error-container" style="display: none;">
+            <div class="error-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <h3>Errore di connessione</h3>
+                    <p id="error-message"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div id="main-content" style="display: none;">
+            
+            <!-- KPI CARDS -->
+            <div class="kpi-grid" id="kpi-grid">
+                
+                <!-- Fatturato Card -->
+                <div class="kpi-card" id="fatturato-card">
+                    <div class="kpi-header">
+                        <div class="kpi-info">
+                            <p class="kpi-label">Fatturato 2025</p>
+                            <p class="kpi-value" id="fatturato-value">€0</p>
+                        </div>
+                        <div class="kpi-badge">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="growth-value">+0%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-footer">
+                        <span>vs 2024: </span>
+                        <span id="previous-value">€0</span>
+                    </div>
+                </div>
+
+                <!-- Obiettivo Card (condizionale) -->
+                <div class="kpi-card" id="obiettivo-card" style="display: none;">
+                    <div class="kpi-header">
+                        <div class="kpi-info">
+                            <p class="kpi-label">Obiettivo 2025</p>
+                            <p class="kpi-value" id="obiettivo-value">€0</p>
+                        </div>
+                        <div class="kpi-percentage">
+                            <span id="obiettivo-percentage">0%</span>
+                        </div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-footer">
+                        <span>Da raggiungere: </span>
+                        <span id="remaining-value">€0</span>
+                    </div>
+                </div>
+
+                <!-- Clienti Card -->
+                <div class="kpi-card" id="clienti-card">
+                    <div class="kpi-header">
+                        <div class="kpi-info">
+                            <p class="kpi-label">Clienti Attivi</p>
+                            <p class="kpi-value" id="clienti-value">0</p>
+                        </div>
+                        <div class="kpi-badge secondary">
+                            <span id="provincia-label">TOT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOP VENDITE TABLE -->
+            <div class="table-container" id="table-container">
+                <div class="table-header">
+                    <h3>Top Vendite per Cliente (Dati Reali CSV)</h3>
+                    <div class="table-status">
+                        <span id="table-update">Aggiornato: <span id="table-timestamp">-</span></span>
+                        <div class="status-badge small" id="table-status-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Live</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table id="vendite-table">
+                        <thead>
+                            <tr>
+                                <th>Provincia</th>
+                                <th>Cliente</th>
+                                <th>Categoria</th>
+                                <th>Fatturato</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendite-tbody">
+                            <!-- Popolato dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="table-footer">
+                    <div class="footer-stats">
+                        <div class="stat">
+                            <span class="stat-value" id="total-clients">0</span>
+                            <span class="stat-label">Top Clienti</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="total-top-revenue">€0</span>
+                            <span class="stat-label">Fatturato Top</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="update-status-icon">✅</span>
+                            <span class="stat-label">Status</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">2min</span>
+                            <span class="stat-label">Auto Update</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROVINCE FILTER POPUP -->
+        <div id="province-popup" class="popup-overlay" style="display: none;">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <div>
+                        <h3>Seleziona Provincia</h3>
+                        <p>Filtra i dati per territorio</p>
+                    </div>
+                    <button id="close-popup" class="close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="popup-body" id="popup-options">
+                    <!-- Popolato dinamicamente -->
+                </div>
+                
+                <div class="popup-footer">
+                    <div class="popup-status">
+                        <div class="status-dot" id="popup-status-dot"></div>
+                        <span id="popup-status-text">Dati CSV aggiornati automaticamente</span>
+                    </div>
+                    <button id="popup-close-btn" class="popup-btn">Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
