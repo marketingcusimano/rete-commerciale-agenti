@@ -4,8 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard CARABOT NATALINO - Auto Update</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        // Fallback se Chart.js non si carica
+        window.addEventListener('load', function() {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js failed to load - loading fallback');
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
+                document.head.appendChild(script);
+            }
+        });
+    </script>
     <style>
         /* ==================== VARIABLES ==================== */
         :root {
@@ -119,7 +130,7 @@
           transform: none;
         }
 
-        .control-btn i.fa-sync-alt.spinning {
+        .spinning {
           animation: spin 1s linear infinite;
         }
 
@@ -143,16 +154,11 @@
           font-size: 0.875rem;
         }
 
-        .status-item .label {
-          color: var(--text-secondary);
-        }
-
         .status-item code {
           background: rgba(107, 114, 128, 0.1);
           padding: 0.25rem 0.5rem;
           border-radius: 0.375rem;
           font-family: 'Monaco', 'Consolas', monospace;
-          font-size: 0.875rem;
         }
 
         .status-dot {
@@ -186,7 +192,6 @@
           border-radius: 9999px;
           font-size: 0.75rem;
           font-weight: 600;
-          transition: all 0.3s ease;
         }
 
         .status-badge.success {
@@ -242,12 +247,6 @@
           animation: spin 1s linear infinite;
         }
 
-        .loading-content p, .error-content p {
-          font-size: 1.125rem;
-          font-weight: 500;
-          color: var(--text-primary);
-        }
-
         .error-content {
           display: flex;
           align-items: center;
@@ -258,12 +257,6 @@
         .error-content i {
           font-size: 1.5rem;
           color: #ef4444;
-        }
-
-        .error-content h3 {
-          font-weight: 700;
-          color: #ef4444;
-          margin-bottom: 0.25rem;
         }
 
         /* ==================== KPI CARDS ==================== */
@@ -282,24 +275,6 @@
           box-shadow: var(--shadow);
           padding: 2rem;
           transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .kpi-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: linear-gradient(90deg, var(--primary-blue), var(--primary-violet));
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        .kpi-card:hover::before {
-          opacity: 1;
         }
 
         .kpi-header {
@@ -321,7 +296,6 @@
           font-weight: 800;
           color: var(--text-primary);
           line-height: 1;
-          transition: all 0.5s ease;
         }
 
         .kpi-badge {
@@ -341,15 +315,10 @@
           color: #22d3ee;
         }
 
-        .kpi-percentage {
-          text-align: right;
-        }
-
         .kpi-percentage span {
           font-size: 2rem;
           font-weight: 800;
           color: var(--primary-emerald);
-          transition: all 0.5s ease;
         }
 
         .progress-container {
@@ -373,12 +342,8 @@
         }
 
         .kpi-footer {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
           color: var(--text-secondary);
           font-size: 0.875rem;
-          margin-top: auto;
         }
 
         .kpi-footer span:last-child {
@@ -406,7 +371,6 @@
 
         .chart-card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
         }
 
         .chart-card h3 {
@@ -424,8 +388,6 @@
           border: 1px solid var(--border-color);
           box-shadow: var(--shadow);
           padding: 2rem;
-          position: relative;
-          overflow: hidden;
         }
 
         .table-header {
@@ -443,21 +405,12 @@
           color: var(--text-primary);
         }
 
-        .table-status {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          font-size: 0.875rem;
-        }
-
         .status-badge.small {
           display: flex;
           align-items: center;
           gap: 0.25rem;
           padding: 0.25rem 0.5rem;
-          border-radius: 0.5rem;
           font-size: 0.75rem;
-          font-weight: 500;
         }
 
         .table-wrapper {
@@ -478,7 +431,6 @@
           font-weight: 700;
           text-transform: uppercase;
           color: var(--text-secondary);
-          letter-spacing: 0.05em;
         }
 
         #vendite-table th:last-child {
@@ -488,7 +440,6 @@
         #vendite-table td {
           padding: 0.75rem 1rem;
           border-bottom: 1px solid rgba(107, 114, 128, 0.05);
-          transition: all 0.3s ease;
         }
 
         #vendite-table td:last-child {
@@ -541,7 +492,6 @@
           font-size: 0.875rem;
           font-weight: 700;
           color: var(--text-primary);
-          transition: all 0.5s ease;
         }
 
         .stat-label {
@@ -607,7 +557,6 @@
         .close-btn:hover {
           background: rgba(107, 114, 128, 0.1);
           color: var(--text-primary);
-          transform: scale(1.05);
         }
 
         .popup-body {
@@ -641,7 +590,6 @@
           background: var(--primary-blue);
           border-color: var(--primary-blue);
           color: white;
-          transform: scale(1.02);
         }
 
         .province-option.selected.LT {
@@ -719,57 +667,20 @@
             padding: 1rem;
           }
           
-          .header-content {
-            padding: 1.5rem;
+          .charts-container {
+            grid-template-columns: 1fr;
+          }
+          
+          .kpi-grid {
+            grid-template-columns: 1fr;
           }
           
           .agent-info h1 {
             font-size: 2rem;
           }
           
-          .agent-info p {
-            font-size: 1rem;
-          }
-          
-          .status-info {
-            padding: 0 1.5rem 1rem;
-            gap: 1rem;
-          }
-          
-          .status-bar {
-            padding: 1rem 1.5rem;
-            flex-direction: column;
-            align-items: stretch;
-          }
-          
-          .kpi-grid {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-          }
-          
-          .kpi-card {
-            padding: 1.5rem;
-          }
-          
           .kpi-value {
             font-size: 2rem;
-          }
-          
-          .charts-container {
-            grid-template-columns: 1fr;
-          }
-          
-          .table-container {
-            padding: 1.5rem;
-          }
-          
-          .table-header {
-            flex-direction: column;
-            align-items: stretch;
-          }
-          
-          .footer-stats {
-            grid-template-columns: repeat(2, 1fr);
           }
         }
     </style>
@@ -797,7 +708,7 @@
             
             <div class="status-info">
                 <div class="status-item">
-                    <span class="label">ID:</span>
+                    <span>ID:</span>
                     <code>631.00238</code>
                 </div>
                 <div class="status-item">
@@ -805,7 +716,7 @@
                     <span>Gen - Ago 2025</span>
                 </div>
                 <div class="status-item">
-                    <div class="status-dot" id="connection-dot"></div>
+                    <div class="status-dot offline" id="connection-dot"></div>
                     <span id="connection-status">Caricamento...</span>
                 </div>
                 <div class="status-item">
@@ -814,8 +725,8 @@
             </div>
             
             <div class="status-bar">
-                <div class="status-badge" id="status-badge">
-                    🔄 Caricamento dati...
+                <div class="status-badge updating" id="status-badge">
+                    Caricamento dati...
                 </div>
                 <button id="province-filter" class="filter-btn">
                     <i class="fas fa-filter"></i>
@@ -839,6 +750,9 @@
                 <div>
                     <h3>Errore di connessione</h3>
                     <p id="error-message"></p>
+                    <button class="control-btn" onclick="window.dashboard?.fetchCSVData(true)" style="margin-top: 1rem;">
+                        <i class="fas fa-redo"></i> Riprova
+                    </button>
                 </div>
             </div>
         </div>
@@ -847,10 +761,10 @@
         <div id="main-content" style="display: none;">
             
             <!-- KPI CARDS -->
-            <div class="kpi-grid" id="kpi-grid">
+            <div class="kpi-grid">
                 
                 <!-- Fatturato Card -->
-                <div class="kpi-card" id="fatturato-card">
+                <div class="kpi-card">
                     <div class="kpi-header">
                         <div class="kpi-info">
                             <p class="kpi-label">Fatturato 2025</p>
@@ -867,7 +781,7 @@
                     </div>
                 </div>
 
-                <!-- Obiettivo Card (condizionale) -->
+                <!-- Obiettivo Card -->
                 <div class="kpi-card" id="obiettivo-card" style="display: none;">
                     <div class="kpi-header">
                         <div class="kpi-info">
@@ -890,7 +804,7 @@
                 </div>
 
                 <!-- Clienti Card -->
-                <div class="kpi-card" id="clienti-card">
+                <div class="kpi-card">
                     <div class="kpi-header">
                         <div class="kpi-info">
                             <p class="kpi-label">Clienti Attivi</p>
@@ -947,13 +861,13 @@
                 </div>
             </div>
 
-            <!-- TOP VENDITE TABLE -->
-            <div class="table-container" id="table-container">
+            <!-- TABLE SECTION -->
+            <div class="table-container">
                 <div class="table-header">
                     <h3>Top Vendite per Cliente (Dati Reali CSV)</h3>
-                    <div class="table-status">
+                    <div>
                         <span id="table-update">Aggiornato: <span id="table-timestamp">-</span></span>
-                        <div class="status-badge small" id="table-status-badge">
+                        <div class="status-badge small success" id="table-status-badge">
                             <i class="fas fa-check-circle"></i>
                             <span>Live</span>
                         </div>
@@ -1018,7 +932,7 @@
                 
                 <div class="popup-footer">
                     <div class="popup-status">
-                        <div class="status-dot" id="popup-status-dot"></div>
+                        <div class="status-dot online" id="popup-status-dot"></div>
                         <span id="popup-status-text">Dati CSV aggiornati automaticamente</span>
                     </div>
                     <button id="popup-close-btn" class="popup-btn">Chiudi</button>
@@ -1028,12 +942,6 @@
     </div>
 
     <script>
-        // ==================== DASHBOARD CARABOT NATALINO - GITHUB PAGES ====================
-        // Vanilla JS — CSV live, parser IT, formattazione "k" max 3 cifre ovunque + Grafici
-        // Fix: URL risolti automaticamente per GitHub Pages (repo-pages con /<repo>/),
-        //      rimozione controllo troppo rigido sul contenuto del CSV,
-        //      log dettagliati e messaggi d'errore più chiari.
-
         class DashboardManager {
           constructor() {
             this.csvData = null;
@@ -1042,7 +950,6 @@
             this.lastUpdate = null;
             this.updateInterval = null;
 
-            // Nomi possibili del file CSV (vedi repo screenshot)
             this.csvFileNames = [
               '631.00238_CARABOT-NATALINO.csv',
               '631.00238_CARABOT NATALINO.csv'
@@ -1057,7 +964,6 @@
             this.startAutoUpdate();
           }
 
-          // ==================== EVENT LISTENERS ====================
           setupEventListeners() {
             const byId = (id) => document.getElementById(id);
 
@@ -1084,7 +990,6 @@
             }
           }
 
-          // ==================== THEME MANAGEMENT ====================
           toggleTheme() {
             const body = document.body;
             const themeIcon = document.getElementById('theme-icon');
@@ -1099,24 +1004,18 @@
             }
           }
 
-          // ==================== DATA LOADING ====================
           async loadInitialData() { await this.fetchCSVData(); }
 
-          // Costruisce una lista di URL candidati che funzionano su GitHub Pages
           buildCandidateUrls() {
             const { pathname, origin } = window.location;
-            // es.: /utente/repo/ => repoSlug = 'repo'
             const segs = pathname.split('/').filter(Boolean);
             const repoSlug = segs.length ? segs[0] : '';
 
             const bases = new Set([
               './',
               '',
-              // base calcolata dalla pagina corrente (termina con /)
               pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''),
-              // root del repo pages
               repoSlug ? `/${repoSlug}/` : '/',
-              // in alcuni setup rimane /<repo>/docs/
               repoSlug ? `/${repoSlug}/docs/` : '/docs/'
             ]);
 
@@ -1129,7 +1028,6 @@
                 } catch { /* ignore */ }
               }
             }
-            // dedup
             return Array.from(new Set(urls));
           }
 
@@ -1145,13 +1043,12 @@
               let lastError = null;
               let text = null;
 
-              console.log('🔎 CSV candidate URLs:', candidates);
+              console.log('CSV candidate URLs:', candidates);
 
-              // Prova in sequenza gli URL definiti
               for (const url of candidates) {
                 const u = url + cacheBuster;
                 try {
-                  console.log('↗️ GET', u);
+                  console.log('GET', u);
                   const res = await fetch(u, {
                     method: 'GET',
                     cache: 'no-cache',
@@ -1165,19 +1062,17 @@
                   if (t && t.trim().length > 0) { text = t; break; }
                   lastError = new Error('CSV vuoto');
                 } catch (e) {
-                  console.warn('⚠️ Fallito', u, e);
+                  console.warn('Fallito', u, e);
                   lastError = e;
                 }
               }
 
               if (!text) throw lastError || new Error('Impossibile leggere il CSV');
 
-              // Log diagnostico
-              console.log('✅ CSV caricato, len:', text.length);
-              console.log('📝 CSV head (200):', text.substring(0, 200));
+              console.log('CSV caricato, len:', text.length);
 
               const parsedData = this.parseCSV(text);
-              if (!parsedData) throw new Error('Parsing CSV fallito — controlla intestazioni/marker nel CSV');
+              if (!parsedData) throw new Error('Parsing CSV fallito');
 
               this.csvData = parsedData;
               this.lastUpdate = new Date();
@@ -1185,22 +1080,19 @@
               this.renderDashboard();
 
             } catch (error) {
-              console.error('❌ Errore fetch CSV:', error);
-              this.updateLoadingState('error', error && error.message ? error.message : 'Errore sconosciuto');
+              console.error('Errore fetch CSV:', error);
+              this.updateLoadingState('error', error?.message || 'Errore sconosciuto');
             } finally {
               this.isLoading = false;
             }
           }
 
-          // ==================== CSV PARSING ====================
           parseCSV(csvText) {
             try {
-              // OBIETTIVI
               const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
               if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
               const obiettiviText = obiettiviMatch[1];
 
-              // GENERALE
               const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
               if (!generaleMatch) throw new Error('Dati Generale non trovati');
               const generale = {
@@ -1209,21 +1101,19 @@
                 clienti: parseInt(generaleMatch[4], 10)
               };
 
-              // LATINA
               const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
               if (!ltMatch) throw new Error('Dati Latina non trovati');
               const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
               const latina = {
                 annoPrecedente: this.parseNumber(ltMatch[1]),
                 annoCorrente: this.parseNumber(ltMatch[2]),
-                obiettivo: latinaObiettivoRaw * 1000, // CSV in "migliaia" → euro
+                obiettivo: latinaObiettivoRaw * 1000,
                 percentualeObiettivo: parseInt(ltMatch[4], 10),
                 clientiPrecedenti: parseInt(ltMatch[5], 10),
                 clientiCorrente: parseInt(ltMatch[6], 10),
                 obiettivoClienti: parseInt(ltMatch[7], 10)
               };
 
-              // ROMA (da sezione Clienti per provincia)
               const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
               let roma = { annoCorrente: 0, clienti: 0 };
               if (clientiMatch) {
@@ -1237,7 +1127,6 @@
                 }
               }
 
-              // DETTAGLIO VENDITE → top 10
               const dettaglioStart = csvText.indexOf('=== DETTAGLIO VENDITE PER CLIENTE ===');
               const dettaglioEnd = csvText.indexOf('=== RIEPILOGO PER CATEGORIA ===');
               let vendite = [];
@@ -1267,18 +1156,15 @@
                 vendite = Array.from(venditeMap.values()).sort((a,b)=>b.fatturato-a.fatturato).slice(0,10);
               }
 
-              const result = { generale, latina, roma, vendite, timestamp: new Date() };
-              return result;
+              return { generale, latina, roma, vendite, timestamp: new Date() };
             } catch (e) {
-              console.error('❌ Errore parsing:', e);
-              // Stampa un hint in pagina
+              console.error('Errore parsing:', e);
               const err = document.getElementById('error-message');
-              if (err && e && e.message) err.textContent = e.message;
+              if (err && e?.message) err.textContent = e.message;
               return null;
             }
           }
 
-          // ==================== UI UPDATES ====================
           updateLoadingState(state, errorMessage = null) {
             const byId = (id) => document.getElementById(id);
             const loadingEl = byId('loading-state');
@@ -1297,8 +1183,6 @@
               if (state === 'updating') refreshIcon.classList.add('spinning');
               else refreshIcon.classList.remove('spinning');
             }
-            const refreshBtn = byId('refresh-btn');
-            if (refreshBtn) refreshBtn.disabled = (state === 'updating');
 
             if (connectionDot) connectionDot.className = 'status-dot ' + (state === 'updating' ? 'updating' : state === 'success' ? 'online' : 'offline');
 
@@ -1306,18 +1190,18 @@
               case 'updating':
                 if (loadingEl) loadingEl.style.display = 'block';
                 if (connectionStatus) connectionStatus.textContent = 'Aggiornamento...';
-                if (statusBadge) { statusBadge.className = 'status-badge updating'; statusBadge.textContent = '🔄 Caricamento dati reali...'; }
+                if (statusBadge) { statusBadge.className = 'status-badge updating'; statusBadge.textContent = 'Caricamento dati reali...'; }
                 break;
               case 'success':
                 if (mainEl) mainEl.style.display = 'block';
                 if (connectionStatus) connectionStatus.textContent = 'Online';
-                if (statusBadge) { statusBadge.className = 'status-badge success'; statusBadge.textContent = '✅ CSV letto correttamente'; }
+                if (statusBadge) { statusBadge.className = 'status-badge success'; statusBadge.textContent = 'CSV letto correttamente'; }
                 this.updateLastUpdateDisplay();
                 break;
               case 'error':
                 if (errorEl) errorEl.style.display = 'block';
                 if (connectionStatus) connectionStatus.textContent = 'Errore';
-                if (statusBadge) { statusBadge.className = 'status-badge error'; statusBadge.textContent = '⚠️ Errore CSV'; }
+                if (statusBadge) { statusBadge.className = 'status-badge error'; statusBadge.textContent = 'Errore CSV'; }
                 const err = byId('error-message');
                 if (err) err.textContent = errorMessage || 'Errore sconosciuto';
                 break;
@@ -1340,7 +1224,6 @@
             if (tableTimestamp) tableTimestamp.textContent = this.lastUpdate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
           }
 
-          // ==================== DASHBOARD RENDERING ====================
           renderDashboard() {
             if (!this.csvData) return;
             this.renderKPICards();
@@ -1352,7 +1235,6 @@
           renderKPICards() {
             const data = this.getDisplayData();
 
-            // Fatturato — in k
             const fatturatoValue = document.getElementById('fatturato-value');
             if (fatturatoValue) fatturatoValue.textContent = this.formatEuroK3(data.fatturato);
 
@@ -1362,7 +1244,6 @@
             const previousValue = document.getElementById('previous-value');
             if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
 
-            // Obiettivo — in k
             const obiettivoCard = document.getElementById('obiettivo-card');
             if (obiettivoCard) {
               if (data.obiettivo) {
@@ -1380,7 +1261,6 @@
               }
             }
 
-            // Clienti
             const clientiValue = document.getElementById('clienti-value');
             if (clientiValue) clientiValue.textContent = String(data.clienti);
 
@@ -1422,9 +1302,19 @@
             if (tableStatusBadge) { tableStatusBadge.innerHTML = '<i class="fas fa-check-circle"></i><span>Live</span>'; tableStatusBadge.className = 'status-badge small success'; }
           }
 
-          // ==================== CHARTS RENDERING ====================
           renderCharts() {
             if (!this.csvData) return;
+            
+            if (typeof Chart === 'undefined') {
+              console.warn('Chart.js non caricato - grafici disabilitati');
+              // Nascondi i grafici se Chart.js non è disponibile
+              const chartsContainer = document.querySelector('.charts-container');
+              if (chartsContainer) {
+                chartsContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">Grafici non disponibili - Chart.js non caricato</div>';
+              }
+              return;
+            }
+            
             this.renderProvinceChart();
             this.renderCategoryChart();
             this.renderTopClientsChart();
@@ -1433,12 +1323,11 @@
 
           renderProvinceChart() {
             const ctx = document.getElementById('provinceChart');
-            if (!ctx) return;
+            if (!ctx || typeof Chart === 'undefined') return;
 
             const data = {
               labels: ['Latina (LT)', 'Roma (RM)'],
               datasets: [{
-                label: 'Fatturato per Provincia',
                 data: [this.csvData.latina.annoCorrente, this.csvData.roma.annoCorrente],
                 backgroundColor: ['#3b82f6', '#ef4444'],
                 borderColor: ['#2563eb', '#dc2626'],
@@ -1478,14 +1367,13 @@
 
           renderCategoryChart() {
             const ctx = document.getElementById('categoryChart');
-            if (!ctx) return;
+            if (!ctx || typeof Chart === 'undefined') return;
 
             const categories = this.extractCategoryData();
             
             const data = {
               labels: categories.map(c => c.name),
               datasets: [{
-                label: 'Fatturato per Categoria',
                 data: categories.map(c => c.value),
                 backgroundColor: [
                   '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
@@ -1537,14 +1425,13 @@
 
           renderTopClientsChart() {
             const ctx = document.getElementById('topClientsChart');
-            if (!ctx) return;
+            if (!ctx || typeof Chart === 'undefined') return;
 
             const topClients = this.csvData.vendite.slice(0, 5);
             
             const data = {
               labels: topClients.map(c => c.cliente.length > 25 ? c.cliente.substring(0, 25) + '...' : c.cliente),
               datasets: [{
-                label: 'Top 5 Clienti',
                 data: topClients.map(c => c.fatturato),
                 backgroundColor: '#3b82f6',
                 borderColor: '#2563eb',
@@ -1594,12 +1481,20 @@
 
           renderProgressChart() {
             const ctx = document.getElementById('progressChart');
-            if (!ctx) return;
+            if (!ctx || typeof Chart === 'undefined') return;
 
             const data = this.getDisplayData();
             const obiettivo = data.obiettivo || 0;
             const fatturato = data.fatturato || 0;
             const rimanente = Math.max(0, obiettivo - fatturato);
+
+            if (obiettivo === 0) {
+              ctx.getContext('2d').fillStyle = 'rgba(100, 116, 139, 0.5)';
+              ctx.getContext('2d').font = '16px Inter';
+              ctx.getContext('2d').textAlign = 'center';
+              ctx.getContext('2d').fillText('Nessun obiettivo impostato', ctx.width/2, ctx.height/2);
+              return;
+            }
 
             const chartData = {
               labels: ['Realizzato', 'Da Realizzare'],
@@ -1615,32 +1510,30 @@
               window.progressChartInstance.destroy();
             }
 
-            if (obiettivo > 0) {
-              window.progressChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: chartData,
-                options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  cutout: '70%',
-                  plugins: {
-                    legend: {
-                      position: 'bottom',
-                      labels: { color: '#64748b', font: { size: 12 } }
-                    },
-                    tooltip: {
-                      callbacks: {
-                        label: (context) => {
-                          const value = this.formatEuroK3(context.raw);
-                          const percentage = ((context.raw / obiettivo) * 100).toFixed(1);
-                          return `${context.label}: ${value} (${percentage}%)`;
-                        }
+            window.progressChartInstance = new Chart(ctx, {
+              type: 'doughnut',
+              data: chartData,
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: { color: '#64748b', font: { size: 12 } }
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => {
+                        const value = this.formatEuroK3(context.raw);
+                        const percentage = ((context.raw / obiettivo) * 100).toFixed(1);
+                        return `${context.label}: ${value} (${percentage}%)`;
                       }
                     }
                   }
                 }
-              });
-            }
+              }
+            });
           }
 
           extractCategoryData() {
@@ -1663,9 +1556,17 @@
               .slice(0, 8);
           }
 
-          // ==================== PROVINCE FILTER ====================
-          showProvincePopup() { if (!this.csvData) return; this.updateProvinceOptions(); const p = document.getElementById('province-popup'); if (p) p.style.display = 'flex'; }
-          hideProvincePopup() { const p = document.getElementById('province-popup'); if (p) p.style.display = 'none'; }
+          showProvincePopup() { 
+            if (!this.csvData) return; 
+            this.updateProvinceOptions(); 
+            const p = document.getElementById('province-popup'); 
+            if (p) p.style.display = 'flex'; 
+          }
+          
+          hideProvincePopup() { 
+            const p = document.getElementById('province-popup'); 
+            if (p) p.style.display = 'none'; 
+          }
 
           updateProvinceOptions() {
             if (!this.csvData) return;
@@ -1673,21 +1574,18 @@
             if (!popupOptions) return;
             popupOptions.innerHTML = '';
 
-            // Tutte le province
             popupOptions.appendChild(this.createProvinceOption('all', {
               title: 'Tutte le Province',
               description: this.formatEuroK3(this.csvData.generale.annoCorrente) + ' • ' + this.csvData.generale.clienti + ' clienti',
               className: ''
             }));
 
-            // Latina
             popupOptions.appendChild(this.createProvinceOption('LT', {
               title: 'Latina (LT)',
               description: this.formatEuroK3(this.csvData.latina.annoCorrente) + ' • ' + this.csvData.latina.clientiCorrente + ' clienti • Obiettivo: ' + (this.csvData.latina.percentualeObiettivo || 0) + '%',
               className: 'LT'
             }));
 
-            // Roma
             popupOptions.appendChild(this.createProvinceOption('RM', {
               title: 'Roma (RM)',
               description: this.formatEuroK3(this.csvData.roma.annoCorrente) + ' • ' + this.csvData.roma.clienti + ' clienti',
@@ -1719,7 +1617,6 @@
             return option;
           }
 
-          // ==================== DATA HELPERS ====================
           getDisplayData() {
             if (!this.csvData) {
               return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
@@ -1742,8 +1639,6 @@
             return { fatturato: 0, annoPrecedente: 0, crescita: '0.0', clienti: 0, obiettivo: null, percentualeObiettivo: null };
           }
 
-          // ==================== UTILITY FUNCTIONS ====================
-          // Parser robusto per numeri in formato italiano
           parseNumber(input) {
             if (typeof input === 'number') return input;
             if (!input) return 0;
@@ -1756,7 +1651,6 @@
             return Number.isFinite(n) ? n : 0;
           }
 
-          // "k" con max 3 cifre (1,23k • 12,3k • 123k). Per importi in euro → sempre migliaia.
           formatK3(value) {
             const num = Number(value) || 0;
             const sign = num < 0 ? '-' : '';
@@ -1766,7 +1660,6 @@
             if (k >= 100) out = String(Math.round(k));
             else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
             else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
-            // rimuovi zeri/virgola superflui
             out = out.replace(/,?0+$/, '');
             return sign + out + 'k';
           }
@@ -1777,37 +1670,16 @@
             return '€' + k.replace('k','') + 'k';
           }
 
-          // ==================== AUTO UPDATE ====================
           startAutoUpdate() {
-            // Auto-update ogni 2 minuti
             this.updateInterval = setInterval(() => {
               this.fetchCSVData();
             }, 2 * 60 * 1000);
 
-            // Update time display ogni 30 secondi
             setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
-
-            // Esegui piccoli test in console all'avvio (non bloccanti)
-            this.runUnitTests();
           }
 
-          // ==================== TEST (console.assert) ====================
-          runUnitTests() {
-            try {
-              const approx = (a,b) => Math.abs(a-b) < 1e-6;
-              console.assert(approx(this.parseNumber('1.234,56'), 1234.56), 'parseNumber 1');
-              console.assert(this.parseNumber('€ 987.654,00') === 987654, 'parseNumber 2');
-              console.assert(this.formatK3(1234) === '1,23k', 'formatK3 1');
-              console.assert(this.formatK3(12345) === '12,3k', 'formatK3 2');
-              console.assert(this.formatK3(123456) === '123k', 'formatK3 3');
-              console.assert(this.formatEuroK3(1500) === '€1,5k', 'formatEuroK3');
-            } catch (e) { /* ignore in produzione */ }
-          }
-
-          // ==================== CLEANUP ====================
           destroy() { 
             if (this.updateInterval) clearInterval(this.updateInterval); 
-            // Destroy chart instances
             if (window.provinceChartInstance) window.provinceChartInstance.destroy();
             if (window.categoryChartInstance) window.categoryChartInstance.destroy();
             if (window.topClientsChartInstance) window.topClientsChartInstance.destroy();
@@ -1815,12 +1687,10 @@
           }
         }
 
-        // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', () => {
           window.dashboard = new DashboardManager();
         });
 
-        // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
           if (window.dashboard) window.dashboard.destroy();
         });
