@@ -1,7 +1,7 @@
 // ==================== DASHBOARD CARABOT NATALINO - GITHUB PAGES ====================
 // Vanilla JS — CSV live, parser IT, formattazione "k" max 3 cifre ovunque
 // CSV fisso: 631.00238_CARABOT-NATALINO.csv
-// Parsing robusto: non richiede marker di sezione, scansiona il file e riconosce le righe.
+// Include 3 grafici Chart.js: Top 10 Clienti, Ripartizione Provincie, Obiettivo LT
 
 class DashboardManager {
   constructor() {
@@ -10,10 +10,9 @@ class DashboardManager {
     this.isLoading = false;
     this.lastUpdate = null;
     this.updateInterval = null;
+    this.charts = {}; // Chart.js instances
 
-    // 🔒 Unico file CSV richiesto
     this.csvFileName = '631.00238_CARABOT-NATALINO.csv';
-
     this.init();
   }
 
@@ -26,12 +25,15 @@ class DashboardManager {
   // ==================== EVENT LISTENERS ====================
   setupEventListeners() {
     const byId = (id) => document.getElementById(id);
-
     const refreshBtn = byId('refresh-btn');
     if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchCSVData(true));
 
     const themeToggle = byId('theme-toggle');
-    if (themeToggle) themeToggle.addEventListener('click', () => this.toggleTheme());
+    if (themeToggle) themeToggle.addEventListener('click', () => {
+      this.toggleTheme();
+      // Re-render charts (per contrasto tema)
+      this.renderCharts();
+    });
 
     const provinceFilter = byId('province-filter');
     if (provinceFilter) provinceFilter.addEventListener('click', () => this.showProvincePopup());
@@ -50,17 +52,15 @@ class DashboardManager {
     }
   }
 
-  // ==================== THEME MANAGEMENT ====================
+  // ==================== THEME ====================
   toggleTheme() {
     const body = document.body;
     const themeIcon = document.getElementById('theme-icon');
     if (body.classList.contains('light-mode')) {
-      body.classList.remove('light-mode');
-      body.classList.add('dark-mode');
+      body.classList.remove('light-mode'); body.classList.add('dark-mode');
       if (themeIcon) themeIcon.className = 'fas fa-sun';
     } else {
-      body.classList.remove('dark-mode');
-      body.classList.add('light-mode');
+      body.classList.remove('dark-mode'); body.classList.add('light-mode');
       if (themeIcon) themeIcon.className = 'fas fa-moon';
     }
   }
@@ -68,70 +68,43 @@ class DashboardManager {
   // ==================== DATA LOADING ====================
   async loadInitialData() { await this.fetchCSVData(); }
 
-  // Costruisce una lista di URL candidati compatibili con GitHub Pages (repo pages)
   buildCandidateUrls() {
     const { pathname, origin } = window.location;
-
-    // directory corrente della pagina (finisce con "/")
     const dir = pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, '');
-    // slug repo, es. "/rete-commerciale-agenti/"
     const segs = dir.split('/').filter(Boolean);
     const repoSlug = segs.length ? segs[0] : '';
     const repoBase = repoSlug ? `/${repoSlug}/` : '/';
-
-    const bases = new Set([
-      './',                 // relativo al file
-      '',                   // solo nome file
-      dir,                  // base pagina corrente
-      repoBase,             // root del repo pages
-    ]);
-
+    const bases = new Set(['./', '', dir, repoBase]);
     const urls = [];
     for (const base of bases) {
-      try {
-        const abs = new URL(base + this.csvFileName, origin).href;
-        urls.push(abs);
-      } catch { /* ignore */ }
+      try { urls.push(new URL(base + this.csvFileName, origin).href); } catch {}
     }
     return Array.from(new Set(urls));
   }
 
   async fetchCSVData(isManual = false) {
     if (this.isLoading) return;
-
     this.isLoading = true;
     this.updateLoadingState('updating');
 
     try {
       const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
       const candidates = this.buildCandidateUrls();
-      let lastError = null;
-      let text = null;
+      let lastError = null, text = null;
 
       console.log('🔎 CSV candidate URLs:', candidates);
-
       for (const url of candidates) {
         const u = url + cacheBuster;
         try {
           console.log('↗️ GET', u);
-          const res = await fetch(u, {
-            method: 'GET',
-            cache: 'no-cache',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-            },
-          });
+          const res = await fetch(u, { method:'GET', cache:'no-cache',
+            headers:{ 'Cache-Control':'no-cache, no-store, must-revalidate','Pragma':'no-cache' }});
           if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
           const t = await res.text();
-          if (t && t.trim().length > 0) { text = t; break; }
+          if (t && t.trim()) { text = t; break; }
           lastError = new Error('CSV vuoto');
-        } catch (e) {
-          console.warn('⚠️ Fallito', u, e);
-          lastError = e;
-        }
+        } catch (e) { console.warn('⚠️ Fallito', u, e); lastError = e; }
       }
-
       if (!text) throw lastError || new Error('Impossibile leggere il CSV');
 
       console.log('✅ CSV caricato, len:', text.length);
@@ -147,7 +120,7 @@ class DashboardManager {
 
     } catch (error) {
       console.error('❌ Errore fetch CSV:', error);
-      this.updateLoadingState('error', error && error.message ? error.message : 'Errore sconosciuto');
+      this.updateLoadingState('error', error?.message || 'Errore sconosciuto');
     } finally {
       this.isLoading = false;
     }
@@ -158,27 +131,20 @@ class DashboardManager {
     try {
       const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
-      // ---------- GENERALE ----------
-      // Trova prima riga che inizia con "Generale;"
-      // Atteso: Generale;[annoPrec];[annoCorr];...;[clientiPrec];[clientiCurr];;
+      // GENERALE  (prima riga che inizia con "Generale;")
       const generalLine = lines.find(l => /^Generale;/.test(l));
       if (!generalLine) throw new Error('Riga "Generale;" non trovata');
       const g = generalLine.split(';');
       const generale = {
         annoPrecedente: this.parseNumber(g[1]),
         annoCorrente: this.parseNumber(g[2]),
-        // clienti: prendi l'ultimo campo intero presente sulla riga (fallback sicuro)
-        clienti: (function pickClients(parts) {
-          let out = 0;
-          for (let i = parts.length - 1; i >= 0; i--) {
-            if (/^\d+$/.test(parts[i])) { out = parseInt(parts[i], 10); break; }
-          }
-          return out;
-        })(g)
+        clienti: (() => { // ultimo intero sulla riga
+          for (let i = g.length - 1; i >= 0; i--) if (/^\d+$/.test(g[i])) return parseInt(g[i], 10);
+          return 0;
+        })()
       };
 
-      // ---------- LATINA (LT) ----------
-      // Atteso: LT;[annoPrec];[annoCorr];[obiettivo (in migliaia)];[x%];[clientiPrec];[clientiCurr];[obiettivoClienti];[y%]
+      // LATINA (LT)
       const ltLine = lines.find(l => /^LT;/.test(l));
       if (!ltLine) throw new Error('Riga "LT;" non trovata');
       const lt = ltLine.split(';');
@@ -186,15 +152,14 @@ class DashboardManager {
       const latina = {
         annoPrecedente: this.parseNumber(lt[1]),
         annoCorrente: this.parseNumber(lt[2]),
-        obiettivo: latinaObiettivoRaw * 1000, // migliaia → euro
+        obiettivo: latinaObiettivoRaw * 1000,
         percentualeObiettivo: parseInt(String(lt[4]).replace(/\D/g, ''), 10) || 0,
         clientiPrecedenti: parseInt(lt[5], 10) || 0,
         clientiCorrente: parseInt(lt[6], 10) || 0,
         obiettivoClienti: parseInt(lt[7], 10) || 0
       };
 
-      // ---------- ROMA (RM) ----------
-      // Cerchiamo riga RM per "Clienti per provincia": deve avere [0]=RM, [1]=intero clienti, [2]=fatturato numero
+      // ROMA (RM): cerca riga con RM;[clienti int];[fatturato numero]
       let roma = { annoCorrente: 0, clienti: 0 };
       for (const l of lines) {
         if (!/^RM;/.test(l)) continue;
@@ -204,47 +169,36 @@ class DashboardManager {
           break;
         }
       }
-      // Se non trovata la riga “clienti per provincia”, Roma rimane 0/0: è ok, non blocchiamo la dashboard.
 
-      // ---------- DETTAGLIO VENDITE (Top 10) ----------
-      // Righe con provincia (2 lettere), cliente (stringa), categoria (stringa), fatturato (numero)
-      // Escludiamo le righe che sembrano “clienti per provincia” (2° campo intero)
+      // DETTAGLIO VENDITE: provincia (2 lettere), cliente (stringa), categoria (stringa), fatturato (numero)
       const venditeMap = new Map();
       for (const l of lines) {
         if (!/^[A-Z]{2};/.test(l)) continue;
         const parts = l.split(';');
         if (parts.length < 4) continue;
-
         const prov = parts[0].trim();
         const campo2 = parts[1].trim();
         const categoria = parts[2].trim();
         const fatturato = this.parseNumber(parts[3]);
-
-        // scarta se è la riga "clienti per provincia" (campo2 deve essere nome cliente, non intero)
-        if (/^\d+$/.test(campo2)) continue;
+        if (/^\d+$/.test(campo2)) continue; // escludi righe "clienti per provincia"
         if (!prov || !categoria || !Number.isFinite(fatturato) || fatturato <= 0) continue;
 
         const cliente = campo2;
         const exist = venditeMap.get(cliente);
-        // se lo stesso cliente compare più volte, tieni il max fatturato
-        if (!exist || exist.fatturato < fatturato) {
-          venditeMap.set(cliente, { provincia: prov, cliente, categoria, fatturato });
-        }
+        if (!exist || exist.fatturato < fatturato) venditeMap.set(cliente, { provincia: prov, cliente, categoria, fatturato });
       }
-      const vendite = Array.from(venditeMap.values())
-        .sort((a, b) => b.fatturato - a.fatturato)
-        .slice(0, 10);
+      const vendite = Array.from(venditeMap.values()).sort((a,b)=>b.fatturato-a.fatturato).slice(0,10);
 
       return { generale, latina, roma, vendite, timestamp: new Date() };
     } catch (e) {
       console.error('❌ Errore parsing:', e);
       const err = document.getElementById('error-message');
-      if (err && e && e.message) err.textContent = e.message;
+      if (err && e?.message) err.textContent = e.message;
       return null;
     }
   }
 
-  // ==================== UI UPDATES ====================
+  // ==================== UI ====================
   updateLoadingState(state, errorMessage = null) {
     const byId = (id) => document.getElementById(id);
     const loadingEl = byId('loading-state');
@@ -306,28 +260,24 @@ class DashboardManager {
     if (tableTimestamp) tableTimestamp.textContent = this.lastUpdate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
   }
 
-  // ==================== DASHBOARD RENDERING ====================
+  // ==================== RENDER ====================
   renderDashboard() {
     if (!this.csvData) return;
     this.renderKPICards();
     this.renderVenditeTable();
+    this.renderCharts();
     this.updateProvinceOptions();
   }
 
   renderKPICards() {
     const data = this.getDisplayData();
-
-    // Fatturato — in k
     const fatturatoValue = document.getElementById('fatturato-value');
     if (fatturatoValue) fatturatoValue.textContent = this.formatEuroK3(data.fatturato);
-
     const growthValue = document.getElementById('growth-value');
     if (growthValue) growthValue.textContent = '+' + data.crescita + '%';
-
     const previousValue = document.getElementById('previous-value');
     if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
 
-    // Obiettivo — in k
     const obiettivoCard = document.getElementById('obiettivo-card');
     if (obiettivoCard) {
       if (data.obiettivo) {
@@ -345,10 +295,8 @@ class DashboardManager {
       }
     }
 
-    // Clienti
     const clientiValue = document.getElementById('clienti-value');
     if (clientiValue) clientiValue.textContent = String(data.clienti);
-
     const provinciaLabel = document.getElementById('provincia-label');
     if (provinciaLabel) provinciaLabel.textContent = this.selectedProvince === 'all' ? 'TOT' : this.selectedProvince;
   }
@@ -357,33 +305,154 @@ class DashboardManager {
     const tbody = document.getElementById('vendite-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-
     const vendite = Array.isArray(this.csvData?.vendite) ? this.csvData.vendite : [];
     vendite.forEach(v => {
       const row = document.createElement('tr');
       row.innerHTML =
-        '<td>' +
-          '<span class="province-badge ' + v.provincia + '">' + v.provincia + '</span>' +
-        '</td>' +
+        '<td><span class="province-badge ' + v.provincia + '">' + v.provincia + '</span></td>' +
         '<td>' + (v.cliente.length > 30 ? v.cliente.slice(0,30) + '...' : v.cliente) + '</td>' +
         '<td>' + v.categoria + '</td>' +
         '<td>' + this.formatEuroK3(v.fatturato) + '</td>';
       tbody.appendChild(row);
     });
-
     const totalClients = document.getElementById('total-clients');
     if (totalClients) totalClients.textContent = String(vendite.length);
-
     const totalTopRevenue = document.getElementById('total-top-revenue');
     if (totalTopRevenue) totalTopRevenue.textContent = this.formatEuroK3(
       vendite.reduce((sum, v) => sum + v.fatturato, 0)
     );
-
     const statusIcon = document.getElementById('update-status-icon');
     if (statusIcon) statusIcon.textContent = '✅';
-
     const tableStatusBadge = document.getElementById('table-status-badge');
     if (tableStatusBadge) { tableStatusBadge.innerHTML = '<i class="fas fa-check-circle"></i><span>Live</span>'; tableStatusBadge.className = 'status-badge small success'; }
+  }
+
+  // ====== CHARTS ======
+  ensureChartsDOM() {
+    if (document.getElementById('charts-grid')) return;
+    const host = document.getElementById('main-content');
+    if (!host) return;
+    const grid = document.createElement('div');
+    grid.className = 'kpi-grid';
+    grid.id = 'charts-grid';
+    grid.innerHTML = `
+      <div class="kpi-card">
+        <div class="kpi-header"><div class="kpi-info"><p class="kpi-label">Top 10 Clienti</p></div></div>
+        <div style="height:320px"><canvas id="chart-top"></canvas></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header"><div class="kpi-info"><p class="kpi-label">Ripartizione per Provincia</p></div></div>
+        <div style="height:320px"><canvas id="chart-provincie"></canvas></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header"><div class="kpi-info"><p class="kpi-label">Obiettivo LT</p></div></div>
+        <div style="height:320px"><canvas id="chart-obiettivo"></canvas></div>
+      </div>`;
+    host.appendChild(grid);
+  }
+
+  destroyChart(name) {
+    if (this.charts[name]) { this.charts[name].destroy(); delete this.charts[name]; }
+  }
+
+  upsertChart(name, type, ctx, data, options) {
+    if (this.charts[name]) {
+      this.charts[name].data = data;
+      this.charts[name].options = options;
+      this.charts[name].update();
+    } else {
+      this.charts[name] = new Chart(ctx, { type, data, options });
+    }
+  }
+
+  renderCharts() {
+    if (typeof Chart === 'undefined') return;
+    if (!this.csvData) return;
+
+    this.ensureChartsDOM();
+
+    const fmt = this.formatEuroK3.bind(this);
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-primary') || '#e5e7eb';
+
+    // --- Top 10 Clienti (Bar) ---
+    const topEl = document.getElementById('chart-top');
+    if (topEl) {
+      const labels = (this.csvData.vendite || []).map(v => v.cliente.length > 20 ? v.cliente.slice(0,20) + '…' : v.cliente);
+      const values = (this.csvData.vendite || []).map(v => v.fatturato);
+      const ctx = topEl.getContext('2d');
+      this.upsertChart('top', 'bar', ctx, {
+        labels,
+        datasets: [{ data: values, borderWidth: 1 }]
+      }, {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: { label: (c) => fmt(c.raw) }
+          }
+        },
+        scales: {
+          x: { ticks: { color: textColor, maxRotation: 0, minRotation: 0 }, grid: { display: false } },
+          y: { ticks: { color: textColor, callback: (v) => fmt(v) }, grid: { display: false } }
+        }
+      });
+    }
+
+    // --- Ripartizione Provincie (Doughnut) ---
+    const provEl = document.getElementById('chart-provincie');
+    if (provEl) {
+      const lt = this.csvData.latina?.annoCorrente || 0;
+      const rm = this.csvData.roma?.annoCorrente || 0;
+      const tot = this.csvData.generale?.annoCorrente || 0;
+      const altre = Math.max(0, tot - lt - rm);
+      const labels = ['Latina', 'Roma', 'Altre'];
+      const dataArr = [lt, rm, altre];
+      const ctx = provEl.getContext('2d');
+      this.upsertChart('provincie', 'doughnut', ctx, {
+        labels, datasets: [{ data: dataArr, borderWidth: 1 }]
+      }, {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: textColor } },
+          tooltip: {
+            callbacks: {
+              label: (c) => {
+                const val = c.raw;
+                const total = c.dataset.data.reduce((a,b)=>a+b,0) || 1;
+                const pct = Math.round((val/total)*1000)/10;
+                return `${c.label}: ${fmt(val)} (${pct}%)`;
+              }
+            }
+          }
+        },
+        cutout: '55%'
+      });
+    }
+
+    // --- Obiettivo LT (Doughnut progress) ---
+    const objEl = document.getElementById('chart-obiettivo');
+    if (objEl) {
+      const ob = this.csvData.latina?.obiettivo || 0;
+      const curr = this.csvData.latina?.annoCorrente || 0;
+      if (ob > 0) {
+        const done = Math.min(curr, ob);
+        const rem = Math.max(0, ob - done);
+        const ctx = objEl.getContext('2d');
+        this.upsertChart('obiettivo', 'doughnut', ctx, {
+          labels: ['Raggiunto', 'Da fare'],
+          datasets: [{ data: [done, rem], borderWidth: 1 }]
+        }, {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: textColor } },
+            tooltip: { callbacks: { label: (c) => `${c.label}: ${fmt(c.raw)}` } }
+          },
+          cutout: '60%'
+        });
+      } else {
+        this.destroyChart('obiettivo');
+      }
+    }
   }
 
   // ==================== PROVINCE FILTER ====================
@@ -395,28 +464,21 @@ class DashboardManager {
     const popupOptions = document.getElementById('popup-options');
     if (!popupOptions) return;
     popupOptions.innerHTML = '';
-
-    // Tutte le province
     popupOptions.appendChild(this.createProvinceOption('all', {
       title: 'Tutte le Province',
       description: this.formatEuroK3(this.csvData.generale.annoCorrente) + ' • ' + this.csvData.generale.clienti + ' clienti',
       className: ''
     }));
-
-    // Latina
     popupOptions.appendChild(this.createProvinceOption('LT', {
       title: 'Latina (LT)',
       description: this.formatEuroK3(this.csvData.latina.annoCorrente) + ' • ' + this.csvData.latina.clientiCorrente + ' clienti • Obiettivo: ' + (this.csvData.latina.percentualeObiettivo || 0) + '%',
       className: 'LT'
     }));
-
-    // Roma
     popupOptions.appendChild(this.createProvinceOption('RM', {
       title: 'Roma (RM)',
       description: this.formatEuroK3(this.csvData.roma.annoCorrente) + ' • ' + this.csvData.roma.clienti + ' clienti',
       className: 'RM'
     }));
-
     const popupStatusDot = document.getElementById('popup-status-dot');
     const popupStatusText = document.getElementById('popup-status-text');
     if (popupStatusDot) popupStatusDot.className = 'status-dot online';
@@ -427,27 +489,19 @@ class DashboardManager {
     const option = document.createElement('button');
     option.className = 'province-option ' + (this.selectedProvince === province ? 'selected ' + (config.className || '') : '');
     option.innerHTML =
-      '<div class="option-info">' +
-        '<h4>' + config.title + '</h4>' +
-        '<p>' + config.description + '</p>' +
-      '</div>' +
+      '<div class="option-info"><h4>' + config.title + '</h4><p>' + config.description + '</p></div>' +
       '<div class="option-radio ' + (this.selectedProvince === province ? 'selected' : '') + '"></div>';
-
     option.addEventListener('click', () => {
       this.selectedProvince = province;
       this.renderDashboard();
       this.hideProvincePopup();
     });
-
     return option;
   }
 
   // ==================== DATA HELPERS ====================
   getDisplayData() {
-    if (!this.csvData) {
-      return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
-    }
-
+    if (!this.csvData) return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
     if (this.selectedProvince === 'all') {
       const prev = this.csvData.generale.annoPrecedente || 0;
       const curr = this.csvData.generale.annoCorrente || 0;
@@ -461,45 +515,17 @@ class DashboardManager {
     } else if (this.selectedProvince === 'RM') {
       return { fatturato: this.csvData.roma.annoCorrente, annoPrecedente: 0, crescita: '0.0', clienti: this.csvData.roma.clienti, obiettivo: null, percentualeObiettivo: null };
     }
-
     return { fatturato: 0, annoPrecedente: 0, crescita: '0.0', clienti: 0, obiettivo: null, percentualeObiettivo: null };
   }
 
-  // ==================== UTILITY FUNCTIONS ====================
-  // Parser robusto per numeri in formato italiano
+  // Parser numeri IT
   parseNumber(input) {
     if (typeof input === 'number') return input;
     if (!input) return 0;
-    const cleaned = String(input)
-      .replace(/\s+/g, '')
-      .replace(/€/g, '')
-      .replace(/\./g, '')
-      .replace(/,/g, '.');
+    const cleaned = String(input).replace(/\s+/g,'').replace(/€/g,'').replace(/\./g,'').replace(/,/g,'.');
     const n = Number(cleaned);
     return Number.isFinite(n) ? n : 0;
   }
-
-  // "k" con max 3 cifre (1,23k • 12,3k • 123k). Per importi in euro → sempre migliaia.
-  formatK3(value) {
-    const num = Number(value) || 0;
-    const sign = num < 0 ? '-' : '';
-    const v = Math.abs(num);
-    const k = v / 1000;
-    let out;
-    if (k >= 100) out = String(Math.round(k));
-    else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
-    else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
-    // rimuovi zeri/virgola superflui
-    out = out.replace(/,?0+$/, '');
-    return sign + out + 'k';
-  }
-
-  formatEuroK3(value) {
-    if (!value) return '€0k';
-    const k = this.formatK3(value);
-    return '€' + k.replace('k','') + 'k';
-  }
-
   isNumericIT(s) {
     if (s == null) return false;
     const t = String(s).trim();
@@ -508,31 +534,28 @@ class DashboardManager {
     return !isNaN(Number(cleaned));
   }
 
-  // ==================== AUTO UPDATE ====================
-  startAutoUpdate() {
-    // Auto-update ogni 2 minuti
-    this.updateInterval = setInterval(() => {
-      this.fetchCSVData();
-    }, 2 * 60 * 1000);
-
-    // Update time display ogni 30 secondi
-    setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
-
-    // Esegui piccoli test in console all'avvio (non bloccanti)
-    this.runUnitTests();
+  // Formattazioni k
+  formatK3(value) {
+    const num = Number(value) || 0;
+    const sign = num < 0 ? '-' : '';
+    const v = Math.abs(num), k = v / 1000;
+    let out;
+    if (k >= 100) out = String(Math.round(k));
+    else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
+    else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
+    out = out.replace(/,?0+$/, '');
+    return sign + out + 'k';
+  }
+  formatEuroK3(value) {
+    if (!value) return '€0k';
+    const k = this.formatK3(value);
+    return '€' + k.replace('k','') + 'k';
   }
 
-  // ==================== TEST (console.assert) ====================
-  runUnitTests() {
-    try {
-      const approx = (a,b) => Math.abs(a-b) < 1e-6;
-      console.assert(approx(this.parseNumber('1.234,56'), 1234.56), 'parseNumber 1');
-      console.assert(this.parseNumber('€ 987.654,00') === 987654, 'parseNumber 2');
-      console.assert(this.formatK3(1234) === '1,23k', 'formatK3 1');
-      console.assert(this.formatK3(12345) === '12,3k', 'formatK3 2');
-      console.assert(this.formatK3(123456) === '123k', 'formatK3 3');
-      console.assert(this.formatEuroK3(1500) === '€1,5k', 'formatEuroK3');
-    } catch (e) { /* ignore in produzione */ }
+  // ==================== AUTO UPDATE ====================
+  startAutoUpdate() {
+    this.updateInterval = setInterval(() => this.fetchCSVData(), 2 * 60 * 1000); // 2 minuti
+    setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
   }
 
   // ==================== CLEANUP ====================
@@ -540,11 +563,5 @@ class DashboardManager {
 }
 
 // ==================== INITIALIZATION ====================
-document.addEventListener('DOMContentLoaded', () => {
-  window.dashboard = new DashboardManager();
-});
-
-// Cleanup on page unload
-window.addEventListener('beforeunload', () => {
-  if (window.dashboard) window.dashboard.destroy();
-});
+document.addEventListener('DOMContentLoaded', () => { window.dashboard = new DashboardManager(); });
+window.addEventListener('beforeunload', () => { if (window.dashboard) window.dashboard.destroy(); });
