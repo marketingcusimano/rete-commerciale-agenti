@@ -8,6 +8,11 @@
 class DashboardManager {
   constructor() {
     this.csvFileName = '631.00238_CARABOT-NATALINO.csv';
+    // fallback names (in repo esiste anche con spazio)
+    this.altCsvNames = [
+      '631.00238_CARABOT-NATALINO.csv',
+      '631.00238_CARABOT NATALINO.csv'
+    ];
 
     this.csvData = null;              // parsed core data
     this.aggregates = null;           // extra computed metrics (by province/category/month)
@@ -18,6 +23,9 @@ class DashboardManager {
     this.updateInterval = null;
 
     this.charts = {}; // Chart.js instances
+
+    // raw.githubusercontent fallback per sicurezza path
+    this.repoRawBase = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/';
 
     this.init();
   }
@@ -67,7 +75,31 @@ class DashboardManager {
   async loadInitialData() { await this.fetchCSVData(); }
 
   buildCandidateUrls() {
-    const { pathname, origin } = window.location;
+    // Genera una lista di URL probabili per GH Pages + fallback raw.githubusercontent
+    const names = this.altCsvNames;
+    const urls = new Set();
+
+    const baseHref = document.baseURI || window.location.href;
+    const { origin, pathname } = window.location;
+
+    // es: /rete-commerciale-agenti/ oppure /rete-commerciale-agenti/docs/
+    const parts = pathname.split('/').filter(Boolean);
+    const repoRoot = parts.length ? `/${parts[0]}/` : '/';
+
+    for (const name of names) {
+      // relativo alla pagina attuale
+      try { urls.add(new URL(`./${name}`, baseHref).href); } catch {}
+      try { urls.add(new URL(name, baseHref).href); } catch {}
+      // repo root (GH Pages project site)
+      try { urls.add(origin + repoRoot + name); } catch {}
+      // root assoluto (in alcuni viewer)
+      try { urls.add(origin + '/' + name); } catch {}
+      // fallback raw githubusercontent (CORS ok)
+      try { urls.add(this.repoRawBase + name); } catch {}
+    }
+
+    return Array.from(urls);
+  } = window.location;
     const dir = pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, '');
     const segs = dir.split('/').filter(Boolean);
     const repoSlug = segs.length ? segs[0] : '';
@@ -86,8 +118,54 @@ class DashboardManager {
     this.isLoading = true;
     this.updateLoadingState('updating');
 
+    let tried = [];
+
     try {
       const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
+      const candidates = this.buildCandidateUrls();
+      let lastError = null; let text = null;
+
+      console.log('🔎 CSV candidate URLs:', candidates);
+      for (const url of candidates) {
+        const u = url + cacheBuster;
+        tried.push(url);
+        try {
+          console.log('↗️ GET', u);
+          const res = await fetch(u, { method: 'GET', cache: 'no-cache', headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache'
+          }});
+          if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          const t = await res.text();
+          if (t && t.trim()) { text = t; break; }
+          lastError = new Error('CSV vuoto');
+        } catch (e) { console.warn('⚠️ Fallito', u, e); lastError = e; }
+      }
+      if (!text) {
+        const msg = (lastError?.message || 'Impossibile leggere il CSV') + `
+Provati: ${tried.join(' | ')}`;
+        throw new Error(msg);
+      }
+
+      console.log('✅ CSV caricato, len:', text.length);
+      console.log('📝 CSV head (200):', text.substring(0, 200));
+
+      const parsed = this.parseCSV(text);
+      if (!parsed) throw new Error('Parsing CSV fallito — verifica formati righe');
+
+      this.csvData = parsed;
+      this.aggregates = this.computeAggregates(parsed);
+
+      this.lastUpdate = new Date();
+      this.updateLoadingState('success');
+      this.renderDashboard();
+
+    } catch (error) {
+      console.error('❌ Errore fetch CSV:', error);
+      this.updateLoadingState('error', error?.message || 'Errore sconosciuto');
+    } finally {
+      this.isLoading = false;
+    }
+  }&r=${Math.random()}`;
       const candidates = this.buildCandidateUrls();
       let lastError = null; let text = null;
 
