@@ -1,6 +1,7 @@
 // ==================== DASHBOARD CARABOT NATALINO - GITHUB PAGES ====================
 // Vanilla JS — CSV live, parser IT, formattazione "k" max 3 cifre ovunque
 // CSV fisso: 631.00238_CARABOT-NATALINO.csv
+// Parsing robusto: non richiede marker di sezione, scansiona il file e riconosce le righe.
 
 class DashboardManager {
   constructor() {
@@ -79,13 +80,12 @@ class DashboardManager {
     const repoBase = repoSlug ? `/${repoSlug}/` : '/';
 
     const bases = new Set([
-      './',                 // relativo
+      './',                 // relativo al file
       '',                   // solo nome file
       dir,                  // base pagina corrente
-      repoBase,             // root repo pages
+      repoBase,             // root del repo pages
     ]);
 
-    // compone URL assoluti, rimuove duplicati
     const urls = [];
     for (const base of bases) {
       try {
@@ -138,7 +138,7 @@ class DashboardManager {
       console.log('📝 CSV head (200):', text.substring(0, 200));
 
       const parsedData = this.parseCSV(text);
-      if (!parsedData) throw new Error('Parsing CSV fallito — controlla intestazioni/marker nel CSV');
+      if (!parsedData) throw new Error('Parsing CSV fallito — verifica formati righe');
 
       this.csvData = parsedData;
       this.lastUpdate = new Date();
@@ -153,113 +153,91 @@ class DashboardManager {
     }
   }
 
-  // ==================== CSV PARSING ====================
+  // ==================== CSV PARSING (robusto, no marker richiesti) ====================
   parseCSV(csvText) {
     try {
-      // OBIETTIVI
-      const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
-      if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
-      const obiettiviText = obiettiviMatch[1];
+      const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
-      // GENERALE
-      const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
-      if (!generaleMatch) throw new Error('Dati Generale non trovati');
+      // ---------- GENERALE ----------
+      // Trova prima riga che inizia con "Generale;"
+      // Atteso: Generale;[annoPrec];[annoCorr];...;[clientiPrec];[clientiCurr];;
+      const generalLine = lines.find(l => /^Generale;/.test(l));
+      if (!generalLine) throw new Error('Riga "Generale;" non trovata');
+      const g = generalLine.split(';');
       const generale = {
-        annoPrecedente: this.parseNumber(generaleMatch[1]),
-        annoCorrente: this.parseNumber(generaleMatch[2]),
-        clienti: parseInt(generaleMatch[4], 10),
-      };
-
-      // LATINA
-      const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
-      if (!ltMatch) throw new Error('Dati Latina non trovati');
-      const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
-      const latina = {
-        annoPrecedente: this.parseNumber(ltMatch[1]),
-        annoCorrente: this.parseNumber(ltMatch[2]),
-        obiettivo: latinaObiettivoRaw * 1000, // CSV in "migliaia" → euro
-        percentualeObiettivo: parseInt(ltMatch[4], 10),
-        clientiPrecedenti: parseInt(ltMatch[5], 10),
-        clientiCorrente: parseInt(ltMatch[6], 10),
-        obiettivoClienti: parseInt(ltMatch[7], 10),
-      };
-
-      // ROMA (da sezione Clienti per provincia)
-      const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
-      let roma = { annoCorrente: 0, clienti: 0 };
-      if (clientiMatch) {
-        const clientiText = clientiMatch[1];
-        const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);;;;;;/);
-        if (rmMatch) {
-          roma = {
-            annoCorrente: this.parseNumber(rmMatch[2]),
-            clienti: parseInt(rmMatch[1], 10),
-          };
-        }
-      } else {
-        // fallback: cerca riga RM ovunque
-        const rmMatch = csvText.match(/RM;(\d+);([\d.,]+);/);
-        if (rmMatch) {
-          roma = {
-            annoCorrente: this.parseNumber(rmMatch[2]),
-            clienti: parseInt(rmMatch[1], 10),
-          };
-        }
-      }
-
-      // DETTAGLIO VENDITE → top 10
-      let vendite = [];
-      const dettaglioStart = csvText.indexOf('=== DETTAGLIO VENDITE PER CLIENTE ===');
-      const dettaglioEnd = csvText.indexOf('=== RIEPILOGO PER CATEGORIA ===');
-
-      let dettaglioSection = '';
-      if (dettaglioStart !== -1 && dettaglioEnd !== -1 && dettaglioEnd > dettaglioStart) {
-        dettaglioSection = csvText.substring(dettaglioStart, dettaglioEnd);
-      } else {
-        // fallback: usa tutto il file (filtriamo meglio sotto)
-        dettaglioSection = csvText;
-      }
-
-      const lines = dettaglioSection.split('\n').filter((line) => {
-        const ok = line.trim()
-          && !line.includes('===')
-          && !line.includes('Provincia;Ragione Sociale Cliente')
-          && line.includes(';')
-          && line.split(';').length >= 4;
-
-        if (!ok) return false;
-        // accetta solo righe con provincia 2 lettere maiuscole (LT, RM…)
-        const prov = line.split(';')[0].trim();
-        return /^[A-Z]{2}$/.test(prov);
-      });
-
-      const venditeMap = new Map();
-      lines.forEach((line) => {
-        const parts = line.split(';');
-        if (parts.length >= 4) {
-          const fatturato = this.parseNumber(parts[3]);
-          if (!isNaN(fatturato) && fatturato > 0) {
-            const cliente = parts[1].trim();
-            const vendita = {
-              provincia: parts[0].trim(),
-              cliente,
-              categoria: parts[2].trim(),
-              fatturato,
-            };
-            const exist = venditeMap.get(cliente);
-            if (!exist || exist.fatturato < fatturato) venditeMap.set(cliente, vendita);
+        annoPrecedente: this.parseNumber(g[1]),
+        annoCorrente: this.parseNumber(g[2]),
+        // clienti: prendi l'ultimo campo intero presente sulla riga (fallback sicuro)
+        clienti: (function pickClients(parts) {
+          let out = 0;
+          for (let i = parts.length - 1; i >= 0; i--) {
+            if (/^\d+$/.test(parts[i])) { out = parseInt(parts[i], 10); break; }
           }
-        }
-      });
+          return out;
+        })(g)
+      };
 
-      vendite = Array.from(venditeMap.values())
+      // ---------- LATINA (LT) ----------
+      // Atteso: LT;[annoPrec];[annoCorr];[obiettivo (in migliaia)];[x%];[clientiPrec];[clientiCurr];[obiettivoClienti];[y%]
+      const ltLine = lines.find(l => /^LT;/.test(l));
+      if (!ltLine) throw new Error('Riga "LT;" non trovata');
+      const lt = ltLine.split(';');
+      const latinaObiettivoRaw = this.parseNumber(lt[3]);
+      const latina = {
+        annoPrecedente: this.parseNumber(lt[1]),
+        annoCorrente: this.parseNumber(lt[2]),
+        obiettivo: latinaObiettivoRaw * 1000, // migliaia → euro
+        percentualeObiettivo: parseInt(String(lt[4]).replace(/\D/g, ''), 10) || 0,
+        clientiPrecedenti: parseInt(lt[5], 10) || 0,
+        clientiCorrente: parseInt(lt[6], 10) || 0,
+        obiettivoClienti: parseInt(lt[7], 10) || 0
+      };
+
+      // ---------- ROMA (RM) ----------
+      // Cerchiamo riga RM per "Clienti per provincia": deve avere [0]=RM, [1]=intero clienti, [2]=fatturato numero
+      let roma = { annoCorrente: 0, clienti: 0 };
+      for (const l of lines) {
+        if (!/^RM;/.test(l)) continue;
+        const parts = l.split(';');
+        if (parts.length >= 3 && /^\d+$/.test(parts[1]) && this.isNumericIT(parts[2])) {
+          roma = { clienti: parseInt(parts[1], 10), annoCorrente: this.parseNumber(parts[2]) };
+          break;
+        }
+      }
+      // Se non trovata la riga “clienti per provincia”, Roma rimane 0/0: è ok, non blocchiamo la dashboard.
+
+      // ---------- DETTAGLIO VENDITE (Top 10) ----------
+      // Righe con provincia (2 lettere), cliente (stringa), categoria (stringa), fatturato (numero)
+      // Escludiamo le righe che sembrano “clienti per provincia” (2° campo intero)
+      const venditeMap = new Map();
+      for (const l of lines) {
+        if (!/^[A-Z]{2};/.test(l)) continue;
+        const parts = l.split(';');
+        if (parts.length < 4) continue;
+
+        const prov = parts[0].trim();
+        const campo2 = parts[1].trim();
+        const categoria = parts[2].trim();
+        const fatturato = this.parseNumber(parts[3]);
+
+        // scarta se è la riga "clienti per provincia" (campo2 deve essere nome cliente, non intero)
+        if (/^\d+$/.test(campo2)) continue;
+        if (!prov || !categoria || !Number.isFinite(fatturato) || fatturato <= 0) continue;
+
+        const cliente = campo2;
+        const exist = venditeMap.get(cliente);
+        // se lo stesso cliente compare più volte, tieni il max fatturato
+        if (!exist || exist.fatturato < fatturato) {
+          venditeMap.set(cliente, { provincia: prov, cliente, categoria, fatturato });
+        }
+      }
+      const vendite = Array.from(venditeMap.values())
         .sort((a, b) => b.fatturato - a.fatturato)
         .slice(0, 10);
 
       return { generale, latina, roma, vendite, timestamp: new Date() };
     } catch (e) {
       console.error('❌ Errore parsing:', e);
-      // Stampa un hint in pagina
       const err = document.getElementById('error-message');
       if (err && e && e.message) err.textContent = e.message;
       return null;
@@ -305,3 +283,268 @@ class DashboardManager {
       case 'error':
         if (errorEl) errorEl.style.display = 'block';
         if (connectionStatus) connectionStatus.textContent = 'Errore';
+        if (statusBadge) { statusBadge.className = 'status-badge error'; statusBadge.textContent = '⚠️ Errore CSV'; }
+        const err = byId('error-message');
+        if (err) err.textContent = errorMessage || 'Errore sconosciuto';
+        break;
+    }
+  }
+
+  updateLastUpdateDisplay() {
+    if (!this.lastUpdate) return;
+    const now = new Date();
+    const diff = Math.floor((now - this.lastUpdate) / 1000);
+    let timeText;
+    if (diff < 60) timeText = diff + 's fa';
+    else if (diff < 3600) timeText = Math.floor(diff / 60) + 'm fa';
+    else timeText = this.lastUpdate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+    const lastUpdateEl = document.getElementById('last-update');
+    if (lastUpdateEl) lastUpdateEl.textContent = timeText;
+
+    const tableTimestamp = document.getElementById('table-timestamp');
+    if (tableTimestamp) tableTimestamp.textContent = this.lastUpdate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ==================== DASHBOARD RENDERING ====================
+  renderDashboard() {
+    if (!this.csvData) return;
+    this.renderKPICards();
+    this.renderVenditeTable();
+    this.updateProvinceOptions();
+  }
+
+  renderKPICards() {
+    const data = this.getDisplayData();
+
+    // Fatturato — in k
+    const fatturatoValue = document.getElementById('fatturato-value');
+    if (fatturatoValue) fatturatoValue.textContent = this.formatEuroK3(data.fatturato);
+
+    const growthValue = document.getElementById('growth-value');
+    if (growthValue) growthValue.textContent = '+' + data.crescita + '%';
+
+    const previousValue = document.getElementById('previous-value');
+    if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
+
+    // Obiettivo — in k
+    const obiettivoCard = document.getElementById('obiettivo-card');
+    if (obiettivoCard) {
+      if (data.obiettivo) {
+        obiettivoCard.style.display = 'block';
+        const obVal = document.getElementById('obiettivo-value');
+        const obPerc = document.getElementById('obiettivo-percentage');
+        const remVal = document.getElementById('remaining-value');
+        if (obVal) obVal.textContent = this.formatEuroK3(data.obiettivo);
+        if (obPerc) obPerc.textContent = (data.percentualeObiettivo || 0) + '%';
+        if (remVal) remVal.textContent = this.formatEuroK3((data.obiettivo || 0) - data.fatturato);
+        const progressFill = document.getElementById('progress-fill');
+        if (progressFill) progressFill.style.width = (data.percentualeObiettivo || 0) + '%';
+      } else {
+        obiettivoCard.style.display = 'none';
+      }
+    }
+
+    // Clienti
+    const clientiValue = document.getElementById('clienti-value');
+    if (clientiValue) clientiValue.textContent = String(data.clienti);
+
+    const provinciaLabel = document.getElementById('provincia-label');
+    if (provinciaLabel) provinciaLabel.textContent = this.selectedProvince === 'all' ? 'TOT' : this.selectedProvince;
+  }
+
+  renderVenditeTable() {
+    const tbody = document.getElementById('vendite-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const vendite = Array.isArray(this.csvData?.vendite) ? this.csvData.vendite : [];
+    vendite.forEach(v => {
+      const row = document.createElement('tr');
+      row.innerHTML =
+        '<td>' +
+          '<span class="province-badge ' + v.provincia + '">' + v.provincia + '</span>' +
+        '</td>' +
+        '<td>' + (v.cliente.length > 30 ? v.cliente.slice(0,30) + '...' : v.cliente) + '</td>' +
+        '<td>' + v.categoria + '</td>' +
+        '<td>' + this.formatEuroK3(v.fatturato) + '</td>';
+      tbody.appendChild(row);
+    });
+
+    const totalClients = document.getElementById('total-clients');
+    if (totalClients) totalClients.textContent = String(vendite.length);
+
+    const totalTopRevenue = document.getElementById('total-top-revenue');
+    if (totalTopRevenue) totalTopRevenue.textContent = this.formatEuroK3(
+      vendite.reduce((sum, v) => sum + v.fatturato, 0)
+    );
+
+    const statusIcon = document.getElementById('update-status-icon');
+    if (statusIcon) statusIcon.textContent = '✅';
+
+    const tableStatusBadge = document.getElementById('table-status-badge');
+    if (tableStatusBadge) { tableStatusBadge.innerHTML = '<i class="fas fa-check-circle"></i><span>Live</span>'; tableStatusBadge.className = 'status-badge small success'; }
+  }
+
+  // ==================== PROVINCE FILTER ====================
+  showProvincePopup() { if (!this.csvData) return; this.updateProvinceOptions(); const p = document.getElementById('province-popup'); if (p) p.style.display = 'flex'; }
+  hideProvincePopup() { const p = document.getElementById('province-popup'); if (p) p.style.display = 'none'; }
+
+  updateProvinceOptions() {
+    if (!this.csvData) return;
+    const popupOptions = document.getElementById('popup-options');
+    if (!popupOptions) return;
+    popupOptions.innerHTML = '';
+
+    // Tutte le province
+    popupOptions.appendChild(this.createProvinceOption('all', {
+      title: 'Tutte le Province',
+      description: this.formatEuroK3(this.csvData.generale.annoCorrente) + ' • ' + this.csvData.generale.clienti + ' clienti',
+      className: ''
+    }));
+
+    // Latina
+    popupOptions.appendChild(this.createProvinceOption('LT', {
+      title: 'Latina (LT)',
+      description: this.formatEuroK3(this.csvData.latina.annoCorrente) + ' • ' + this.csvData.latina.clientiCorrente + ' clienti • Obiettivo: ' + (this.csvData.latina.percentualeObiettivo || 0) + '%',
+      className: 'LT'
+    }));
+
+    // Roma
+    popupOptions.appendChild(this.createProvinceOption('RM', {
+      title: 'Roma (RM)',
+      description: this.formatEuroK3(this.csvData.roma.annoCorrente) + ' • ' + this.csvData.roma.clienti + ' clienti',
+      className: 'RM'
+    }));
+
+    const popupStatusDot = document.getElementById('popup-status-dot');
+    const popupStatusText = document.getElementById('popup-status-text');
+    if (popupStatusDot) popupStatusDot.className = 'status-dot online';
+    if (popupStatusText) popupStatusText.textContent = 'Dati CSV aggiornati automaticamente';
+  }
+
+  createProvinceOption(province, config) {
+    const option = document.createElement('button');
+    option.className = 'province-option ' + (this.selectedProvince === province ? 'selected ' + (config.className || '') : '');
+    option.innerHTML =
+      '<div class="option-info">' +
+        '<h4>' + config.title + '</h4>' +
+        '<p>' + config.description + '</p>' +
+      '</div>' +
+      '<div class="option-radio ' + (this.selectedProvince === province ? 'selected' : '') + '"></div>';
+
+    option.addEventListener('click', () => {
+      this.selectedProvince = province;
+      this.renderDashboard();
+      this.hideProvincePopup();
+    });
+
+    return option;
+  }
+
+  // ==================== DATA HELPERS ====================
+  getDisplayData() {
+    if (!this.csvData) {
+      return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
+    }
+
+    if (this.selectedProvince === 'all') {
+      const prev = this.csvData.generale.annoPrecedente || 0;
+      const curr = this.csvData.generale.annoCorrente || 0;
+      const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
+      return { fatturato: curr, annoPrecedente: prev, crescita, clienti: this.csvData.generale.clienti, obiettivo: null, percentualeObiettivo: null };
+    } else if (this.selectedProvince === 'LT') {
+      const prev = this.csvData.latina.annoPrecedente || 0;
+      const curr = this.csvData.latina.annoCorrente || 0;
+      const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
+      return { fatturato: curr, annoPrecedente: prev, crescita, clienti: this.csvData.latina.clientiCorrente, obiettivo: this.csvData.latina.obiettivo, percentualeObiettivo: this.csvData.latina.percentualeObiettivo };
+    } else if (this.selectedProvince === 'RM') {
+      return { fatturato: this.csvData.roma.annoCorrente, annoPrecedente: 0, crescita: '0.0', clienti: this.csvData.roma.clienti, obiettivo: null, percentualeObiettivo: null };
+    }
+
+    return { fatturato: 0, annoPrecedente: 0, crescita: '0.0', clienti: 0, obiettivo: null, percentualeObiettivo: null };
+  }
+
+  // ==================== UTILITY FUNCTIONS ====================
+  // Parser robusto per numeri in formato italiano
+  parseNumber(input) {
+    if (typeof input === 'number') return input;
+    if (!input) return 0;
+    const cleaned = String(input)
+      .replace(/\s+/g, '')
+      .replace(/€/g, '')
+      .replace(/\./g, '')
+      .replace(/,/g, '.');
+    const n = Number(cleaned);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  // "k" con max 3 cifre (1,23k • 12,3k • 123k). Per importi in euro → sempre migliaia.
+  formatK3(value) {
+    const num = Number(value) || 0;
+    const sign = num < 0 ? '-' : '';
+    const v = Math.abs(num);
+    const k = v / 1000;
+    let out;
+    if (k >= 100) out = String(Math.round(k));
+    else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
+    else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
+    // rimuovi zeri/virgola superflui
+    out = out.replace(/,?0+$/, '');
+    return sign + out + 'k';
+  }
+
+  formatEuroK3(value) {
+    if (!value) return '€0k';
+    const k = this.formatK3(value);
+    return '€' + k.replace('k','') + 'k';
+  }
+
+  isNumericIT(s) {
+    if (s == null) return false;
+    const t = String(s).trim();
+    if (!t) return false;
+    const cleaned = t.replace(/\s+/g,'').replace(/€/g,'').replace(/\./g,'').replace(/,/g,'.');
+    return !isNaN(Number(cleaned));
+  }
+
+  // ==================== AUTO UPDATE ====================
+  startAutoUpdate() {
+    // Auto-update ogni 2 minuti
+    this.updateInterval = setInterval(() => {
+      this.fetchCSVData();
+    }, 2 * 60 * 1000);
+
+    // Update time display ogni 30 secondi
+    setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
+
+    // Esegui piccoli test in console all'avvio (non bloccanti)
+    this.runUnitTests();
+  }
+
+  // ==================== TEST (console.assert) ====================
+  runUnitTests() {
+    try {
+      const approx = (a,b) => Math.abs(a-b) < 1e-6;
+      console.assert(approx(this.parseNumber('1.234,56'), 1234.56), 'parseNumber 1');
+      console.assert(this.parseNumber('€ 987.654,00') === 987654, 'parseNumber 2');
+      console.assert(this.formatK3(1234) === '1,23k', 'formatK3 1');
+      console.assert(this.formatK3(12345) === '12,3k', 'formatK3 2');
+      console.assert(this.formatK3(123456) === '123k', 'formatK3 3');
+      console.assert(this.formatEuroK3(1500) === '€1,5k', 'formatEuroK3');
+    } catch (e) { /* ignore in produzione */ }
+  }
+
+  // ==================== CLEANUP ====================
+  destroy() { if (this.updateInterval) clearInterval(this.updateInterval); }
+}
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', () => {
+  window.dashboard = new DashboardManager();
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  if (window.dashboard) window.dashboard.destroy();
+});
