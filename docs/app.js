@@ -1,6 +1,6 @@
 // WOW Charts App (Chart.js + parser per report multi-sezione)
 // Auto-refresh + cache-busting + filtri
-
++
 const CSV_CANDIDATES = [
   "631.00238_CARABOT-NATALINO.csv",
   "docs/631.00238_CARABOT-NATALINO.csv",
