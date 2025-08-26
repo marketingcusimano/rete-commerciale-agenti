@@ -1,1329 +1,546 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARABOT NATALINO - Dashboard Performance</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-          --primary-blue: #3b82f6;
-          --primary-violet: #8b5cf6;
-          --primary-cyan: #22d3ee;
-          --primary-emerald: #10b981;
-          --primary-orange: #f59e0b;
-          --primary-red: #ef4444;
-          --text-primary: #1f2937;
-          --text-secondary: #6b7280;
-          --bg-primary: #f8fafc;
-          --bg-card: rgba(255, 255, 255, 0.95);
-          --border-color: rgba(255, 255, 255, 0.9);
-          --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-          --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .dark-mode {
-          --text-primary: #f9fafb;
-          --text-secondary: #9ca3af;
-          --bg-primary: #0f172a;
-          --bg-card: rgba(30, 41, 59, 0.9);
-          --border-color: rgba(51, 65, 85, 0.6);
-          --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-          --gradient-primary: linear-gradient(135deg, #1e293b 0%, #581c87 50%, #0f172a 100%);
-        }
-
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        body {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-          min-height: 100vh;
-          background: var(--gradient-primary);
-          color: var(--text-primary);
-          transition: all 0.5s ease;
-          overflow-x: hidden;
-        }
-
-        .container {
-          max-width: 1600px;
-          margin: 0 auto;
-          padding: 1.5rem;
-        }
-
-        /* Header */
-        .dashboard-header {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          margin-bottom: 2rem;
-          padding: 2rem;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .dashboard-header::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, var(--primary-blue), var(--primary-violet), var(--primary-cyan), var(--primary-emerald));
-          animation: gradient-flow 3s ease-in-out infinite;
-        }
-
-        @keyframes gradient-flow {
-          0%, 100% { transform: translateX(-100%); }
-          50% { transform: translateX(100%); }
-        }
-
-        .header-content {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 2rem;
-        }
-
-        .brand {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        .brand-icon {
-          width: 70px;
-          height: 70px;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          border-radius: 1.5rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2.5rem;
-          color: white;
-          box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
-        }
-
-        .brand-info h1 {
-          font-size: 2.8rem;
-          font-weight: 900;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin-bottom: 0.5rem;
-        }
-
-        .brand-info p {
-          color: var(--text-secondary);
-          font-size: 1.1rem;
-          font-weight: 500;
-        }
-
-        .header-controls {
-          display: flex;
-          gap: 1rem;
-          align-items: center;
-        }
-
-        .control-btn {
-          padding: 1rem 1.5rem;
-          border-radius: 1rem;
-          border: none;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          color: white;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-size: 1rem;
-          font-weight: 600;
-        }
-
-        .control-btn:hover {
-          transform: scale(1.05);
-          box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
-        }
-
-        .control-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-          transform: none;
-        }
-
-        .spinning {
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        .status-info {
-          padding: 1.5rem 0 0;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 2rem;
-          align-items: center;
-        }
-
-        .status-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 0.9rem;
-          font-weight: 500;
-          padding: 0.75rem 1.25rem;
-          background: rgba(59, 130, 246, 0.1);
-          border-radius: 1rem;
-          backdrop-filter: blur(10px);
-        }
-
-        .status-dot {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          position: relative;
-        }
-
-        .status-dot::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          animation: pulse-ring 2s infinite;
-        }
-
-        .status-dot.online { background: #10b981; }
-        .status-dot.online::after { background: rgba(16, 185, 129, 0.3); }
-        .status-dot.offline { background: #ef4444; }
-        .status-dot.offline::after { background: rgba(239, 68, 68, 0.3); }
-        .status-dot.updating { background: var(--primary-blue); }
-        .status-dot.updating::after { background: rgba(59, 130, 246, 0.3); }
-
-        @keyframes pulse-ring {
-          0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
-          100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
-        }
-
-        /* Loading States */
-        .loading-container, .error-container {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          padding: 4rem;
-          text-align: center;
-          margin-bottom: 2rem;
-        }
-
-        .loading-spinner {
-          font-size: 3rem;
-          color: var(--primary-blue);
-          margin-bottom: 2rem;
-          animation: spin 2s ease-in-out infinite;
-        }
-
-        /* KPI Grid */
-        .kpi-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-          gap: 2rem;
-          margin-bottom: 2rem;
-        }
-
-        .kpi-card {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          padding: 2.5rem;
-          position: relative;
-          overflow: hidden;
-          transition: all 0.3s ease;
-        }
-
-        .kpi-card:hover {
-          transform: translateY(-10px) scale(1.02);
-          box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
-        }
-
-        .kpi-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 6px;
-          background: linear-gradient(90deg, var(--primary-blue), var(--primary-violet), var(--primary-cyan));
-          opacity: 0;
-          transition: opacity 0.4s ease;
-        }
-
-        .kpi-card:hover::before {
-          opacity: 1;
-        }
-
-        .kpi-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 1.5rem;
-        }
-
-        .kpi-info .kpi-label {
-          color: var(--text-secondary);
-          font-size: 1rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          margin-bottom: 1rem;
-        }
-
-        .kpi-value {
-          font-size: 3.5rem;
-          font-weight: 900;
-          color: var(--text-primary);
-          line-height: 1;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          transition: all 0.5s ease;
-        }
-
-        .kpi-badge {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          border-radius: 1rem;
-          background: rgba(16, 185, 129, 0.15);
-          color: #10b981;
-          font-size: 1rem;
-          font-weight: 700;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .kpi-badge.secondary {
-          background: rgba(34, 211, 238, 0.15);
-          color: #22d3ee;
-          border: 1px solid rgba(34, 211, 238, 0.2);
-        }
-
-        .progress-container {
-          margin: 2rem 0;
-        }
-
-        .progress-bar {
-          width: 100%;
-          height: 12px;
-          background: rgba(107, 114, 128, 0.2);
-          border-radius: 1rem;
-          overflow: hidden;
-          position: relative;
-        }
-
-        .progress-fill {
-          height: 100%;
-          background: linear-gradient(90deg, var(--primary-emerald), #34d399);
-          border-radius: 1rem;
-          transition: width 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .progress-fill::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-          animation: progress-shine 2s infinite;
-        }
-
-        @keyframes progress-shine {
-          0% { left: -100%; }
-          100% { left: 100%; }
-        }
-
-        /* Charts */
-        .charts-section {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          margin-bottom: 2rem;
-          overflow: hidden;
-          position: relative;
-        }
-
-        .charts-header {
-          padding: 2.5rem 2.5rem 1.5rem;
-          text-align: center;
-        }
-
-        .charts-title {
-          font-size: 2.5rem;
-          font-weight: 800;
-          background: linear-gradient(135deg, var(--primary-emerald), var(--primary-cyan));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin-bottom: 1rem;
-        }
-
-        .charts-grid {
-          padding: 0 2.5rem 2.5rem;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-          gap: 2rem;
-        }
-
-        .chart-card {
-          background: rgba(255, 255, 255, 0.08);
-          backdrop-filter: blur(20px);
-          border-radius: 1.5rem;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          padding: 2rem;
-          position: relative;
-          overflow: hidden;
-          transition: all 0.4s ease;
-        }
-
-        .chart-card:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
-        }
-
-        .chart-header {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 2rem;
-        }
-
-        .chart-icon {
-          width: 50px;
-          height: 50px;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          border-radius: 1rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.5rem;
-          color: white;
-          box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
-        }
-
-        .chart-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: var(--text-primary);
-        }
-
-        .chart-container {
-          position: relative;
-          height: 350px;
-          width: 100%;
-        }
-
-        /* Table */
-        .table-section {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          padding: 2.5rem;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .table-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 2rem;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-
-        .table-title {
-          font-size: 2rem;
-          font-weight: 800;
-          color: var(--text-primary);
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        .table-icon {
-          width: 45px;
-          height: 45px;
-          background: linear-gradient(135deg, var(--primary-cyan), var(--primary-emerald));
-          border-radius: 1rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.25rem;
-          color: white;
-        }
-
-        .enhanced-table {
-          width: 100%;
-          border-collapse: separate;
-          border-spacing: 0;
-          background: transparent;
-          border-radius: 1rem;
-          overflow: hidden;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .enhanced-table th {
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-          color: var(--text-primary);
-          padding: 1.25rem;
-          text-align: left;
-          font-weight: 700;
-          font-size: 0.9rem;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .enhanced-table th:last-child {
-          text-align: right;
-        }
-
-        .enhanced-table td {
-          padding: 1.25rem;
-          background: rgba(255, 255, 255, 0.05);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          transition: all 0.3s ease;
-          font-weight: 500;
-        }
-
-        .enhanced-table td:last-child {
-          text-align: right;
-          font-weight: 700;
-          color: var(--primary-emerald);
-        }
-
-        .enhanced-table tr:hover td {
-          background: rgba(59, 130, 246, 0.1);
-          transform: scale(1.01);
-        }
-
-        .province-badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 0.5rem 1rem;
-          border-radius: 1rem;
-          font-size: 0.8rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-
-        .province-badge.LT {
-          background: rgba(139, 92, 246, 0.2);
-          color: #8b5cf6;
-          border: 1px solid rgba(139, 92, 246, 0.3);
-        }
-
-        .province-badge.RM {
-          background: rgba(34, 211, 238, 0.2);
-          color: #22d3ee;
-          border: 1px solid rgba(34, 211, 238, 0.3);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-          .container {
-            padding: 1rem;
-          }
-          
-          .charts-grid {
-            grid-template-columns: 1fr;
-          }
-          
-          .chart-container {
-            height: 300px;
-          }
-          
-          .kpi-grid {
-            grid-template-columns: 1fr;
-          }
-          
-          .brand-info h1 {
-            font-size: 2.2rem;
-          }
-          
-          .kpi-value {
-            font-size: 2.5rem;
-          }
-        }
-    </style>
-</head>
-<body class="light-mode">
-    <div class="container">
-        <!-- Header -->
-        <header class="dashboard-header">
-            <div class="header-content">
-                <div class="brand">
-                    <div class="brand-icon">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="brand-info">
-                        <h1>CARABOT NATALINO</h1>
-                        <p>Dashboard Performance Analytics - Dati CSV Reali</p>
-                    </div>
-                </div>
-                
-                <div class="header-controls">
-                    <button class="control-btn" id="refresh-btn">
-                        <i class="fas fa-sync-alt" id="refresh-icon"></i>
-                        Aggiorna Dati
-                    </button>
-                    <button class="control-btn" id="theme-toggle">
-                        <i class="fas fa-moon" id="theme-icon"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="status-info">
-                <div class="status-item">
-                    <i class="fas fa-id-card"></i>
-                    <span><strong>ID:</strong> 631.00238</span>
-                </div>
-                <div class="status-item">
-                    <i class="fas fa-calendar"></i>
-                    <span>Gen - Ago 2025</span>
-                </div>
-                <div class="status-item">
-                    <div class="status-dot offline" id="connection-dot"></div>
-                    <span id="connection-status">Connecting...</span>
-                </div>
-                <div class="status-item">
-                    <i class="fas fa-clock"></i>
-                    <span>Last: <span id="last-update">Never</span></span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Loading State -->
-        <div id="loading-state" class="loading-container">
-            <div class="loading-content">
-                <i class="fas fa-sync-alt loading-spinner"></i>
-                <h2>Caricamento dati CSV da GitHub...</h2>
-                <p>Connessione al file dati reale</p>
-            </div>
-        </div>
-
-        <!-- Error State -->
-        <div id="error-state" class="error-container" style="display: none;">
-            <div class="error-content">
-                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
-                <h2>Errore Connessione</h2>
-                <p id="error-message"></p>
-                <button class="control-btn" onclick="dashboardManager.fetchCSVData(true)" style="margin-top: 1rem;">
-                    <i class="fas fa-redo"></i> Riprova
-                </button>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div id="main-content" style="display: none;">
-            
-            <!-- KPI Cards -->
-            <div class="kpi-grid">
-                <!-- Fatturato Card -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-info">
-                            <p class="kpi-label">Fatturato 2025</p>
-                            <p class="kpi-value" id="fatturato-value">€0k</p>
-                        </div>
-                        <div class="kpi-badge">
-                            <i class="fas fa-arrow-up"></i>
-                            <span id="growth-value">+0%</span>
-                        </div>
-                    </div>
-                    <div class="kpi-footer" style="color: var(--text-secondary); font-size: 1rem;">
-                        <span>vs 2024: </span>
-                        <span id="previous-value" style="font-weight: 700;">€0k</span>
-                    </div>
-                </div>
-
-                <!-- Obiettivo Card -->
-                <div class="kpi-card" id="obiettivo-card" style="display: none;">
-                    <div class="kpi-header">
-                        <div class="kpi-info">
-                            <p class="kpi-label">Target 2025</p>
-                            <p class="kpi-value" id="obiettivo-value">€0k</p>
-                        </div>
-                        <div class="kpi-badge secondary">
-                            <span id="obiettivo-percentage">0%</span>
-                        </div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progress-fill"></div>
-                        </div>
-                    </div>
-                    <div class="kpi-footer" style="color: var(--text-secondary); font-size: 1rem;">
-                        <span>Rimanente: </span>
-                        <span id="remaining-value" style="font-weight: 700;">€0k</span>
-                    </div>
-                </div>
-
-                <!-- Clienti Card -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-info">
-                            <p class="kpi-label">Clienti Attivi</p>
-                            <p class="kpi-value" id="clienti-value">0</p>
-                        </div>
-                        <div class="kpi-badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
-                            <span>TOTALE</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="charts-section">
-                <div class="charts-header">
-                    <h2 class="charts-title">Analisi Performance</h2>
-                    <p style="color: var(--text-secondary); font-size: 1.125rem;">Grafici basati sui dati CSV reali</p>
-                </div>
-                
-                <div class="charts-grid">
-                    <!-- Province Distribution -->
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-icon">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </div>
-                            <h3 class="chart-title">Fatturato per Provincia</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="provinceChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Top Clients -->
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-icon">
-                                <i class="fas fa-crown"></i>
-                            </div>
-                            <h3 class="chart-title">Top 5 Clienti</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="topClientsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Table Section -->
-            <div class="table-section">
-                <div class="table-header">
-                    <div class="table-title">
-                        <div class="table-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        Top Clienti (Dati CSV)
-                    </div>
-                </div>
-                
-                <div style="overflow-x: auto;">
-                    <table class="enhanced-table">
-                        <thead>
-                            <tr>
-                                <th>Provincia</th>
-                                <th>Cliente</th>
-                                <th>Categoria</th>
-                                <th>Fatturato</th>
-                            </tr>
-                        </thead>
-                        <tbody id="vendite-tbody">
-                            <!-- Popolato da JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; flex-wrap: wrap; gap: 2rem;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-blue);" id="total-clients">0</div>
-                        <div style="color: var(--text-secondary);">Clienti Totali</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-emerald);" id="total-revenue">€0k</div>
-                        <div style="color: var(--text-secondary);">Fatturato Totale</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-violet);" id="last-sync-time">--:--</div>
-                        <div style="color: var(--text-secondary);">Ultimo Aggiornamento</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        class DashboardManager {
-            constructor() {
-                this.csvData = null;
-                this.isLoading = false;
-                this.lastUpdate = null;
-                this.updateInterval = null;
-                this.charts = {};
-
-                // File CSV nome esatto dal tuo repository
-                this.csvFileNames = [
-                    '631.00238_CARABOT-NATALINO.csv',
-                    '631.00238_CARABOT NATALINO.csv'
-                ];
-
-                this.init();
+// ==================== DASHBOARD CARABOT NATALINO - GITHUB PAGES ====================
+// Vanilla JS â€” CSV live, parser IT, formattazione "k" max 3 cifre ovunque
+// Fix: URL risolti automaticamente per GitHub Pages (repo-pages con /<repo>/),
+//      rimozione controllo troppo rigido sul contenuto del CSV,
+//      log dettagliati e messaggi d'errore piÃ¹ chiari.
+
+class DashboardManager {
+  constructor() {
+    this.csvData = null;
+    this.selectedProvince = 'all';
+    this.isLoading = false;
+    this.lastUpdate = null;
+    this.updateInterval = null;
+
+    // Nomi possibili del file CSV (vedi repo screenshot)
+    this.csvFileNames = [
+      '631.00238_CARABOT-NATALINO.csv',
+      '631.00238_CARABOT NATALINO.csv'
+    ];
+
+    this.init();
+  }
+
+  init() {
+    this.setupEventListeners();
+    this.loadInitialData();
+    this.startAutoUpdate();
+  }
+
+  // ==================== EVENT LISTENERS ====================
+  setupEventListeners() {
+    const byId = (id) => document.getElementById(id);
+
+    const refreshBtn = byId('refresh-btn');
+    if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchCSVData(true));
+
+    const themeToggle = byId('theme-toggle');
+    if (themeToggle) themeToggle.addEventListener('click', () => this.toggleTheme());
+
+    const provinceFilter = byId('province-filter');
+    if (provinceFilter) provinceFilter.addEventListener('click', () => this.showProvincePopup());
+
+    const closePopup = byId('close-popup');
+    if (closePopup) closePopup.addEventListener('click', () => this.hideProvincePopup());
+
+    const popupCloseBtn = byId('popup-close-btn');
+    if (popupCloseBtn) popupCloseBtn.addEventListener('click', () => this.hideProvincePopup());
+
+    const provincePopup = byId('province-popup');
+    if (provincePopup) {
+      provincePopup.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'province-popup') this.hideProvincePopup();
+      });
+    }
+  }
+
+  // ==================== THEME MANAGEMENT ====================
+  toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.getElementById('theme-icon');
+    if (body.classList.contains('light-mode')) {
+      body.classList.remove('light-mode');
+      body.classList.add('dark-mode');
+      if (themeIcon) themeIcon.className = 'fas fa-sun';
+    } else {
+      body.classList.remove('dark-mode');
+      body.classList.add('light-mode');
+      if (themeIcon) themeIcon.className = 'fas fa-moon';
+    }
+  }
+
+  // ==================== DATA LOADING ====================
+  async loadInitialData() { await this.fetchCSVData(); }
+
+  // Costruisce una lista di URL candidati che funzionano su GitHub Pages
+  buildCandidateUrls() {
+    const { pathname, origin } = window.location;
+    // es.: /utente/repo/ => repoSlug = 'repo'
+    const segs = pathname.split('/').filter(Boolean);
+    const repoSlug = segs.length ? segs[0] : '';
+
+    const bases = new Set([
+      './',
+      '',
+      // base calcolata dalla pagina corrente (termina con /)
+      pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''),
+      // root del repo pages
+      repoSlug ? `/${repoSlug}/` : '/',
+      // in alcuni setup rimane /<repo>/docs/
+      repoSlug ? `/${repoSlug}/docs/` : '/docs/'
+    ]);
+
+    const urls = [];
+    for (const base of bases) {
+      for (const name of this.csvFileNames) {
+        try {
+          const abs = new URL(base + name, origin).href;
+          urls.push(abs);
+        } catch { /* ignore */ }
+      }
+    }
+    // dedup
+    return Array.from(new Set(urls));
+  }
+
+  async fetchCSVData(isManual = false) {
+    if (this.isLoading) return;
+
+    this.isLoading = true;
+    this.updateLoadingState('updating');
+
+    try {
+      const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
+      const candidates = this.buildCandidateUrls();
+      let lastError = null;
+      let text = null;
+
+      console.log('ðŸ”Ž CSV candidate URLs:', candidates);
+
+      // Prova in sequenza gli URL definiti
+      for (const url of candidates) {
+        const u = url + cacheBuster;
+        try {
+          console.log('â†—ï¸ GET', u);
+          const res = await fetch(u, {
+            method: 'GET',
+            cache: 'no-cache',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache'
             }
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          const t = await res.text();
+          if (t && t.trim().length > 0) { text = t; break; }
+          lastError = new Error('CSV vuoto');
+        } catch (e) {
+          console.warn('âš ï¸ Fallito', u, e);
+          lastError = e;
+        }
+      }
 
-            init() {
-                this.setupEventListeners();
-                this.loadInitialData();
-                this.startAutoUpdate();
-            }
+      if (!text) throw lastError || new Error('Impossibile leggere il CSV');
 
-            setupEventListeners() {
-                const refreshBtn = document.getElementById('refresh-btn');
-                if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchCSVData(true));
+      // Log diagnostico
+      console.log('âœ… CSV caricato, len:', text.length);
+      console.log('ðŸ“ CSV head (200):', text.substring(0, 200));
 
-                const themeToggle = document.getElementById('theme-toggle');
-                if (themeToggle) themeToggle.addEventListener('click', () => this.toggleTheme());
-            }
+      const parsedData = this.parseCSV(text);
+      if (!parsedData) throw new Error('Parsing CSV fallito â€” controlla intestazioni/marker nel CSV');
 
-            toggleTheme() {
-                const body = document.body;
-                const themeIcon = document.getElementById('theme-icon');
-                if (body.classList.contains('light-mode')) {
-                    body.classList.remove('light-mode');
-                    body.classList.add('dark-mode');
-                    if (themeIcon) themeIcon.className = 'fas fa-sun';
-                } else {
-                    body.classList.remove('dark-mode');
-                    body.classList.add('light-mode');
-                    if (themeIcon) themeIcon.className = 'fas fa-moon';
-                }
-            }
+      this.csvData = parsedData;
+      this.lastUpdate = new Date();
+      this.updateLoadingState('success');
+      this.renderDashboard();
 
-            async loadInitialData() {
-                await this.fetchCSVData();
-            }
+    } catch (error) {
+      console.error('âŒ Errore fetch CSV:', error);
+      this.updateLoadingState('error', error && error.message ? error.message : 'Errore sconosciuto');
+    } finally {
+      this.isLoading = false;
+    }
+  }
 
-            buildCandidateUrls() {
-                const { pathname, origin } = window.location;
-                const segs = pathname.split('/').filter(Boolean);
-                const repoSlug = segs.length ? segs[0] : '';
+  // ==================== CSV PARSING ====================
+  parseCSV(csvText) {
+    try {
+      // OBIETTIVI
+      const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
+      if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
+      const obiettiviText = obiettiviMatch[1];
 
-                const bases = new Set([
-                    './',
-                    '',
-                    pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''),
-                    repoSlug ? `/${repoSlug}/` : '/',
-                    repoSlug ? `/${repoSlug}/docs/` : '/docs/'
-                ]);
+      // GENERALE
+      const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
+      if (!generaleMatch) throw new Error('Dati Generale non trovati');
+      const generale = {
+        annoPrecedente: this.parseNumber(generaleMatch[1]),
+        annoCorrente: this.parseNumber(generaleMatch[2]),
+        clienti: parseInt(generaleMatch[4], 10)
+      };
 
-                const urls = [];
-                for (const base of bases) {
-                    for (const name of this.csvFileNames) {
-                        try {
-                            const abs = new URL(base + name, origin).href;
-                            urls.push(abs);
-                        } catch { /* ignore */ }
-                    }
-                }
-                return Array.from(new Set(urls));
-            }
+      // LATINA
+      const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
+      if (!ltMatch) throw new Error('Dati Latina non trovati');
+      const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
+      const latina = {
+        annoPrecedente: this.parseNumber(ltMatch[1]),
+        annoCorrente: this.parseNumber(ltMatch[2]),
+        obiettivo: latinaObiettivoRaw * 1000, // CSV in "migliaia" â†’ euro
+        percentualeObiettivo: parseInt(ltMatch[4], 10),
+        clientiPrecedenti: parseInt(ltMatch[5], 10),
+        clientiCorrente: parseInt(ltMatch[6], 10),
+        obiettivoClienti: parseInt(ltMatch[7], 10)
+      };
 
-            async fetchCSVData(isManual = false) {
-                if (this.isLoading) return;
+      // ROMA (da sezione Clienti per provincia)
+      const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
+      let roma = { annoCorrente: 0, clienti: 0 };
+      if (clientiMatch) {
+        const clientiText = clientiMatch[1];
+        const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);;;;;;/);
+        if (rmMatch) {
+          roma = {
+            annoCorrente: this.parseNumber(rmMatch[2]),
+            clienti: parseInt(rmMatch[1], 10)
+          };
+        }
+      }
 
-                this.isLoading = true;
-                this.updateLoadingState('updating');
-
-                try {
-                    const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
-                    const candidates = this.buildCandidateUrls();
-                    let lastError = null;
-                    let text = null;
-
-                    console.log('Tentativo caricamento CSV da:', candidates);
-
-                    for (const url of candidates) {
-                        const u = url + cacheBuster;
-                        try {
-                            console.log('Tentativo GET:', u);
-                            const res = await fetch(u, {
-                                method: 'GET',
-                                cache: 'no-cache',
-                                headers: {
-                                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                                    'Pragma': 'no-cache'
-                                }
-                            });
-                            if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-                            const t = await res.text();
-                            if (t && t.trim().length > 0) { text = t; break; }
-                            lastError = new Error('CSV vuoto');
-                        } catch (e) {
-                            console.warn('Fallito:', u, e);
-                            lastError = e;
-                        }
-                    }
-
-                    if (!text) throw lastError || new Error('Impossibile caricare CSV');
-
-                    console.log('CSV caricato, lunghezza:', text.length);
-
-                    const parsedData = this.parseCSV(text);
-                    if (!parsedData) throw new Error('Parsing CSV fallito');
-
-                    this.csvData = parsedData;
-                    this.lastUpdate = new Date();
-                    this.updateLoadingState('success');
-                    this.renderDashboard();
-
-                } catch (error) {
-                    console.error('Errore caricamento CSV:', error);
-                    this.updateLoadingState('error', error?.message || 'Errore sconosciuto');
-                } finally {
-                    this.isLoading = false;
-                }
-            }
-
-            parseCSV(csvText) {
-                try {
-                    // Parsing OBIETTIVI
-                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
-                    if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata nel CSV');
-                    const obiettiviText = obiettiviMatch[1];
-
-                    // DATI GENERALI
-                    const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
-                    if (!generaleMatch) throw new Error('Dati Generale non trovati');
-                    const generale = {
-                        annoPrecedente: this.parseNumber(generaleMatch[1]),
-                        annoCorrente: this.parseNumber(generaleMatch[2]),
-                        clienti: parseInt(generaleMatch[4], 10)
-                    };
-
-                    // DATI LATINA
-                    const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
-                    if (!ltMatch) throw new Error('Dati Latina non trovati');
-                    const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
-                    const latina = {
-                        annoPrecedente: this.parseNumber(ltMatch[1]),
-                        annoCorrente: this.parseNumber(ltMatch[2]),
-                        obiettivo: latinaObiettivoRaw * 1000, // CSV in migliaia
-                        percentualeObiettivo: parseInt(ltMatch[4], 10),
-                        clientiPrecedenti: parseInt(ltMatch[5], 10),
-                        clientiCorrente: parseInt(ltMatch[6], 10),
-                        obiettivoClienti: parseInt(ltMatch[7], 10)
-                    };
-
-                    // DATI ROMA
-                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
-                    let roma = { annoCorrente: 0, clienti: 0 };
-                    if (clientiMatch) {
-                        const clientiText = clientiMatch[1];
-                        const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);;;;;;/);
-                        if (rmMatch) {
-                            roma = {
-                                annoCorrente: this.parseNumber(rmMatch[2]),
-                                clienti: parseInt(rmMatch[1], 10)
-                            };
-                        }
-                    }
-
-                    // VENDITE PER CLIENTE
-                    const dettaglioStart = csvText.indexOf('=== DETTAGLIO VENDITE PER CLIENTE ===');
-                    const dettaglioEnd = csvText.indexOf('=== RIEPILOGO PER CATEGORIA ===');
-                    let vendite = [];
-                    if (dettaglioStart !== -1 && dettaglioEnd !== -1) {
-                        const dettaglioSection = csvText.substring(dettaglioStart, dettaglioEnd);
-                        const lines = dettaglioSection.split('\n').filter(line =>
-                            line.trim() && 
-                            !line.includes('===') && 
-                            !line.includes('Provincia;Ragione Sociale Cliente') && 
-                            line.includes(';') && 
-                            line.split(';').length >= 4
-                        );
-                        
-                        const venditeMap = new Map();
-                        lines.forEach(line => {
-                            const parts = line.split(';');
-                            if (parts.length >= 4) {
-                                const fatturato = this.parseNumber(parts[3]);
-                                if (!isNaN(fatturato) && fatturato > 0) {
-                                    const cliente = parts[1].trim();
-                                    if (!venditeMap.has(cliente) || venditeMap.get(cliente).fatturato < fatturato) {
-                                        venditeMap.set(cliente, {
-                                            provincia: parts[0].trim(),
-                                            cliente: cliente,
-                                            categoria: parts[2].trim(),
-                                            fatturato: fatturato
-                                        });
-                                    }
-                                }
-                            }
-                        });
-                        vendite = Array.from(venditeMap.values())
-                            .sort((a, b) => b.fatturato - a.fatturato)
-                            .slice(0, 20); // Top 20
-                    }
-
-                    const result = { generale, latina, roma, vendite, timestamp: new Date() };
-                    console.log('Dati CSV parsati:', result);
-                    return result;
-                } catch (e) {
-                    console.error('Errore parsing CSV:', e);
-                    return null;
-                }
-            }
-
-            parseNumber(input) {
-                if (typeof input === 'number') return input;
-                if (!input) return 0;
-                const cleaned = String(input)
-                    .replace(/\s+/g, '')
-                    .replace(/€/g, '')
-                    .replace(/\./g, '')
-                    .replace(/,/g, '.');
-                const n = Number(cleaned);
-                return Number.isFinite(n) ? n : 0;
-            }
-
-            formatK3(value) {
-                const num = Number(value) || 0;
-                const sign = num < 0 ? '-' : '';
-                const v = Math.abs(num);
-                const k = v / 1000;
-                let out;
-                if (k >= 100) out = String(Math.round(k));
-                else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
-                else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
-                out = out.replace(/,?0+$/, '');
-                return sign + out + 'k';
-            }
-
-            formatEuroK3(value) {
-                if (!value) return '€0k';
-                const k = this.formatK3(value);
-                return '€' + k.replace('k', '') + 'k';
-            }
-
-            updateLoadingState(state, errorMessage = null) {
-                const loadingEl = document.getElementById('loading-state');
-                const errorEl = document.getElementById('error-state');
-                const mainEl = document.getElementById('main-content');
-                const refreshIcon = document.getElementById('refresh-icon');
-                const connectionDot = document.getElementById('connection-dot');
-                const connectionStatus = document.getElementById('connection-status');
-
-                if (loadingEl) loadingEl.style.display = 'none';
-                if (errorEl) errorEl.style.display = 'none';
-                if (mainEl) mainEl.style.display = 'none';
-
-                if (refreshIcon) {
-                    if (state === 'updating') refreshIcon.classList.add('spinning');
-                    else refreshIcon.classList.remove('spinning');
-                }
-
-                if (connectionDot) connectionDot.className = 'status-dot ' + 
-                    (state === 'updating' ? 'updating' : state === 'success' ? 'online' : 'offline');
-
-                switch (state) {
-                    case 'updating':
-                        if (loadingEl) loadingEl.style.display = 'block';
-                        if (connectionStatus) connectionStatus.textContent = 'Caricamento...';
-                        break;
-                    case 'success':
-                        if (mainEl) mainEl.style.display = 'block';
-                        if (connectionStatus) connectionStatus.textContent = 'Online';
-                        this.updateLastUpdateDisplay();
-                        break;
-                    case 'error':
-                        if (errorEl) errorEl.style.display = 'block';
-                        if (connectionStatus) connectionStatus.textContent = 'Errore';
-                        const err = document.getElementById('error-message');
-                        if (err) err.textContent = errorMessage || 'Errore sconosciuto';
-                        break;
-                }
-            }
-
-            updateLastUpdateDisplay() {
-                if (!this.lastUpdate) return;
-                const lastUpdateEl = document.getElementById('last-update');
-                const lastSyncTime = document.getElementById('last-sync-time');
-                if (lastUpdateEl) lastUpdateEl.textContent = this.lastUpdate.toLocaleTimeString('it-IT');
-                if (lastSyncTime) lastSyncTime.textContent = this.lastUpdate.toLocaleTimeString('it-IT', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
+      // DETTAGLIO VENDITE â†’ top 10
+      const dettaglioStart = csvText.indexOf('=== DETTAGLIO VENDITE PER CLIENTE ===');
+      const dettaglioEnd = csvText.indexOf('=== RIEPILOGO PER CATEGORIA ===');
+      let vendite = [];
+      if (dettaglioStart !== -1 && dettaglioEnd !== -1) {
+        const dettaglioSection = csvText.substring(dettaglioStart, dettaglioEnd);
+        const lines = dettaglioSection.split('\n').filter(line =>
+          line.trim() && !line.includes('===') && !line.includes('Provincia;Ragione Sociale Cliente') && line.includes(';') && line.split(';').length >= 4
+        );
+        const venditeMap = new Map();
+        lines.forEach(line => {
+          const parts = line.split(';');
+          if (parts.length >= 4) {
+            const fatturato = this.parseNumber(parts[3]);
+            if (!isNaN(fatturato) && fatturato > 0) {
+              const cliente = parts[1].trim();
+              if (!venditeMap.has(cliente) || venditeMap.get(cliente).fatturato < fatturato) {
+                venditeMap.set(cliente, {
+                  provincia: parts[0].trim(),
+                  cliente: cliente,
+                  categoria: parts[2].trim(),
+                  fatturato: fatturato
                 });
+              }
             }
-
-            renderDashboard() {
-                if (!this.csvData) return;
-                this.renderKPICards();
-                this.renderVenditeTable();
-                this.renderCharts();
-            }
-
-            renderKPICards() {
-                const data = this.getDisplayData();
-
-                // Fatturato
-                const fatturatoValue = document.getElementById('fatturato-value');
-                if (fatturatoValue) fatturatoValue.textContent = this.formatEuroK3(data.fatturato);
-
-                // Crescita
-                const growthValue = document.getElementById('growth-value');
-                if (growthValue) growthValue.textContent = '+' + data.crescita + '%';
-
-                // Valore precedente
-                const previousValue = document.getElementById('previous-value');
-                if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
-
-                // Obiettivo
-                const obiettivoCard = document.getElementById('obiettivo-card');
-                if (obiettivoCard) {
-                    if (data.obiettivo) {
-                        obiettivoCard.style.display = 'block';
-                        const obVal = document.getElementById('obiettivo-value');
-                        const obPerc = document.getElementById('obiettivo-percentage');
-                        const remVal = document.getElementById('remaining-value');
-                        if (obVal) obVal.textContent = this.formatEuroK3(data.obiettivo);
-                        if (obPerc) obPerc.textContent = (data.percentualeObiettivo || 0) + '%';
-                        if (remVal) remVal.textContent = this.formatEuroK3((data.obiettivo || 0) - data.fatturato);
-                        const progressFill = document.getElementById('progress-fill');
-                        if (progressFill) progressFill.style.width = (data.percentualeObiettivo || 0) + '%';
-                    } else {
-                        obiettivoCard.style.display = 'none';
-                    }
-                }
-
-                // Clienti
-                const clientiValue = document.getElementById('clienti-value');
-                if (clientiValue) clientiValue.textContent = String(data.clienti);
-            }
-
-            renderVenditeTable() {
-                if (!this.csvData.vendite || this.csvData.vendite.length === 0) return;
-
-                const tbody = document.getElementById('vendite-tbody');
-                if (!tbody) return;
-                tbody.innerHTML = '';
-
-                this.csvData.vendite.forEach(vendita => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><span class="province-badge ${vendita.provincia}">${vendita.provincia}</span></td>
-                        <td>${vendita.cliente.length > 35 ? vendita.cliente.slice(0, 35) + '...' : vendita.cliente}</td>
-                        <td>${vendita.categoria}</td>
-                        <td>${this.formatEuroK3(vendita.fatturato)}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-
-                // Update footer stats
-                const totalClients = document.getElementById('total-clients');
-                const totalRevenue = document.getElementById('total-revenue');
-                if (totalClients) totalClients.textContent = String(this.csvData.vendite.length);
-                if (totalRevenue) totalRevenue.textContent = this.formatEuroK3(
-                    this.csvData.vendite.reduce((sum, v) => sum + v.fatturato, 0)
-                );
-            }
-
-            renderCharts() {
-                if (!this.csvData) return;
-                this.renderProvinceChart();
-                this.renderTopClientsChart();
-            }
-
-            renderProvinceChart() {
-                const ctx = document.getElementById('provinceChart');
-                if (!ctx) return;
-
-                if (this.charts.province) this.charts.province.destroy();
-
-                const data = {
-                    labels: ['Latina (LT)', 'Roma (RM)'],
-                    datasets: [{
-                        data: [this.csvData.latina.annoCorrente, this.csvData.roma.annoCorrente],
-                        backgroundColor: [
-                            'rgba(139, 92, 246, 0.8)',
-                            'rgba(34, 211, 238, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(139, 92, 246, 1)',
-                            'rgba(34, 211, 238, 1)'
-                        ],
-                        borderWidth: 3
-                    }]
-                };
-
-                this.charts.province = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: data,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                    font: { size: 14, weight: '600' },
-                                    padding: 20
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => {
-                                        const value = this.formatEuroK3(context.raw);
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = ((context.raw / total) * 100).toFixed(1);
-                                        return `${context.label}: ${value} (${percentage}%)`;
-                                    }
-                                }
-                            }
-                        },
-                        cutout: '60%'
-                    }
-                });
-            }
-
-            renderTopClientsChart() {
-                const ctx = document.getElementById('topClientsChart');
-                if (!ctx) return;
-
-                if (this.charts.topClients) this.charts.topClients.destroy();
-
-                const topClients = this.csvData.vendite.slice(0, 5);
-
-                const data = {
-                    labels: topClients.map(c => c.cliente.length > 25 ? c.cliente.substring(0, 25) + '...' : c.cliente),
-                    datasets: [{
-                        data: topClients.map(c => c.fatturato),
-                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 2
-                    }]
-                };
-
-                this.charts.topClients = new Chart(ctx, {
-                    type: 'bar',
-                    data: data,
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => this.formatEuroK3(context.raw)
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: (value) => this.formatK3(value),
-                                    color: 'rgba(255, 255, 255, 0.7)'
-                                },
-                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                            },
-                            y: {
-                                ticks: { color: 'rgba(255, 255, 255, 0.7)' },
-                                grid: { display: false }
-                            }
-                        }
-                    }
-                });
-            }
-
-            getDisplayData() {
-                if (!this.csvData) {
-                    return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
-                }
-
-                // Usa sempre i dati generali
-                const prev = this.csvData.generale.annoPrecedente || 0;
-                const curr = this.csvData.generale.annoCorrente || 0;
-                const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
-                
-                // Mostra obiettivo solo per Latina se esiste
-                const obiettivo = this.csvData.latina.obiettivo || null;
-                const percentualeObiettivo = this.csvData.latina.percentualeObiettivo || null;
-                
-                return { 
-                    fatturato: curr, 
-                    annoPrecedente: prev, 
-                    crescita, 
-                    clienti: this.csvData.generale.clienti,
-                    obiettivo,
-                    percentualeObiettivo
-                };
-            }
-
-            startAutoUpdate() {
-                // Auto-update ogni 2 minuti
-                this.updateInterval = setInterval(() => {
-                    this.fetchCSVData();
-                }, 2 * 60 * 1000);
-
-                // Update display ogni 30 secondi
-                setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
-            }
-
-            destroy() {
-                if (this.updateInterval) clearInterval(this.updateInterval);
-                Object.values(this.charts).forEach(chart => {
-                    if (chart) chart.destroy();
-                });
-            }
-        }
-
-        // Initialize
-        let dashboardManager;
-        document.addEventListener('DOMContentLoaded', () => {
-            dashboardManager = new DashboardManager();
+          }
         });
+        vendite = Array.from(venditeMap.values()).sort((a,b)=>b.fatturato-a.fatturato).slice(0,10);
+      }
 
-        window.addEventListener('beforeunload', () => {
-            if (dashboardManager) dashboardManager.destroy();
-        });
-    </script>
-</body>
-</html>
+      const result = { generale, latina, roma, vendite, timestamp: new Date() };
+      return result;
+    } catch (e) {
+      console.error('âŒ Errore parsing:', e);
+      // Stampa un hint in pagina
+      const err = document.getElementById('error-message');
+      if (err && e && e.message) err.textContent = e.message;
+      return null;
+    }
+  }
+
+  // ==================== UI UPDATES ====================
+  updateLoadingState(state, errorMessage = null) {
+    const byId = (id) => document.getElementById(id);
+    const loadingEl = byId('loading-state');
+    const errorEl = byId('error-state');
+    const mainEl = byId('main-content');
+    const refreshIcon = byId('refresh-icon');
+    const connectionDot = byId('connection-dot');
+    const connectionStatus = byId('connection-status');
+    const statusBadge = byId('status-badge');
+
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (errorEl) errorEl.style.display = 'none';
+    if (mainEl) mainEl.style.display = 'none';
+
+    if (refreshIcon) {
+      if (state === 'updating') refreshIcon.classList.add('spinning');
+      else refreshIcon.classList.remove('spinning');
+    }
+    const refreshBtn = byId('refresh-btn');
+    if (refreshBtn) refreshBtn.disabled = (state === 'updating');
+
+    if (connectionDot) connectionDot.className = 'status-dot ' + (state === 'updating' ? 'updating' : state === 'success' ? 'online' : 'offline');
+
+    switch (state) {
+      case 'updating':
+        if (loadingEl) loadingEl.style.display = 'block';
+        if (connectionStatus) connectionStatus.textContent = 'Aggiornamento...';
+        if (statusBadge) { statusBadge.className = 'status-badge updating'; statusBadge.textContent = 'ðŸ”„ Caricamento dati reali...'; }
+        break;
+      case 'success':
+        if (mainEl) mainEl.style.display = 'block';
+        if (connectionStatus) connectionStatus.textContent = 'Online';
+        if (statusBadge) { statusBadge.className = 'status-badge success'; statusBadge.textContent = 'âœ… CSV letto correttamente'; }
+        this.updateLastUpdateDisplay();
+        break;
+      case 'error':
+        if (errorEl) errorEl.style.display = 'block';
+        if (connectionStatus) connectionStatus.textContent = 'Errore';
+        if (statusBadge) { statusBadge.className = 'status-badge error'; statusBadge.textContent = 'âš ï¸ Errore CSV'; }
+        const err = byId('error-message');
+        if (err) err.textContent = errorMessage || 'Errore sconosciuto';
+        break;
+    }
+  }
+
+  updateLastUpdateDisplay() {
+    if (!this.lastUpdate) return;
+    const now = new Date();
+    const diff = Math.floor((now - this.lastUpdate) / 1000);
+    let timeText;
+    if (diff < 60) timeText = diff + 's fa';
+    else if (diff < 3600) timeText = Math.floor(diff / 60) + 'm fa';
+    else timeText = this.lastUpdate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+    const lastUpdateEl = document.getElementById('last-update');
+    if (lastUpdateEl) lastUpdateEl.textContent = timeText;
+
+    const tableTimestamp = document.getElementById('table-timestamp');
+    if (tableTimestamp) tableTimestamp.textContent = this.lastUpdate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ==================== DASHBOARD RENDERING ====================
+  renderDashboard() {
+    if (!this.csvData) return;
+    this.renderKPICards();
+    this.renderVenditeTable();
+    this.updateProvinceOptions();
+  }
+
+  renderKPICards() {
+    const data = this.getDisplayData();
+
+    // Fatturato â€” in k
+    const fatturatoValue = document.getElementById('fatturato-value');
+    if (fatturatoValue) fatturatoValue.textContent = this.formatEuroK3(data.fatturato);
+
+    const growthValue = document.getElementById('growth-value');
+    if (growthValue) growthValue.textContent = '+' + data.crescita + '%';
+
+    const previousValue = document.getElementById('previous-value');
+    if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
+
+    // Obiettivo â€” in k
+    const obiettivoCard = document.getElementById('obiettivo-card');
+    if (obiettivoCard) {
+      if (data.obiettivo) {
+        obiettivoCard.style.display = 'block';
+        const obVal = document.getElementById('obiettivo-value');
+        const obPerc = document.getElementById('obiettivo-percentage');
+        const remVal = document.getElementById('remaining-value');
+        if (obVal) obVal.textContent = this.formatEuroK3(data.obiettivo);
+        if (obPerc) obPerc.textContent = (data.percentualeObiettivo || 0) + '%';
+        if (remVal) remVal.textContent = this.formatEuroK3((data.obiettivo || 0) - data.fatturato);
+        const progressFill = document.getElementById('progress-fill');
+        if (progressFill) progressFill.style.width = (data.percentualeObiettivo || 0) + '%';
+      } else {
+        obiettivoCard.style.display = 'none';
+      }
+    }
+
+    // Clienti
+    const clientiValue = document.getElementById('clienti-value');
+    if (clientiValue) clientiValue.textContent = String(data.clienti);
+
+    const provinciaLabel = document.getElementById('provincia-label');
+    if (provinciaLabel) provinciaLabel.textContent = this.selectedProvince === 'all' ? 'TOT' : this.selectedProvince;
+  }
+
+  renderVenditeTable() {
+    if (!this.csvData.vendite || this.csvData.vendite.length === 0) return;
+
+    const tbody = document.getElementById('vendite-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    this.csvData.vendite.forEach(vendita => {
+      const row = document.createElement('tr');
+      row.innerHTML =
+        '<td>'+
+          '<span class="province-badge '+ vendita.provincia +'">'+ vendita.provincia +'</span>'+
+        '</td>'+
+        '<td>'+ (vendita.cliente.length > 30 ? vendita.cliente.slice(0,30)+'...' : vendita.cliente) +'</td>'+
+        '<td>'+ vendita.categoria +'</td>'+
+        '<td>'+ this.formatEuroK3(vendita.fatturato) +'</td>';
+      tbody.appendChild(row);
+    });
+
+    const totalClients = document.getElementById('total-clients');
+    if (totalClients) totalClients.textContent = String(this.csvData.vendite.length);
+
+    const totalTopRevenue = document.getElementById('total-top-revenue');
+    if (totalTopRevenue) totalTopRevenue.textContent = this.formatEuroK3(
+      this.csvData.vendite.reduce((sum, v) => sum + v.fatturato, 0)
+    );
+
+    const statusIcon = document.getElementById('update-status-icon');
+    if (statusIcon) statusIcon.textContent = 'âœ…';
+
+    const tableStatusBadge = document.getElementById('table-status-badge');
+    if (tableStatusBadge) { tableStatusBadge.innerHTML = '<i class="fas fa-check-circle"></i><span>Live</span>'; tableStatusBadge.className = 'status-badge small success'; }
+  }
+
+  // ==================== PROVINCE FILTER ====================
+  showProvincePopup() { if (!this.csvData) return; this.updateProvinceOptions(); const p = document.getElementById('province-popup'); if (p) p.style.display = 'flex'; }
+  hideProvincePopup() { const p = document.getElementById('province-popup'); if (p) p.style.display = 'none'; }
+
+  updateProvinceOptions() {
+    if (!this.csvData) return;
+    const popupOptions = document.getElementById('popup-options');
+    if (!popupOptions) return;
+    popupOptions.innerHTML = '';
+
+    // Tutte le province
+    popupOptions.appendChild(this.createProvinceOption('all', {
+      title: 'Tutte le Province',
+      description: this.formatEuroK3(this.csvData.generale.annoCorrente) + ' â€¢ ' + this.csvData.generale.clienti + ' clienti',
+      className: ''
+    }));
+
+    // Latina
+    popupOptions.appendChild(this.createProvinceOption('LT', {
+      title: 'Latina (LT)',
+      description: this.formatEuroK3(this.csvData.latina.annoCorrente) + ' â€¢ ' + this.csvData.latina.clientiCorrente + ' clienti â€¢ Obiettivo: ' + (this.csvData.latina.percentualeObiettivo || 0) + '%',
+      className: 'LT'
+    }));
+
+    // Roma
+    popupOptions.appendChild(this.createProvinceOption('RM', {
+      title: 'Roma (RM)',
+      description: this.formatEuroK3(this.csvData.roma.annoCorrente) + ' â€¢ ' + this.csvData.roma.clienti + ' clienti',
+      className: 'RM'
+    }));
+
+    const popupStatusDot = document.getElementById('popup-status-dot');
+    const popupStatusText = document.getElementById('popup-status-text');
+    if (popupStatusDot) popupStatusDot.className = 'status-dot online';
+    if (popupStatusText) popupStatusText.textContent = 'Dati CSV aggiornati automaticamente';
+  }
+
+  createProvinceOption(province, config) {
+    const option = document.createElement('button');
+    option.className = 'province-option ' + (this.selectedProvince === province ? 'selected ' + (config.className || '') : '');
+    option.innerHTML =
+      '<div class="option-info">' +
+        '<h4>'+ config.title +'</h4>' +
+        '<p>'+ config.description +'</p>' +
+      '</div>' +
+      '<div class="option-radio ' + (this.selectedProvince === province ? 'selected' : '') + '"></div>';
+
+    option.addEventListener('click', () => {
+      this.selectedProvince = province;
+      this.renderDashboard();
+      this.hideProvincePopup();
+    });
+
+    return option;
+  }
+
+  // ==================== DATA HELPERS ====================
+  getDisplayData() {
+    if (!this.csvData) {
+      return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
+    }
+
+    if (this.selectedProvince === 'all') {
+      const prev = this.csvData.generale.annoPrecedente || 0;
+      const curr = this.csvData.generale.annoCorrente || 0;
+      const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
+      return { fatturato: curr, annoPrecedente: prev, crescita, clienti: this.csvData.generale.clienti, obiettivo: null, percentualeObiettivo: null };
+    } else if (this.selectedProvince === 'LT') {
+      const prev = this.csvData.latina.annoPrecedente || 0;
+      const curr = this.csvData.latina.annoCorrente || 0;
+      const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
+      return { fatturato: curr, annoPrecedente: prev, crescita, clienti: this.csvData.latina.clientiCorrente, obiettivo: this.csvData.latina.obiettivo, percentualeObiettivo: this.csvData.latina.percentualeObiettivo };
+    } else if (this.selectedProvince === 'RM') {
+      return { fatturato: this.csvData.roma.annoCorrente, annoPrecedente: 0, crescita: '0.0', clienti: this.csvData.roma.clienti, obiettivo: null, percentualeObiettivo: null };
+    }
+
+    return { fatturato: 0, annoPrecedente: 0, crescita: '0.0', clienti: 0, obiettivo: null, percentualeObiettivo: null };
+  }
+
+  // ==================== UTILITY FUNCTIONS ====================
+  // Parser robusto per numeri in formato italiano
+  parseNumber(input) {
+    if (typeof input === 'number') return input;
+    if (!input) return 0;
+    const cleaned = String(input)
+      .replace(/\s+/g, '')
+      .replace(/â‚¬/g, '')
+      .replace(/\./g, '')
+      .replace(/,/g, '.');
+    const n = Number(cleaned);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  // "k" con max 3 cifre (1,23k â€¢ 12,3k â€¢ 123k). Per importi in euro â†’ sempre migliaia.
+  formatK3(value) {
+    const num = Number(value) || 0;
+    const sign = num < 0 ? '-' : '';
+    const v = Math.abs(num);
+    const k = v / 1000;
+    let out;
+    if (k >= 100) out = String(Math.round(k));
+    else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
+    else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
+    // rimuovi zeri/virgola superflui
+    out = out.replace(/,?0+$/, '');
+    return sign + out + 'k';
+  }
+
+  formatEuroK3(value) {
+    if (!value) return 'â‚¬0k';
+    const k = this.formatK3(value);
+    return 'â‚¬' + k.replace('k','') + 'k';
+  }
+
+  // ==================== AUTO UPDATE ====================
+  startAutoUpdate() {
+    // Auto-update ogni 2 minuti
+    this.updateInterval = setInterval(() => {
+      this.fetchCSVData();
+    }, 2 * 60 * 1000);
+
+    // Update time display ogni 30 secondi
+    setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
+
+    // Esegui piccoli test in console all'avvio (non bloccanti)
+    this.runUnitTests();
+  }
+
+  // ==================== TEST (console.assert) ====================
+  runUnitTests() {
+    try {
+      const approx = (a,b) => Math.abs(a-b) < 1e-6;
+      console.assert(approx(this.parseNumber('1.234,56'), 1234.56), 'parseNumber 1');
+      console.assert(this.parseNumber('â‚¬ 987.654,00') === 987654, 'parseNumber 2');
+      console.assert(this.formatK3(1234) === '1,23k', 'formatK3 1');
+      console.assert(this.formatK3(12345) === '12,3k', 'formatK3 2');
+      console.assert(this.formatK3(123456) === '123k', 'formatK3 3');
+      console.assert(this.formatEuroK3(1500) === 'â‚¬1,5k', 'formatEuroK3');
+    } catch (e) { /* ignore in produzione */ }
+  }
+
+  // ==================== CLEANUP ====================
+  destroy() { if (this.updateInterval) clearInterval(this.updateInterval); }
+}
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', () => {
+  window.dashboard = new DashboardManager();
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  if (window.dashboard) window.dashboard.destroy();
