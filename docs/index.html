@@ -3,843 +3,957 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARABOT NATALINO - Dashboard Performance</title>
+    <title>CARABOT NATALINO - Dashboard Direzionale</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-          --primary-blue: #3b82f6;
-          --primary-violet: #8b5cf6;
-          --primary-cyan: #22d3ee;
-          --primary-emerald: #10b981;
-          --primary-orange: #f59e0b;
-          --primary-red: #ef4444;
-          --text-primary: #1f2937;
-          --text-secondary: #6b7280;
-          --bg-primary: #f8fafc;
-          --bg-card: rgba(255, 255, 255, 0.95);
-          --border-color: rgba(255, 255, 255, 0.9);
-          --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-          --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .dark-mode {
-          --text-primary: #f9fafb;
-          --text-secondary: #9ca3af;
-          --bg-primary: #0f172a;
-          --bg-card: rgba(30, 41, 59, 0.9);
-          --border-color: rgba(51, 65, 85, 0.6);
-          --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-          --gradient-primary: linear-gradient(135deg, #1e293b 0%, #581c87 50%, #0f172a 100%);
-        }
-
         * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-          min-height: 100vh;
-          background: var(--gradient-primary);
-          color: var(--text-primary);
-          transition: all 0.5s ease;
-          overflow-x: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #faf5ff 100%);
+            color: #374151;
+            min-height: 100vh;
         }
 
         .container {
-          max-width: 1600px;
-          margin: 0 auto;
-          padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        /* Header */
-        .dashboard-header {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          margin-bottom: 2rem;
-          padding: 2rem;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .dashboard-header::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, var(--primary-blue), var(--primary-violet), var(--primary-cyan), var(--primary-emerald));
-          animation: gradient-flow 3s ease-in-out infinite;
-        }
-
-        @keyframes gradient-flow {
-          0%, 100% { transform: translateX(-100%); }
-          50% { transform: translateX(100%); }
+        /* Header Card */
+        .main-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: visible;
         }
 
         .header-content {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 2rem;
+            margin-bottom: 2rem;
         }
 
-        .brand {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
+        .header-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
         }
 
-        .brand-icon {
-          width: 70px;
-          height: 70px;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          border-radius: 1.5rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2.5rem;
-          color: white;
-          box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+        .header-subtitle {
+            font-size: 1.25rem;
+            color: #6b7280;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
         }
 
-        .brand-info h1 {
-          font-size: 2.8rem;
-          font-weight: 900;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin-bottom: 0.5rem;
-        }
-
-        .brand-info p {
-          color: var(--text-secondary);
-          font-size: 1.1rem;
-          font-weight: 500;
-        }
-
-        .header-controls {
-          display: flex;
-          gap: 1rem;
-          align-items: center;
-        }
-
-        .control-btn {
-          padding: 1rem 1.5rem;
-          border-radius: 1rem;
-          border: none;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          color: white;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-size: 1rem;
-          font-weight: 600;
-        }
-
-        .control-btn:hover {
-          transform: scale(1.05);
-          box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
-        }
-
-        .control-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-          transform: none;
-        }
-
-        .spinning {
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        .status-info {
-          padding: 1.5rem 0 0;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 2rem;
-          align-items: center;
-        }
-
-        .status-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 0.9rem;
-          font-weight: 500;
-          padding: 0.75rem 1.25rem;
-          background: rgba(59, 130, 246, 0.1);
-          border-radius: 1rem;
-          backdrop-filter: blur(10px);
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
         }
 
         .status-dot {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          position: relative;
+            width: 8px;
+            height: 8px;
+            background: #16a34a;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
-        .status-dot::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          animation: pulse-ring 2s infinite;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        .status-dot.online { background: #10b981; }
-        .status-dot.online::after { background: rgba(16, 185, 129, 0.3); }
-        .status-dot.offline { background: #ef4444; }
-        .status-dot.offline::after { background: rgba(239, 68, 68, 0.3); }
-        .status-dot.updating { background: var(--primary-blue); }
-        .status-dot.updating::after { background: rgba(59, 130, 246, 0.3); }
-
-        @keyframes pulse-ring {
-          0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
-          100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        .header-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        /* Loading States */
-        .loading-container, .error-container {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          padding: 4rem;
-          text-align: center;
-          margin-bottom: 2rem;
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
         }
 
-        .loading-spinner {
-          font-size: 3rem;
-          color: var(--primary-blue);
-          margin-bottom: 2rem;
-          animation: spin 2s ease-in-out infinite;
+        .stat-icon {
+            width: 20px;
+            height: 20px;
+            color: #9ca3af;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(107, 114, 128, 0.1);
+            color: #374151;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(107, 114, 128, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Overview Section */
+        .overview-section {
+            background: white;
+            border-radius: 2rem;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            width: 60px;
+            height: 60px;
+            background: #3b82f6;
+            border-radius: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1f2937;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .overview-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            border-radius: 1rem;
+            font-weight: 600;
+        }
+
+        .stat-badge.blue {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .stat-badge.purple {
+            background: rgba(147, 51, 234, 0.1);
+            color: #9333ea;
+        }
+
+        /* Vista Card */
+        .vista-card {
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .vista-icon {
+            width: 80px;
+            height: 80px;
+            background: #3b82f6;
+            border-radius: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .vista-content {
+            flex: 1;
+        }
+
+        .vista-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .vista-subtitle {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .vista-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .vista-stat {
+            text-align: center;
+        }
+
+        .vista-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .vista-stat-value.regions { color: #3b82f6; }
+        .vista-stat-value.revenue { color: #16a34a; }
+
+        .vista-stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .vista-expand {
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .vista-expand:hover {
+            background: rgba(107, 114, 128, 0.1);
         }
 
         /* KPI Grid */
         .kpi-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-          gap: 2rem;
-          margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
         .kpi-card {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          padding: 2.5rem;
-          position: relative;
-          overflow: hidden;
-          transition: all 0.3s ease;
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
         }
 
         .kpi-card:hover {
-          transform: translateY(-10px) scale(1.02);
-          box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
-        }
-
-        .kpi-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 6px;
-          background: linear-gradient(90deg, var(--primary-blue), var(--primary-violet), var(--primary-cyan));
-          opacity: 0;
-          transition: opacity 0.4s ease;
-        }
-
-        .kpi-card:hover::before {
-          opacity: 1;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
         }
 
         .kpi-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
         }
 
-        .kpi-info .kpi-label {
-          color: var(--text-secondary);
-          font-size: 1rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          margin-bottom: 1rem;
+        .kpi-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
         }
 
         .kpi-value {
-          font-size: 3.5rem;
-          font-weight: 900;
-          color: var(--text-primary);
-          line-height: 1;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          transition: all 0.5s ease;
+            font-size: 3rem;
+            font-weight: 900;
+            color: #1f2937;
+            line-height: 1;
         }
 
         .kpi-badge {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          border-radius: 1rem;
-          background: rgba(16, 185, 129, 0.15);
-          color: #10b981;
-          font-size: 1rem;
-          font-weight: 700;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 700;
         }
 
-        .kpi-badge.secondary {
-          background: rgba(34, 211, 238, 0.15);
-          color: #22d3ee;
-          border: 1px solid rgba(34, 211, 238, 0.2);
+        .kpi-badge.green {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
         }
 
-        .progress-container {
-          margin: 2rem 0;
+        .kpi-badge.blue {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .kpi-progress {
+            margin: 1.5rem 0;
         }
 
         .progress-bar {
-          width: 100%;
-          height: 12px;
-          background: rgba(107, 114, 128, 0.2);
-          border-radius: 1rem;
-          overflow: hidden;
-          position: relative;
+            width: 100%;
+            height: 8px;
+            background: rgba(107, 114, 128, 0.1);
+            border-radius: 1rem;
+            overflow: hidden;
         }
 
         .progress-fill {
-          height: 100%;
-          background: linear-gradient(90deg, var(--primary-emerald), #34d399);
-          border-radius: 1rem;
-          transition: width 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          position: relative;
-          overflow: hidden;
+            height: 100%;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            border-radius: 1rem;
+            transition: width 1s ease;
         }
 
-        .progress-fill::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-          animation: progress-shine 2s infinite;
-        }
-
-        @keyframes progress-shine {
-          0% { left: -100%; }
-          100% { left: 100%; }
+        .kpi-footer {
+            color: #6b7280;
+            font-size: 0.875rem;
         }
 
         /* Charts */
-        .charts-section {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          margin-bottom: 2rem;
-          overflow: hidden;
-          position: relative;
-        }
-
-        .charts-header {
-          padding: 2.5rem 2.5rem 1.5rem;
-          text-align: center;
-        }
-
-        .charts-title {
-          font-size: 2.5rem;
-          font-weight: 800;
-          background: linear-gradient(135deg, var(--primary-emerald), var(--primary-cyan));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin-bottom: 1rem;
-        }
-
-        .charts-grid {
-          padding: 0 2.5rem 2.5rem;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-          gap: 2rem;
-        }
-
-        .chart-card {
-          background: rgba(255, 255, 255, 0.08);
-          backdrop-filter: blur(20px);
-          border-radius: 1.5rem;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          padding: 2rem;
-          position: relative;
-          overflow: hidden;
-          transition: all 0.4s ease;
-        }
-
-        .chart-card:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+        .chart-container {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
         }
 
         .chart-header {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .chart-icon {
-          width: 50px;
-          height: 50px;
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
-          border-radius: 1rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.5rem;
-          color: white;
-          box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
         }
 
         .chart-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
         }
 
-        .chart-container {
-          position: relative;
-          height: 350px;
-          width: 100%;
+        .chart-canvas {
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-legend {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            margin: 0 1rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
         }
 
         /* Table */
-        .table-section {
-          background: var(--bg-card);
-          backdrop-filter: blur(30px);
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          padding: 2.5rem;
-          position: relative;
-          overflow: hidden;
+        .table-container {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
         }
 
         .table-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 2rem;
-          flex-wrap: wrap;
-          gap: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
         }
 
         .table-title {
-          font-size: 2rem;
-          font-weight: 800;
-          color: var(--text-primary);
-          display: flex;
-          align-items: center;
-          gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
         }
 
-        .table-icon {
-          width: 45px;
-          height: 45px;
-          background: linear-gradient(135deg, var(--primary-cyan), var(--primary-emerald));
-          border-radius: 1rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.25rem;
-          color: white;
+        .province-selector {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .enhanced-table {
-          width: 100%;
-          border-collapse: separate;
-          border-spacing: 0;
-          background: transparent;
-          border-radius: 1rem;
-          overflow: hidden;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        .province-selector:hover {
+            background: rgba(59, 130, 246, 0.2);
         }
 
-        .enhanced-table th {
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-          color: var(--text-primary);
-          padding: 1.25rem;
-          text-align: left;
-          font-weight: 700;
-          font-size: 0.9rem;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .enhanced-table th:last-child {
-          text-align: right;
+        .data-table th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 700;
+            color: #6b7280;
+            border-bottom: 2px solid #f3f4f6;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .enhanced-table td {
-          padding: 1.25rem;
-          background: rgba(255, 255, 255, 0.05);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          transition: all 0.3s ease;
-          font-weight: 500;
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
         }
 
-        .enhanced-table td:last-child {
-          text-align: right;
-          font-weight: 700;
-          color: var(--primary-emerald);
-        }
-
-        .enhanced-table tr:hover td {
-          background: rgba(59, 130, 246, 0.1);
-          transform: scale(1.01);
+        .data-table tr:hover {
+            background: rgba(59, 130, 246, 0.05);
         }
 
         .province-badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 0.5rem 1rem;
-          border-radius: 1rem;
-          font-size: 0.8rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         .province-badge.LT {
-          background: rgba(139, 92, 246, 0.2);
-          color: #8b5cf6;
-          border: 1px solid rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
         }
 
         .province-badge.RM {
-          background: rgba(34, 211, 238, 0.2);
-          color: #22d3ee;
-          border: 1px solid rgba(34, 211, 238, 0.3);
+            background: rgba(34, 211, 238, 0.1);
+            color: #22d3ee;
+        }
+
+        /* Province Popup */
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .popup-overlay.show .popup-content {
+            transform: scale(1);
+        }
+
+        .popup-header {
+            padding: 2rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .popup-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .popup-subtitle {
+            color: #6b7280;
+        }
+
+        .popup-body {
+            padding: 1.5rem;
+        }
+
+        .province-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(248, 250, 252, 0.8);
+        }
+
+        .province-option:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .province-option.selected {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .option-info h4 {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .option-info p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .option-radio.selected::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        .popup-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #f3f4f6;
+            text-align: right;
+        }
+
+        /* Loading States */
+        .loading-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .loading-spinner {
+            font-size: 3rem;
+            color: #3b82f6;
+            margin-bottom: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(239, 68, 68, 0.05);
+            border-radius: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            color: #ef4444;
+            margin-bottom: 1rem;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-          .container {
-            padding: 1rem;
-          }
-          
-          .charts-grid {
-            grid-template-columns: 1fr;
-          }
-          
-          .chart-container {
-            height: 300px;
-          }
-          
-          .kpi-grid {
-            grid-template-columns: 1fr;
-          }
-          
-          .brand-info h1 {
-            font-size: 2.2rem;
-          }
-          
-          .kpi-value {
-            font-size: 2.5rem;
-          }
+            .container {
+                padding: 1rem;
+            }
+
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .overview-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .vista-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .vista-stats {
+                justify-content: center;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body class="light-mode">
+<body>
     <div class="container">
         <!-- Header -->
-        <header class="dashboard-header">
+        <div class="main-card">
             <div class="header-content">
-                <div class="brand">
-                    <div class="brand-icon">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="brand-info">
-                        <h1>CARABOT NATALINO</h1>
-                        <p>Dashboard Performance Analytics - Dati CSV Reali</p>
-                    </div>
-                </div>
-                
-                <div class="header-controls">
-                    <button class="control-btn" id="refresh-btn">
-                        <i class="fas fa-sync-alt" id="refresh-icon"></i>
-                        Aggiorna Dati
-                    </button>
-                    <button class="control-btn" id="theme-toggle">
-                        <i class="fas fa-moon" id="theme-icon"></i>
-                    </button>
+                <h1 class="header-title">Dashboard Direzionale</h1>
+                <p class="header-subtitle">CARABOT NATALINO - Controllo Rete Vendita</p>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Aggiornamento automatico attivo</span>
                 </div>
             </div>
-            
-            <div class="status-info">
-                <div class="status-item">
-                    <i class="fas fa-id-card"></i>
-                    <span><strong>ID:</strong> 631.00238</span>
-                </div>
-                <div class="status-item">
-                    <i class="fas fa-calendar"></i>
-                    <span>Gen - Ago 2025</span>
-                </div>
-                <div class="status-item">
-                    <div class="status-dot offline" id="connection-dot"></div>
-                    <span id="connection-status">Connecting...</span>
-                </div>
-                <div class="status-item">
-                    <i class="fas fa-clock"></i>
-                    <span>Last: <span id="last-update">Never</span></span>
-                </div>
-                <div class="status-item">
-                    <button class="control-btn" id="province-filter" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
-                        <i class="fas fa-map-marker-alt"></i> <span id="selected-province">TUTTE</span>
-                    </button>
-                </div>
-            </div></div>
-        </header>
 
-        <!-- Loading State -->
-        <div id="loading-state" class="loading-container">
-            <div class="loading-content">
-                <i class="fas fa-sync-alt loading-spinner"></i>
-                <h2>Caricamento dati CSV da GitHub...</h2>
-                <p>Connessione al file dati reale</p>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <i class="fas fa-calendar stat-icon"></i>
+                    <span id="date-range">01 Gen - 18 Ago 2025</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-users stat-icon"></i>
+                    <span id="agents-count">4 Agenti Attivi</span>
+                </div>
             </div>
-        </div>
 
-        <!-- Error State -->
-        <div id="error-state" class="error-container" style="display: none;">
-            <div class="error-content">
-                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
-                <h2>Errore Connessione</h2>
-                <p id="error-message"></p>
-                <button class="control-btn" onclick="dashboardManager.fetchCSVData(true)" style="margin-top: 1rem;">
-                    <i class="fas fa-redo"></i> Riprova
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="showPanoramicaAziendale()">
+                    <i class="fas fa-chart-line"></i>
+                    Panoramica Aziendale
+                </button>
+                <button class="btn-secondary" onclick="showDettaglioAgenti()">
+                    <i class="fas fa-users"></i>
+                    Dettaglio Agenti
                 </button>
             </div>
         </div>
 
+        <!-- Loading State -->
+        <div id="loading-state" class="main-card loading-state">
+            <i class="fas fa-sync-alt loading-spinner"></i>
+            <h2>Caricamento dati CSV...</h2>
+            <p>Connessione al file dati reale</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="error-state" style="display: none;">
+            <i class="fas fa-exclamation-triangle error-icon"></i>
+            <h2>Errore Connessione</h2>
+            <p id="error-message"></p>
+            <button class="btn-primary" onclick="dashboardManager.fetchCSVData(true)" style="margin-top: 1rem;">
+                <i class="fas fa-redo"></i> Riprova
+            </button>
+        </div>
+
         <!-- Main Content -->
         <div id="main-content" style="display: none;">
-            
-            <!-- KPI Cards -->
-            <div class="kpi-grid">
-                <!-- Fatturato Card -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-info">
-                            <p class="kpi-label">Fatturato 2025</p>
-                            <p class="kpi-value" id="fatturato-value">€0k</p>
-                        </div>
-                        <div class="kpi-badge">
-                            <i class="fas fa-arrow-up"></i>
-                            <span id="growth-value">+0%</span>
-                        </div>
+            <!-- Overview Section -->
+            <div class="overview-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-chart-line"></i>
                     </div>
-                    <div class="kpi-footer" style="color: var(--text-secondary); font-size: 1rem;">
-                        <span>vs 2024: </span>
-                        <span id="previous-value" style="font-weight: 700;">€0k</span>
+                    <div>
+                        <h2 class="section-title">Panoramica Aziendale</h2>
+                        <p class="section-subtitle">Analytics e performance rete vendita per territorio</p>
                     </div>
                 </div>
 
-                <!-- Obiettivo Card -->
-                <div class="kpi-card" id="obiettivo-card">
-                    <div class="kpi-header">
-                        <div class="kpi-info">
-                            <p class="kpi-label">Target 2025</p>
-                            <p class="kpi-value" id="obiettivo-value">€0k</p>
-                        </div>
-                        <div class="kpi-badge secondary">
-                            <span id="obiettivo-percentage">0%</span>
-                        </div>
+                <div class="overview-stats">
+                    <div class="stat-badge">
+                        <span>3 Regioni Attive</span>
                     </div>
-                    <div class="progress-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
-                        </div>
+                    <div class="stat-badge blue">
+                        <i class="fas fa-users"></i>
+                        <span id="total-agents">4 Agenti Totali</span>
                     </div>
-                    <div class="kpi-footer" style="color: var(--text-secondary); font-size: 1rem;">
-                        <span>Rimanente: </span>
-                        <span id="remaining-value" style="font-weight: 700;">€0k</span>
+                    <div class="stat-badge purple">
+                        <i class="fas fa-building"></i>
+                        <span id="total-clients">45 Clienti Totali</span>
                     </div>
                 </div>
 
-                <!-- Clienti Card -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-info">
-                            <p class="kpi-label">Clienti Attivi</p>
-                            <p class="kpi-value" id="clienti-value">0</p>
+                <!-- Vista Nazionale -->
+                <div class="vista-card">
+                    <div class="vista-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="vista-content">
+                        <h3 class="vista-title">Vista Nazionale</h3>
+                        <p class="vista-subtitle">Panoramica completa tutte le regioni</p>
+                        <div class="vista-stats">
+                            <div class="vista-stat">
+                                <div class="vista-stat-value regions" id="regions-count">3 regioni</div>
+                                <div class="vista-stat-label">Territori</div>
+                            </div>
+                            <div class="vista-stat">
+                                <div class="vista-stat-value revenue" id="total-revenue">€203k</div>
+                                <div class="vista-stat-label">Fatturato</div>
+                            </div>
                         </div>
-                        <div class="kpi-badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
-                            <span>TOTALE</span>
+                    </div>
+                    <div class="vista-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="kpi-grid">
+                    <!-- Fatturato Card -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div>
+                                <p class="kpi-label">Fatturato 2025</p>
+                                <p class="kpi-value" id="fatturato-value">€0k</p>
+                            </div>
+                            <div class="kpi-badge green">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="growth-value">+0%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-footer">
+                            <span>vs 2024: </span>
+                            <span id="previous-value" style="font-weight: 700;">€0k</span>
+                        </div>
+                    </div>
+
+                    <!-- Obiettivo Card -->
+                    <div class="kpi-card" id="obiettivo-card">
+                        <div class="kpi-header">
+                            <div>
+                                <p class="kpi-label">Target 2025</p>
+                                <p class="kpi-value" id="obiettivo-value">€0k</p>
+                            </div>
+                            <div class="kpi-badge blue">
+                                <span id="obiettivo-percentage">0%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                        <div class="kpi-footer">
+                            <span>Rimanente: </span>
+                            <span id="remaining-value" style="font-weight: 700;">€0k</span>
+                        </div>
+                    </div>
+
+                    <!-- Clienti Card -->
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div>
+                                <p class="kpi-label">Clienti Attivi</p>
+                                <p class="kpi-value" id="clienti-value">0</p>
+                            </div>
+                            <div class="kpi-badge blue">
+                                <span id="selected-province-label">TOTALE</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Charts Section -->
-            <div class="charts-section">
-                <div class="charts-header">
-                    <h2 class="charts-title">Analisi Performance</h2>
-                    <p style="color: var(--text-secondary); font-size: 1.125rem;">Grafici basati sui dati CSV reali</p>
+            <!-- Charts -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3 class="chart-title">Fatturato per Provincia</h3>
                 </div>
-                
-                <div class="charts-grid">
-                    <!-- Province Distribution -->
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-icon">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </div>
-                            <h3 class="chart-title">Fatturato per Provincia</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="provinceChart"></canvas>
-                        </div>
-                        <div class="chart-legend" style="margin-top: 1rem; text-align: center; font-size: 0.875rem; color: var(--text-secondary);">
-                            <span style="display: inline-flex; align-items: center; margin-right: 1rem;">
-                                <span style="width: 12px; height: 12px; background: #8b5cf6; border-radius: 50%; margin-right: 0.5rem;"></span>
-                                Latina
-                            </span>
-                            <span style="display: inline-flex; align-items: center;">
-                                <span style="width: 12px; height: 12px; background: #22d3ee; border-radius: 50%; margin-right: 0.5rem;"></span>
-                                Roma
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Top Clients -->
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-icon">
-                                <i class="fas fa-crown"></i>
-                            </div>
-                            <h3 class="chart-title">Top 5 Clienti</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="topClientsChart"></canvas>
-                        </div>
-                        <div class="chart-legend" style="margin-top: 1rem; text-align: center; font-size: 0.875rem; color: var(--text-secondary);">
-                            Top clienti per fatturato - dati dal CSV
-                        </div>
-                    </div>
+                <div class="chart-canvas">
+                    <canvas id="provinceChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <span class="legend-item">
+                        <span class="legend-color" style="background: #8b5cf6;"></span>
+                        Latina
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-color" style="background: #22d3ee;"></span>
+                        Roma
+                    </span>
                 </div>
             </div>
 
-            <!-- Table Section -->
-            <div class="table-section">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h3 class="chart-title">Top 5 Clienti</h3>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="topClientsChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    Top clienti per fatturato - dati dal CSV
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
                 <div class="table-header">
-                    <div class="table-title">
-                        <div class="table-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        Top Clienti (Dati CSV)
-                    </div>
+                    <h3 class="table-title">Dettaglio Clienti</h3>
+                    <button class="province-selector" id="province-filter">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="selected-province">TUTTE LE PROVINCE</span>
+                    </button>
                 </div>
-                
-                <div style="overflow-x: auto;">
-                    <table class="enhanced-table">
-                        <thead>
-                            <tr>
-                                <th>Provincia</th>
-                                <th>Cliente</th>
-                                <th>Categoria</th>
-                                <th>Fatturato</th>
-                            </tr>
-                        </thead>
-                        <tbody id="vendite-tbody">
-                            <!-- Popolato da JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; flex-wrap: wrap; gap: 2rem;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-blue);" id="total-clients">0</div>
-                        <div style="color: var(--text-secondary);">Clienti Totali</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-emerald);" id="total-revenue">€0k</div>
-                        <div style="color: var(--text-secondary);">Fatturato Totale</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-violet);" id="last-sync-time">--:--</div>
-                        <div style="color: var(--text-secondary);">Ultimo Aggiornamento</div>
-                    </div>
-                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Provincia</th>
+                            <th>Cliente</th>
+                            <th>Categoria</th>
+                            <th style="text-align: right;">Fatturato</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vendite-tbody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <!-- Province Selection Popup -->
-        <div id="province-popup" class="popup-overlay" style="display: none;">
-            <div class="popup-content" style="background: var(--bg-card); backdrop-filter: blur(30px); border-radius: 2rem; border: 1px solid var(--border-color); box-shadow: var(--shadow); width: 100%; max-width: 500px; transform: scale(0.9); transition: transform 0.3s ease;">
-                <div style="padding: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Seleziona Provincia</h3>
-                    <p style="color: var(--text-secondary);">Filtra dati per territorio</p>
+        <div id="province-popup" class="popup-overlay">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h3 class="popup-title">Seleziona Provincia</h3>
+                    <p class="popup-subtitle">Filtra dati per territorio</p>
                 </div>
                 
-                <div style="padding: 2rem;" id="popup-options">
-                    <div class="province-option" data-province="all" style="width: 100%; padding: 1rem; border-radius: 1rem; border: 2px solid transparent; background: rgba(107, 114, 128, 0.05); text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                        <div>
-                            <h4 style="font-weight: 700; margin-bottom: 0.25rem;">Tutte le Province</h4>
-                            <p style="font-size: 0.875rem; opacity: 0.8;" id="all-province-desc">€0k • 0 clienti</p>
+                <div class="popup-body">
+                    <div class="province-option" data-province="all">
+                        <div class="option-info">
+                            <h4>Tutte le Province</h4>
+                            <p id="all-province-desc">€0k • 0 clienti</p>
                         </div>
-                        <div class="option-radio" style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 2px solid currentColor;"></div>
+                        <div class="option-radio"></div>
                     </div>
-                    <div class="province-option" data-province="LT" style="width: 100%; padding: 1rem; border-radius: 1rem; border: 2px solid transparent; background: rgba(107, 114, 128, 0.05); text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                        <div>
-                            <h4 style="font-weight: 700; margin-bottom: 0.25rem;">Latina (LT)</h4>
-                            <p style="font-size: 0.875rem; opacity: 0.8;" id="lt-province-desc">€0k • 0 clienti</p>
+                    <div class="province-option" data-province="LT">
+                        <div class="option-info">
+                            <h4>Latina (LT)</h4>
+                            <p id="lt-province-desc">€0k • 0 clienti</p>
                         </div>
-                        <div class="option-radio" style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 2px solid currentColor;"></div>
+                        <div class="option-radio"></div>
                     </div>
-                    <div class="province-option" data-province="RM" style="width: 100%; padding: 1rem; border-radius: 1rem; border: 2px solid transparent; background: rgba(107, 114, 128, 0.05); text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between;">
-                        <div>
-                            <h4 style="font-weight: 700; margin-bottom: 0.25rem;">Roma (RM)</h4>
-                            <p style="font-size: 0.875rem; opacity: 0.8;" id="rm-province-desc">€0k • 0 clienti</p>
+                    <div class="province-option" data-province="RM">
+                        <div class="option-info">
+                            <h4>Roma (RM)</h4>
+                            <p id="rm-province-desc">€0k • 0 clienti</p>
                         </div>
-                        <div class="option-radio" style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 2px solid currentColor;"></div>
+                        <div class="option-radio"></div>
                     </div>
                 </div>
                 
-                <div style="padding: 1.5rem 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: flex-end;">
-                    <button id="close-popup" class="control-btn" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Chiudi</button>
+                <div class="popup-footer">
+                    <button class="btn-secondary" id="close-popup">Chiudi</button>
                 </div>
             </div>
         </div>
@@ -870,21 +984,9 @@
             }
 
             setupEventListeners() {
-                // Refresh button
-                const refreshBtn = document.getElementById('refresh-btn');
-                if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchCSVData(true));
-
-                // Theme toggle
-                const themeToggle = document.getElementById('theme-toggle');
-                if (themeToggle) themeToggle.addEventListener('click', () => this.toggleTheme());
-
                 // Province filter
-                const provinceFilter = document.getElementById('province-filter');
-                if (provinceFilter) provinceFilter.addEventListener('click', () => this.showProvincePopup());
-
-                // Close popup
-                const closePopup = document.getElementById('close-popup');
-                if (closePopup) closePopup.addEventListener('click', () => this.hideProvincePopup());
+                document.getElementById('province-filter').addEventListener('click', () => this.showProvincePopup());
+                document.getElementById('close-popup').addEventListener('click', () => this.hideProvincePopup());
 
                 // Province options
                 document.addEventListener('click', (e) => {
@@ -903,20 +1005,14 @@
                 const popup = document.getElementById('province-popup');
                 if (popup && this.csvData) {
                     this.updateProvinceOptions();
-                    popup.style.display = 'flex';
-                    setTimeout(() => {
-                        popup.querySelector('.popup-content').style.transform = 'scale(1)';
-                    }, 10);
+                    popup.classList.add('show');
                 }
             }
 
             hideProvincePopup() {
                 const popup = document.getElementById('province-popup');
                 if (popup) {
-                    popup.querySelector('.popup-content').style.transform = 'scale(0.9)';
-                    setTimeout(() => {
-                        popup.style.display = 'none';
-                    }, 300);
+                    popup.classList.remove('show');
                 }
             }
 
@@ -924,31 +1020,20 @@
                 if (!this.csvData) return;
 
                 // Update descriptions
-                const allDesc = document.getElementById('all-province-desc');
-                const ltDesc = document.getElementById('lt-province-desc');
-                const rmDesc = document.getElementById('rm-province-desc');
-
-                if (allDesc) allDesc.textContent = `${this.formatEuroK3(this.csvData.generale.annoCorrente)} • ${this.csvData.generale.clienti} clienti`;
-                if (ltDesc) ltDesc.textContent = `${this.formatEuroK3(this.csvData.latina.annoCorrente)} • ${this.csvData.latina.clientiCorrente} clienti • Target: ${this.csvData.latina.percentualeObiettivo}%`;
-                if (rmDesc) rmDesc.textContent = `${this.formatEuroK3(this.csvData.roma.annoCorrente)} • ${this.csvData.roma.clienti} clienti`;
+                document.getElementById('all-province-desc').textContent = `${this.formatEuroK3(this.csvData.generale.annoCorrente)} • ${this.csvData.generale.clienti} clienti`;
+                document.getElementById('lt-province-desc').textContent = `${this.formatEuroK3(this.csvData.latina.annoCorrente)} • ${this.csvData.latina.clientiCorrente} clienti`;
+                document.getElementById('rm-province-desc').textContent = `${this.formatEuroK3(this.csvData.roma.annoCorrente)} • ${this.csvData.roma.clienti} clienti`;
 
                 // Update selected state
                 document.querySelectorAll('.province-option').forEach(option => {
                     const province = option.dataset.province;
                     const radio = option.querySelector('.option-radio');
                     if (province === this.selectedProvince) {
-                        option.style.background = 'var(--primary-blue)';
-                        option.style.borderColor = 'var(--primary-blue)';
-                        option.style.color = 'white';
-                        radio.innerHTML = '<div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background: currentColor;"></div>';
-                        radio.style.display = 'flex';
-                        radio.style.alignItems = 'center';
-                        radio.style.justifyContent = 'center';
+                        option.classList.add('selected');
+                        radio.classList.add('selected');
                     } else {
-                        option.style.background = 'rgba(107, 114, 128, 0.05)';
-                        option.style.borderColor = 'transparent';
-                        option.style.color = 'var(--text-primary)';
-                        radio.innerHTML = '';
+                        option.classList.remove('selected');
+                        radio.classList.remove('selected');
                     }
                 });
             }
@@ -957,28 +1042,12 @@
                 this.selectedProvince = province;
                 
                 // Update button text
-                const selectedProvinceEl = document.getElementById('selected-province');
-                if (selectedProvinceEl) {
-                    const labels = { all: 'TUTTE', LT: 'LATINA', RM: 'ROMA' };
-                    selectedProvinceEl.textContent = labels[province] || 'TUTTE';
-                }
+                const labels = { all: 'TUTTE LE PROVINCE', LT: 'LATINA (LT)', RM: 'ROMA (RM)' };
+                document.getElementById('selected-province').textContent = labels[province];
+                document.getElementById('selected-province-label').textContent = province === 'all' ? 'TOTALE' : province;
 
                 this.hideProvincePopup();
                 this.renderDashboard();
-            }
-
-            toggleTheme() {
-                const body = document.body;
-                const themeIcon = document.getElementById('theme-icon');
-                if (body.classList.contains('light-mode')) {
-                    body.classList.remove('light-mode');
-                    body.classList.add('dark-mode');
-                    if (themeIcon) themeIcon.className = 'fas fa-sun';
-                } else {
-                    body.classList.remove('dark-mode');
-                    body.classList.add('light-mode');
-                    if (themeIcon) themeIcon.className = 'fas fa-moon';
-                }
             }
 
             async loadInitialData() {
@@ -990,24 +1059,18 @@
                 const segs = pathname.split('/').filter(Boolean);
                 const repoSlug = segs.length ? segs[0] : '';
 
-                const bases = new Set([
-                    './',
-                    '',
-                    pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''),
-                    repoSlug ? `/${repoSlug}/` : '/',
-                    repoSlug ? `/${repoSlug}/docs/` : '/docs/'
-                ]);
+                const bases = ['./', '', pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''), 
+                              repoSlug ? `/${repoSlug}/` : '/', repoSlug ? `/${repoSlug}/docs/` : '/docs/'];
 
                 const urls = [];
                 for (const base of bases) {
                     for (const name of this.csvFileNames) {
                         try {
-                            const abs = new URL(base + name, origin).href;
-                            urls.push(abs);
+                            urls.push(new URL(base + name, origin).href);
                         } catch { /* ignore */ }
                     }
                 }
-                return Array.from(new Set(urls));
+                return [...new Set(urls)];
             }
 
             async fetchCSVData(isManual = false) {
@@ -1022,12 +1085,9 @@
                     let lastError = null;
                     let text = null;
 
-                    console.log('Tentativo caricamento CSV da:', candidates);
-
                     for (const url of candidates) {
                         const u = url + cacheBuster;
                         try {
-                            console.log('Tentativo GET:', u);
                             const res = await fetch(u, {
                                 method: 'GET',
                                 cache: 'no-cache',
@@ -1041,14 +1101,11 @@
                             if (t && t.trim().length > 0) { text = t; break; }
                             lastError = new Error('CSV vuoto');
                         } catch (e) {
-                            console.warn('Fallito:', u, e);
                             lastError = e;
                         }
                     }
 
                     if (!text) throw lastError || new Error('Impossibile caricare CSV');
-
-                    console.log('CSV caricato, lunghezza:', text.length);
 
                     const parsedData = this.parseCSV(text);
                     if (!parsedData) throw new Error('Parsing CSV fallito');
@@ -1068,12 +1125,10 @@
 
             parseCSV(csvText) {
                 try {
-                    // Parsing OBIETTIVI
                     const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
-                    if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata nel CSV');
+                    if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
                     const obiettiviText = obiettiviMatch[1];
 
-                    // DATI GENERALI
                     const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
                     if (!generaleMatch) throw new Error('Dati Generale non trovati');
                     const generale = {
@@ -1082,21 +1137,18 @@
                         clienti: parseInt(generaleMatch[4], 10)
                     };
 
-                    // DATI LATINA
                     const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
                     if (!ltMatch) throw new Error('Dati Latina non trovati');
-                    const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
                     const latina = {
                         annoPrecedente: this.parseNumber(ltMatch[1]),
                         annoCorrente: this.parseNumber(ltMatch[2]),
-                        obiettivo: latinaObiettivoRaw * 1000, // CSV in migliaia
+                        obiettivo: this.parseNumber(ltMatch[3]) * 1000,
                         percentualeObiettivo: parseInt(ltMatch[4], 10),
                         clientiPrecedenti: parseInt(ltMatch[5], 10),
                         clientiCorrente: parseInt(ltMatch[6], 10),
                         obiettivoClienti: parseInt(ltMatch[7], 10)
                     };
 
-                    // DATI ROMA
                     const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
                     let roma = { annoCorrente: 0, clienti: 0 };
                     if (clientiMatch) {
@@ -1110,18 +1162,14 @@
                         }
                     }
 
-                    // VENDITE PER CLIENTE
                     const dettaglioStart = csvText.indexOf('=== DETTAGLIO VENDITE PER CLIENTE ===');
                     const dettaglioEnd = csvText.indexOf('=== RIEPILOGO PER CATEGORIA ===');
                     let vendite = [];
                     if (dettaglioStart !== -1 && dettaglioEnd !== -1) {
                         const dettaglioSection = csvText.substring(dettaglioStart, dettaglioEnd);
                         const lines = dettaglioSection.split('\n').filter(line =>
-                            line.trim() && 
-                            !line.includes('===') && 
-                            !line.includes('Provincia;Ragione Sociale Cliente') && 
-                            line.includes(';') && 
-                            line.split(';').length >= 4
+                            line.trim() && !line.includes('===') && !line.includes('Provincia;Ragione Sociale Cliente') && 
+                            line.includes(';') && line.split(';').length >= 4
                         );
                         
                         const venditeMap = new Map();
@@ -1142,14 +1190,10 @@
                                 }
                             }
                         });
-                        vendite = Array.from(venditeMap.values())
-                            .sort((a, b) => b.fatturato - a.fatturato)
-                            .slice(0, 20); // Top 20
+                        vendite = Array.from(venditeMap.values()).sort((a, b) => b.fatturato - a.fatturato).slice(0, 20);
                     }
 
-                    const result = { generale, latina, roma, vendite, timestamp: new Date() };
-                    console.log('Dati CSV parsati:', result);
-                    return result;
+                    return { generale, latina, roma, vendite, timestamp: new Date() };
                 } catch (e) {
                     console.error('Errore parsing CSV:', e);
                     return null;
@@ -1159,82 +1203,45 @@
             parseNumber(input) {
                 if (typeof input === 'number') return input;
                 if (!input) return 0;
-                const cleaned = String(input)
-                    .replace(/\s+/g, '')
-                    .replace(/€/g, '')
-                    .replace(/\./g, '')
-                    .replace(/,/g, '.');
+                const cleaned = String(input).replace(/\s+/g, '').replace(/€/g, '').replace(/\./g, '').replace(/,/g, '.');
                 const n = Number(cleaned);
                 return Number.isFinite(n) ? n : 0;
             }
 
             formatK3(value) {
                 const num = Number(value) || 0;
-                const sign = num < 0 ? '-' : '';
-                const v = Math.abs(num);
-                const k = v / 1000;
-                let out;
-                if (k >= 100) out = String(Math.round(k));
-                else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
-                else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
-                out = out.replace(/,?0+$/, '');
-                return sign + out + 'k';
+                const k = Math.abs(num) / 1000;
+                if (k >= 100) return (num < 0 ? '-' : '') + Math.round(k) + 'k';
+                else if (k >= 10) return (num < 0 ? '-' : '') + (Math.round(k * 10) / 10).toString().replace('.', ',') + 'k';
+                else return (num < 0 ? '-' : '') + (Math.round(k * 100) / 100).toString().replace('.', ',') + 'k';
             }
 
             formatEuroK3(value) {
-                if (!value) return '€0k';
-                const k = this.formatK3(value);
-                return '€' + k.replace('k', '') + 'k';
+                return value ? '€' + this.formatK3(value).replace('k', '') + 'k' : '€0k';
             }
 
             updateLoadingState(state, errorMessage = null) {
                 const loadingEl = document.getElementById('loading-state');
                 const errorEl = document.getElementById('error-state');
                 const mainEl = document.getElementById('main-content');
-                const refreshIcon = document.getElementById('refresh-icon');
-                const connectionDot = document.getElementById('connection-dot');
-                const connectionStatus = document.getElementById('connection-status');
 
                 if (loadingEl) loadingEl.style.display = 'none';
                 if (errorEl) errorEl.style.display = 'none';
                 if (mainEl) mainEl.style.display = 'none';
 
-                if (refreshIcon) {
-                    if (state === 'updating') refreshIcon.classList.add('spinning');
-                    else refreshIcon.classList.remove('spinning');
-                }
-
-                if (connectionDot) connectionDot.className = 'status-dot ' + 
-                    (state === 'updating' ? 'updating' : state === 'success' ? 'online' : 'offline');
-
                 switch (state) {
                     case 'updating':
                         if (loadingEl) loadingEl.style.display = 'block';
-                        if (connectionStatus) connectionStatus.textContent = 'Caricamento...';
                         break;
                     case 'success':
                         if (mainEl) mainEl.style.display = 'block';
-                        if (connectionStatus) connectionStatus.textContent = 'Online';
-                        this.updateLastUpdateDisplay();
                         break;
                     case 'error':
                         if (errorEl) errorEl.style.display = 'block';
-                        if (connectionStatus) connectionStatus.textContent = 'Errore';
                         const err = document.getElementById('error-message');
                         if (err) err.textContent = errorMessage || 'Errore sconosciuto';
                         break;
                 }
-            }
-
-            updateLastUpdateDisplay() {
-                if (!this.lastUpdate) return;
-                const lastUpdateEl = document.getElementById('last-update');
-                const lastSyncTime = document.getElementById('last-sync-time');
-                if (lastUpdateEl) lastUpdateEl.textContent = this.lastUpdate.toLocaleTimeString('it-IT');
-                if (lastSyncTime) lastSyncTime.textContent = this.lastUpdate.toLocaleTimeString('it-IT', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
             }
 
             renderDashboard() {
@@ -1247,58 +1254,34 @@
             renderKPICards() {
                 const data = this.getDisplayData();
 
-                // Fatturato
-                const fatturatoValue = document.getElementById('fatturato-value');
-                if (fatturatoValue) fatturatoValue.textContent = this.formatEuroK3(data.fatturato);
+                document.getElementById('fatturato-value').textContent = this.formatEuroK3(data.fatturato);
+                document.getElementById('growth-value').textContent = '+' + data.crescita + '%';
+                document.getElementById('previous-value').textContent = this.formatEuroK3(data.annoPrecedente);
+                document.getElementById('clienti-value').textContent = String(data.clienti);
+                document.getElementById('total-revenue').textContent = this.formatEuroK3(data.fatturato);
+                document.getElementById('total-clients').textContent = data.clienti + ' Clienti Totali';
 
-                // Crescita
-                const growthValue = document.getElementById('growth-value');
-                if (growthValue) growthValue.textContent = '+' + data.crescita + '%';
-
-                // Valore precedente
-                const previousValue = document.getElementById('previous-value');
-                if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
-
-                // Obiettivo - sempre visibile ora
-                const obiettivoCard = document.getElementById('obiettivo-card');
-                if (obiettivoCard) {
-                    if (data.obiettivo) {
-                        obiettivoCard.style.display = 'block';
-                        const obVal = document.getElementById('obiettivo-value');
-                        const obPerc = document.getElementById('obiettivo-percentage');
-                        const remVal = document.getElementById('remaining-value');
-                        const progressFill = document.getElementById('progress-fill');
-                        
-                        if (obVal) obVal.textContent = this.formatEuroK3(data.obiettivo);
-                        if (obPerc) obPerc.textContent = (data.percentualeObiettivo || 0) + '%';
-                        if (remVal) remVal.textContent = this.formatEuroK3(Math.max(0, (data.obiettivo || 0) - data.fatturato));
-                        
-                        // Animazione progress bar
-                        if (progressFill) {
-                            const percentage = Math.min(100, data.percentualeObiettivo || 0);
-                            setTimeout(() => {
-                                progressFill.style.width = percentage + '%';
-                            }, 100);
-                        }
-                    } else {
-                        // Nascondi solo se non ci sono obiettivi
-                        obiettivoCard.style.display = 'none';
-                    }
+                if (data.obiettivo) {
+                    document.getElementById('obiettivo-value').textContent = this.formatEuroK3(data.obiettivo);
+                    document.getElementById('obiettivo-percentage').textContent = (data.percentualeObiettivo || 0) + '%';
+                    document.getElementById('remaining-value').textContent = this.formatEuroK3(Math.max(0, data.obiettivo - data.fatturato));
+                    
+                    const progressFill = document.getElementById('progress-fill');
+                    const percentage = Math.min(100, data.percentualeObiettivo || 0);
+                    setTimeout(() => {
+                        progressFill.style.width = percentage + '%';
+                    }, 100);
+                } else {
+                    document.getElementById('obiettivo-card').style.display = 'none';
                 }
-
-                // Clienti
-                const clientiValue = document.getElementById('clienti-value');
-                if (clientiValue) clientiValue.textContent = String(data.clienti);
             }
 
             renderVenditeTable() {
                 if (!this.csvData.vendite || this.csvData.vendite.length === 0) return;
 
                 const tbody = document.getElementById('vendite-tbody');
-                if (!tbody) return;
                 tbody.innerHTML = '';
 
-                // Filtra per provincia se selezionata
                 let venditeToShow = this.csvData.vendite;
                 if (this.selectedProvince !== 'all') {
                     venditeToShow = this.csvData.vendite.filter(v => v.provincia === this.selectedProvince);
@@ -1308,28 +1291,18 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td><span class="province-badge ${vendita.provincia}">${vendita.provincia}</span></td>
-                        <td>${vendita.cliente.length > 35 ? vendita.cliente.slice(0, 35) + '...' : vendita.cliente}</td>
+                        <td>${vendita.cliente.length > 40 ? vendita.cliente.slice(0, 40) + '...' : vendita.cliente}</td>
                         <td>${vendita.categoria}</td>
-                        <td>${this.formatEuroK3(vendita.fatturato)}</td>
+                        <td style="text-align: right; font-weight: 700; color: #16a34a;">${this.formatEuroK3(vendita.fatturato)}</td>
                     `;
                     tbody.appendChild(row);
                 });
-
-                // Update footer stats
-                const totalClients = document.getElementById('total-clients');
-                const totalRevenue = document.getElementById('total-revenue');
-                if (totalClients) totalClients.textContent = String(venditeToShow.length);
-                if (totalRevenue) totalRevenue.textContent = this.formatEuroK3(
-                    venditeToShow.reduce((sum, v) => sum + v.fatturato, 0)
-                );
             }
 
             renderCharts() {
                 if (!this.csvData) return;
                 
-                // Debounce per evitare rendering multipli
-                if (this.chartRenderTimeout) clearTimeout(this.chartRenderTimeout);
-                this.chartRenderTimeout = setTimeout(() => {
+                setTimeout(() => {
                     this.renderProvinceChart();
                     this.renderTopClientsChart();
                 }, 100);
@@ -1341,27 +1314,24 @@
 
                 if (this.charts.province) {
                     this.charts.province.destroy();
-                    delete this.charts.province;
                 }
-
-                const data = {
-                    labels: ['Latina (LT)', 'Roma (RM)'],
-                    datasets: [{
-                        data: [this.csvData.latina.annoCorrente, this.csvData.roma.annoCorrente],
-                        backgroundColor: ['rgba(139, 92, 246, 0.8)', 'rgba(34, 211, 238, 0.8)'],
-                        borderColor: ['rgba(139, 92, 246, 1)', 'rgba(34, 211, 238, 1)'],
-                        borderWidth: 3
-                    }]
-                };
 
                 this.charts.province = new Chart(ctx, {
                     type: 'doughnut',
-                    data: data,
+                    data: {
+                        labels: ['Latina (LT)', 'Roma (RM)'],
+                        datasets: [{
+                            data: [this.csvData.latina.annoCorrente, this.csvData.roma.annoCorrente],
+                            backgroundColor: ['#8b5cf6', '#22d3ee'],
+                            borderColor: ['#8b5cf6', '#22d3ee'],
+                            borderWidth: 3
+                        }]
+                    },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false }, // Legende custom sotto
+                            legend: { display: false },
                             tooltip: {
                                 callbacks: {
                                     label: (context) => {
@@ -1373,8 +1343,7 @@
                                 }
                             }
                         },
-                        cutout: '60%',
-                        animation: { duration: 1000 }
+                        cutout: '60%'
                     }
                 });
             }
@@ -1385,10 +1354,8 @@
 
                 if (this.charts.topClients) {
                     this.charts.topClients.destroy();
-                    delete this.charts.topClients;
                 }
 
-                // Filtra clienti per provincia selezionata
                 let clientsToShow = this.csvData.vendite;
                 if (this.selectedProvince !== 'all') {
                     clientsToShow = this.csvData.vendite.filter(v => v.provincia === this.selectedProvince);
@@ -1396,19 +1363,17 @@
                 
                 const topClients = clientsToShow.slice(0, 5);
 
-                const data = {
-                    labels: topClients.map(c => c.cliente.length > 20 ? c.cliente.substring(0, 20) + '...' : c.cliente),
-                    datasets: [{
-                        data: topClients.map(c => c.fatturato),
-                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 2
-                    }]
-                };
-
                 this.charts.topClients = new Chart(ctx, {
                     type: 'bar',
-                    data: data,
+                    data: {
+                        labels: topClients.map(c => c.cliente.length > 20 ? c.cliente.substring(0, 20) + '...' : c.cliente),
+                        datasets: [{
+                            data: topClients.map(c => c.fatturato),
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#3b82f6',
+                            borderWidth: 2
+                        }]
+                    },
                     options: {
                         indexAxis: 'y',
                         responsive: true,
@@ -1425,20 +1390,10 @@
                             x: {
                                 beginAtZero: true,
                                 ticks: {
-                                    callback: (value) => this.formatK3(value),
-                                    color: 'rgba(255, 255, 255, 0.7)'
-                                },
-                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                            },
-                            y: {
-                                ticks: { 
-                                    color: 'rgba(255, 255, 255, 0.7)',
-                                    font: { size: 11 }
-                                },
-                                grid: { display: false }
+                                    callback: (value) => this.formatK3(value)
+                                }
                             }
-                        },
-                        animation: { duration: 800 }
+                        }
                     }
                 });
             }
@@ -1458,8 +1413,8 @@
                         annoPrecedente: prev, 
                         crescita, 
                         clienti: this.csvData.generale.clienti,
-                        obiettivo: this.csvData.latina.obiettivo || null, // Mostra sempre obiettivo Latina
-                        percentualeObiettivo: this.csvData.latina.percentualeObiettivo || null
+                        obiettivo: this.csvData.latina.obiettivo,
+                        percentualeObiettivo: this.csvData.latina.percentualeObiettivo
                     };
                 } else if (this.selectedProvince === 'LT') {
                     const prev = this.csvData.latina.annoPrecedente || 0;
@@ -1489,13 +1444,9 @@
             }
 
             startAutoUpdate() {
-                // Auto-update ogni 5 minuti invece di 2 per migliorare performance
                 this.updateInterval = setInterval(() => {
                     this.fetchCSVData();
                 }, 5 * 60 * 1000);
-
-                // Update display ogni minuto
-                setInterval(() => this.updateLastUpdateDisplay(), 60 * 1000);
             }
 
             destroy() {
@@ -1515,6 +1466,15 @@
         window.addEventListener('beforeunload', () => {
             if (dashboardManager) dashboardManager.destroy();
         });
+
+        // Placeholder functions for buttons
+        function showPanoramicaAziendale() {
+            // Already showing panoramica
+        }
+
+        function showDettaglioAgenti() {
+            alert('Funzionalità "Dettaglio Agenti" in sviluppo');
+        }
     </script>
 </body>
 </html>
