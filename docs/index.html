@@ -625,7 +625,12 @@
                     <i class="fas fa-clock"></i>
                     <span>Last: <span id="last-update">Never</span></span>
                 </div>
-            </div>
+                <div class="status-item">
+                    <button class="control-btn" id="province-filter" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                        <i class="fas fa-map-marker-alt"></i> <span id="selected-province">TUTTE</span>
+                    </button>
+                </div>
+            </div></div>
         </header>
 
         <!-- Loading State -->
@@ -673,7 +678,7 @@
                 </div>
 
                 <!-- Obiettivo Card -->
-                <div class="kpi-card" id="obiettivo-card" style="display: none;">
+                <div class="kpi-card" id="obiettivo-card">
                     <div class="kpi-header">
                         <div class="kpi-info">
                             <p class="kpi-label">Target 2025</p>
@@ -685,7 +690,7 @@
                     </div>
                     <div class="progress-container">
                         <div class="progress-bar">
-                            <div class="progress-fill" id="progress-fill"></div>
+                            <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
                         </div>
                     </div>
                     <div class="kpi-footer" style="color: var(--text-secondary); font-size: 1rem;">
@@ -727,6 +732,16 @@
                         <div class="chart-container">
                             <canvas id="provinceChart"></canvas>
                         </div>
+                        <div class="chart-legend" style="margin-top: 1rem; text-align: center; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="display: inline-flex; align-items: center; margin-right: 1rem;">
+                                <span style="width: 12px; height: 12px; background: #8b5cf6; border-radius: 50%; margin-right: 0.5rem;"></span>
+                                Latina
+                            </span>
+                            <span style="display: inline-flex; align-items: center;">
+                                <span style="width: 12px; height: 12px; background: #22d3ee; border-radius: 50%; margin-right: 0.5rem;"></span>
+                                Roma
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Top Clients -->
@@ -739,6 +754,9 @@
                         </div>
                         <div class="chart-container">
                             <canvas id="topClientsChart"></canvas>
+                        </div>
+                        <div class="chart-legend" style="margin-top: 1rem; text-align: center; font-size: 0.875rem; color: var(--text-secondary);">
+                            Top clienti per fatturato - dati dal CSV
                         </div>
                     </div>
                 </div>
@@ -787,18 +805,56 @@
                 </div>
             </div>
         </div>
+
+        <!-- Province Selection Popup -->
+        <div id="province-popup" class="popup-overlay" style="display: none;">
+            <div class="popup-content" style="background: var(--bg-card); backdrop-filter: blur(30px); border-radius: 2rem; border: 1px solid var(--border-color); box-shadow: var(--shadow); width: 100%; max-width: 500px; transform: scale(0.9); transition: transform 0.3s ease;">
+                <div style="padding: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Seleziona Provincia</h3>
+                    <p style="color: var(--text-secondary);">Filtra dati per territorio</p>
+                </div>
+                
+                <div style="padding: 2rem;" id="popup-options">
+                    <div class="province-option" data-province="all" style="width: 100%; padding: 1rem; border-radius: 1rem; border: 2px solid transparent; background: rgba(107, 114, 128, 0.05); text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="font-weight: 700; margin-bottom: 0.25rem;">Tutte le Province</h4>
+                            <p style="font-size: 0.875rem; opacity: 0.8;" id="all-province-desc">€0k • 0 clienti</p>
+                        </div>
+                        <div class="option-radio" style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 2px solid currentColor;"></div>
+                    </div>
+                    <div class="province-option" data-province="LT" style="width: 100%; padding: 1rem; border-radius: 1rem; border: 2px solid transparent; background: rgba(107, 114, 128, 0.05); text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="font-weight: 700; margin-bottom: 0.25rem;">Latina (LT)</h4>
+                            <p style="font-size: 0.875rem; opacity: 0.8;" id="lt-province-desc">€0k • 0 clienti</p>
+                        </div>
+                        <div class="option-radio" style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 2px solid currentColor;"></div>
+                    </div>
+                    <div class="province-option" data-province="RM" style="width: 100%; padding: 1rem; border-radius: 1rem; border: 2px solid transparent; background: rgba(107, 114, 128, 0.05); text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <h4 style="font-weight: 700; margin-bottom: 0.25rem;">Roma (RM)</h4>
+                            <p style="font-size: 0.875rem; opacity: 0.8;" id="rm-province-desc">€0k • 0 clienti</p>
+                        </div>
+                        <div class="option-radio" style="width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 2px solid currentColor;"></div>
+                    </div>
+                </div>
+                
+                <div style="padding: 1.5rem 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: flex-end;">
+                    <button id="close-popup" class="control-btn" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Chiudi</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         class DashboardManager {
             constructor() {
                 this.csvData = null;
+                this.selectedProvince = 'all';
                 this.isLoading = false;
                 this.lastUpdate = null;
                 this.updateInterval = null;
                 this.charts = {};
 
-                // File CSV nome esatto dal tuo repository
                 this.csvFileNames = [
                     '631.00238_CARABOT-NATALINO.csv',
                     '631.00238_CARABOT NATALINO.csv'
@@ -814,11 +870,101 @@
             }
 
             setupEventListeners() {
+                // Refresh button
                 const refreshBtn = document.getElementById('refresh-btn');
                 if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchCSVData(true));
 
+                // Theme toggle
                 const themeToggle = document.getElementById('theme-toggle');
                 if (themeToggle) themeToggle.addEventListener('click', () => this.toggleTheme());
+
+                // Province filter
+                const provinceFilter = document.getElementById('province-filter');
+                if (provinceFilter) provinceFilter.addEventListener('click', () => this.showProvincePopup());
+
+                // Close popup
+                const closePopup = document.getElementById('close-popup');
+                if (closePopup) closePopup.addEventListener('click', () => this.hideProvincePopup());
+
+                // Province options
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.province-option')) {
+                        const option = e.target.closest('.province-option');
+                        const province = option.dataset.province;
+                        this.selectProvince(province);
+                    }
+                    if (e.target.id === 'province-popup') {
+                        this.hideProvincePopup();
+                    }
+                });
+            }
+
+            showProvincePopup() {
+                const popup = document.getElementById('province-popup');
+                if (popup && this.csvData) {
+                    this.updateProvinceOptions();
+                    popup.style.display = 'flex';
+                    setTimeout(() => {
+                        popup.querySelector('.popup-content').style.transform = 'scale(1)';
+                    }, 10);
+                }
+            }
+
+            hideProvincePopup() {
+                const popup = document.getElementById('province-popup');
+                if (popup) {
+                    popup.querySelector('.popup-content').style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        popup.style.display = 'none';
+                    }, 300);
+                }
+            }
+
+            updateProvinceOptions() {
+                if (!this.csvData) return;
+
+                // Update descriptions
+                const allDesc = document.getElementById('all-province-desc');
+                const ltDesc = document.getElementById('lt-province-desc');
+                const rmDesc = document.getElementById('rm-province-desc');
+
+                if (allDesc) allDesc.textContent = `${this.formatEuroK3(this.csvData.generale.annoCorrente)} • ${this.csvData.generale.clienti} clienti`;
+                if (ltDesc) ltDesc.textContent = `${this.formatEuroK3(this.csvData.latina.annoCorrente)} • ${this.csvData.latina.clientiCorrente} clienti • Target: ${this.csvData.latina.percentualeObiettivo}%`;
+                if (rmDesc) rmDesc.textContent = `${this.formatEuroK3(this.csvData.roma.annoCorrente)} • ${this.csvData.roma.clienti} clienti`;
+
+                // Update selected state
+                document.querySelectorAll('.province-option').forEach(option => {
+                    const province = option.dataset.province;
+                    const radio = option.querySelector('.option-radio');
+                    if (province === this.selectedProvince) {
+                        option.style.background = 'var(--primary-blue)';
+                        option.style.borderColor = 'var(--primary-blue)';
+                        option.style.color = 'white';
+                        radio.innerHTML = '<div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background: currentColor;"></div>';
+                        radio.style.display = 'flex';
+                        radio.style.alignItems = 'center';
+                        radio.style.justifyContent = 'center';
+                    } else {
+                        option.style.background = 'rgba(107, 114, 128, 0.05)';
+                        option.style.borderColor = 'transparent';
+                        option.style.color = 'var(--text-primary)';
+                        radio.innerHTML = '';
+                    }
+                });
+            }
+
+            selectProvince(province) {
+                this.selectedProvince = province;
+                
+                // Update button text
+                const selectedProvinceEl = document.getElementById('selected-province');
+                if (selectedProvinceEl) {
+                    const labels = { all: 'TUTTE', LT: 'LATINA', RM: 'ROMA' };
+                    selectedProvinceEl.textContent = labels[province] || 'TUTTE';
+                }
+
+                this.hideProvincePopup();
+                this.renderDashboard();
             }
 
             toggleTheme() {
@@ -1113,7 +1259,7 @@
                 const previousValue = document.getElementById('previous-value');
                 if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
 
-                // Obiettivo
+                // Obiettivo - sempre visibile ora
                 const obiettivoCard = document.getElementById('obiettivo-card');
                 if (obiettivoCard) {
                     if (data.obiettivo) {
@@ -1121,12 +1267,21 @@
                         const obVal = document.getElementById('obiettivo-value');
                         const obPerc = document.getElementById('obiettivo-percentage');
                         const remVal = document.getElementById('remaining-value');
+                        const progressFill = document.getElementById('progress-fill');
+                        
                         if (obVal) obVal.textContent = this.formatEuroK3(data.obiettivo);
                         if (obPerc) obPerc.textContent = (data.percentualeObiettivo || 0) + '%';
-                        if (remVal) remVal.textContent = this.formatEuroK3((data.obiettivo || 0) - data.fatturato);
-                        const progressFill = document.getElementById('progress-fill');
-                        if (progressFill) progressFill.style.width = (data.percentualeObiettivo || 0) + '%';
+                        if (remVal) remVal.textContent = this.formatEuroK3(Math.max(0, (data.obiettivo || 0) - data.fatturato));
+                        
+                        // Animazione progress bar
+                        if (progressFill) {
+                            const percentage = Math.min(100, data.percentualeObiettivo || 0);
+                            setTimeout(() => {
+                                progressFill.style.width = percentage + '%';
+                            }, 100);
+                        }
                     } else {
+                        // Nascondi solo se non ci sono obiettivi
                         obiettivoCard.style.display = 'none';
                     }
                 }
@@ -1136,57 +1291,32 @@
                 if (clientiValue) clientiValue.textContent = String(data.clienti);
             }
 
-            renderVenditeTable() {
-                if (!this.csvData.vendite || this.csvData.vendite.length === 0) return;
-
-                const tbody = document.getElementById('vendite-tbody');
-                if (!tbody) return;
-                tbody.innerHTML = '';
-
-                this.csvData.vendite.forEach(vendita => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><span class="province-badge ${vendita.provincia}">${vendita.provincia}</span></td>
-                        <td>${vendita.cliente.length > 35 ? vendita.cliente.slice(0, 35) + '...' : vendita.cliente}</td>
-                        <td>${vendita.categoria}</td>
-                        <td>${this.formatEuroK3(vendita.fatturato)}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-
-                // Update footer stats
-                const totalClients = document.getElementById('total-clients');
-                const totalRevenue = document.getElementById('total-revenue');
-                if (totalClients) totalClients.textContent = String(this.csvData.vendite.length);
-                if (totalRevenue) totalRevenue.textContent = this.formatEuroK3(
-                    this.csvData.vendite.reduce((sum, v) => sum + v.fatturato, 0)
-                );
-            }
-
             renderCharts() {
                 if (!this.csvData) return;
-                this.renderProvinceChart();
-                this.renderTopClientsChart();
+                
+                // Debounce per evitare rendering multipli
+                if (this.chartRenderTimeout) clearTimeout(this.chartRenderTimeout);
+                this.chartRenderTimeout = setTimeout(() => {
+                    this.renderProvinceChart();
+                    this.renderTopClientsChart();
+                }, 100);
             }
 
             renderProvinceChart() {
                 const ctx = document.getElementById('provinceChart');
                 if (!ctx) return;
 
-                if (this.charts.province) this.charts.province.destroy();
+                if (this.charts.province) {
+                    this.charts.province.destroy();
+                    delete this.charts.province;
+                }
 
                 const data = {
                     labels: ['Latina (LT)', 'Roma (RM)'],
                     datasets: [{
                         data: [this.csvData.latina.annoCorrente, this.csvData.roma.annoCorrente],
-                        backgroundColor: [
-                            'rgba(139, 92, 246, 0.8)',
-                            'rgba(34, 211, 238, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(139, 92, 246, 1)',
-                            'rgba(34, 211, 238, 1)'
-                        ],
+                        backgroundColor: ['rgba(139, 92, 246, 0.8)', 'rgba(34, 211, 238, 0.8)'],
+                        borderColor: ['rgba(139, 92, 246, 1)', 'rgba(34, 211, 238, 1)'],
                         borderWidth: 3
                     }]
                 };
@@ -1198,14 +1328,7 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                    font: { size: 14, weight: '600' },
-                                    padding: 20
-                                }
-                            },
+                            legend: { display: false }, // Legende custom sotto
                             tooltip: {
                                 callbacks: {
                                     label: (context) => {
@@ -1217,7 +1340,8 @@
                                 }
                             }
                         },
-                        cutout: '60%'
+                        cutout: '60%',
+                        animation: { duration: 1000 }
                     }
                 });
             }
@@ -1226,12 +1350,21 @@
                 const ctx = document.getElementById('topClientsChart');
                 if (!ctx) return;
 
-                if (this.charts.topClients) this.charts.topClients.destroy();
+                if (this.charts.topClients) {
+                    this.charts.topClients.destroy();
+                    delete this.charts.topClients;
+                }
 
-                const topClients = this.csvData.vendite.slice(0, 5);
+                // Filtra clienti per provincia selezionata
+                let clientsToShow = this.csvData.vendite;
+                if (this.selectedProvince !== 'all') {
+                    clientsToShow = this.csvData.vendite.filter(v => v.provincia === this.selectedProvince);
+                }
+                
+                const topClients = clientsToShow.slice(0, 5);
 
                 const data = {
-                    labels: topClients.map(c => c.cliente.length > 25 ? c.cliente.substring(0, 25) + '...' : c.cliente),
+                    labels: topClients.map(c => c.cliente.length > 20 ? c.cliente.substring(0, 20) + '...' : c.cliente),
                     datasets: [{
                         data: topClients.map(c => c.fatturato),
                         backgroundColor: 'rgba(59, 130, 246, 0.8)',
@@ -1265,10 +1398,14 @@
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' }
                             },
                             y: {
-                                ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                                ticks: { 
+                                    color: 'rgba(255, 255, 255, 0.7)',
+                                    font: { size: 11 }
+                                },
                                 grid: { display: false }
                             }
-                        }
+                        },
+                        animation: { duration: 800 }
                     }
                 });
             }
@@ -1278,33 +1415,54 @@
                     return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
                 }
 
-                // Usa sempre i dati generali
-                const prev = this.csvData.generale.annoPrecedente || 0;
-                const curr = this.csvData.generale.annoCorrente || 0;
-                const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
-                
-                // Mostra obiettivo solo per Latina se esiste
-                const obiettivo = this.csvData.latina.obiettivo || null;
-                const percentualeObiettivo = this.csvData.latina.percentualeObiettivo || null;
-                
-                return { 
-                    fatturato: curr, 
-                    annoPrecedente: prev, 
-                    crescita, 
-                    clienti: this.csvData.generale.clienti,
-                    obiettivo,
-                    percentualeObiettivo
-                };
+                if (this.selectedProvince === 'all') {
+                    const prev = this.csvData.generale.annoPrecedente || 0;
+                    const curr = this.csvData.generale.annoCorrente || 0;
+                    const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
+                    
+                    return { 
+                        fatturato: curr, 
+                        annoPrecedente: prev, 
+                        crescita, 
+                        clienti: this.csvData.generale.clienti,
+                        obiettivo: this.csvData.latina.obiettivo || null, // Mostra sempre obiettivo Latina
+                        percentualeObiettivo: this.csvData.latina.percentualeObiettivo || null
+                    };
+                } else if (this.selectedProvince === 'LT') {
+                    const prev = this.csvData.latina.annoPrecedente || 0;
+                    const curr = this.csvData.latina.annoCorrente || 0;
+                    const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
+                    
+                    return { 
+                        fatturato: curr, 
+                        annoPrecedente: prev, 
+                        crescita, 
+                        clienti: this.csvData.latina.clientiCorrente,
+                        obiettivo: this.csvData.latina.obiettivo,
+                        percentualeObiettivo: this.csvData.latina.percentualeObiettivo
+                    };
+                } else if (this.selectedProvince === 'RM') {
+                    return { 
+                        fatturato: this.csvData.roma.annoCorrente, 
+                        annoPrecedente: 0, 
+                        crescita: '0.0', 
+                        clienti: this.csvData.roma.clienti,
+                        obiettivo: null,
+                        percentualeObiettivo: null
+                    };
+                }
+
+                return { fatturato: 0, annoPrecedente: 0, crescita: '0.0', clienti: 0, obiettivo: null, percentualeObiettivo: null };
             }
 
             startAutoUpdate() {
-                // Auto-update ogni 2 minuti
+                // Auto-update ogni 5 minuti invece di 2 per migliorare performance
                 this.updateInterval = setInterval(() => {
                     this.fetchCSVData();
-                }, 2 * 60 * 1000);
+                }, 5 * 60 * 1000);
 
-                // Update display ogni 30 secondi
-                setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
+                // Update display ogni minuto
+                setInterval(() => this.updateLastUpdateDisplay(), 60 * 1000);
             }
 
             destroy() {
