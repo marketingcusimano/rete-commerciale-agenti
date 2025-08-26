@@ -1291,6 +1291,39 @@
                 if (clientiValue) clientiValue.textContent = String(data.clienti);
             }
 
+            renderVenditeTable() {
+                if (!this.csvData.vendite || this.csvData.vendite.length === 0) return;
+
+                const tbody = document.getElementById('vendite-tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+
+                // Filtra per provincia se selezionata
+                let venditeToShow = this.csvData.vendite;
+                if (this.selectedProvince !== 'all') {
+                    venditeToShow = this.csvData.vendite.filter(v => v.provincia === this.selectedProvince);
+                }
+
+                venditeToShow.forEach(vendita => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="province-badge ${vendita.provincia}">${vendita.provincia}</span></td>
+                        <td>${vendita.cliente.length > 35 ? vendita.cliente.slice(0, 35) + '...' : vendita.cliente}</td>
+                        <td>${vendita.categoria}</td>
+                        <td>${this.formatEuroK3(vendita.fatturato)}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Update footer stats
+                const totalClients = document.getElementById('total-clients');
+                const totalRevenue = document.getElementById('total-revenue');
+                if (totalClients) totalClients.textContent = String(venditeToShow.length);
+                if (totalRevenue) totalRevenue.textContent = this.formatEuroK3(
+                    venditeToShow.reduce((sum, v) => sum + v.fatturato, 0)
+                );
+            }
+
             renderCharts() {
                 if (!this.csvData) return;
                 
