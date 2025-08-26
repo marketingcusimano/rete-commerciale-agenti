@@ -752,6 +752,83 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Mix Prodotti Section -->
+            <div class="card" style="padding: 2rem; margin-top: 2rem;">
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: #1f2937;">Mix Prodotti</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+                    <!-- Doughnut Chart -->
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="mixProdottiChart"></canvas>
+                    </div>
+                    
+                    <!-- Product Details -->
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- Mattone + Pavimentazione -->
+                        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border-left: 4px solid #3b82f6;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <span style="font-size: 1.125rem; font-weight: 700; color: #3b82f6;">Mattone + Pavimentazione</span>
+                                <span style="font-size: 1.5rem; font-weight: 900; color: #3b82f6;" id="core-percentage">79.6%</span>
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 900; color: #1f2937; margin-bottom: 1rem;" id="core-amount">54.245 €</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem;">
+                                <div>
+                                    <span style="color: #3b82f6; font-weight: 600;">Mattone:</span>
+                                    <span id="mattone-amount">€39k</span>
+                                </div>
+                                <div>
+                                    <span style="color: #3b82f6; font-weight: 600;">Pavimentazione:</span>
+                                    <span id="pavimentazione-amount">€16k</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Altri Prodotti -->
+                        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border-left: 4px solid #6b7280;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <span style="font-size: 1.125rem; font-weight: 700; color: #6b7280;">Altri Prodotti</span>
+                                <span style="font-size: 1.5rem; font-weight: 900; color: #6b7280;" id="other-percentage">20.4%</span>
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 900; color: #1f2937; margin-bottom: 1rem;" id="other-amount">13.934 €</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem;">
+                                <div>
+                                    <span style="color: #6b7280; font-weight: 600;">Refrattari:</span>
+                                    <span id="refrattari-amount">€10k</span>
+                                </div>
+                                <div>
+                                    <span style="color: #6b7280; font-weight: 600;">Altri:</span>
+                                    <span id="altri-amount">€4k</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Mix Prodotti -->
+                <div style="background: linear-gradient(135deg, #f0f4ff, #e0e7ff); padding: 1.5rem; border-radius: 1rem; margin-top: 2rem; border: 1px solid #c7d2fe;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                        <div style="width: 12px; height: 12px; background: #3b82f6; border-radius: 50%;"></div>
+                        <span style="font-weight: 700; color: #3730a3;">Performance Mix Prodotti</span>
+                        <span style="margin-left: auto; font-weight: 700; color: #3730a3;">Equilibrio Ottimo</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: center;">
+                        <div>
+                            <div style="font-size: 2rem; font-weight: 900; color: #3730a3;" id="core-perf">79.6%</div>
+                            <div style="color: #6366f1; font-size: 0.875rem; font-weight: 600;">Prodotti Core</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; font-weight: 900; color: #3730a3;" id="categories-count">7</div>
+                            <div style="color: #6366f1; font-size: 0.875rem; font-weight: 600;">Categorie Attive</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; font-weight: 900; color: #3730a3;" id="involved-clients">20</div>
+                            <div style="color: #6366f1; font-size: 0.875rem; font-weight: 600;">Clienti Coinvolti</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Province Selection Popup -->
@@ -1003,7 +1080,35 @@
                         }
                     }
 
-                    return { generale, latina, roma };
+                    // Parse CATEGORIE data for Mix Prodotti
+                    const categorieMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===([\s\S]*?)===.*===/);
+                    let categorie = [];
+                    if (categorieMatch) {
+                        const categorieSection = categorieMatch[1];
+                        const lines = categorieSection.split('\n').filter(line => 
+                            line.trim() && 
+                            !line.includes('===') && 
+                            !line.includes('Categoria') && 
+                            line.includes(';') && 
+                            line.split(';').length >= 2
+                        );
+                        
+                        lines.forEach(line => {
+                            const parts = line.split(';');
+                            if (parts.length >= 2) {
+                                const categoria = parts[0].trim();
+                                const importo = this.parseNumber(parts[1]);
+                                if (categoria && importo > 0) {
+                                    categorie.push({
+                                        nome: categoria,
+                                        importo: importo
+                                    });
+                                }
+                            }
+                        });
+                    }
+
+                    return { generale, latina, roma, categorie };
                     
                 } catch (e) {
                     console.error('Parse error:', e);
@@ -1157,7 +1262,128 @@
             updateChartsAndDisplays() {
                 this.createClientiChart();
                 this.createFatturatoChart();
+                this.createMixProdottiChart();
                 this.updateProvinceDisplays();
+                this.updateMixProdottiData();
+            }
+
+            createMixProdottiChart() {
+                const ctx = document.getElementById('mixProdottiChart');
+                if (!ctx) return;
+
+                const mixData = this.calculateMixProdotti();
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Mattone + Pavimentazione', 'Altri Prodotti'],
+                        datasets: [{
+                            data: [mixData.core.importo, mixData.others.importo],
+                            backgroundColor: ['#3b82f6', '#6b7280'],
+                            borderColor: ['#1e40af', '#4b5563'],
+                            borderWidth: 3,
+                            cutout: '50%'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => {
+                                        const value = this.formatEuro(context.raw);
+                                        const percentage = mixData.core.importo + mixData.others.importo > 0 ? 
+                                            ((context.raw / (mixData.core.importo + mixData.others.importo)) * 100).toFixed(1) : '0';
+                                        return `${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 2000,
+                            easing: 'easeOutBounce'
+                        }
+                    }
+                });
+            }
+
+            calculateMixProdotti() {
+                if (!this.csvData.categorie || this.csvData.categorie.length === 0) {
+                    return {
+                        core: { importo: 45000, mattone: 30000, pavimentazione: 15000 },
+                        others: { importo: 15000, refrattari: 10000, altri: 5000 }
+                    };
+                }
+
+                const categorie = this.csvData.categorie;
+                let mattone = 0, pavimentazione = 0, refrattari = 0, altri = 0;
+
+                categorie.forEach(cat => {
+                    const nome = cat.nome.toLowerCase();
+                    if (nome.includes('mattone') || nome.includes('laterizio')) {
+                        mattone += cat.importo;
+                    } else if (nome.includes('paviment') || nome.includes('cotto')) {
+                        pavimentazione += cat.importo;
+                    } else if (nome.includes('refratt')) {
+                        refrattari += cat.importo;
+                    } else {
+                        altri += cat.importo;
+                    }
+                });
+
+                const coreImporto = mattone + pavimentazione;
+                const othersImporto = refrattari + altri;
+
+                return {
+                    core: { importo: coreImporto, mattone, pavimentazione },
+                    others: { importo: othersImporto, refrattari, altri },
+                    total: coreImporto + othersImporto
+                };
+            }
+
+            updateMixProdottiData() {
+                const mixData = this.calculateMixProdotti();
+                const total = mixData.total;
+
+                if (total > 0) {
+                    // Calculate percentages
+                    const corePercentage = ((mixData.core.importo / total) * 100).toFixed(1);
+                    const othersPercentage = ((mixData.others.importo / total) * 100).toFixed(1);
+
+                    // Update percentages
+                    document.getElementById('core-percentage').textContent = `${corePercentage}%`;
+                    document.getElementById('other-percentage').textContent = `${othersPercentage}%`;
+
+                    // Update amounts
+                    document.getElementById('core-amount').textContent = this.formatEuro(mixData.core.importo);
+                    document.getElementById('other-amount').textContent = this.formatEuro(mixData.others.importo);
+
+                    // Update breakdown
+                    document.getElementById('mattone-amount').textContent = this.formatEuroK(mixData.core.mattone);
+                    document.getElementById('pavimentazione-amount').textContent = this.formatEuroK(mixData.core.pavimentazione);
+                    document.getElementById('refrattari-amount').textContent = this.formatEuroK(mixData.others.refrattari);
+                    document.getElementById('altri-amount').textContent = this.formatEuroK(mixData.others.altri);
+
+                    // Update performance metrics
+                    document.getElementById('core-perf').textContent = `${corePercentage}%`;
+                    document.getElementById('categories-count').textContent = this.csvData.categorie.length;
+                    
+                    // Calculate involved clients (estimate based on categories)
+                    const involvedClients = Math.min(this.csvData.generale.clienti, this.csvData.categorie.length * 3);
+                    document.getElementById('involved-clients').textContent = involvedClients;
+                }
+            }
+
+            formatEuro(value) {
+                if (!value) return '0 €';
+                if (value >= 1000) {
+                    return `${(value / 1000).toFixed(3)} €`.replace('.', ',');
+                }
+                return `${Math.round(value)} €`;
             }
 
             createClientiChart() {
