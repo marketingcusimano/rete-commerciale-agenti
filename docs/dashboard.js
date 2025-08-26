@@ -3,45 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard CARABOT NATALINO - Auto Update</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script>
-        // Fallback se Chart.js non si carica
-        window.addEventListener('load', function() {
-            if (typeof Chart === 'undefined') {
-                console.error('Chart.js failed to load - loading fallback');
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
-                document.head.appendChild(script);
-            }
-        });
-    </script>
+    <title>CARABOT NATALINO - Dashboard Performance</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ==================== VARIABLES ==================== */
         :root {
           --primary-blue: #3b82f6;
           --primary-violet: #8b5cf6;
           --primary-cyan: #22d3ee;
           --primary-emerald: #10b981;
+          --primary-orange: #f59e0b;
+          --primary-red: #ef4444;
           --text-primary: #1f2937;
           --text-secondary: #6b7280;
           --bg-primary: #f8fafc;
           --bg-card: rgba(255, 255, 255, 0.95);
           --border-color: rgba(255, 255, 255, 0.9);
           --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+          --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
-        [class*="dark-mode"] {
+        .dark-mode {
           --text-primary: #f9fafb;
           --text-secondary: #9ca3af;
           --bg-primary: #0f172a;
           --bg-card: rgba(30, 41, 59, 0.9);
           --border-color: rgba(51, 65, 85, 0.6);
           --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+          --gradient-primary: linear-gradient(135deg, #1e293b 0%, #581c87 50%, #0f172a 100%);
         }
 
-        /* ==================== BASE STYLES ==================== */
         * {
           margin: 0;
           padding: 0;
@@ -51,81 +43,115 @@
         body {
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
           min-height: 100vh;
+          background: var(--gradient-primary);
+          color: var(--text-primary);
           transition: all 0.5s ease;
+          overflow-x: hidden;
         }
 
-        .light-mode {
-          background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 50%, #f3e8ff 100%);
-          color: var(--text-primary);
-        }
-
-        .dark-mode {
-          background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
-          color: var(--text-primary);
-        }
-
-        #dashboard-container {
-          max-width: 1400px;
+        .container {
+          max-width: 1600px;
           margin: 0 auto;
           padding: 1.5rem;
-          position: relative;
         }
 
-        /* ==================== HEADER ==================== */
+        /* Header */
         .dashboard-header {
           background: var(--bg-card);
-          backdrop-filter: blur(20px);
-          border-radius: 1.5rem;
+          backdrop-filter: blur(30px);
+          border-radius: 2rem;
           border: 1px solid var(--border-color);
           box-shadow: var(--shadow);
           margin-bottom: 2rem;
+          padding: 2rem;
+          position: relative;
           overflow: hidden;
         }
 
-        .header-content {
-          padding: 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          flex-wrap: wrap;
-          gap: 1.5rem;
+        .dashboard-header::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, var(--primary-blue), var(--primary-violet), var(--primary-cyan), var(--primary-emerald));
+          animation: gradient-flow 3s ease-in-out infinite;
         }
 
-        .agent-info h1 {
+        @keyframes gradient-flow {
+          0%, 100% { transform: translateX(-100%); }
+          50% { transform: translateX(100%); }
+        }
+
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 2rem;
+        }
+
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .brand-icon {
+          width: 70px;
+          height: 70px;
+          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
+          border-radius: 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           font-size: 2.5rem;
-          font-weight: 800;
-          color: var(--text-primary);
+          color: white;
+          box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+        }
+
+        .brand-info h1 {
+          font-size: 2.8rem;
+          font-weight: 900;
+          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
           margin-bottom: 0.5rem;
         }
 
-        .agent-info p {
+        .brand-info p {
           color: var(--text-secondary);
-          font-size: 1.125rem;
+          font-size: 1.1rem;
+          font-weight: 500;
         }
 
         .header-controls {
           display: flex;
-          gap: 0.75rem;
+          gap: 1rem;
+          align-items: center;
         }
 
         .control-btn {
-          padding: 0.75rem;
-          border-radius: 0.75rem;
+          padding: 1rem 1.5rem;
+          border-radius: 1rem;
           border: none;
-          background: var(--primary-blue);
+          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
           color: white;
           cursor: pointer;
           transition: all 0.3s ease;
-          font-size: 1.125rem;
+          font-size: 1rem;
+          font-weight: 600;
         }
 
         .control-btn:hover {
           transform: scale(1.05);
-          filter: brightness(1.1);
+          box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
         }
 
         .control-btn:disabled {
-          opacity: 0.6;
+          opacity: 0.5;
           cursor: not-allowed;
           transform: none;
         }
@@ -140,567 +166,443 @@
         }
 
         .status-info {
-          padding: 0 2rem 1.5rem;
+          padding: 1.5rem 0 0;
           display: flex;
           flex-wrap: wrap;
-          gap: 1.5rem;
+          gap: 2rem;
           align-items: center;
         }
 
         .status-item {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          font-size: 0.875rem;
-        }
-
-        .status-item code {
-          background: rgba(107, 114, 128, 0.1);
-          padding: 0.25rem 0.5rem;
-          border-radius: 0.375rem;
-          font-family: 'Monaco', 'Consolas', monospace;
+          gap: 0.75rem;
+          font-size: 0.9rem;
+          font-weight: 500;
+          padding: 0.75rem 1.25rem;
+          background: rgba(59, 130, 246, 0.1);
+          border-radius: 1rem;
+          backdrop-filter: blur(10px);
         }
 
         .status-dot {
-          width: 0.5rem;
-          height: 0.5rem;
+          width: 12px;
+          height: 12px;
           border-radius: 50%;
-          transition: all 0.3s ease;
+          position: relative;
+        }
+
+        .status-dot::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          animation: pulse-ring 2s infinite;
         }
 
         .status-dot.online { background: #10b981; }
+        .status-dot.online::after { background: rgba(16, 185, 129, 0.3); }
         .status-dot.offline { background: #ef4444; }
-        .status-dot.updating { background: var(--primary-blue); animation: pulse 2s infinite; }
+        .status-dot.offline::after { background: rgba(239, 68, 68, 0.3); }
+        .status-dot.updating { background: var(--primary-blue); }
+        .status-dot.updating::after { background: rgba(59, 130, 246, 0.3); }
 
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+        @keyframes pulse-ring {
+          0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+          100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
         }
 
-        .status-bar {
-          padding: 1rem 2rem;
-          border-top: 1px solid rgba(107, 114, 128, 0.1);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-
-        .status-badge {
-          padding: 0.5rem 1rem;
-          border-radius: 9999px;
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
-
-        .status-badge.success {
-          background: rgba(16, 185, 129, 0.1);
-          color: #10b981;
-        }
-
-        .status-badge.error {
-          background: rgba(239, 68, 68, 0.1);
-          color: #ef4444;
-        }
-
-        .status-badge.updating {
-          background: rgba(59, 130, 246, 0.1);
-          color: var(--primary-blue);
-        }
-
-        .filter-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          background: var(--primary-blue);
-          color: white;
-          border: none;
-          border-radius: 0.5rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .filter-btn:hover {
-          transform: scale(1.05);
-          filter: brightness(1.1);
-        }
-
-        /* ==================== LOADING & ERROR STATES ==================== */
+        /* Loading States */
         .loading-container, .error-container {
           background: var(--bg-card);
-          backdrop-filter: blur(20px);
-          border-radius: 1.5rem;
+          backdrop-filter: blur(30px);
+          border-radius: 2rem;
           border: 1px solid var(--border-color);
           box-shadow: var(--shadow);
-          padding: 3rem;
+          padding: 4rem;
           text-align: center;
           margin-bottom: 2rem;
         }
 
         .loading-spinner {
-          font-size: 2rem;
+          font-size: 3rem;
           color: var(--primary-blue);
-          margin-bottom: 1rem;
-          animation: spin 1s linear infinite;
+          margin-bottom: 2rem;
+          animation: spin 2s ease-in-out infinite;
         }
 
-        .error-content {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          text-align: left;
-        }
-
-        .error-content i {
-          font-size: 1.5rem;
-          color: #ef4444;
-        }
-
-        /* ==================== KPI CARDS ==================== */
+        /* KPI Grid */
         .kpi-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 1.5rem;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 2rem;
           margin-bottom: 2rem;
         }
 
         .kpi-card {
           background: var(--bg-card);
-          backdrop-filter: blur(20px);
-          border-radius: 1.5rem;
-          border: 2px solid var(--border-color);
+          backdrop-filter: blur(30px);
+          border-radius: 2rem;
+          border: 1px solid var(--border-color);
           box-shadow: var(--shadow);
-          padding: 2rem;
+          padding: 2.5rem;
+          position: relative;
+          overflow: hidden;
           transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+          transform: translateY(-10px) scale(1.02);
+          box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .kpi-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 6px;
+          background: linear-gradient(90deg, var(--primary-blue), var(--primary-violet), var(--primary-cyan));
+          opacity: 0;
+          transition: opacity 0.4s ease;
+        }
+
+        .kpi-card:hover::before {
+          opacity: 1;
         }
 
         .kpi-header {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
+          margin-bottom: 1.5rem;
+        }
+
+        .kpi-info .kpi-label {
+          color: var(--text-secondary);
+          font-size: 1rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
           margin-bottom: 1rem;
         }
 
-        .kpi-label {
-          color: var(--text-secondary);
-          font-size: 0.875rem;
-          font-weight: 500;
-          margin-bottom: 0.5rem;
-        }
-
         .kpi-value {
-          font-size: 2.5rem;
-          font-weight: 800;
+          font-size: 3.5rem;
+          font-weight: 900;
           color: var(--text-primary);
           line-height: 1;
+          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          transition: all 0.5s ease;
         }
 
         .kpi-badge {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          padding: 0.5rem 0.75rem;
-          border-radius: 9999px;
-          background: rgba(16, 185, 129, 0.1);
+          padding: 0.75rem 1rem;
+          border-radius: 1rem;
+          background: rgba(16, 185, 129, 0.15);
           color: #10b981;
-          font-size: 0.875rem;
+          font-size: 1rem;
           font-weight: 700;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
         .kpi-badge.secondary {
-          background: rgba(34, 211, 238, 0.1);
+          background: rgba(34, 211, 238, 0.15);
           color: #22d3ee;
-        }
-
-        .kpi-percentage span {
-          font-size: 2rem;
-          font-weight: 800;
-          color: var(--primary-emerald);
+          border: 1px solid rgba(34, 211, 238, 0.2);
         }
 
         .progress-container {
-          margin: 1rem 0;
+          margin: 2rem 0;
         }
 
         .progress-bar {
           width: 100%;
-          height: 0.75rem;
+          height: 12px;
           background: rgba(107, 114, 128, 0.2);
-          border-radius: 9999px;
+          border-radius: 1rem;
           overflow: hidden;
+          position: relative;
         }
 
         .progress-fill {
           height: 100%;
           background: linear-gradient(90deg, var(--primary-emerald), #34d399);
-          border-radius: 9999px;
-          transition: width 1.5s ease;
-          width: 0%;
-        }
-
-        .kpi-footer {
-          color: var(--text-secondary);
-          font-size: 0.875rem;
-        }
-
-        .kpi-footer span:last-child {
-          font-weight: 500;
-          color: var(--text-primary);
-        }
-
-        /* ==================== CHARTS ==================== */
-        .charts-container {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-          gap: 2rem;
-          margin-bottom: 2rem;
-        }
-
-        .chart-card {
-          background: var(--bg-card);
-          backdrop-filter: blur(20px);
-          border-radius: 1.5rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          padding: 2rem;
-          transition: all 0.3s ease;
-        }
-
-        .chart-card:hover {
-          transform: translateY(-5px);
-        }
-
-        .chart-card h3 {
-          margin-bottom: 1.5rem;
-          color: var(--text-primary);
-          font-size: 1.2rem;
-          font-weight: 700;
-        }
-
-        /* ==================== TABLE ==================== */
-        .table-container {
-          background: var(--bg-card);
-          backdrop-filter: blur(20px);
-          border-radius: 1.5rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          padding: 2rem;
-        }
-
-        .table-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 1.5rem;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-
-        .table-header h3 {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: var(--text-primary);
-        }
-
-        .status-badge.small {
-          display: flex;
-          align-items: center;
-          gap: 0.25rem;
-          padding: 0.25rem 0.5rem;
-          font-size: 0.75rem;
-        }
-
-        .table-wrapper {
-          overflow-x: auto;
-          margin-bottom: 1.5rem;
-        }
-
-        #vendite-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        #vendite-table th {
-          text-align: left;
-          padding: 0.75rem 1rem;
-          border-bottom: 2px solid rgba(107, 114, 128, 0.1);
-          font-size: 0.75rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          color: var(--text-secondary);
-        }
-
-        #vendite-table th:last-child {
-          text-align: right;
-        }
-
-        #vendite-table td {
-          padding: 0.75rem 1rem;
-          border-bottom: 1px solid rgba(107, 114, 128, 0.05);
-        }
-
-        #vendite-table td:last-child {
-          text-align: right;
-          font-weight: 700;
-          color: var(--text-primary);
-        }
-
-        #vendite-table tr:hover {
-          background: rgba(107, 114, 128, 0.03);
-        }
-
-        .province-badge {
-          display: inline-block;
-          padding: 0.25rem 0.5rem;
-          border-radius: 9999px;
-          font-size: 0.75rem;
-          font-weight: 700;
-        }
-
-        .province-badge.LT {
-          background: rgba(139, 92, 246, 0.1);
-          color: #8b5cf6;
-        }
-
-        .province-badge.RM {
-          background: rgba(34, 211, 238, 0.1);
-          color: #22d3ee;
-        }
-
-        .table-footer {
-          border-top: 1px solid rgba(107, 114, 128, 0.1);
-          padding-top: 1rem;
-        }
-
-        .footer-stats {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-          gap: 1rem;
-          text-align: center;
-        }
-
-        .stat {
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
-        }
-
-        .stat-value {
-          font-size: 0.875rem;
-          font-weight: 700;
-          color: var(--text-primary);
-        }
-
-        .stat-label {
-          font-size: 0.75rem;
-          color: var(--text-secondary);
-        }
-
-        /* ==================== POPUP ==================== */
-        .popup-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(4px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          padding: 1rem;
-        }
-
-        .popup-content {
-          background: var(--bg-card);
-          backdrop-filter: blur(20px);
           border-radius: 1rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow);
-          width: 100%;
-          max-width: 28rem;
-          max-height: 85vh;
+          transition: width 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: relative;
           overflow: hidden;
         }
 
-        .popup-header {
-          padding: 1.5rem;
-          border-bottom: 1px solid rgba(107, 114, 128, 0.1);
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
+        .progress-fill::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          animation: progress-shine 2s infinite;
         }
 
-        .popup-header h3 {
+        @keyframes progress-shine {
+          0% { left: -100%; }
+          100% { left: 100%; }
+        }
+
+        /* Charts */
+        .charts-section {
+          background: var(--bg-card);
+          backdrop-filter: blur(30px);
+          border-radius: 2rem;
+          border: 1px solid var(--border-color);
+          box-shadow: var(--shadow);
+          margin-bottom: 2rem;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .charts-header {
+          padding: 2.5rem 2.5rem 1.5rem;
+          text-align: center;
+        }
+
+        .charts-title {
+          font-size: 2.5rem;
+          font-weight: 800;
+          background: linear-gradient(135deg, var(--primary-emerald), var(--primary-cyan));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 1rem;
+        }
+
+        .charts-grid {
+          padding: 0 2.5rem 2.5rem;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+          gap: 2rem;
+        }
+
+        .chart-card {
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(20px);
+          border-radius: 1.5rem;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          padding: 2rem;
+          position: relative;
+          overflow: hidden;
+          transition: all 0.4s ease;
+        }
+
+        .chart-card:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-header {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 2rem;
+        }
+
+        .chart-icon {
+          width: 50px;
+          height: 50px;
+          background: linear-gradient(135deg, var(--primary-blue), var(--primary-violet));
+          border-radius: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          color: white;
+          box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .chart-title {
           font-size: 1.25rem;
           font-weight: 700;
           color: var(--text-primary);
         }
 
-        .popup-header p {
-          font-size: 0.875rem;
-          color: var(--text-secondary);
-          margin-top: 0.25rem;
-        }
-
-        .close-btn {
-          padding: 0.5rem;
-          border-radius: 0.5rem;
-          border: none;
-          background: transparent;
-          color: var(--text-secondary);
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .close-btn:hover {
-          background: rgba(107, 114, 128, 0.1);
-          color: var(--text-primary);
-        }
-
-        .popup-body {
-          padding: 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-          max-height: 60vh;
-          overflow-y: auto;
-        }
-
-        .province-option {
+        .chart-container {
+          position: relative;
+          height: 350px;
           width: 100%;
-          padding: 1rem;
-          border-radius: 0.75rem;
-          border: 2px solid transparent;
-          background: rgba(107, 114, 128, 0.05);
-          text-align: left;
-          cursor: pointer;
-          transition: all 0.3s ease;
+        }
+
+        /* Table */
+        .table-section {
+          background: var(--bg-card);
+          backdrop-filter: blur(30px);
+          border-radius: 2rem;
+          border: 1px solid var(--border-color);
+          box-shadow: var(--shadow);
+          padding: 2.5rem;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .table-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 2rem;
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+
+        .table-title {
+          font-size: 2rem;
+          font-weight: 800;
+          color: var(--text-primary);
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          gap: 1rem;
         }
 
-        .province-option:hover {
-          background: rgba(107, 114, 128, 0.1);
-        }
-
-        .province-option.selected {
-          background: var(--primary-blue);
-          border-color: var(--primary-blue);
-          color: white;
-        }
-
-        .province-option.selected.LT {
-          background: #8b5cf6;
-          border-color: #8b5cf6;
-        }
-
-        .province-option.selected.RM {
-          background: #22d3ee;
-          border-color: #22d3ee;
-        }
-
-        .option-info h4 {
-          font-weight: 700;
-          margin-bottom: 0.25rem;
-        }
-
-        .option-info p {
-          font-size: 0.875rem;
-          opacity: 0.8;
-        }
-
-        .option-radio {
-          width: 1.25rem;
-          height: 1.25rem;
-          border-radius: 50%;
-          border: 2px solid currentColor;
+        .table-icon {
+          width: 45px;
+          height: 45px;
+          background: linear-gradient(135deg, var(--primary-cyan), var(--primary-emerald));
+          border-radius: 1rem;
           display: flex;
           align-items: center;
           justify-content: center;
+          font-size: 1.25rem;
+          color: white;
         }
 
-        .option-radio.selected::after {
-          content: '';
-          width: 0.625rem;
-          height: 0.625rem;
-          border-radius: 50%;
-          background: currentColor;
+        .enhanced-table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+          background: transparent;
+          border-radius: 1rem;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .popup-footer {
-          padding: 1rem 1.5rem;
-          border-top: 1px solid rgba(107, 114, 128, 0.1);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .popup-status {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.75rem;
-          color: var(--text-secondary);
-        }
-
-        .popup-btn {
-          padding: 0.5rem 1rem;
-          border-radius: 0.5rem;
-          border: none;
-          background: rgba(107, 114, 128, 0.1);
+        .enhanced-table th {
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
           color: var(--text-primary);
-          font-weight: 500;
-          cursor: pointer;
+          padding: 1.25rem;
+          text-align: left;
+          font-weight: 700;
+          font-size: 0.9rem;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .enhanced-table th:last-child {
+          text-align: right;
+        }
+
+        .enhanced-table td {
+          padding: 1.25rem;
+          background: rgba(255, 255, 255, 0.05);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
           transition: all 0.3s ease;
+          font-weight: 500;
         }
 
-        .popup-btn:hover {
-          background: rgba(107, 114, 128, 0.2);
+        .enhanced-table td:last-child {
+          text-align: right;
+          font-weight: 700;
+          color: var(--primary-emerald);
         }
 
-        /* ==================== RESPONSIVE ==================== */
+        .enhanced-table tr:hover td {
+          background: rgba(59, 130, 246, 0.1);
+          transform: scale(1.01);
+        }
+
+        .province-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          border-radius: 1rem;
+          font-size: 0.8rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .province-badge.LT {
+          background: rgba(139, 92, 246, 0.2);
+          color: #8b5cf6;
+          border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .province-badge.RM {
+          background: rgba(34, 211, 238, 0.2);
+          color: #22d3ee;
+          border: 1px solid rgba(34, 211, 238, 0.3);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-          #dashboard-container {
+          .container {
             padding: 1rem;
           }
           
-          .charts-container {
+          .charts-grid {
             grid-template-columns: 1fr;
+          }
+          
+          .chart-container {
+            height: 300px;
           }
           
           .kpi-grid {
             grid-template-columns: 1fr;
           }
           
-          .agent-info h1 {
-            font-size: 2rem;
+          .brand-info h1 {
+            font-size: 2.2rem;
           }
           
           .kpi-value {
-            font-size: 2rem;
+            font-size: 2.5rem;
           }
         }
     </style>
 </head>
 <body class="light-mode">
-    <div id="dashboard-container">
-        
-        <!-- HEADER -->
+    <div class="container">
+        <!-- Header -->
         <header class="dashboard-header">
             <div class="header-content">
-                <div class="agent-info">
-                    <h1>CARABOT NATALINO</h1>
-                    <p>Dashboard Performance Vendite - Auto Update dal CSV GitHub</p>
+                <div class="brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="brand-info">
+                        <h1>CARABOT NATALINO</h1>
+                        <p>Dashboard Performance Analytics - Dati CSV Reali</p>
+                    </div>
                 </div>
                 
                 <div class="header-controls">
-                    <button id="refresh-btn" class="control-btn">
+                    <button class="control-btn" id="refresh-btn">
                         <i class="fas fa-sync-alt" id="refresh-icon"></i>
+                        Aggiorna Dati
                     </button>
-                    <button id="theme-toggle" class="control-btn">
+                    <button class="control-btn" id="theme-toggle">
                         <i class="fas fa-moon" id="theme-icon"></i>
                     </button>
                 </div>
@@ -708,8 +610,8 @@
             
             <div class="status-info">
                 <div class="status-item">
-                    <span>ID:</span>
-                    <code>631.00238</code>
+                    <i class="fas fa-id-card"></i>
+                    <span><strong>ID:</strong> 631.00238</span>
                 </div>
                 <div class="status-item">
                     <i class="fas fa-calendar"></i>
@@ -717,67 +619,56 @@
                 </div>
                 <div class="status-item">
                     <div class="status-dot offline" id="connection-dot"></div>
-                    <span id="connection-status">Caricamento...</span>
+                    <span id="connection-status">Connecting...</span>
                 </div>
                 <div class="status-item">
-                    <span>Ultimo: <span id="last-update">Mai</span></span>
+                    <i class="fas fa-clock"></i>
+                    <span>Last: <span id="last-update">Never</span></span>
                 </div>
-            </div>
-            
-            <div class="status-bar">
-                <div class="status-badge updating" id="status-badge">
-                    Caricamento dati...
-                </div>
-                <button id="province-filter" class="filter-btn">
-                    <i class="fas fa-filter"></i>
-                    <span>Filtro Provincia</span>
-                </button>
             </div>
         </header>
 
-        <!-- LOADING STATE -->
+        <!-- Loading State -->
         <div id="loading-state" class="loading-container">
             <div class="loading-content">
                 <i class="fas fa-sync-alt loading-spinner"></i>
-                <p>Caricamento dati REALI dal CSV GitHub...</p>
+                <h2>Caricamento dati CSV da GitHub...</h2>
+                <p>Connessione al file dati reale</p>
             </div>
         </div>
 
-        <!-- ERROR STATE -->
+        <!-- Error State -->
         <div id="error-state" class="error-container" style="display: none;">
             <div class="error-content">
-                <i class="fas fa-exclamation-triangle"></i>
-                <div>
-                    <h3>Errore di connessione</h3>
-                    <p id="error-message"></p>
-                    <button class="control-btn" onclick="window.dashboard?.fetchCSVData(true)" style="margin-top: 1rem;">
-                        <i class="fas fa-redo"></i> Riprova
-                    </button>
-                </div>
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                <h2>Errore Connessione</h2>
+                <p id="error-message"></p>
+                <button class="control-btn" onclick="dashboardManager.fetchCSVData(true)" style="margin-top: 1rem;">
+                    <i class="fas fa-redo"></i> Riprova
+                </button>
             </div>
         </div>
 
-        <!-- MAIN CONTENT -->
+        <!-- Main Content -->
         <div id="main-content" style="display: none;">
             
-            <!-- KPI CARDS -->
+            <!-- KPI Cards -->
             <div class="kpi-grid">
-                
                 <!-- Fatturato Card -->
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <div class="kpi-info">
                             <p class="kpi-label">Fatturato 2025</p>
-                            <p class="kpi-value" id="fatturato-value">€0</p>
+                            <p class="kpi-value" id="fatturato-value">€0k</p>
                         </div>
                         <div class="kpi-badge">
                             <i class="fas fa-arrow-up"></i>
                             <span id="growth-value">+0%</span>
                         </div>
                     </div>
-                    <div class="kpi-footer">
+                    <div class="kpi-footer" style="color: var(--text-secondary); font-size: 1rem;">
                         <span>vs 2024: </span>
-                        <span id="previous-value">€0</span>
+                        <span id="previous-value" style="font-weight: 700;">€0k</span>
                     </div>
                 </div>
 
@@ -785,10 +676,10 @@
                 <div class="kpi-card" id="obiettivo-card" style="display: none;">
                     <div class="kpi-header">
                         <div class="kpi-info">
-                            <p class="kpi-label">Obiettivo 2025</p>
-                            <p class="kpi-value" id="obiettivo-value">€0</p>
+                            <p class="kpi-label">Target 2025</p>
+                            <p class="kpi-value" id="obiettivo-value">€0k</p>
                         </div>
-                        <div class="kpi-percentage">
+                        <div class="kpi-badge secondary">
                             <span id="obiettivo-percentage">0%</span>
                         </div>
                     </div>
@@ -797,9 +688,9 @@
                             <div class="progress-fill" id="progress-fill"></div>
                         </div>
                     </div>
-                    <div class="kpi-footer">
-                        <span>Da raggiungere: </span>
-                        <span id="remaining-value">€0</span>
+                    <div class="kpi-footer" style="color: var(--text-secondary); font-size: 1rem;">
+                        <span>Rimanente: </span>
+                        <span id="remaining-value" style="font-weight: 700;">€0k</span>
                     </div>
                 </div>
 
@@ -810,72 +701,62 @@
                             <p class="kpi-label">Clienti Attivi</p>
                             <p class="kpi-value" id="clienti-value">0</p>
                         </div>
-                        <div class="kpi-badge secondary">
-                            <span id="provincia-label">TOT</span>
+                        <div class="kpi-badge" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+                            <span>TOTALE</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- CHARTS SECTION -->
-            <div class="charts-container">
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="charts-header">
+                    <h2 class="charts-title">Analisi Performance</h2>
+                    <p style="color: var(--text-secondary); font-size: 1.125rem;">Grafici basati sui dati CSV reali</p>
+                </div>
                 
-                <div class="chart-card">
-                    <h3>
-                        <i class="fas fa-map-marker-alt" style="margin-right: 0.5rem; color: var(--primary-blue);"></i>
-                        Fatturato per Provincia
-                    </h3>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="provinceChart"></canvas>
+                <div class="charts-grid">
+                    <!-- Province Distribution -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-icon">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </div>
+                            <h3 class="chart-title">Fatturato per Provincia</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="provinceChart"></canvas>
+                        </div>
                     </div>
-                </div>
 
-                <div class="chart-card">
-                    <h3>
-                        <i class="fas fa-bullseye" style="margin-right: 0.5rem; color: var(--primary-emerald);"></i>
-                        Progresso Obiettivo
-                    </h3>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="progressChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card">
-                    <h3>
-                        <i class="fas fa-layer-group" style="margin-right: 0.5rem; color: var(--primary-violet);"></i>
-                        Categorie Prodotti
-                    </h3>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="categoryChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card">
-                    <h3>
-                        <i class="fas fa-crown" style="margin-right: 0.5rem; color: var(--primary-cyan);"></i>
-                        Top 5 Clienti
-                    </h3>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="topClientsChart"></canvas>
+                    <!-- Top Clients -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-icon">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <h3 class="chart-title">Top 5 Clienti</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="topClientsChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TABLE SECTION -->
-            <div class="table-container">
+            <!-- Table Section -->
+            <div class="table-section">
                 <div class="table-header">
-                    <h3>Top Vendite per Cliente (Dati Reali CSV)</h3>
-                    <div>
-                        <span id="table-update">Aggiornato: <span id="table-timestamp">-</span></span>
-                        <div class="status-badge small success" id="table-status-badge">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Live</span>
+                    <div class="table-title">
+                        <div class="table-icon">
+                            <i class="fas fa-chart-line"></i>
                         </div>
+                        Top Clienti (Dati CSV)
                     </div>
                 </div>
                 
-                <div class="table-wrapper">
-                    <table id="vendite-table">
+                <div style="overflow-x: auto;">
+                    <table class="enhanced-table">
                         <thead>
                             <tr>
                                 <th>Provincia</th>
@@ -885,57 +766,24 @@
                             </tr>
                         </thead>
                         <tbody id="vendite-tbody">
-                            <!-- Popolato dinamicamente -->
+                            <!-- Popolato da JavaScript -->
                         </tbody>
                     </table>
                 </div>
                 
-                <div class="table-footer">
-                    <div class="footer-stats">
-                        <div class="stat">
-                            <span class="stat-value" id="total-clients">0</span>
-                            <span class="stat-label">Top Clienti</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-value" id="total-top-revenue">€0</span>
-                            <span class="stat-label">Fatturato Top</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-value" id="update-status-icon">✅</span>
-                            <span class="stat-label">Status</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-value">2min</span>
-                            <span class="stat-label">Auto Update</span>
-                        </div>
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; flex-wrap: wrap; gap: 2rem;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-blue);" id="total-clients">0</div>
+                        <div style="color: var(--text-secondary);">Clienti Totali</div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PROVINCE FILTER POPUP -->
-        <div id="province-popup" class="popup-overlay" style="display: none;">
-            <div class="popup-content">
-                <div class="popup-header">
-                    <div>
-                        <h3>Seleziona Provincia</h3>
-                        <p>Filtra i dati per territorio</p>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-emerald);" id="total-revenue">€0k</div>
+                        <div style="color: var(--text-secondary);">Fatturato Totale</div>
                     </div>
-                    <button id="close-popup" class="close-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="popup-body" id="popup-options">
-                    <!-- Popolato dinamicamente -->
-                </div>
-                
-                <div class="popup-footer">
-                    <div class="popup-status">
-                        <div class="status-dot online" id="popup-status-dot"></div>
-                        <span id="popup-status-text">Dati CSV aggiornati automaticamente</span>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-violet);" id="last-sync-time">--:--</div>
+                        <div style="color: var(--text-secondary);">Ultimo Aggiornamento</div>
                     </div>
-                    <button id="popup-close-btn" class="popup-btn">Chiudi</button>
                 </div>
             </div>
         </div>
@@ -943,756 +791,538 @@
 
     <script>
         class DashboardManager {
-          constructor() {
-            this.csvData = null;
-            this.selectedProvince = 'all';
-            this.isLoading = false;
-            this.lastUpdate = null;
-            this.updateInterval = null;
+            constructor() {
+                this.csvData = null;
+                this.isLoading = false;
+                this.lastUpdate = null;
+                this.updateInterval = null;
+                this.charts = {};
 
-            this.csvFileNames = [
-              '631.00238_CARABOT-NATALINO.csv',
-              '631.00238_CARABOT NATALINO.csv'
-            ];
+                // File CSV nome esatto dal tuo repository
+                this.csvFileNames = [
+                    '631.00238_CARABOT-NATALINO.csv',
+                    '631.00238_CARABOT NATALINO.csv'
+                ];
 
-            this.init();
-          }
-
-          init() {
-            this.setupEventListeners();
-            this.loadInitialData();
-            this.startAutoUpdate();
-          }
-
-          setupEventListeners() {
-            const byId = (id) => document.getElementById(id);
-
-            const refreshBtn = byId('refresh-btn');
-            if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchCSVData(true));
-
-            const themeToggle = byId('theme-toggle');
-            if (themeToggle) themeToggle.addEventListener('click', () => this.toggleTheme());
-
-            const provinceFilter = byId('province-filter');
-            if (provinceFilter) provinceFilter.addEventListener('click', () => this.showProvincePopup());
-
-            const closePopup = byId('close-popup');
-            if (closePopup) closePopup.addEventListener('click', () => this.hideProvincePopup());
-
-            const popupCloseBtn = byId('popup-close-btn');
-            if (popupCloseBtn) popupCloseBtn.addEventListener('click', () => this.hideProvincePopup());
-
-            const provincePopup = byId('province-popup');
-            if (provincePopup) {
-              provincePopup.addEventListener('click', (e) => {
-                if (e.target && e.target.id === 'province-popup') this.hideProvincePopup();
-              });
+                this.init();
             }
-          }
 
-          toggleTheme() {
-            const body = document.body;
-            const themeIcon = document.getElementById('theme-icon');
-            if (body.classList.contains('light-mode')) {
-              body.classList.remove('light-mode');
-              body.classList.add('dark-mode');
-              if (themeIcon) themeIcon.className = 'fas fa-sun';
-            } else {
-              body.classList.remove('dark-mode');
-              body.classList.add('light-mode');
-              if (themeIcon) themeIcon.className = 'fas fa-moon';
+            init() {
+                this.setupEventListeners();
+                this.loadInitialData();
+                this.startAutoUpdate();
             }
-          }
 
-          async loadInitialData() { await this.fetchCSVData(); }
+            setupEventListeners() {
+                const refreshBtn = document.getElementById('refresh-btn');
+                if (refreshBtn) refreshBtn.addEventListener('click', () => this.fetchCSVData(true));
 
-          buildCandidateUrls() {
-            const { pathname, origin } = window.location;
-            const segs = pathname.split('/').filter(Boolean);
-            const repoSlug = segs.length ? segs[0] : '';
-
-            const bases = new Set([
-              './',
-              '',
-              pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''),
-              repoSlug ? `/${repoSlug}/` : '/',
-              repoSlug ? `/${repoSlug}/docs/` : '/docs/'
-            ]);
-
-            const urls = [];
-            for (const base of bases) {
-              for (const name of this.csvFileNames) {
-                try {
-                  const abs = new URL(base + name, origin).href;
-                  urls.push(abs);
-                } catch { /* ignore */ }
-              }
+                const themeToggle = document.getElementById('theme-toggle');
+                if (themeToggle) themeToggle.addEventListener('click', () => this.toggleTheme());
             }
-            return Array.from(new Set(urls));
-          }
 
-          async fetchCSVData(isManual = false) {
-            if (this.isLoading) return;
+            toggleTheme() {
+                const body = document.body;
+                const themeIcon = document.getElementById('theme-icon');
+                if (body.classList.contains('light-mode')) {
+                    body.classList.remove('light-mode');
+                    body.classList.add('dark-mode');
+                    if (themeIcon) themeIcon.className = 'fas fa-sun';
+                } else {
+                    body.classList.remove('dark-mode');
+                    body.classList.add('light-mode');
+                    if (themeIcon) themeIcon.className = 'fas fa-moon';
+                }
+            }
 
-            this.isLoading = true;
-            this.updateLoadingState('updating');
+            async loadInitialData() {
+                await this.fetchCSVData();
+            }
 
-            try {
-              const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
-              const candidates = this.buildCandidateUrls();
-              let lastError = null;
-              let text = null;
+            buildCandidateUrls() {
+                const { pathname, origin } = window.location;
+                const segs = pathname.split('/').filter(Boolean);
+                const repoSlug = segs.length ? segs[0] : '';
 
-              console.log('CSV candidate URLs:', candidates);
+                const bases = new Set([
+                    './',
+                    '',
+                    pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''),
+                    repoSlug ? `/${repoSlug}/` : '/',
+                    repoSlug ? `/${repoSlug}/docs/` : '/docs/'
+                ]);
 
-              for (const url of candidates) {
-                const u = url + cacheBuster;
-                try {
-                  console.log('GET', u);
-                  const res = await fetch(u, {
-                    method: 'GET',
-                    cache: 'no-cache',
-                    headers: {
-                      'Cache-Control': 'no-cache, no-store, must-revalidate',
-                      'Pragma': 'no-cache'
+                const urls = [];
+                for (const base of bases) {
+                    for (const name of this.csvFileNames) {
+                        try {
+                            const abs = new URL(base + name, origin).href;
+                            urls.push(abs);
+                        } catch { /* ignore */ }
                     }
-                  });
-                  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-                  const t = await res.text();
-                  if (t && t.trim().length > 0) { text = t; break; }
-                  lastError = new Error('CSV vuoto');
-                } catch (e) {
-                  console.warn('Fallito', u, e);
-                  lastError = e;
                 }
-              }
-
-              if (!text) throw lastError || new Error('Impossibile leggere il CSV');
-
-              console.log('CSV caricato, len:', text.length);
-
-              const parsedData = this.parseCSV(text);
-              if (!parsedData) throw new Error('Parsing CSV fallito');
-
-              this.csvData = parsedData;
-              this.lastUpdate = new Date();
-              this.updateLoadingState('success');
-              this.renderDashboard();
-
-            } catch (error) {
-              console.error('Errore fetch CSV:', error);
-              this.updateLoadingState('error', error?.message || 'Errore sconosciuto');
-            } finally {
-              this.isLoading = false;
+                return Array.from(new Set(urls));
             }
-          }
 
-          parseCSV(csvText) {
-            try {
-              const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
-              if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
-              const obiettiviText = obiettiviMatch[1];
+            async fetchCSVData(isManual = false) {
+                if (this.isLoading) return;
 
-              const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
-              if (!generaleMatch) throw new Error('Dati Generale non trovati');
-              const generale = {
-                annoPrecedente: this.parseNumber(generaleMatch[1]),
-                annoCorrente: this.parseNumber(generaleMatch[2]),
-                clienti: parseInt(generaleMatch[4], 10)
-              };
+                this.isLoading = true;
+                this.updateLoadingState('updating');
 
-              const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
-              if (!ltMatch) throw new Error('Dati Latina non trovati');
-              const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
-              const latina = {
-                annoPrecedente: this.parseNumber(ltMatch[1]),
-                annoCorrente: this.parseNumber(ltMatch[2]),
-                obiettivo: latinaObiettivoRaw * 1000,
-                percentualeObiettivo: parseInt(ltMatch[4], 10),
-                clientiPrecedenti: parseInt(ltMatch[5], 10),
-                clientiCorrente: parseInt(ltMatch[6], 10),
-                obiettivoClienti: parseInt(ltMatch[7], 10)
-              };
+                try {
+                    const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
+                    const candidates = this.buildCandidateUrls();
+                    let lastError = null;
+                    let text = null;
 
-              const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
-              let roma = { annoCorrente: 0, clienti: 0 };
-              if (clientiMatch) {
-                const clientiText = clientiMatch[1];
-                const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);;;;;;/);
-                if (rmMatch) {
-                  roma = {
-                    annoCorrente: this.parseNumber(rmMatch[2]),
-                    clienti: parseInt(rmMatch[1], 10)
-                  };
+                    console.log('Tentativo caricamento CSV da:', candidates);
+
+                    for (const url of candidates) {
+                        const u = url + cacheBuster;
+                        try {
+                            console.log('Tentativo GET:', u);
+                            const res = await fetch(u, {
+                                method: 'GET',
+                                cache: 'no-cache',
+                                headers: {
+                                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                    'Pragma': 'no-cache'
+                                }
+                            });
+                            if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                            const t = await res.text();
+                            if (t && t.trim().length > 0) { text = t; break; }
+                            lastError = new Error('CSV vuoto');
+                        } catch (e) {
+                            console.warn('Fallito:', u, e);
+                            lastError = e;
+                        }
+                    }
+
+                    if (!text) throw lastError || new Error('Impossibile caricare CSV');
+
+                    console.log('CSV caricato, lunghezza:', text.length);
+
+                    const parsedData = this.parseCSV(text);
+                    if (!parsedData) throw new Error('Parsing CSV fallito');
+
+                    this.csvData = parsedData;
+                    this.lastUpdate = new Date();
+                    this.updateLoadingState('success');
+                    this.renderDashboard();
+
+                } catch (error) {
+                    console.error('Errore caricamento CSV:', error);
+                    this.updateLoadingState('error', error?.message || 'Errore sconosciuto');
+                } finally {
+                    this.isLoading = false;
                 }
-              }
+            }
 
-              const dettaglioStart = csvText.indexOf('=== DETTAGLIO VENDITE PER CLIENTE ===');
-              const dettaglioEnd = csvText.indexOf('=== RIEPILOGO PER CATEGORIA ===');
-              let vendite = [];
-              if (dettaglioStart !== -1 && dettaglioEnd !== -1) {
-                const dettaglioSection = csvText.substring(dettaglioStart, dettaglioEnd);
-                const lines = dettaglioSection.split('\n').filter(line =>
-                  line.trim() && !line.includes('===') && !line.includes('Provincia;Ragione Sociale Cliente') && line.includes(';') && line.split(';').length >= 4
-                );
-                const venditeMap = new Map();
-                lines.forEach(line => {
-                  const parts = line.split(';');
-                  if (parts.length >= 4) {
-                    const fatturato = this.parseNumber(parts[3]);
-                    if (!isNaN(fatturato) && fatturato > 0) {
-                      const cliente = parts[1].trim();
-                      if (!venditeMap.has(cliente) || venditeMap.get(cliente).fatturato < fatturato) {
-                        venditeMap.set(cliente, {
-                          provincia: parts[0].trim(),
-                          cliente: cliente,
-                          categoria: parts[2].trim(),
-                          fatturato: fatturato
+            parseCSV(csvText) {
+                try {
+                    // Parsing OBIETTIVI
+                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
+                    if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata nel CSV');
+                    const obiettiviText = obiettiviMatch[1];
+
+                    // DATI GENERALI
+                    const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
+                    if (!generaleMatch) throw new Error('Dati Generale non trovati');
+                    const generale = {
+                        annoPrecedente: this.parseNumber(generaleMatch[1]),
+                        annoCorrente: this.parseNumber(generaleMatch[2]),
+                        clienti: parseInt(generaleMatch[4], 10)
+                    };
+
+                    // DATI LATINA
+                    const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
+                    if (!ltMatch) throw new Error('Dati Latina non trovati');
+                    const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
+                    const latina = {
+                        annoPrecedente: this.parseNumber(ltMatch[1]),
+                        annoCorrente: this.parseNumber(ltMatch[2]),
+                        obiettivo: latinaObiettivoRaw * 1000, // CSV in migliaia
+                        percentualeObiettivo: parseInt(ltMatch[4], 10),
+                        clientiPrecedenti: parseInt(ltMatch[5], 10),
+                        clientiCorrente: parseInt(ltMatch[6], 10),
+                        obiettivoClienti: parseInt(ltMatch[7], 10)
+                    };
+
+                    // DATI ROMA
+                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
+                    let roma = { annoCorrente: 0, clienti: 0 };
+                    if (clientiMatch) {
+                        const clientiText = clientiMatch[1];
+                        const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);;;;;;/);
+                        if (rmMatch) {
+                            roma = {
+                                annoCorrente: this.parseNumber(rmMatch[2]),
+                                clienti: parseInt(rmMatch[1], 10)
+                            };
+                        }
+                    }
+
+                    // VENDITE PER CLIENTE
+                    const dettaglioStart = csvText.indexOf('=== DETTAGLIO VENDITE PER CLIENTE ===');
+                    const dettaglioEnd = csvText.indexOf('=== RIEPILOGO PER CATEGORIA ===');
+                    let vendite = [];
+                    if (dettaglioStart !== -1 && dettaglioEnd !== -1) {
+                        const dettaglioSection = csvText.substring(dettaglioStart, dettaglioEnd);
+                        const lines = dettaglioSection.split('\n').filter(line =>
+                            line.trim() && 
+                            !line.includes('===') && 
+                            !line.includes('Provincia;Ragione Sociale Cliente') && 
+                            line.includes(';') && 
+                            line.split(';').length >= 4
+                        );
+                        
+                        const venditeMap = new Map();
+                        lines.forEach(line => {
+                            const parts = line.split(';');
+                            if (parts.length >= 4) {
+                                const fatturato = this.parseNumber(parts[3]);
+                                if (!isNaN(fatturato) && fatturato > 0) {
+                                    const cliente = parts[1].trim();
+                                    if (!venditeMap.has(cliente) || venditeMap.get(cliente).fatturato < fatturato) {
+                                        venditeMap.set(cliente, {
+                                            provincia: parts[0].trim(),
+                                            cliente: cliente,
+                                            categoria: parts[2].trim(),
+                                            fatturato: fatturato
+                                        });
+                                    }
+                                }
+                            }
                         });
-                      }
+                        vendite = Array.from(venditeMap.values())
+                            .sort((a, b) => b.fatturato - a.fatturato)
+                            .slice(0, 20); // Top 20
                     }
-                  }
+
+                    const result = { generale, latina, roma, vendite, timestamp: new Date() };
+                    console.log('Dati CSV parsati:', result);
+                    return result;
+                } catch (e) {
+                    console.error('Errore parsing CSV:', e);
+                    return null;
+                }
+            }
+
+            parseNumber(input) {
+                if (typeof input === 'number') return input;
+                if (!input) return 0;
+                const cleaned = String(input)
+                    .replace(/\s+/g, '')
+                    .replace(/€/g, '')
+                    .replace(/\./g, '')
+                    .replace(/,/g, '.');
+                const n = Number(cleaned);
+                return Number.isFinite(n) ? n : 0;
+            }
+
+            formatK3(value) {
+                const num = Number(value) || 0;
+                const sign = num < 0 ? '-' : '';
+                const v = Math.abs(num);
+                const k = v / 1000;
+                let out;
+                if (k >= 100) out = String(Math.round(k));
+                else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
+                else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
+                out = out.replace(/,?0+$/, '');
+                return sign + out + 'k';
+            }
+
+            formatEuroK3(value) {
+                if (!value) return '€0k';
+                const k = this.formatK3(value);
+                return '€' + k.replace('k', '') + 'k';
+            }
+
+            updateLoadingState(state, errorMessage = null) {
+                const loadingEl = document.getElementById('loading-state');
+                const errorEl = document.getElementById('error-state');
+                const mainEl = document.getElementById('main-content');
+                const refreshIcon = document.getElementById('refresh-icon');
+                const connectionDot = document.getElementById('connection-dot');
+                const connectionStatus = document.getElementById('connection-status');
+
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (errorEl) errorEl.style.display = 'none';
+                if (mainEl) mainEl.style.display = 'none';
+
+                if (refreshIcon) {
+                    if (state === 'updating') refreshIcon.classList.add('spinning');
+                    else refreshIcon.classList.remove('spinning');
+                }
+
+                if (connectionDot) connectionDot.className = 'status-dot ' + 
+                    (state === 'updating' ? 'updating' : state === 'success' ? 'online' : 'offline');
+
+                switch (state) {
+                    case 'updating':
+                        if (loadingEl) loadingEl.style.display = 'block';
+                        if (connectionStatus) connectionStatus.textContent = 'Caricamento...';
+                        break;
+                    case 'success':
+                        if (mainEl) mainEl.style.display = 'block';
+                        if (connectionStatus) connectionStatus.textContent = 'Online';
+                        this.updateLastUpdateDisplay();
+                        break;
+                    case 'error':
+                        if (errorEl) errorEl.style.display = 'block';
+                        if (connectionStatus) connectionStatus.textContent = 'Errore';
+                        const err = document.getElementById('error-message');
+                        if (err) err.textContent = errorMessage || 'Errore sconosciuto';
+                        break;
+                }
+            }
+
+            updateLastUpdateDisplay() {
+                if (!this.lastUpdate) return;
+                const lastUpdateEl = document.getElementById('last-update');
+                const lastSyncTime = document.getElementById('last-sync-time');
+                if (lastUpdateEl) lastUpdateEl.textContent = this.lastUpdate.toLocaleTimeString('it-IT');
+                if (lastSyncTime) lastSyncTime.textContent = this.lastUpdate.toLocaleTimeString('it-IT', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
                 });
-                vendite = Array.from(venditeMap.values()).sort((a,b)=>b.fatturato-a.fatturato).slice(0,10);
-              }
-
-              return { generale, latina, roma, vendite, timestamp: new Date() };
-            } catch (e) {
-              console.error('Errore parsing:', e);
-              const err = document.getElementById('error-message');
-              if (err && e?.message) err.textContent = e.message;
-              return null;
-            }
-          }
-
-          updateLoadingState(state, errorMessage = null) {
-            const byId = (id) => document.getElementById(id);
-            const loadingEl = byId('loading-state');
-            const errorEl = byId('error-state');
-            const mainEl = byId('main-content');
-            const refreshIcon = byId('refresh-icon');
-            const connectionDot = byId('connection-dot');
-            const connectionStatus = byId('connection-status');
-            const statusBadge = byId('status-badge');
-
-            if (loadingEl) loadingEl.style.display = 'none';
-            if (errorEl) errorEl.style.display = 'none';
-            if (mainEl) mainEl.style.display = 'none';
-
-            if (refreshIcon) {
-              if (state === 'updating') refreshIcon.classList.add('spinning');
-              else refreshIcon.classList.remove('spinning');
             }
 
-            if (connectionDot) connectionDot.className = 'status-dot ' + (state === 'updating' ? 'updating' : state === 'success' ? 'online' : 'offline');
-
-            switch (state) {
-              case 'updating':
-                if (loadingEl) loadingEl.style.display = 'block';
-                if (connectionStatus) connectionStatus.textContent = 'Aggiornamento...';
-                if (statusBadge) { statusBadge.className = 'status-badge updating'; statusBadge.textContent = 'Caricamento dati reali...'; }
-                break;
-              case 'success':
-                if (mainEl) mainEl.style.display = 'block';
-                if (connectionStatus) connectionStatus.textContent = 'Online';
-                if (statusBadge) { statusBadge.className = 'status-badge success'; statusBadge.textContent = 'CSV letto correttamente'; }
-                this.updateLastUpdateDisplay();
-                break;
-              case 'error':
-                if (errorEl) errorEl.style.display = 'block';
-                if (connectionStatus) connectionStatus.textContent = 'Errore';
-                if (statusBadge) { statusBadge.className = 'status-badge error'; statusBadge.textContent = 'Errore CSV'; }
-                const err = byId('error-message');
-                if (err) err.textContent = errorMessage || 'Errore sconosciuto';
-                break;
-            }
-          }
-
-          updateLastUpdateDisplay() {
-            if (!this.lastUpdate) return;
-            const now = new Date();
-            const diff = Math.floor((now - this.lastUpdate) / 1000);
-            let timeText;
-            if (diff < 60) timeText = diff + 's fa';
-            else if (diff < 3600) timeText = Math.floor(diff / 60) + 'm fa';
-            else timeText = this.lastUpdate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-
-            const lastUpdateEl = document.getElementById('last-update');
-            if (lastUpdateEl) lastUpdateEl.textContent = timeText;
-
-            const tableTimestamp = document.getElementById('table-timestamp');
-            if (tableTimestamp) tableTimestamp.textContent = this.lastUpdate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-          }
-
-          renderDashboard() {
-            if (!this.csvData) return;
-            this.renderKPICards();
-            this.renderVenditeTable();
-            this.renderCharts();
-            this.updateProvinceOptions();
-          }
-
-          renderKPICards() {
-            const data = this.getDisplayData();
-
-            const fatturatoValue = document.getElementById('fatturato-value');
-            if (fatturatoValue) fatturatoValue.textContent = this.formatEuroK3(data.fatturato);
-
-            const growthValue = document.getElementById('growth-value');
-            if (growthValue) growthValue.textContent = '+' + data.crescita + '%';
-
-            const previousValue = document.getElementById('previous-value');
-            if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
-
-            const obiettivoCard = document.getElementById('obiettivo-card');
-            if (obiettivoCard) {
-              if (data.obiettivo) {
-                obiettivoCard.style.display = 'block';
-                const obVal = document.getElementById('obiettivo-value');
-                const obPerc = document.getElementById('obiettivo-percentage');
-                const remVal = document.getElementById('remaining-value');
-                if (obVal) obVal.textContent = this.formatEuroK3(data.obiettivo);
-                if (obPerc) obPerc.textContent = (data.percentualeObiettivo || 0) + '%';
-                if (remVal) remVal.textContent = this.formatEuroK3((data.obiettivo || 0) - data.fatturato);
-                const progressFill = document.getElementById('progress-fill');
-                if (progressFill) progressFill.style.width = (data.percentualeObiettivo || 0) + '%';
-              } else {
-                obiettivoCard.style.display = 'none';
-              }
+            renderDashboard() {
+                if (!this.csvData) return;
+                this.renderKPICards();
+                this.renderVenditeTable();
+                this.renderCharts();
             }
 
-            const clientiValue = document.getElementById('clienti-value');
-            if (clientiValue) clientiValue.textContent = String(data.clienti);
+            renderKPICards() {
+                const data = this.getDisplayData();
 
-            const provinciaLabel = document.getElementById('provincia-label');
-            if (provinciaLabel) provinciaLabel.textContent = this.selectedProvince === 'all' ? 'TOT' : this.selectedProvince;
-          }
+                // Fatturato
+                const fatturatoValue = document.getElementById('fatturato-value');
+                if (fatturatoValue) fatturatoValue.textContent = this.formatEuroK3(data.fatturato);
 
-          renderVenditeTable() {
-            if (!this.csvData.vendite || this.csvData.vendite.length === 0) return;
+                // Crescita
+                const growthValue = document.getElementById('growth-value');
+                if (growthValue) growthValue.textContent = '+' + data.crescita + '%';
 
-            const tbody = document.getElementById('vendite-tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
+                // Valore precedente
+                const previousValue = document.getElementById('previous-value');
+                if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
 
-            this.csvData.vendite.forEach(vendita => {
-              const row = document.createElement('tr');
-              row.innerHTML =
-                '<td>'+
-                  '<span class="province-badge '+ vendita.provincia +'">'+ vendita.provincia +'</span>'+
-                '</td>'+
-                '<td>'+ (vendita.cliente.length > 30 ? vendita.cliente.slice(0,30)+'...' : vendita.cliente) +'</td>'+
-                '<td>'+ vendita.categoria +'</td>'+
-                '<td>'+ this.formatEuroK3(vendita.fatturato) +'</td>';
-              tbody.appendChild(row);
-            });
-
-            const totalClients = document.getElementById('total-clients');
-            if (totalClients) totalClients.textContent = String(this.csvData.vendite.length);
-
-            const totalTopRevenue = document.getElementById('total-top-revenue');
-            if (totalTopRevenue) totalTopRevenue.textContent = this.formatEuroK3(
-              this.csvData.vendite.reduce((sum, v) => sum + v.fatturato, 0)
-            );
-
-            const statusIcon = document.getElementById('update-status-icon');
-            if (statusIcon) statusIcon.textContent = '✅';
-
-            const tableStatusBadge = document.getElementById('table-status-badge');
-            if (tableStatusBadge) { tableStatusBadge.innerHTML = '<i class="fas fa-check-circle"></i><span>Live</span>'; tableStatusBadge.className = 'status-badge small success'; }
-          }
-
-          renderCharts() {
-            if (!this.csvData) return;
-            
-            if (typeof Chart === 'undefined') {
-              console.warn('Chart.js non caricato - grafici disabilitati');
-              // Nascondi i grafici se Chart.js non è disponibile
-              const chartsContainer = document.querySelector('.charts-container');
-              if (chartsContainer) {
-                chartsContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">Grafici non disponibili - Chart.js non caricato</div>';
-              }
-              return;
-            }
-            
-            this.renderProvinceChart();
-            this.renderCategoryChart();
-            this.renderTopClientsChart();
-            this.renderProgressChart();
-          }
-
-          renderProvinceChart() {
-            const ctx = document.getElementById('provinceChart');
-            if (!ctx || typeof Chart === 'undefined') return;
-
-            const data = {
-              labels: ['Latina (LT)', 'Roma (RM)'],
-              datasets: [{
-                data: [this.csvData.latina.annoCorrente, this.csvData.roma.annoCorrente],
-                backgroundColor: ['#3b82f6', '#ef4444'],
-                borderColor: ['#2563eb', '#dc2626'],
-                borderWidth: 2
-              }]
-            };
-
-            if (window.provinceChartInstance) {
-              window.provinceChartInstance.destroy();
-            }
-
-            window.provinceChartInstance = new Chart(ctx, {
-              type: 'doughnut',
-              data: data,
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    position: 'bottom',
-                    labels: { color: '#64748b', font: { size: 12 } }
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => {
-                        const value = this.formatEuroK3(context.raw);
-                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                        const percentage = ((context.raw / total) * 100).toFixed(1);
-                        return `${context.label}: ${value} (${percentage}%)`;
-                      }
+                // Obiettivo
+                const obiettivoCard = document.getElementById('obiettivo-card');
+                if (obiettivoCard) {
+                    if (data.obiettivo) {
+                        obiettivoCard.style.display = 'block';
+                        const obVal = document.getElementById('obiettivo-value');
+                        const obPerc = document.getElementById('obiettivo-percentage');
+                        const remVal = document.getElementById('remaining-value');
+                        if (obVal) obVal.textContent = this.formatEuroK3(data.obiettivo);
+                        if (obPerc) obPerc.textContent = (data.percentualeObiettivo || 0) + '%';
+                        if (remVal) remVal.textContent = this.formatEuroK3((data.obiettivo || 0) - data.fatturato);
+                        const progressFill = document.getElementById('progress-fill');
+                        if (progressFill) progressFill.style.width = (data.percentualeObiettivo || 0) + '%';
+                    } else {
+                        obiettivoCard.style.display = 'none';
                     }
-                  }
                 }
-              }
-            });
-          }
 
-          renderCategoryChart() {
-            const ctx = document.getElementById('categoryChart');
-            if (!ctx || typeof Chart === 'undefined') return;
-
-            const categories = this.extractCategoryData();
-            
-            const data = {
-              labels: categories.map(c => c.name),
-              datasets: [{
-                data: categories.map(c => c.value),
-                backgroundColor: [
-                  '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
-                  '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6b7280'
-                ],
-                borderWidth: 0
-              }]
-            };
-
-            if (window.categoryChartInstance) {
-              window.categoryChartInstance.destroy();
+                // Clienti
+                const clientiValue = document.getElementById('clienti-value');
+                if (clientiValue) clientiValue.textContent = String(data.clienti);
             }
 
-            window.categoryChartInstance = new Chart(ctx, {
-              type: 'bar',
-              data: data,
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: { display: false },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => `${context.label}: ${this.formatEuroK3(context.raw)}`
+            renderVenditeTable() {
+                if (!this.csvData.vendite || this.csvData.vendite.length === 0) return;
+
+                const tbody = document.getElementById('vendite-tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+
+                this.csvData.vendite.forEach(vendita => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="province-badge ${vendita.provincia}">${vendita.provincia}</span></td>
+                        <td>${vendita.cliente.length > 35 ? vendita.cliente.slice(0, 35) + '...' : vendita.cliente}</td>
+                        <td>${vendita.categoria}</td>
+                        <td>${this.formatEuroK3(vendita.fatturato)}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Update footer stats
+                const totalClients = document.getElementById('total-clients');
+                const totalRevenue = document.getElementById('total-revenue');
+                if (totalClients) totalClients.textContent = String(this.csvData.vendite.length);
+                if (totalRevenue) totalRevenue.textContent = this.formatEuroK3(
+                    this.csvData.vendite.reduce((sum, v) => sum + v.fatturato, 0)
+                );
+            }
+
+            renderCharts() {
+                if (!this.csvData) return;
+                this.renderProvinceChart();
+                this.renderTopClientsChart();
+            }
+
+            renderProvinceChart() {
+                const ctx = document.getElementById('provinceChart');
+                if (!ctx) return;
+
+                if (this.charts.province) this.charts.province.destroy();
+
+                const data = {
+                    labels: ['Latina (LT)', 'Roma (RM)'],
+                    datasets: [{
+                        data: [this.csvData.latina.annoCorrente, this.csvData.roma.annoCorrente],
+                        backgroundColor: [
+                            'rgba(139, 92, 246, 0.8)',
+                            'rgba(34, 211, 238, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(139, 92, 246, 1)',
+                            'rgba(34, 211, 238, 1)'
+                        ],
+                        borderWidth: 3
+                    }]
+                };
+
+                this.charts.province = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: 'rgba(255, 255, 255, 0.8)',
+                                    font: { size: 14, weight: '600' },
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => {
+                                        const value = this.formatEuroK3(context.raw);
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.raw / total) * 100).toFixed(1);
+                                        return `${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
                     }
-                  }
-                },
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    ticks: {
-                      callback: (value) => this.formatK3(value),
-                      color: '#64748b'
-                    },
-                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
-                  },
-                  x: {
-                    ticks: { 
-                      color: '#64748b',
-                      maxRotation: 45,
-                      font: { size: 10 }
-                    },
-                    grid: { display: false }
-                  }
-                }
-              }
-            });
-          }
-
-          renderTopClientsChart() {
-            const ctx = document.getElementById('topClientsChart');
-            if (!ctx || typeof Chart === 'undefined') return;
-
-            const topClients = this.csvData.vendite.slice(0, 5);
-            
-            const data = {
-              labels: topClients.map(c => c.cliente.length > 25 ? c.cliente.substring(0, 25) + '...' : c.cliente),
-              datasets: [{
-                data: topClients.map(c => c.fatturato),
-                backgroundColor: '#3b82f6',
-                borderColor: '#2563eb',
-                borderWidth: 1
-              }]
-            };
-
-            if (window.topClientsChartInstance) {
-              window.topClientsChartInstance.destroy();
+                });
             }
 
-            window.topClientsChartInstance = new Chart(ctx, {
-              type: 'bar',
-              data: data,
-              options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: { display: false },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => this.formatEuroK3(context.raw)
+            renderTopClientsChart() {
+                const ctx = document.getElementById('topClientsChart');
+                if (!ctx) return;
+
+                if (this.charts.topClients) this.charts.topClients.destroy();
+
+                const topClients = this.csvData.vendite.slice(0, 5);
+
+                const data = {
+                    labels: topClients.map(c => c.cliente.length > 25 ? c.cliente.substring(0, 25) + '...' : c.cliente),
+                    datasets: [{
+                        data: topClients.map(c => c.fatturato),
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2
+                    }]
+                };
+
+                this.charts.topClients = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => this.formatEuroK3(context.raw)
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: (value) => this.formatK3(value),
+                                    color: 'rgba(255, 255, 255, 0.7)'
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            y: {
+                                ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                                grid: { display: false }
+                            }
+                        }
                     }
-                  }
-                },
-                scales: {
-                  x: {
-                    beginAtZero: true,
-                    ticks: {
-                      callback: (value) => this.formatK3(value),
-                      color: '#64748b'
-                    },
-                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
-                  },
-                  y: {
-                    ticks: { 
-                      color: '#64748b',
-                      font: { size: 11 }
-                    },
-                    grid: { display: false }
-                  }
+                });
+            }
+
+            getDisplayData() {
+                if (!this.csvData) {
+                    return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
                 }
-              }
-            });
-          }
 
-          renderProgressChart() {
-            const ctx = document.getElementById('progressChart');
-            if (!ctx || typeof Chart === 'undefined') return;
-
-            const data = this.getDisplayData();
-            const obiettivo = data.obiettivo || 0;
-            const fatturato = data.fatturato || 0;
-            const rimanente = Math.max(0, obiettivo - fatturato);
-
-            if (obiettivo === 0) {
-              ctx.getContext('2d').fillStyle = 'rgba(100, 116, 139, 0.5)';
-              ctx.getContext('2d').font = '16px Inter';
-              ctx.getContext('2d').textAlign = 'center';
-              ctx.getContext('2d').fillText('Nessun obiettivo impostato', ctx.width/2, ctx.height/2);
-              return;
+                // Usa sempre i dati generali
+                const prev = this.csvData.generale.annoPrecedente || 0;
+                const curr = this.csvData.generale.annoCorrente || 0;
+                const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
+                
+                // Mostra obiettivo solo per Latina se esiste
+                const obiettivo = this.csvData.latina.obiettivo || null;
+                const percentualeObiettivo = this.csvData.latina.percentualeObiettivo || null;
+                
+                return { 
+                    fatturato: curr, 
+                    annoPrecedente: prev, 
+                    crescita, 
+                    clienti: this.csvData.generale.clienti,
+                    obiettivo,
+                    percentualeObiettivo
+                };
             }
 
-            const chartData = {
-              labels: ['Realizzato', 'Da Realizzare'],
-              datasets: [{
-                data: [fatturato, rimanente],
-                backgroundColor: ['#10b981', '#e5e7eb'],
-                borderColor: ['#059669', '#d1d5db'],
-                borderWidth: 2
-              }]
-            };
+            startAutoUpdate() {
+                // Auto-update ogni 2 minuti
+                this.updateInterval = setInterval(() => {
+                    this.fetchCSVData();
+                }, 2 * 60 * 1000);
 
-            if (window.progressChartInstance) {
-              window.progressChartInstance.destroy();
+                // Update display ogni 30 secondi
+                setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
             }
 
-            window.progressChartInstance = new Chart(ctx, {
-              type: 'doughnut',
-              data: chartData,
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '70%',
-                plugins: {
-                  legend: {
-                    position: 'bottom',
-                    labels: { color: '#64748b', font: { size: 12 } }
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => {
-                        const value = this.formatEuroK3(context.raw);
-                        const percentage = ((context.raw / obiettivo) * 100).toFixed(1);
-                        return `${context.label}: ${value} (${percentage}%)`;
-                      }
-                    }
-                  }
-                }
-              }
-            });
-          }
-
-          extractCategoryData() {
-            if (!this.csvData.vendite) return [];
-            
-            const categoryMap = new Map();
-            
-            this.csvData.vendite.forEach(vendita => {
-              const cat = vendita.categoria;
-              if (categoryMap.has(cat)) {
-                categoryMap.set(cat, categoryMap.get(cat) + vendita.fatturato);
-              } else {
-                categoryMap.set(cat, vendita.fatturato);
-              }
-            });
-
-            return Array.from(categoryMap.entries())
-              .map(([name, value]) => ({ name, value }))
-              .sort((a, b) => b.value - a.value)
-              .slice(0, 8);
-          }
-
-          showProvincePopup() { 
-            if (!this.csvData) return; 
-            this.updateProvinceOptions(); 
-            const p = document.getElementById('province-popup'); 
-            if (p) p.style.display = 'flex'; 
-          }
-          
-          hideProvincePopup() { 
-            const p = document.getElementById('province-popup'); 
-            if (p) p.style.display = 'none'; 
-          }
-
-          updateProvinceOptions() {
-            if (!this.csvData) return;
-            const popupOptions = document.getElementById('popup-options');
-            if (!popupOptions) return;
-            popupOptions.innerHTML = '';
-
-            popupOptions.appendChild(this.createProvinceOption('all', {
-              title: 'Tutte le Province',
-              description: this.formatEuroK3(this.csvData.generale.annoCorrente) + ' • ' + this.csvData.generale.clienti + ' clienti',
-              className: ''
-            }));
-
-            popupOptions.appendChild(this.createProvinceOption('LT', {
-              title: 'Latina (LT)',
-              description: this.formatEuroK3(this.csvData.latina.annoCorrente) + ' • ' + this.csvData.latina.clientiCorrente + ' clienti • Obiettivo: ' + (this.csvData.latina.percentualeObiettivo || 0) + '%',
-              className: 'LT'
-            }));
-
-            popupOptions.appendChild(this.createProvinceOption('RM', {
-              title: 'Roma (RM)',
-              description: this.formatEuroK3(this.csvData.roma.annoCorrente) + ' • ' + this.csvData.roma.clienti + ' clienti',
-              className: 'RM'
-            }));
-
-            const popupStatusDot = document.getElementById('popup-status-dot');
-            const popupStatusText = document.getElementById('popup-status-text');
-            if (popupStatusDot) popupStatusDot.className = 'status-dot online';
-            if (popupStatusText) popupStatusText.textContent = 'Dati CSV aggiornati automaticamente';
-          }
-
-          createProvinceOption(province, config) {
-            const option = document.createElement('button');
-            option.className = 'province-option ' + (this.selectedProvince === province ? 'selected ' + (config.className || '') : '');
-            option.innerHTML =
-              '<div class="option-info">' +
-                '<h4>'+ config.title +'</h4>' +
-                '<p>'+ config.description +'</p>' +
-              '</div>' +
-              '<div class="option-radio ' + (this.selectedProvince === province ? 'selected' : '') + '"></div>';
-
-            option.addEventListener('click', () => {
-              this.selectedProvince = province;
-              this.renderDashboard();
-              this.hideProvincePopup();
-            });
-
-            return option;
-          }
-
-          getDisplayData() {
-            if (!this.csvData) {
-              return { fatturato: 0, annoPrecedente: 0, crescita: 0, clienti: 0, obiettivo: null, percentualeObiettivo: null };
+            destroy() {
+                if (this.updateInterval) clearInterval(this.updateInterval);
+                Object.values(this.charts).forEach(chart => {
+                    if (chart) chart.destroy();
+                });
             }
-
-            if (this.selectedProvince === 'all') {
-              const prev = this.csvData.generale.annoPrecedente || 0;
-              const curr = this.csvData.generale.annoCorrente || 0;
-              const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
-              return { fatturato: curr, annoPrecedente: prev, crescita, clienti: this.csvData.generale.clienti, obiettivo: null, percentualeObiettivo: null };
-            } else if (this.selectedProvince === 'LT') {
-              const prev = this.csvData.latina.annoPrecedente || 0;
-              const curr = this.csvData.latina.annoCorrente || 0;
-              const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
-              return { fatturato: curr, annoPrecedente: prev, crescita, clienti: this.csvData.latina.clientiCorrente, obiettivo: this.csvData.latina.obiettivo, percentualeObiettivo: this.csvData.latina.percentualeObiettivo };
-            } else if (this.selectedProvince === 'RM') {
-              return { fatturato: this.csvData.roma.annoCorrente, annoPrecedente: 0, crescita: '0.0', clienti: this.csvData.roma.clienti, obiettivo: null, percentualeObiettivo: null };
-            }
-
-            return { fatturato: 0, annoPrecedente: 0, crescita: '0.0', clienti: 0, obiettivo: null, percentualeObiettivo: null };
-          }
-
-          parseNumber(input) {
-            if (typeof input === 'number') return input;
-            if (!input) return 0;
-            const cleaned = String(input)
-              .replace(/\s+/g, '')
-              .replace(/€/g, '')
-              .replace(/\./g, '')
-              .replace(/,/g, '.');
-            const n = Number(cleaned);
-            return Number.isFinite(n) ? n : 0;
-          }
-
-          formatK3(value) {
-            const num = Number(value) || 0;
-            const sign = num < 0 ? '-' : '';
-            const v = Math.abs(num);
-            const k = v / 1000;
-            let out;
-            if (k >= 100) out = String(Math.round(k));
-            else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
-            else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
-            out = out.replace(/,?0+$/, '');
-            return sign + out + 'k';
-          }
-
-          formatEuroK3(value) {
-            if (!value) return '€0k';
-            const k = this.formatK3(value);
-            return '€' + k.replace('k','') + 'k';
-          }
-
-          startAutoUpdate() {
-            this.updateInterval = setInterval(() => {
-              this.fetchCSVData();
-            }, 2 * 60 * 1000);
-
-            setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
-          }
-
-          destroy() { 
-            if (this.updateInterval) clearInterval(this.updateInterval); 
-            if (window.provinceChartInstance) window.provinceChartInstance.destroy();
-            if (window.categoryChartInstance) window.categoryChartInstance.destroy();
-            if (window.topClientsChartInstance) window.topClientsChartInstance.destroy();
-            if (window.progressChartInstance) window.progressChartInstance.destroy();
-          }
         }
 
+        // Initialize
+        let dashboardManager;
         document.addEventListener('DOMContentLoaded', () => {
-          window.dashboard = new DashboardManager();
+            dashboardManager = new DashboardManager();
         });
 
         window.addEventListener('beforeunload', () => {
-          if (window.dashboard) window.dashboard.destroy();
+            if (dashboardManager) dashboardManager.destroy();
         });
     </script>
 </body>
