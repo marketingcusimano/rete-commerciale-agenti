@@ -1215,34 +1215,40 @@
                         });
                     }
 
-                    // Parse individual clients data for detailed analysis
-                    const clientiDetailMatch = csvText.match(/Ragione_sociale;Provincia;Fatturato[\s\S]*?===.*===/);
+                    // Parse individual clients data for detailed analysis (optional)
                     let clientiDetail = [];
-                    if (clientiDetailMatch) {
-                        const lines = clientiDetailMatch[0].split('\n').filter(line => 
-                            line.trim() && 
-                            !line.includes('===') && 
-                            !line.includes('Ragione_sociale') &&
-                            line.includes(';')
-                        );
-                        
-                        lines.forEach(line => {
-                            const parts = line.split(';');
-                            if (parts.length >= 3) {
-                                const ragioneSociale = parts[0].trim();
-                                const provincia = parts[1].trim();
-                                const fatturato = this.parseNumber(parts[2]);
-                                
-                                if (ragioneSociale && fatturato > 0) {
-                                    clientiDetail.push({
-                                        Ragione_sociale: ragioneSociale,
-                                        Provincia: provincia,
-                                        Fatturato: fatturato,
-                                        Categoria: 'Generale'
-                                    });
+                    try {
+                        const clientiDetailMatch = csvText.match(/Ragione_sociale;Provincia;Fatturato[\s\S]*?===.*===/);
+                        if (clientiDetailMatch) {
+                            const lines = clientiDetailMatch[0].split('\n').filter(line => 
+                                line.trim() && 
+                                !line.includes('===') && 
+                                !line.includes('Ragione_sociale') &&
+                                line.includes(';')
+                            );
+                            
+                            lines.forEach(line => {
+                                const parts = line.split(';');
+                                if (parts.length >= 3) {
+                                    const ragioneSociale = parts[0].trim();
+                                    const provincia = parts[1].trim();
+                                    const fatturato = this.parseNumber(parts[2]);
+                                    
+                                    if (ragioneSociale && fatturato > 0) {
+                                        clientiDetail.push({
+                                            Ragione_sociale: ragioneSociale,
+                                            Provincia: provincia,
+                                            Fatturato: fatturato,
+                                            Categoria: 'Generale'
+                                        });
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
+                    } catch (e) {
+                        console.warn('Impossibile parsare dettagli clienti:', e);
+                        // Crea dati di fallback se il parsing fallisce
+                        clientiDetail = [];
                     }
 
                     return { generale, latina, roma, categorie, clientiDetail };
