@@ -2260,8 +2260,12 @@ Periodo;01/01/2025 - 17/08/2025;;;;;;;`;
                     
                     if (pieniECoppi) {
                         // Aggiorna percentuale prodotti core dal CSV
-                        document.getElementById('core-perf').textContent = `${pieniECoppi.percentuale}%`;
-                        document.getElementById('core-percentage').textContent = `${pieniECoppi.percentuale}%`;
+                        const corePerfEl = document.getElementById('core-perf');
+                        const corePercentageEl = document.getElementById('core-percentage');
+                        
+                        if (corePerfEl) corePerfEl.textContent = `${pieniECoppi.percentuale}%`;
+                        if (corePercentageEl) corePercentageEl.textContent = `${pieniECoppi.percentuale}%`;
+                        
                         console.log('Updated core percentage to:', pieniECoppi.percentuale);
                     }
                     
@@ -2270,7 +2274,8 @@ Periodo;01/01/2025 - 17/08/2025;;;;;;;`;
                     );
                     
                     if (altro) {
-                        document.getElementById('other-percentage').textContent = `${altro.percentuale}%`;
+                        const otherPercentageEl = document.getElementById('other-percentage');
+                        if (otherPercentageEl) otherPercentageEl.textContent = `${altro.percentuale}%`;
                         console.log('Updated other percentage to:', altro.percentuale);
                     }
                 }
@@ -2280,8 +2285,11 @@ Periodo;01/01/2025 - 17/08/2025;;;;;;;`;
                     const uniqueClienti = new Set(this.csvData.dettaglioVendite.map(v => `${v.provincia}-${v.cliente}`));
                     const uniqueCategorie = new Set(this.csvData.dettaglioVendite.map(v => v.categoria));
                     
-                    document.getElementById('involved-clients').textContent = uniqueClienti.size;
-                    document.getElementById('categories-count').textContent = uniqueCategorie.size;
+                    const involvedClientsEl = document.getElementById('involved-clients');
+                    const categoriesCountEl = document.getElementById('categories-count');
+                    
+                    if (involvedClientsEl) involvedClientsEl.textContent = uniqueClienti.size;
+                    if (categoriesCountEl) categoriesCountEl.textContent = uniqueCategorie.size;
                     
                     console.log('Updated metrics: clienti unici=', uniqueClienti.size, ', categorie=', uniqueCategorie.size);
                 }
@@ -2293,7 +2301,6 @@ Periodo;01/01/2025 - 17/08/2025;;;;;;;`;
                     if (this.csvData.totali['Clienti Totali']) {
                         const clientiTotali = parseInt(this.csvData.totali['Clienti Totali'], 10);
                         console.log('Clienti Totali da CSV:', clientiTotali);
-                        // Potremmo confrontare con quello calcolato
                     }
                     
                     if (this.csvData.totali['Fatturato Totale']) {
@@ -2314,10 +2321,14 @@ Periodo;01/01/2025 - 17/08/2025;;;;;;;`;
                     if (this.csvData.totali['Periodo']) {
                         // Aggiorna periodo se diverso
                         const periodoTotali = this.csvData.totali['Periodo'];
-                        const currentPeriod = document.getElementById('period-display').textContent;
-                        if (periodoTotali !== currentPeriod) {
-                            document.getElementById('period-display').textContent = periodoTotali;
-                            console.log('Updated period from', currentPeriod, 'to', periodoTotali);
+                        const periodDisplayEl = document.getElementById('period-display');
+                        
+                        if (periodDisplayEl) {
+                            const currentPeriod = periodDisplayEl.textContent;
+                            if (periodoTotali !== currentPeriod) {
+                                periodDisplayEl.textContent = periodoTotali;
+                                console.log('Updated period from', currentPeriod, 'to', periodoTotali);
+                            }
                         }
                     }
                     
@@ -2330,7 +2341,8 @@ Periodo;01/01/2025 - 17/08/2025;;;;;;;`;
                 // Aggiorna dati categorie se disponibili  
                 if (this.csvData.categorie && this.csvData.categorie.length > 0) {
                     const categorieAttive = this.csvData.categorie.filter(c => c.importo > 0).length;
-                    document.getElementById('categories-count').textContent = categorieAttive;
+                    const categoriesCountEl = document.getElementById('categories-count');
+                    if (categoriesCountEl) categoriesCountEl.textContent = categorieAttive;
                     console.log('Updated categories count to:', categorieAttive);
                 }
             }
