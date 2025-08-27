@@ -1016,6 +1016,25 @@
                 }
             }
 
+            showLoading() {
+                document.getElementById('loading-state').style.display = 'block';
+                document.getElementById('error-state').style.display = 'none';
+                document.getElementById('main-content').style.display = 'none';
+            }
+
+            showError(message) {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('error-state').style.display = 'block';
+                document.getElementById('main-content').style.display = 'none';
+                document.getElementById('error-message').textContent = message;
+            }
+
+            showSuccess() {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('error-state').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }
+
             showProvincePopup() {
                 if (this.csvData) {
                     this.updateProvinceOptions();
@@ -1155,40 +1174,107 @@
             }
 
             createRealCSVData() {
-                // Usa i dati reali dal CSV fornito
-                return `==================== CARABOT NATALINO ====================
-
-=== INFORMAZIONI AGENTE ===
-Codice Agente,Ragione Sociale,Dalla data,Alla data
-631.00238,CARABOT NATALINO,01/01/2025,24/08/2025
-
-=== VERIFICA OBIETTIVI ===
-Provincia,AnnoPrec.,AnnoCorr.,Obiettivo,% su obiet.,ClientiAnnoPrec.,ClientiAnnoCorr.,Obiettivo,% su obiet.
-Generale,"80.238,72","90.159,79",,,352,20,,
-LT,"79.029,16","82.389,23","155.000,00","53,17%",23,18,35,"51,43%"
-
-=== CLIENTI PER PROVINCIA ===
-Provincia,Clienti Serviti,Fatturato
-LT,18,"60.437,22"
-RM,2,"7.770,56"
-
-=== RIPARTIZIONE FATTURATO ===
-Categoria,Importo,Percentuale
-Pieni e Coppi,54.909,62,61%
-Altro,35.250,17,39%
-
-=== RIEPILOGO PER CATEGORIA ===
-Categoria,Importo Totale,Provincia LT Clienti,Provincia RM Clienti
-MATTONE PIENO,"38.558,64",16,1
-PAVIMENTAZIONE POLIS,"15.686,46",13,1
-REFRATTARI RETTIFICATI,"5.367,83",5,0
-REFRATTARI,"4.910,39",4,1
-FACCIAVISTA,"1.591,40",2,0
-PIASTRELLE,"1.240,95",1,0
-LINEA ARCHEO,"746,68",2,1
-CORRIM.COPRIM.,"73,26",1,0
-COPERTURE,"3,36",1,0
-OUTLET,"0,01",1,0`;
+                // Usa i dati reali dal CSV fornito nel formato corretto
+                return `==================== CARABOT NATALINO ====================;;;;;;;;
+;;;;;;;;
+=== INFORMAZIONI AGENTE ===;;;;;;;;
+Codice Agente;Ragione Sociale;Dalla data;Alla data;;;;;
+631.00238;CARABOT NATALINO;01/01/2025;17/08/2025;;;;;
+;;;;;;;;
+=== VERIFICA OBIETTIVI ===;;;;;;;;
+Provincia;AnnoPrec.;AnnoCorr.;Obiettivo;% su obiet.;ClientiAnnoPrec.;ClientiAnnoCorr.;Obiettivo;% su obiet.
+Generale;80.238,72;190.159,79;;;352;20;;
+LT;79.029,16;82.389,23;350.000;58%;23;18;35;51%
+;;;;;;;;
+=== CLIENTI PER PROVINCIA ===;;;;;;;;
+Provincia;Clienti Serviti;Fatturato;;;;;;
+LT;18;60.437,22;;;;;;
+RM;2;7.770,56;;;;;;
+;;;;;;;;
+=== RIPARTIZIONE FATTURATO ===;;;;;;;;
+Categoria;Importo;Percentuale;;;;;;
+Pieni e Coppi;54.909;62;61%;;;;;
+Altro;35.250;17;39%;;;;;
+;;;;;;;;
+=== DETTAGLIO VENDITE PER CLIENTE ===;;;;;;;;
+Provincia;Ragione Sociale Cliente;Categoria ARTICOLI;Fatturato;;;;;
+LT;EDILIZIA SETINA S.R.L.;MATTONE PIENO;1.512,00;;;;;
+LT;EDILIZIA SETINA S.R.L.;PAVIMENTAZIONE POLIS;1.665,62;;;;;
+LT;ROSSETTI EDILIZIA SRL;FACCIAVISTA;583,78;;;;;
+LT;ROSSETTI EDILIZIA SRL;LINEA ARCHEO;743,00;;;;;
+LT;ROSSETTI EDILIZIA SRL;MATTONE PIENO;151,20;;;;;
+LT;ROSSETTI EDILIZIA SRL;PAVIMENTAZIONE POLIS;416,40;;;;;
+LT;F.LLI TORA SRL;COPERTURE;3,36;;;;;
+LT;F.LLI TORA SRL;LINEA ARCHEO;1,74;;;;;
+LT;F.LLI TORA SRL;MATTONE PIENO;3.110,40;;;;;
+LT;F.LLI TORA SRL;PAVIMENTAZIONE POLIS;1.382,40;;;;;
+LT;ADDESSI COMMERCIALE SRL;MATTONE PIENO;3.693,60;;;;;
+LT;ADDESSI COMMERCIALE SRL;OUTLET;0,01;;;;;
+LT;ADDESSI COMMERCIALE SRL;PIASTRELLE;1.240,95;;;;;
+LT;CENTRO EDILE DE GREGORIS SRL;CORRIM.COPRIM.;73,26;;;;;
+LT;CENTRO EDILE DE GREGORIS SRL;MATTONE PIENO;7.776,00;;;;;
+LT;CENTRO EDILE DE GREGORIS SRL;PAVIMENTAZIONE POLIS;8,67;;;;;
+LT;CENTRO EDILE DE GREGORIS SRL;REFRATTARI RETTIFICATI;1.281,60;;;;;
+LT;STENI SRL;MATTONE PIENO;547,20;;;;;
+LT;STENI SRL;PAVIMENTAZIONE POLIS;984,96;;;;;
+RM;DOVAL SRL;REFRATTARI;1.019,82;;;;;
+LT;ROSANCOS SRL;MATTONE PIENO;1.528,80;;;;;
+LT;ROSANCOS SRL;PAVIMENTAZIONE POLIS;604,80;;;;;
+LT;EDILCERAMICA SAS DI VEGLIA CRISTIAN & C.;MATTONE PIENO;1.440,00;;;;;
+LT;D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS;MATTONE PIENO;3.744,00;;;;;
+LT;D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS;PAVIMENTAZIONE POLIS;832,81;;;;;
+LT;DIMED SRL;MATTONE PIENO;1.326,96;;;;;
+LT;BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C;MATTONE PIENO;1.209,60;;;;;
+LT;BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C;REFRATTARI;900,83;;;;;
+LT;BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C;REFRATTARI RETTIFICATI;1.935,58;;;;;
+LT;EDILIM SRL;MATTONE PIENO;1.370,88;;;;;
+LT;EDILIM SRL;PAVIMENTAZIONE POLIS;984,96;;;;;
+LT;EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC;MATTONE PIENO;3.456,00;;;;;
+LT;EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC;PAVIMENTAZIONE POLIS;2.230,80;;;;;
+LT;L'EMPORIO DI IOZZI SONIA;MATTONE PIENO;957,60;;;;;
+LT;L'EMPORIO DI IOZZI SONIA;PAVIMENTAZIONE POLIS;984,96;;;;;
+LT;EDIL PONTINA SRLS;MATTONE PIENO;864,00;;;;;
+LT;EDIL PONTINA SRLS;REFRATTARI;379,47;;;;;
+LT;EDIL PONTINA SRLS;REFRATTARI RETTIFICATI;819,98;;;;;
+LT;FER.COM. COSTRUZIONI SRL;PAVIMENTAZIONE POLIS;2.695,68;;;;;
+LT;FER.COM. COSTRUZIONI SRL;REFRATTARI;640,35;;;;;
+LT;FER.COM. COSTRUZIONI SRL;REFRATTARI RETTIFICATI;460,34;;;;;
+LT;EDILIZIA PRIMAVERA SRL;PAVIMENTAZIONE POLIS;933,12;;;;;
+LT;EDILIZIA PRIMAVERA SRL;REFRATTARI;1.969,92;;;;;
+LT;EDILIZIA PRIMAVERA SRL;REFRATTARI RETTIFICATI;870,33;;;;;
+RM;COLANTUONO 1918 SRL;LINEA ARCHEO;1,94;;;;;
+RM;COLANTUONO 1918 SRL;MATTONE PIENO;5.150,40;;;;;
+RM;COLANTUONO 1918 SRL;PAVIMENTAZIONE POLIS;1.598,40;;;;;
+LT;LATINA BETON SERVIZI SRL;FACCIAVISTA;1.007,62;;;;;
+LT;LATINA BETON SERVIZI SRL;MATTONE PIENO;720,00;;;;;
+LT;LATINA BETON SERVIZI SRL;PAVIMENTAZIONE POLIS;362,88;;;;;
+;;;;;;;;
+=== RIEPILOGO PER CATEGORIA ===;;;;;;;;
+Categoria;Importo Totale;Provincia LT Clienti;Provincia RM Clienti;;;;;
+COPERTURE;3,36;1;0;;;;;
+CORRIM.COPRIM.;73,26;1;0;;;;;
+COTTO A MANO ANTICHE TERRE;0,00;0;0;;;;;
+FACCIAVISTA;1.591,40;2;0;;;;;
+GANCI E ACCESSO;0,00;0;0;;;;;
+LINEA ARCHEO;746,68;2;1;;;;;
+MATTONE PIENO;38.558,64;16;1;;;;;
+OUTLET;0,01;1;0;;;;;
+PAVIMENTAZIONE POLIS;15.686,46;13;1;;;;;
+PEZ.SPEC.COPPI;0,00;0;0;;;;;
+PIASTRELLE;1.240,95;1;0;;;;;
+PRODOTTI FORNO;0,00;0;0;;;;;
+TAVELLONI;0,00;0;0;;;;;
+REFRATTARI;4.910,39;4;1;;;;;
+REFRATTARI RETTIFICATI;5.367,83;5;0;;;;;
+PROMOZIONALI;0,00;0;0;;;;;
+;68.178,98;0;0;;;;;
+;;;;;;;;
+=== TOTALI ===;;;;;;;;
+Descrizione;Valore;;;;;;;
+Fatturato Totale;6820778.00;;;;;;;
+Clienti Totali;20;;;;;;;
+Province Servite;2;;;;;;;
+Periodo;01/01/2025 - 17/08/2025;;;;;;;`;
             }
 
             buildCandidateUrls() {
@@ -1221,12 +1307,15 @@ OUTLET,"0,01",1,0`;
 
             parseCSV(csvText) {
                 try {
+                    console.log('Parsing CSV with length:', csvText.length);
+                    
                     // Parse INFORMAZIONI AGENTE section
                     const agenteMatch = csvText.match(/=== INFORMAZIONI AGENTE ===([\s\S]*?)===.*===/);
                     let agentInfo = {};
                     if (agenteMatch) {
                         const agenteText = agenteMatch[1];
-                        const agenteData = agenteText.match(/631\.00238,CARABOT NATALINO,(\d{2}\/\d{2}\/\d{4}),(\d{2}\/\d{2}\/\d{4})/);
+                        // Formato con ; come separatore
+                        const agenteData = agenteText.match(/631\.00238;CARABOT NATALINO;(\d{2}\/\d{2}\/\d{4});(\d{2}\/\d{2}\/\d{4})/);
                         if (agenteData) {
                             agentInfo = {
                                 codice: '631.00238',
@@ -1234,6 +1323,7 @@ OUTLET,"0,01",1,0`;
                                 dallaData: agenteData[1],
                                 allaData: agenteData[2]
                             };
+                            console.log('Agent info parsed:', agentInfo);
                         }
                     }
 
@@ -1242,9 +1332,10 @@ OUTLET,"0,01",1,0`;
                     if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
                     
                     const obiettiviText = obiettiviMatch[1];
+                    console.log('Obiettivi text:', obiettiviText);
                     
-                    // Parse GENERALE data (formato reale)
-                    const generaleMatch = obiettiviText.match(/Generale,"([\d.,]+)","([\d.,]+)",,,(\d+),(\d+),,/);
+                    // Parse GENERALE data (formato con ; come separatore)
+                    const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
                     if (!generaleMatch) throw new Error('Dati Generale non trovati');
                     
                     const generale = {
@@ -1253,83 +1344,208 @@ OUTLET,"0,01",1,0`;
                         clientiPrecedenti: parseInt(generaleMatch[3], 10),
                         clienti: parseInt(generaleMatch[4], 10)
                     };
+                    console.log('Generale parsed:', generale);
 
-                    // Parse LATINA data (formato reale)
-                    const ltMatch = obiettiviText.match(/LT,"([\d.,]+)","([\d.,]+)","([\d.,]+)","([\d.,]+)%",(\d+),(\d+),(\d+),"([\d.,]+)%"/);
+                    // Parse LATINA data (formato con ; e %)
+                    const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
                     if (!ltMatch) throw new Error('Dati Latina non trovati');
                     
                     const latina = {
                         annoPrecedente: this.parseItalianNumber(ltMatch[1]),
                         annoCorrente: this.parseItalianNumber(ltMatch[2]),
-                        obiettivo: this.parseItalianNumber(ltMatch[3]),
-                        percentualeObiettivo: this.parseItalianNumber(ltMatch[4]),
+                        obiettivo: this.parseItalianNumber(ltMatch[3]) * 1000, // Convert da migliaia
+                        percentualeObiettivo: parseInt(ltMatch[4], 10),
                         clientiPrecedenti: parseInt(ltMatch[5], 10),
                         clientiCorrente: parseInt(ltMatch[6], 10),
                         obiettivoClienti: parseInt(ltMatch[7], 10),
-                        percentualeClienti: this.parseItalianNumber(ltMatch[8])
+                        percentualeClienti: parseInt(ltMatch[8], 10)
                     };
+                    console.log('Latina parsed:', latina);
 
-                    // Parse CLIENTI PER PROVINCIA section (formato reale)
+                    // Parse CLIENTI PER PROVINCIA section (formato con ; come separatore)
                     const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
                     let roma = { annoCorrente: 0, clienti: 0 };
                     let ltClienti = { annoCorrente: 0, clienti: 0 };
                     
                     if (clientiMatch) {
                         const clientiText = clientiMatch[1];
+                        console.log('Clienti text:', clientiText);
                         
-                        // Parse LT data
-                        const ltClientMatch = clientiText.match(/LT,(\d+),"([\d.,]+)"/);
+                        // Parse LT data (formato: LT;18;60.437,22;;;;;;)
+                        const ltClientMatch = clientiText.match(/LT;(\d+);([\d.,]+);/);
                         if (ltClientMatch) {
                             ltClienti = {
                                 annoCorrente: this.parseItalianNumber(ltClientMatch[2]),
                                 clienti: parseInt(ltClientMatch[1], 10)
                             };
+                            console.log('LT Clienti parsed:', ltClienti);
                         }
                         
-                        // Parse RM data
-                        const rmMatch = clientiText.match(/RM,(\d+),"([\d.,]+)"/);
+                        // Parse RM data (formato: RM;2;7.770,56;;;;;;)
+                        const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);/);
                         if (rmMatch) {
                             roma = {
                                 annoCorrente: this.parseItalianNumber(rmMatch[2]),
                                 clienti: parseInt(rmMatch[1], 10)
                             };
+                            console.log('RM parsed:', roma);
                         }
                     }
 
-                    // Parse RIEPILOGO PER CATEGORIA section (formato reale)
+                    // Parse DETTAGLIO VENDITE PER CLIENTE section (formato: LT;CLIENTE;CATEGORIA;1.512,00;;;;;)
+                    const dettaglioMatch = csvText.match(/=== DETTAGLIO VENDITE PER CLIENTE ===([\s\S]*?)===.*===/);
+                    let dettaglioVendite = [];
+                    
+                    if (dettaglioMatch) {
+                        const dettaglioText = dettaglioMatch[1];
+                        console.log('Dettaglio vendite text preview:', dettaglioText.substring(0, 200));
+                        
+                        const lines = dettaglioText.split('\n').filter(line => {
+                            const cleaned = line.trim();
+                            return cleaned.length > 0 && 
+                                   !cleaned.includes('Provincia;Ragione Sociale') && 
+                                   !cleaned.includes('===') &&
+                                   cleaned.includes(';') && 
+                                   !cleaned.startsWith(';') &&
+                                   cleaned.split(';').length >= 4;
+                        });
+                        
+                        console.log('Dettaglio vendite lines found:', lines.length);
+                        
+                        lines.forEach((line, index) => {
+                            const parts = line.split(';');
+                            if (parts.length >= 4) {
+                                const provincia = parts[0]?.trim();
+                                const cliente = parts[1]?.trim();
+                                const categoria = parts[2]?.trim();
+                                const fatturato = this.parseItalianNumber(parts[3]);
+                                
+                                if (provincia && cliente && categoria && fatturato > 0) {
+                                    dettaglioVendite.push({
+                                        provincia,
+                                        cliente,
+                                        categoria,
+                                        fatturato
+                                    });
+                                }
+                            }
+                        });
+                        
+                        console.log('Dettaglio vendite parsed:', dettaglioVendite.length, 'records');
+                    }
+
+                    // Parse RIPARTIZIONE FATTURATO section (formato: Pieni e Coppi;54.909;62;61%;;;;;)
+                    const ripartizioneMatch = csvText.match(/=== RIPARTIZIONE FATTURATO ===([\s\S]*?)===.*===/);
+                    let ripartizioneFatturato = [];
+                    
+                    if (ripartizioneMatch) {
+                        const ripartizioneText = ripartizioneMatch[1];
+                        console.log('Ripartizione text:', ripartizioneText);
+                        
+                        const lines = ripartizioneText.split('\n').filter(line => {
+                            const cleaned = line.trim();
+                            return cleaned.length > 0 && 
+                                   !cleaned.includes('Categoria;Importo') && 
+                                   !cleaned.includes('===') &&
+                                   cleaned.includes(';') && 
+                                   !cleaned.startsWith(';');
+                        });
+                        
+                        lines.forEach(line => {
+                            const parts = line.split(';');
+                            if (parts.length >= 3) {
+                                const categoria = parts[0]?.trim();
+                                const importo = this.parseItalianNumber(parts[1]);
+                                const percentuale = parts[2]?.replace('%', '').trim();
+                                
+                                if (categoria && importo > 0) {
+                                    ripartizioneFatturato.push({
+                                        categoria,
+                                        importo,
+                                        percentuale: this.parseItalianNumber(percentuale)
+                                    });
+                                }
+                            }
+                        });
+                        
+                        console.log('Ripartizione fatturato parsed:', ripartizioneFatturato);
+                    }
+
+                    // Parse RIEPILOGO PER CATEGORIA section (formato: MATTONE PIENO;38.558,64;16;1;;;;;)
                     const riepilogoMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===([\s\S]*?)===.*===/);
                     let categorie = [];
                     
                     if (riepilogoMatch) {
                         const riepilogoText = riepilogoMatch[1];
-                        const lines = riepilogoText.split('\n').filter(line => 
-                            line.trim() && 
-                            !line.includes('Categoria,Importo') && 
-                            !line.includes('===') &&
-                            line.includes(',') && 
-                            !line.startsWith(',') &&
-                            line.includes('"')
-                        );
+                        console.log('Riepilogo text preview:', riepilogoText.substring(0, 300));
+                        
+                        const lines = riepilogoText.split('\n').filter(line => {
+                            const cleaned = line.trim();
+                            return cleaned.length > 0 && 
+                                   !cleaned.includes('Categoria;Importo') && 
+                                   !cleaned.includes('===') &&
+                                   cleaned.includes(';') && 
+                                   !cleaned.startsWith(';') &&
+                                   cleaned.split(';').length >= 4;
+                        });
+                        
+                        console.log('Riepilogo lines found:', lines.length);
                         
                         lines.forEach(line => {
-                            const match = line.match(/([^,]+),"([\d.,]+)",(\d+),(\d+)/);
-                            if (match) {
-                                const categoria = match[1].trim();
-                                const importo = this.parseItalianNumber(match[2]);
+                            const parts = line.split(';');
+                            if (parts.length >= 4) {
+                                const categoria = parts[0]?.trim();
+                                const importo = this.parseItalianNumber(parts[1]);
+                                const ltClienti = parseInt(parts[2], 10) || 0;
+                                const rmClienti = parseInt(parts[3], 10) || 0;
                                 
-                                if (categoria && importo > 0) {
+                                if (categoria && importo >= 0) { // Allow 0 for empty categories
                                     categorie.push({
                                         nome: categoria,
                                         importo: importo,
-                                        ltClienti: parseInt(match[3], 10),
-                                        rmClienti: parseInt(match[4], 10)
+                                        ltClienti: ltClienti,
+                                        rmClienti: rmClienti
                                     });
                                 }
                             }
                         });
+                        
+                        console.log('Categorie parsed:', categorie.length, 'categories');
                     }
 
-                    console.log('Parsed data:', { generale, latina, roma, ltClienti, categorie, agentInfo });
+                    // Parse TOTALI section (formato: Fatturato Totale;6820778.00;;;;;;;)
+                    const totaliMatch = csvText.match(/=== TOTALI ===([\s\S]*?)$/);
+                    let totali = {};
+                    
+                    if (totaliMatch) {
+                        const totaliText = totaliMatch[1];
+                        console.log('Totali text:', totaliText);
+                        
+                        const lines = totaliText.split('\n').filter(line => {
+                            const cleaned = line.trim();
+                            return cleaned.length > 0 && 
+                                   !cleaned.includes('Descrizione;Valore') && 
+                                   !cleaned.includes('===') &&
+                                   cleaned.includes(';') && 
+                                   !cleaned.startsWith(';');
+                        });
+                        
+                        lines.forEach(line => {
+                            const parts = line.split(';');
+                            if (parts.length >= 2) {
+                                const descrizione = parts[0]?.trim();
+                                const valore = parts[1]?.trim();
+                                
+                                if (descrizione && valore) {
+                                    totali[descrizione] = valore;
+                                }
+                            }
+                        });
+                        
+                        console.log('Totali parsed:', totali);
+                    }
+
+                    console.log('Parsed data:', { generale, latina, roma, ltClienti, categorie, dettaglioVendite, ripartizioneFatturato, totali, agentInfo });
 
                     return { 
                         generale, 
@@ -1337,6 +1553,9 @@ OUTLET,"0,01",1,0`;
                         roma, 
                         ltClienti,
                         categorie,
+                        dettaglioVendite,
+                        ripartizioneFatturato,
+                        totali,
                         agentInfo
                     };
                     
@@ -1526,6 +1745,8 @@ OUTLET,"0,01",1,0`;
 
                 // Update charts and data displays
                 this.updateChartsAndDisplays();
+                this.updateTopClienti();
+                this.updatePerformanceAnalytics();
             }
 
             updateChartsAndDisplays() {
@@ -1966,10 +2187,152 @@ OUTLET,"0,01",1,0`;
                 document.getElementById('error-message').textContent = message;
             }
 
-            showSuccess() {
-                document.getElementById('loading-state').style.display = 'none';
-                document.getElementById('error-state').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
+            updateTopClienti() {
+                if (!this.csvData.dettaglioVendite || this.csvData.dettaglioVendite.length === 0) {
+                    console.log('No dettaglio vendite data available');
+                    return;
+                }
+                
+                console.log('Processing', this.csvData.dettaglioVendite.length, 'sales records');
+                
+                // Aggrega per cliente
+                const clientiMap = new Map();
+                this.csvData.dettaglioVendite.forEach(vendita => {
+                    const key = `${vendita.provincia}-${vendita.cliente}`;
+                    if (clientiMap.has(key)) {
+                        clientiMap.get(key).fatturato += vendita.fatturato;
+                        clientiMap.get(key).categorie.add(vendita.categoria);
+                    } else {
+                        clientiMap.set(key, {
+                            provincia: vendita.provincia,
+                            cliente: vendita.cliente,
+                            fatturato: vendita.fatturato,
+                            categorie: new Set([vendita.categoria])
+                        });
+                    }
+                });
+                
+                // Ordina per fatturato
+                const topClienti = Array.from(clientiMap.values())
+                    .sort((a, b) => b.fatturato - a.fatturato)
+                    .slice(0, 5);
+                    
+                console.log('Top 5 Clienti:', topClienti);
+                
+                // Aggiorna Top Performance con il miglior cliente
+                if (topClienti.length > 0) {
+                    const bestClient = topClienti[0];
+                    const clientName = bestClient.cliente.length > 25 ? 
+                        bestClient.cliente.substring(0, 25) + '...' : 
+                        bestClient.cliente;
+                    
+                    document.getElementById('performance-province').textContent = bestClient.provincia;
+                    document.getElementById('performance-subtitle').textContent = clientName;
+                    document.getElementById('province-amount').textContent = this.formatEuroK(bestClient.fatturato);
+                    
+                    // Calcola crescita basata sui dati della provincia
+                    let growthPercent = '0.0';
+                    if (bestClient.provincia === 'LT') {
+                        growthPercent = this.calculateGrowthPercentage(
+                            this.csvData.ltClienti?.annoCorrente || this.csvData.latina.annoCorrente, 
+                            this.csvData.latina.annoPrecedente
+                        );
+                    }
+                    document.getElementById('province-growth').textContent = `+${growthPercent}%`;
+                    
+                    // Aggiorna trend con numero categorie del cliente
+                    document.getElementById('trend-growth').textContent = `${bestClient.categorie.size} categorie`;
+                    
+                    console.log('Updated top performance with:', bestClient);
+                }
+            }
+
+            updatePerformanceAnalytics() {
+                console.log('Updating performance analytics...');
+                
+                // Aggiorna informazioni da RIPARTIZIONE FATTURATO
+                if (this.csvData.ripartizioneFatturato && this.csvData.ripartizioneFatturato.length > 0) {
+                    console.log('Ripartizione fatturato data:', this.csvData.ripartizioneFatturato);
+                    
+                    const pieniECoppi = this.csvData.ripartizioneFatturato.find(r => 
+                        r.categoria.toLowerCase().includes('pieni') || r.categoria.toLowerCase().includes('coppi')
+                    );
+                    
+                    if (pieniECoppi) {
+                        // Aggiorna percentuale prodotti core dal CSV
+                        document.getElementById('core-perf').textContent = `${pieniECoppi.percentuale}%`;
+                        document.getElementById('core-percentage').textContent = `${pieniECoppi.percentuale}%`;
+                        console.log('Updated core percentage to:', pieniECoppi.percentuale);
+                    }
+                    
+                    const altro = this.csvData.ripartizioneFatturato.find(r => 
+                        r.categoria.toLowerCase().includes('altro')
+                    );
+                    
+                    if (altro) {
+                        document.getElementById('other-percentage').textContent = `${altro.percentuale}%`;
+                        console.log('Updated other percentage to:', altro.percentuale);
+                    }
+                }
+                
+                // Calcola metriche avanzate da DETTAGLIO VENDITE
+                if (this.csvData.dettaglioVendite && this.csvData.dettaglioVendite.length > 0) {
+                    const uniqueClienti = new Set(this.csvData.dettaglioVendite.map(v => `${v.provincia}-${v.cliente}`));
+                    const uniqueCategorie = new Set(this.csvData.dettaglioVendite.map(v => v.categoria));
+                    
+                    document.getElementById('involved-clients').textContent = uniqueClienti.size;
+                    document.getElementById('categories-count').textContent = uniqueCategorie.size;
+                    
+                    console.log('Updated metrics: clienti unici=', uniqueClienti.size, ', categorie=', uniqueCategorie.size);
+                }
+                
+                // Aggiorna con dati da TOTALI se disponibili
+                if (this.csvData.totali) {
+                    console.log('Processing totali data:', this.csvData.totali);
+                    
+                    if (this.csvData.totali['Clienti Totali']) {
+                        const clientiTotali = parseInt(this.csvData.totali['Clienti Totali'], 10);
+                        console.log('Clienti Totali da CSV:', clientiTotali);
+                        // Potremmo confrontare con quello calcolato
+                    }
+                    
+                    if (this.csvData.totali['Fatturato Totale']) {
+                        const fatturatoTotale = this.parseItalianNumber(this.csvData.totali['Fatturato Totale']);
+                        console.log('Fatturato Totale da CSV:', this.formatEuroK(fatturatoTotale));
+                        
+                        // Se il fatturato totale è molto diverso da quello calcolato, mostra un warning
+                        const calcolato = this.csvData.generale.annoCorrente;
+                        if (Math.abs(fatturatoTotale - calcolato) > calcolato * 0.1) {
+                            console.warn('DISCREPANZA FATTURATO:', { 
+                                calcolato: this.formatEuroK(calcolato), 
+                                totale: this.formatEuroK(fatturatoTotale),
+                                differenza: this.formatEuroK(Math.abs(fatturatoTotale - calcolato))
+                            });
+                        }
+                    }
+                    
+                    if (this.csvData.totali['Periodo']) {
+                        // Aggiorna periodo se diverso
+                        const periodoTotali = this.csvData.totali['Periodo'];
+                        const currentPeriod = document.getElementById('period-display').textContent;
+                        if (periodoTotali !== currentPeriod) {
+                            document.getElementById('period-display').textContent = periodoTotali;
+                            console.log('Updated period from', currentPeriod, 'to', periodoTotali);
+                        }
+                    }
+                    
+                    if (this.csvData.totali['Province Servite']) {
+                        const provinceServite = parseInt(this.csvData.totali['Province Servite'], 10);
+                        console.log('Province servite:', provinceServite);
+                    }
+                }
+                
+                // Aggiorna dati categorie se disponibili  
+                if (this.csvData.categorie && this.csvData.categorie.length > 0) {
+                    const categorieAttive = this.csvData.categorie.filter(c => c.importo > 0).length;
+                    document.getElementById('categories-count').textContent = categorieAttive;
+                    console.log('Updated categories count to:', categorieAttive);
+                }
             }
         }
 
