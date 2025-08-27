@@ -2,7 +2,7 @@
 // Vanilla JS â€” CSV live, parser IT, formattazione "k" max 3 cifre ovunque
 // Fix: URL risolti automaticamente per GitHub Pages (repo-pages con /<repo>/),
 //      rimozione controllo troppo rigido sul contenuto del CSV,
-//      log dettagliati e messaggi d'errore piÃ¹ chiari.
+//      log dettagliati e messaggi d'errore piu chiari.
 
 class DashboardManager {
   constructor() {
