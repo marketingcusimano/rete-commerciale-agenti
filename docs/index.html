@@ -1037,25 +1037,28 @@
 
             parseCSV(csvText) {
                 try {
-                    // Parse VERIFICA OBIETTIVI section
-                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
-                    if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
+                    console.log('Parsing CSV, lunghezza:', csvText.length);
                     
-                    const obiettiviText = obiettiviMatch[1];
-                    
-                    // Parse GENERALE data - fix the regex to match actual format
-                    const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
-                    if (!generaleMatch) throw new Error('Dati Generale non trovati');
+                    // Parse GENERALE data (cerca la riga che inizia con "Generale;")
+                    const generaleMatch = csvText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
+                    if (!generaleMatch) {
+                        console.error('Regex Generale non trovata, provo formato alternativo');
+                        throw new Error('Dati Generale non trovati');
+                    }
                     
                     const generale = {
                         annoPrecedente: this.parseNumber(generaleMatch[1]),
                         annoCorrente: this.parseNumber(generaleMatch[2]),
                         clienti: parseInt(generaleMatch[4], 10)
                     };
+                    console.log('Generale parsato:', generale);
 
-                    // Parse LATINA data - fix the regex to match actual format
-                    const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
-                    if (!ltMatch) throw new Error('Dati Latina non trovati');
+                    // Parse LATINA data (cerca la riga che inizia con "LT;")
+                    const ltMatch = csvText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
+                    if (!ltMatch) {
+                        console.error('Regex LT non trovata');
+                        throw new Error('Dati Latina non trovati');
+                    }
                     
                     const latina = {
                         annoPrecedente: this.parseNumber(ltMatch[1]),
@@ -1067,52 +1070,62 @@
                         obiettivoClienti: parseInt(ltMatch[7], 10),
                         percentualeClienti: parseInt(ltMatch[8], 10)
                     };
+                    console.log('Latina parsata:', latina);
 
-                    // Parse ROMA data from CLIENTI PER PROVINCIA section
-                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
+                    // Parse ROMA data
+                    const rmMatch = csvText.match(/RM;(\d+);([\d.,]+);;;;;;/);
                     let roma = { annoCorrente: 0, clienti: 0 };
-                    if (clientiMatch) {
-                        const rmMatch = clientiMatch[1].match(/RM;(\d+);([\d.,]+);;;;;;/);
-                        if (rmMatch) {
-                            roma = {
-                                annoCorrente: this.parseNumber(rmMatch[2]),
-                                clienti: parseInt(rmMatch[1], 10)
-                            };
-                        }
+                    if (rmMatch) {
+                        roma = {
+                            annoCorrente: this.parseNumber(rmMatch[2]),
+                            clienti: parseInt(rmMatch[1], 10)
+                        };
                     }
+                    console.log('Roma parsata:', roma);
 
-                    // Parse CATEGORIE data from RIEPILOGO PER CATEGORIA
-                    const categorieMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===([\s\S]*?)===.*===/);
+                    // Parse categorie - cerca tutte le righe con prodotti
                     let categorie = [];
-                    if (categorieMatch) {
-                        const categorieSection = categorieMatch[1];
-                        const lines = categorieSection.split('\n').filter(line => 
-                            line.trim() && 
-                            !line.includes('===') && 
-                            !line.includes('Categoria;Importo') && 
-                            line.includes(';') && 
-                            line.split(';').length >= 2
-                        );
-                        
-                        lines.forEach(line => {
-                            const parts = line.split(';');
-                            if (parts.length >= 2 && parts[0].trim()) {
-                                const categoria = parts[0].trim();
-                                const importo = this.parseNumber(parts[1]);
-                                if (categoria && importo > 0) {
-                                    categorie.push({
-                                        nome: categoria,
-                                        importo: importo
-                                    });
-                                }
+                    const categorieLines = csvText.split('\n').filter(line => {
+                        return line.includes(';') && 
+                               (line.includes('MATTONE') || 
+                                line.includes('PAVIMENTAZIONE') || 
+                                line.includes('REFRATTARI') ||
+                                line.includes('FACCIAVISTA') ||
+                                line.includes('LINEA ARCHEO') ||
+                                line.includes('COPERTURE') ||
+                                line.includes('PIASTRELLE'));
+                    });
+                    
+                    console.log('Righe categorie trovate:', categorieLines.length);
+                    
+                    const categorieMap = {};
+                    categorieLines.forEach(line => {
+                        const parts = line.split(';');
+                        if (parts.length >= 2) {
+                            const categoria = parts[0].trim();
+                            const importo = this.parseNumber(parts[1]);
+                            if (categoria && importo > 0) {
+                                categorieMap[categoria] = (categorieMap[categoria] || 0) + importo;
                             }
+                        }
+                    });
+                    
+                    Object.keys(categorieMap).forEach(nome => {
+                        categorie.push({
+                            nome: nome,
+                            importo: categorieMap[nome]
                         });
-                    }
-
-                    return { generale, latina, roma, categorie };
+                    });
+                    
+                    console.log('Categorie parsate:', categorie);
+                    
+                    const result = { generale, latina, roma, categorie };
+                    console.log('Risultato finale parsing:', result);
+                    return result;
                     
                 } catch (e) {
-                    console.error('Parse error:', e);
+                    console.error('Errore parsing CSV:', e);
+                    console.error('Primi 1000 caratteri del CSV:', csvText.substring(0, 1000));
                     return null;
                 }
             }
