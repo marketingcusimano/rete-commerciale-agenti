@@ -753,6 +753,102 @@
                 </div>
             </div>
 
+            <!-- Distribuzione Province Section -->
+            <div class="card" style="padding: 2rem; margin-top: 2rem;">
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: #1f2937;">Distribuzione Province</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+                    <!-- Province Distribution Chart -->
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="provinceDistributionChart"></canvas>
+                    </div>
+                    
+                    <!-- Province Details Cards -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Latina Card -->
+                        <div style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff); padding: 1.5rem; border-radius: 1rem; border: 2px solid #a855f7;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 1.125rem; font-weight: 700; color: #7c3aed;">Latina (LT)</span>
+                                <span style="font-size: 1.5rem; font-weight: 900; color: #7c3aed;" id="lt-percentage">91.4%</span>
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 900; color: #1f2937; margin-bottom: 0.5rem;" id="lt-amount">82.389 €</div>
+                        </div>
+
+                        <!-- Roma Card -->
+                        <div style="background: linear-gradient(135deg, #ecfeff, #cffafe); padding: 1.5rem; border-radius: 1rem; border: 2px solid #22d3ee;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 1.125rem; font-weight: 700; color: #0891b2;">Roma (RM)</span>
+                                <span style="font-size: 1.5rem; font-weight: 900; color: #0891b2;" id="rm-percentage">8.6%</span>
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 900; color: #1f2937; margin-bottom: 0.5rem;" id="rm-amount">7.771 €</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Riepilogo Clienti per Provincia -->
+            <div class="card" style="padding: 2rem; margin-top: 2rem;">
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: #1f2937;">Riepilogo Clienti per Provincia</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <!-- Latina -->
+                    <div style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff); padding: 2rem; border-radius: 1.5rem; text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #7c3aed; margin-bottom: 1rem;">Latina</div>
+                        
+                        <div style="display: flex; justify-content: space-around; margin-bottom: 1.5rem;">
+                            <div>
+                                <div style="font-size: 2.5rem; font-weight: 900; color: #1f2937;" id="lt-clienti-2025">18</div>
+                                <div style="font-size: 0.875rem; color: #6b7280;">clienti 2025</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #1f2937;" id="lt-fatturato-k">€82k</div>
+                                <div style="font-size: 0.875rem; color: #6b7280;">fatturato</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #7c3aed;" id="lt-medio">€5k</div>
+                                <div style="font-size: 0.875rem; color: #6b7280;">medio</div>
+                            </div>
+                        </div>
+                        
+                        <!-- vs 2024 -->
+                        <div style="background: #fee2e2; padding: 1rem; border-radius: 0.75rem; border: 1px solid #fecaca;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: #dc2626; font-weight: 600;">vs 2024: <span id="lt-clienti-2024">23</span> clienti</span>
+                                <span style="background: #fecaca; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 700;" id="lt-difference">-5 ↓</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Roma -->
+                    <div style="background: linear-gradient(135deg, #ecfeff, #cffafe); padding: 2rem; border-radius: 1.5rem; text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #0891b2; margin-bottom: 1rem;">Roma</div>
+                        
+                        <div style="display: flex; justify-content: space-around; margin-bottom: 1.5rem;">
+                            <div>
+                                <div style="font-size: 2.5rem; font-weight: 900; color: #1f2937;" id="rm-clienti-2025">2</div>
+                                <div style="font-size: 0.875rem; color: #6b7280;">clienti 2025</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #1f2937;" id="rm-fatturato-k">€8k</div>
+                                <div style="font-size: 0.875rem; color: #6b7280;">fatturato</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #0891b2;" id="rm-medio">€4k</div>
+                                <div style="font-size: 0.875rem; color: #6b7280;">medio</div>
+                            </div>
+                        </div>
+                        
+                        <!-- vs 2024 -->
+                        <div style="background: #d1fae5; padding: 1rem; border-radius: 0.75rem; border: 1px solid #a7f3d0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: #059669; font-weight: 600;">vs 2024: <span id="rm-clienti-2024">0</span> clienti</span>
+                                <span style="background: #a7f3d0; color: #059669; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 700;">+∞</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Mix Prodotti Section -->
             <div class="card" style="padding: 2rem; margin-top: 2rem;">
                 <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: #1f2937;">Mix Prodotti</h3>
@@ -1236,371 +1332,4 @@
                     (this.csvData.latina.annoCorrente - this.csvData.latina.annoPrecedente) : 0;
                 document.getElementById('trend-growth').textContent = `+${this.formatEuroK(growthAmount)}`;
 
-                // Update Clienti Card
-                document.getElementById('clienti-count').textContent = data.clienti;
-                
-                if (data.obiettivoClienti && data.percentualeClienti) {
-                    document.getElementById('clienti-obiettivo').textContent = data.obiettivoClienti;
-                    document.getElementById('clienti-percentage').textContent = `${data.percentualeClienti}%`;
-                    document.getElementById('clienti-target-value').textContent = data.obiettivoClienti;
-                    document.getElementById('clienti-mancanti').textContent = `${Math.max(0, data.obiettivoClienti - data.clienti)} clienti`;
-                    document.getElementById('clienti-perc-display').textContent = `${data.percentualeClienti}%`;
-                    
-                    setTimeout(() => {
-                        document.getElementById('progress-clienti').style.width = `${Math.min(100, data.percentualeClienti)}%`;
-                    }, 300);
-                } else {
-                    document.getElementById('clienti-obiettivo').textContent = 'N/A';
-                    document.getElementById('clienti-percentage').textContent = 'N/A';
-                    document.getElementById('progress-clienti').style.width = '0%';
-                }
-
-                // Update charts and data displays
-                this.updateChartsAndDisplays();
-            }
-
-            updateChartsAndDisplays() {
-                this.createClientiChart();
-                this.createFatturatoChart();
-                this.createMixProdottiChart();
-                this.updateProvinceDisplays();
-                this.updateMixProdottiData();
-            }
-
-            createMixProdottiChart() {
-                const ctx = document.getElementById('mixProdottiChart');
-                if (!ctx) return;
-
-                const mixData = this.calculateMixProdotti();
-
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Mattone + Pavimentazione', 'Altri Prodotti'],
-                        datasets: [{
-                            data: [mixData.core.importo, mixData.others.importo],
-                            backgroundColor: ['#3b82f6', '#6b7280'],
-                            borderColor: ['#1e40af', '#4b5563'],
-                            borderWidth: 3,
-                            cutout: '50%'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => {
-                                        const value = this.formatEuro(context.raw);
-                                        const percentage = mixData.core.importo + mixData.others.importo > 0 ? 
-                                            ((context.raw / (mixData.core.importo + mixData.others.importo)) * 100).toFixed(1) : '0';
-                                        return `${context.label}: ${value} (${percentage}%)`;
-                                    }
-                                }
-                            }
-                        },
-                        animation: {
-                            duration: 2000,
-                            easing: 'easeOutBounce'
-                        }
-                    }
-                });
-            }
-
-            calculateMixProdotti() {
-                if (!this.csvData.categorie || this.csvData.categorie.length === 0) {
-                    return {
-                        core: { importo: 45000, mattone: 30000, pavimentazione: 15000 },
-                        others: { importo: 15000, refrattari: 10000, altri: 5000 }
-                    };
-                }
-
-                const categorie = this.csvData.categorie;
-                let mattone = 0, pavimentazione = 0, refrattari = 0, altri = 0;
-
-                categorie.forEach(cat => {
-                    const nome = cat.nome.toLowerCase();
-                    if (nome.includes('mattone') || nome.includes('laterizio')) {
-                        mattone += cat.importo;
-                    } else if (nome.includes('paviment') || nome.includes('cotto')) {
-                        pavimentazione += cat.importo;
-                    } else if (nome.includes('refratt')) {
-                        refrattari += cat.importo;
-                    } else {
-                        altri += cat.importo;
-                    }
-                });
-
-                const coreImporto = mattone + pavimentazione;
-                const othersImporto = refrattari + altri;
-
-                return {
-                    core: { importo: coreImporto, mattone, pavimentazione },
-                    others: { importo: othersImporto, refrattari, altri },
-                    total: coreImporto + othersImporto
-                };
-            }
-
-            updateMixProdottiData() {
-                const mixData = this.calculateMixProdotti();
-                const total = mixData.total;
-
-                if (total > 0) {
-                    // Calculate percentages
-                    const corePercentage = ((mixData.core.importo / total) * 100).toFixed(1);
-                    const othersPercentage = ((mixData.others.importo / total) * 100).toFixed(1);
-
-                    // Update percentages
-                    document.getElementById('core-percentage').textContent = `${corePercentage}%`;
-                    document.getElementById('other-percentage').textContent = `${othersPercentage}%`;
-
-                    // Update amounts
-                    document.getElementById('core-amount').textContent = this.formatEuro(mixData.core.importo);
-                    document.getElementById('other-amount').textContent = this.formatEuro(mixData.others.importo);
-
-                    // Update breakdown
-                    document.getElementById('mattone-amount').textContent = this.formatEuroK(mixData.core.mattone);
-                    document.getElementById('pavimentazione-amount').textContent = this.formatEuroK(mixData.core.pavimentazione);
-                    document.getElementById('refrattari-amount').textContent = this.formatEuroK(mixData.others.refrattari);
-                    document.getElementById('altri-amount').textContent = this.formatEuroK(mixData.others.altri);
-
-                    // Update performance metrics
-                    document.getElementById('core-perf').textContent = `${corePercentage}%`;
-                    document.getElementById('categories-count').textContent = this.csvData.categorie.length;
-                    
-                    // Calculate involved clients (estimate based on categories)
-                    const involvedClients = Math.min(this.csvData.generale.clienti, this.csvData.categorie.length * 3);
-                    document.getElementById('involved-clients').textContent = involvedClients;
-                }
-            }
-
-            formatEuro(value) {
-                if (!value) return '0 €';
-                if (value >= 1000) {
-                    return `${(value / 1000).toFixed(3)} €`.replace('.', ',');
-                }
-                return `${Math.round(value)} €`;
-            }
-
-            createClientiChart() {
-                const ctx = document.getElementById('clientiChart');
-                if (!ctx) return;
-
-                const ltClienti = this.csvData.latina.clientiCorrente;
-                const rmClienti = this.csvData.roma.clienti;
-                const ltPrevClienti = this.csvData.latina.clientiPrecedenti;
-
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['LT', 'RM'],
-                        datasets: [
-                            {
-                                label: '2024',
-                                data: [ltPrevClienti, 0], // RM non ha dati 2024
-                                backgroundColor: '#cbd5e1',
-                                borderRadius: 8,
-                                maxBarThickness: 60
-                            },
-                            {
-                                label: '2025',
-                                data: [ltClienti, rmClienti],
-                                backgroundColor: ['#22d3ee', '#22d3ee'],
-                                borderRadius: 8,
-                                maxBarThickness: 60
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => `${context.dataset.label}: ${context.raw} clienti`
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 24,
-                                ticks: {
-                                    stepSize: 6,
-                                    color: '#6b7280'
-                                },
-                                grid: {
-                                    color: '#e5e7eb'
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    color: '#6b7280',
-                                    font: {
-                                        size: 12,
-                                        weight: '600'
-                                    }
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        },
-                        animation: {
-                            duration: 1500,
-                            easing: 'easeOutBounce'
-                        }
-                    }
-                });
-            }
-
-            createFatturatoChart() {
-                const ctx = document.getElementById('fatturatoChart');
-                if (!ctx) return;
-
-                const ltFatturato = this.csvData.latina.annoCorrente;
-                const rmFatturato = this.csvData.roma.annoCorrente;
-                const ltPrevFatturato = this.csvData.latina.annoPrecedente;
-
-                // Calculate max for Y axis
-                const maxValue = Math.max(ltFatturato, rmFatturato, ltPrevFatturato) * 1.2;
-
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['LT', 'RM'],
-                        datasets: [
-                            {
-                                label: '2024',
-                                data: [ltPrevFatturato, 0], // RM non ha dati 2024
-                                backgroundColor: '#cbd5e1',
-                                borderRadius: 8,
-                                maxBarThickness: 80
-                            },
-                            {
-                                label: '2025',
-                                data: [ltFatturato, rmFatturato],
-                                backgroundColor: ['#8b5cf6', '#6366f1'],
-                                borderRadius: 8,
-                                maxBarThickness: 80
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => `${context.dataset.label}: ${this.formatEuroK(context.raw)}`
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: maxValue,
-                                ticks: {
-                                    callback: (value) => {
-                                        if (value >= 100000) return `€${Math.round(value/1000)}k`;
-                                        if (value >= 25000) return `€${Math.round(value/1000)}k`;
-                                        return `€${Math.round(value/1000)}k`;
-                                    },
-                                    color: '#6b7280'
-                                },
-                                grid: {
-                                    color: '#e5e7eb'
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    color: '#6b7280',
-                                    font: {
-                                        size: 12,
-                                        weight: '600'
-                                    }
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        },
-                        animation: {
-                            duration: 2000,
-                            easing: 'easeOutQuart'
-                        }
-                    }
-                });
-            }
-
-            updateProvinceDisplays() {
-                // Update Clienti displays
-                document.getElementById('lt-clienti-count').textContent = `${this.csvData.latina.clientiCorrente} clienti`;
-                document.getElementById('rm-clienti-count').textContent = `${this.csvData.roma.clienti} clienti`;
-
-                // Calculate client growth for LT
-                const ltClientGrowth = this.csvData.latina.clientiPrecedenti > 0 ? 
-                    this.calculateGrowthPercentage(this.csvData.latina.clientiCorrente, this.csvData.latina.clientiPrecedenti) : '0.0';
-                
-                // Update growth badges for clients
-                const ltGrowthEl = document.getElementById('lt-growth');
-                if (ltClientGrowth >= 0) {
-                    ltGrowthEl.textContent = `+${ltClientGrowth}%`;
-                    ltGrowthEl.style.background = '#f0fdf4';
-                    ltGrowthEl.style.color = '#16a34a';
-                } else {
-                    ltGrowthEl.textContent = `${ltClientGrowth}%`;
-                    ltGrowthEl.style.background = '#fef2f2';
-                    ltGrowthEl.style.color = '#dc2626';
-                }
-
-                // RM is new, so always positive
-                document.getElementById('rm-growth').textContent = '+∞%';
-
-                // Update Fatturato displays
-                document.getElementById('lt-fatturato-display').textContent = this.formatEuroK(this.csvData.latina.annoCorrente);
-                document.getElementById('lt-fatturato-prev').textContent = this.formatEuroK(this.csvData.latina.annoPrecedente);
-                document.getElementById('rm-fatturato-display').textContent = this.formatEuroK(this.csvData.roma.annoCorrente);
-
-                // Update fatturato growth
-                const ltFatturatoGrowth = this.calculateGrowthPercentage(this.csvData.latina.annoCorrente, this.csvData.latina.annoPrecedente);
-                document.getElementById('lt-fatturato-growth').textContent = `+${ltFatturatoGrowth}%`;
-            }
-
-            showLoading() {
-                document.getElementById('loading-state').style.display = 'block';
-                document.getElementById('error-state').style.display = 'none';
-                document.getElementById('main-content').style.display = 'none';
-            }
-
-            showError(message) {
-                document.getElementById('loading-state').style.display = 'none';
-                document.getElementById('error-state').style.display = 'block';
-                document.getElementById('main-content').style.display = 'none';
-                document.getElementById('error-message').textContent = message;
-            }
-
-            showSuccess() {
-                document.getElementById('loading-state').style.display = 'none';
-                document.getElementById('error-state').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-            }
-        }
-
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', () => {
-            new ExecutiveDashboard();
-        });
-    </script>
-</body>
-</html>
+                // Update Client
