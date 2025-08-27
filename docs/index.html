@@ -553,11 +553,11 @@
         <div class="status-bar">
             <div class="status-item">
                 <i class="fas fa-id-card"></i>
-                <span><strong>ID:</strong> 631.00238</span>
+                <span><strong>ID:</strong> <span id="agent-code">631.00238</span></span>
             </div>
             <div class="status-item">
                 <i class="fas fa-calendar"></i>
-                <span><strong>Gen - Ago 2025</strong> (8 mesi)</span>
+                <span><strong id="period-text">01/01/2025 - 24/08/2025</strong> (8 mesi)</span>
             </div>
             <div class="status-item">
                 <div class="status-dot"></div>
@@ -958,7 +958,9 @@
                 this.isLoading = false;
                 this.csvFileNames = [
                     '631.00238_CARABOT-NATALINO.csv',
-                    '631.00238_CARABOT NATALINO.csv'
+                    '631.00238_CARABOT NATALINO.csv',
+                    'CARABOT_NATALINO.csv',
+                    'data.csv'
                 ];
                 this.init();
             }
@@ -1070,9 +1072,8 @@
                 this.showLoading();
 
                 try {
-                    // Timeout dopo 10 secondi
                     const timeoutPromise = new Promise((_, reject) => {
-                        setTimeout(() => reject(new Error('Timeout: caricamento CSV troppo lento')), 10000);
+                        setTimeout(() => reject(new Error('Timeout: caricamento CSV troppo lento')), 15000);
                     });
 
                     const loadPromise = this.tryLoadCSV();
@@ -1121,9 +1122,8 @@
                     try {
                         console.log('Attempting to load:', url);
                         
-                        // Fetch con timeout
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 5000);
+                        const timeoutId = setTimeout(() => controller.abort(), 8000);
                         
                         const response = await fetch(url + '?t=' + Date.now(), {
                             cache: 'no-cache',
@@ -1137,7 +1137,7 @@
                             csvText = await response.text();
                             if (csvText && csvText.trim().length > 0) {
                                 console.log('Successfully loaded CSV from:', url);
-                                console.log('CSV content preview:', csvText.substring(0, 200));
+                                console.log('CSV content preview:', csvText.substring(0, 500));
                                 return csvText;
                             }
                         }
@@ -1149,26 +1149,52 @@
                     }
                 }
 
-                // Se nessun URL funziona, usa dati di esempio
                 console.warn('No CSV found, using sample data');
                 return this.createSampleCSV();
             }
 
             createSampleCSV() {
-                return `=== VERIFICA OBIETTIVI ===
-Generale;79000;90000;;;18;20;;
-LT;79000;82000;150000;55%;23;18;35;51%
+                // Dati compatibili con il formato reale
+                return `==================== CARABOT NATALINO ====================
+
+=== INFORMAZIONI AGENTE ===
+Codice Agente,Ragione Sociale,Dalla data,Alla data
+631.00238,CARABOT NATALINO,01/01/2025,24/08/2025
+
+=== VERIFICA OBIETTIVI ===
+Provincia,AnnoPrec.,AnnoCorr.,Obiettivo,% su obiet.,ClientiAnnoPrec.,ClientiAnnoCorr.,Obiettivo,% su obiet.
+Generale,"80.238,72","90.159,79",,,352,20,,
+LT,"79.029,16","82.389,23","155.000,00","53,%",23,18,35,"51,%"
 
 === CLIENTI PER PROVINCIA ===
-LT;18;82000;;;;;;;
-RM;2;8000;;;;;;;
+Provincia,Clienti Serviti,Fatturato
+LT,18,"60.437,22"
+RM,2,"7.770,56"
+
+=== RIPARTIZIONE FATTURATO ===
+Categoria,Importo,Percentuale
+Pieni e Coppi,54.909,62,61%
+Altro,35.250,17,39%
 
 === RIEPILOGO PER CATEGORIA ===
-Mattone;45000
-Pavimentazione;15000
-Refrattari;8000
-Altri;12000
-`;
+Categoria,Importo Totale,Provincia LT Clienti,Provincia RM Clienti
+MATTONE PIENO,"38.558,64",16,1
+PAVIMENTAZIONE POLIS,"15.686,46",13,1
+REFRATTARI,"4.910,39",4,1
+REFRATTARI RETTIFICATI,"5.367,83",5,0
+FACCIAVISTA,"1.591,40",2,0
+LINEA ARCHEO,"746,68",2,1
+PIASTRELLE,"1.240,95",1,0
+CORRIM.COPRIM.,"73,26",1,0
+COPERTURE,"3,36",1,0
+OUTLET,"0,01",1,0
+
+=== TOTALI ===
+Descrizione,Valore
+Fatturato Totale,68207.78
+Clienti Totali,20
+Province Servite,2
+Periodo,01/01/2025 - 24/08/2025`;
             }
 
             buildCandidateUrls() {
@@ -1201,79 +1227,141 @@ Altri;12000
 
             parseCSV(csvText) {
                 try {
-                    // Parse OBIETTIVI section
-                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
+                    console.log('Parsing CSV with length:', csvText.length);
+                    
+                    // Extract agent info
+                    const agentMatch = csvText.match(/=== INFORMAZIONI AGENTE ===\s*[\s\S]*?(\d{3}\.\d{5}),([^,]+),([^,]+),([^\n\r]+)/);
+                    const agentInfo = agentMatch ? {
+                        codice: agentMatch[1],
+                        ragioneSociale: agentMatch[2],
+                        dataInizio: agentMatch[3],
+                        dataFine: agentMatch[4]
+                    } : null;
+
+                    // Parse VERIFICA OBIETTIVI section
+                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===\s*([\s\S]*?)(?:===|$)/);
                     if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
                     
                     const obiettiviText = obiettiviMatch[1];
+                    console.log('Obiettivi text:', obiettiviText);
                     
-                    // Parse GENERALE data
-                    const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
-                    if (!generaleMatch) throw new Error('Dati Generale non trovati');
+                    // Parse GENERALE data with more flexible regex
+                    const generaleMatch = obiettiviText.match(/Generale,\s*"([^"]+)",\s*"([^"]+)"[^,]*,[^,]*,[^,]*,\s*(\d+),\s*(\d+)/);
+                    if (!generaleMatch) {
+                        console.log('Generale match failed, trying alternative format');
+                        throw new Error('Dati Generale non trovati');
+                    }
+                    
+                    console.log('Generale match:', generaleMatch);
                     
                     const generale = {
-                        annoPrecedente: this.parseNumber(generaleMatch[1]),
-                        annoCorrente: this.parseNumber(generaleMatch[2]),
+                        annoPrecedente: this.parseItalianNumber(generaleMatch[1]),
+                        annoCorrente: this.parseItalianNumber(generaleMatch[2]),
+                        clientiPrecedenti: parseInt(generaleMatch[3], 10),
                         clienti: parseInt(generaleMatch[4], 10)
                     };
 
-                    // Parse LATINA data
-                    const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
-                    if (!ltMatch) throw new Error('Dati Latina non trovati');
+                    // Parse LATINA data with flexible regex
+                    const ltMatch = obiettiviText.match(/LT,\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*(\d+),\s*(\d+),\s*(\d+),\s*"([^"]+)"/);
+                    if (!ltMatch) {
+                        console.log('LT match failed');
+                        throw new Error('Dati Latina non trovati');
+                    }
+                    
+                    console.log('LT match:', ltMatch);
                     
                     const latina = {
-                        annoPrecedente: this.parseNumber(ltMatch[1]),
-                        annoCorrente: this.parseNumber(ltMatch[2]),
-                        obiettivo: this.parseNumber(ltMatch[3]) * 1000, // Convert to euros
-                        percentualeObiettivo: parseInt(ltMatch[4], 10),
+                        annoPrecedente: this.parseItalianNumber(ltMatch[1]),
+                        annoCorrente: this.parseItalianNumber(ltMatch[2]),
+                        obiettivo: this.parseItalianNumber(ltMatch[3]),
+                        percentualeObiettivo: this.parsePercentage(ltMatch[4]),
                         clientiPrecedenti: parseInt(ltMatch[5], 10),
                         clientiCorrente: parseInt(ltMatch[6], 10),
                         obiettivoClienti: parseInt(ltMatch[7], 10),
-                        percentualeClienti: parseInt(ltMatch[8], 10)
+                        percentualeClienti: this.parsePercentage(ltMatch[8])
                     };
 
-                    // Parse ROMA data
-                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
+                    // Parse CLIENTI PER PROVINCIA section
+                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===\s*([\s\S]*?)(?:===|$)/);
                     let roma = { annoCorrente: 0, clienti: 0 };
+                    
                     if (clientiMatch) {
-                        const rmMatch = clientiMatch[1].match(/RM;(\d+);([\d.,]+);;;;;;/);
+                        const clientiText = clientiMatch[1];
+                        console.log('Clienti text:', clientiText);
+                        
+                        // Update LT data from CLIENTI section
+                        const ltClientMatch = clientiText.match(/LT,\s*(\d+),\s*"([^"]+)"/);
+                        if (ltClientMatch) {
+                            latina.clientiCorrente = parseInt(ltClientMatch[1], 10);
+                            latina.fatturatoDettaglio = this.parseItalianNumber(ltClientMatch[2]);
+                        }
+                        
+                        const rmMatch = clientiText.match(/RM,\s*(\d+),\s*"([^"]+)"/);
                         if (rmMatch) {
                             roma = {
-                                annoCorrente: this.parseNumber(rmMatch[2]),
+                                annoCorrente: this.parseItalianNumber(rmMatch[2]),
                                 clienti: parseInt(rmMatch[1], 10)
                             };
                         }
+                        console.log('Roma data:', roma);
                     }
 
-                    // Parse CATEGORIE data for Mix Prodotti
-                    const categorieMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===([\s\S]*?)===.*===/);
+                    // Parse RIEPILOGO PER CATEGORIA section
+                    const riepilogoMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===\s*([\s\S]*?)(?:===|$)/);
                     let categorie = [];
-                    if (categorieMatch) {
-                        const categorieSection = categorieMatch[1];
-                        const lines = categorieSection.split('\n').filter(line => 
+                    
+                    if (riepilogoMatch) {
+                        const riepilogoText = riepilogoMatch[1];
+                        console.log('Riepilogo text:', riepilogoText);
+                        
+                        const lines = riepilogoText.split('\n').filter(line => 
                             line.trim() && 
-                            !line.includes('===') && 
-                            !line.includes('Categoria') && 
-                            line.includes(';') && 
-                            line.split(';').length >= 2
+                            !line.includes('Categoria,Importo') && 
+                            !line.includes('===') &&
+                            line.includes(',') && 
+                            !line.startsWith(',') &&
+                            !line.includes('Totale')
                         );
                         
+                        console.log('Category lines:', lines);
+                        
                         lines.forEach(line => {
-                            const parts = line.split(';');
+                            const parts = line.split(',');
                             if (parts.length >= 2) {
                                 const categoria = parts[0].trim();
-                                const importo = this.parseNumber(parts[1]);
+                                const importoStr = parts[1].replace(/"/g, '');
+                                const importo = this.parseItalianNumber(importoStr);
+                                
                                 if (categoria && importo > 0) {
-                                    categorie.push({
-                                        nome: categoria,
-                                        importo: importo
-                                    });
+                                    // Map categories to dashboard format
+                                    let mappedCategory = categoria;
+                                    if (categoria.includes('MATTONE') || categoria.includes('PIENO')) {
+                                        mappedCategory = 'Mattone';
+                                    } else if (categoria.includes('PAVIMENTAZIONE') || categoria.includes('POLIS')) {
+                                        mappedCategory = 'Pavimentazione';
+                                    } else if (categoria.includes('REFRATTARI')) {
+                                        mappedCategory = 'Refrattari';
+                                    } else {
+                                        mappedCategory = 'Altri';
+                                    }
+                                    
+                                    // Aggrega se la categoria mappata esiste già
+                                    const existing = categorie.find(c => c.nome === mappedCategory);
+                                    if (existing) {
+                                        existing.importo += importo;
+                                    } else {
+                                        categorie.push({
+                                            nome: mappedCategory,
+                                            importo: importo
+                                        });
+                                    }
                                 }
                             }
                         });
                     }
 
-                    return { generale, latina, roma, categorie };
+                    console.log('Final parsed data:', { generale, latina, roma, categorie, agentInfo });
+                    return { generale, latina, roma, categorie, agentInfo };
                     
                 } catch (e) {
                     console.error('Parse error:', e);
@@ -1281,10 +1369,40 @@ Altri;12000
                 }
             }
 
-            parseNumber(input) {
+            // Nuovo metodo per parsare numeri italiani
+            parseItalianNumber(input) {
                 if (typeof input === 'number') return input;
                 if (!input) return 0;
-                return Number(String(input).replace(/\s+/g, '').replace(/€/g, '').replace(/\./g, '').replace(/,/g, '.')) || 0;
+                
+                // Rimuovi spazi, virgolette e €
+                let cleaned = String(input).replace(/\s+/g, '').replace(/€/g, '').replace(/"/g, '');
+                
+                // Se contiene sia punto che virgola, il punto è separatore delle migliaia
+                if (cleaned.includes('.') && cleaned.includes(',')) {
+                    cleaned = cleaned.replace(/\./g, '').replace(/,/g, '.');
+                }
+                // Se contiene solo virgola, è il separatore decimale
+                else if (cleaned.includes(',') && !cleaned.includes('.')) {
+                    cleaned = cleaned.replace(/,/g, '.');
+                }
+                // Se contiene solo punto e ci sono più di 3 cifre dopo, è separatore migliaia
+                else if (cleaned.includes('.')) {
+                    const parts = cleaned.split('.');
+                    if (parts.length === 2 && parts[1].length > 2) {
+                        cleaned = cleaned.replace(/\./g, '');
+                    }
+                }
+                
+                return Number(cleaned) || 0;
+            }
+
+            // Metodo per parsare percentuali
+            parsePercentage(input) {
+                if (typeof input === 'number') return input;
+                if (!input) return 0;
+                
+                let cleaned = String(input).replace(/\s+/g, '').replace(/%/g, '').replace(/,/g, '.');
+                return Number(cleaned) || 0;
             }
 
             formatEuroK(value) {
@@ -1307,7 +1425,7 @@ Altri;12000
                             fatturato: this.csvData.generale.annoCorrente,
                             fatturatoVs: this.csvData.generale.annoPrecedente,
                             clienti: this.csvData.generale.clienti,
-                            obiettivo: this.csvData.latina.obiettivo, // Use Latina target for general view
+                            obiettivo: this.csvData.latina.obiettivo,
                             percentualeObiettivo: this.csvData.latina.percentualeObiettivo,
                             obiettivoClienti: this.csvData.latina.obiettivoClienti,
                             percentualeClienti: this.csvData.latina.percentualeClienti
@@ -1341,13 +1459,27 @@ Altri;12000
                 const data = this.getDisplayData();
                 if (!data) return;
 
+                // Update agent info if available
+                if (this.csvData.agentInfo) {
+                    document.getElementById('agent-code').textContent = this.csvData.agentInfo.codice;
+                    document.getElementById('period-text').textContent = `${this.csvData.agentInfo.dataInizio} - ${this.csvData.agentInfo.dataFine}`;
+                }
+
                 // Calculate growth
                 const growthPercent = this.calculateGrowthPercentage(data.fatturato, data.fatturatoVs);
                 
                 // Update Fatturato Card
                 document.getElementById('fatturato-value').textContent = this.formatEuroK(data.fatturato);
                 document.getElementById('fatturato-vs').textContent = this.formatEuroK(data.fatturatoVs);
-                document.getElementById('growth-badge').textContent = `+${growthPercent}%`;
+                
+                const growthBadge = document.getElementById('growth-badge');
+                if (parseFloat(growthPercent) >= 0) {
+                    growthBadge.textContent = `+${growthPercent}%`;
+                    growthBadge.parentElement.className = 'card-badge';
+                } else {
+                    growthBadge.textContent = `${growthPercent}%`;
+                    growthBadge.parentElement.className = 'card-badge warning';
+                }
                 
                 if (data.obiettivo) {
                     document.getElementById('obiettivo-fatturato').textContent = this.formatEuroK(data.obiettivo);
@@ -1381,7 +1513,6 @@ Altri;12000
                         document.getElementById('progress-obiettivo').style.width = `${Math.min(100, data.percentualeObiettivo)}%`;
                     }, 200);
                 } else {
-                    // Hide objective elements for provinces without targets
                     document.getElementById('obiettivo-value').textContent = 'N/A';
                     document.getElementById('obiettivo-percentage').textContent = 'N/A';
                     document.getElementById('progress-obiettivo').style.width = '0%';
@@ -1439,14 +1570,16 @@ Altri;12000
                 const ctx = document.getElementById('provinceDistributionChart');
                 if (!ctx) return;
 
+                // Destroy existing chart
+                if (ctx.chart) {
+                    ctx.chart.destroy();
+                }
+
                 const ltFatturato = this.csvData.latina.annoCorrente;
                 const rmFatturato = this.csvData.roma.annoCorrente;
                 const total = ltFatturato + rmFatturato;
 
-                const ltPercentage = total > 0 ? ((ltFatturato / total) * 100) : 0;
-                const rmPercentage = total > 0 ? ((rmFatturato / total) * 100) : 0;
-
-                new Chart(ctx, {
+                ctx.chart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Latina (LT)', 'Roma (RM)'],
@@ -1511,14 +1644,13 @@ Altri;12000
                     this.csvData.latina.annoCorrente / this.csvData.latina.clientiCorrente : 0;
                 document.getElementById('riepilogo-lt-medio').textContent = this.formatEuroK(ltMedio);
 
-                // Calculate difference for Latina - CORREZIONE COLORI
+                // Calculate difference for Latina
                 const ltDifference = this.csvData.latina.clientiCorrente - this.csvData.latina.clientiPrecedenti;
                 const ltDifferenceEl = document.getElementById('riepilogo-lt-difference');
                 const ltComparisonBox = document.getElementById('lt-comparison-box');
                 const ltComparisonText = document.getElementById('lt-comparison-text');
                 
                 if (ltDifference >= 0) {
-                    // Positive change - GREEN
                     ltDifferenceEl.textContent = `+${ltDifference} ↑`;
                     ltDifferenceEl.style.background = '#a7f3d0';
                     ltDifferenceEl.style.color = '#059669';
@@ -1526,7 +1658,6 @@ Altri;12000
                     ltComparisonBox.style.borderColor = '#a7f3d0';
                     ltComparisonText.style.color = '#059669';
                 } else {
-                    // Negative change - RED
                     ltDifferenceEl.textContent = `${ltDifference} ↓`;
                     ltDifferenceEl.style.background = '#fecaca';
                     ltDifferenceEl.style.color = '#dc2626';
@@ -1550,9 +1681,14 @@ Altri;12000
                 const ctx = document.getElementById('mixProdottiChart');
                 if (!ctx) return;
 
+                // Destroy existing chart
+                if (ctx.chart) {
+                    ctx.chart.destroy();
+                }
+
                 const mixData = this.calculateMixProdotti();
 
-                new Chart(ctx, {
+                ctx.chart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Mattone + Pavimentazione', 'Altri Prodotti'],
@@ -1575,8 +1711,8 @@ Altri;12000
                                 callbacks: {
                                     label: (context) => {
                                         const value = this.formatEuro(context.raw);
-                                        const percentage = mixData.core.importo + mixData.others.importo > 0 ? 
-                                            ((context.raw / (mixData.core.importo + mixData.others.importo)) * 100).toFixed(1) : '0';
+                                        const percentage = mixData.total > 0 ? 
+                                            ((context.raw / mixData.total) * 100).toFixed(1) : '0';
                                         return `${context.label}: ${value} (${percentage}%)`;
                                     }
                                 }
@@ -1594,7 +1730,8 @@ Altri;12000
                 if (!this.csvData.categorie || this.csvData.categorie.length === 0) {
                     return {
                         core: { importo: 45000, mattone: 30000, pavimentazione: 15000 },
-                        others: { importo: 15000, refrattari: 10000, altri: 5000 }
+                        others: { importo: 15000, refrattari: 10000, altri: 5000 },
+                        total: 60000
                     };
                 }
 
@@ -1602,25 +1739,30 @@ Altri;12000
                 let mattone = 0, pavimentazione = 0, refrattari = 0, altri = 0;
 
                 categorie.forEach(cat => {
-                    const nome = cat.nome.toLowerCase();
-                    if (nome.includes('mattone') || nome.includes('laterizio')) {
-                        mattone += cat.importo;
-                    } else if (nome.includes('paviment') || nome.includes('cotto')) {
-                        pavimentazione += cat.importo;
-                    } else if (nome.includes('refratt')) {
-                        refrattari += cat.importo;
-                    } else {
-                        altri += cat.importo;
+                    switch (cat.nome) {
+                        case 'Mattone':
+                            mattone += cat.importo;
+                            break;
+                        case 'Pavimentazione':
+                            pavimentazione += cat.importo;
+                            break;
+                        case 'Refrattari':
+                            refrattari += cat.importo;
+                            break;
+                        default:
+                            altri += cat.importo;
+                            break;
                     }
                 });
 
                 const coreImporto = mattone + pavimentazione;
                 const othersImporto = refrattari + altri;
+                const total = coreImporto + othersImporto;
 
                 return {
                     core: { importo: coreImporto, mattone, pavimentazione },
                     others: { importo: othersImporto, refrattari, altri },
-                    total: coreImporto + othersImporto
+                    total: total
                 };
             }
 
@@ -1669,18 +1811,23 @@ Altri;12000
                 const ctx = document.getElementById('clientiChart');
                 if (!ctx) return;
 
+                // Destroy existing chart
+                if (ctx.chart) {
+                    ctx.chart.destroy();
+                }
+
                 const ltClienti = this.csvData.latina.clientiCorrente;
                 const rmClienti = this.csvData.roma.clienti;
                 const ltPrevClienti = this.csvData.latina.clientiPrecedenti;
 
-                new Chart(ctx, {
+                ctx.chart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: ['LT', 'RM'],
                         datasets: [
                             {
                                 label: '2024',
-                                data: [ltPrevClienti, 0], // RM non ha dati 2024
+                                data: [ltPrevClienti, 0],
                                 backgroundColor: '#cbd5e1',
                                 borderRadius: 8,
                                 maxBarThickness: 60
@@ -1710,9 +1857,9 @@ Altri;12000
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                max: 24,
+                                max: Math.max(ltClienti, rmClienti, ltPrevClienti) * 1.2,
                                 ticks: {
-                                    stepSize: 6,
+                                    stepSize: Math.ceil(Math.max(ltClienti, rmClienti, ltPrevClienti) / 4),
                                     color: '#6b7280'
                                 },
                                 grid: {
@@ -1744,21 +1891,25 @@ Altri;12000
                 const ctx = document.getElementById('fatturatoChart');
                 if (!ctx) return;
 
+                // Destroy existing chart
+                if (ctx.chart) {
+                    ctx.chart.destroy();
+                }
+
                 const ltFatturato = this.csvData.latina.annoCorrente;
                 const rmFatturato = this.csvData.roma.annoCorrente;
                 const ltPrevFatturato = this.csvData.latina.annoPrecedente;
 
-                // Calculate max for Y axis
                 const maxValue = Math.max(ltFatturato, rmFatturato, ltPrevFatturato) * 1.2;
 
-                new Chart(ctx, {
+                ctx.chart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: ['LT', 'RM'],
                         datasets: [
                             {
                                 label: '2024',
-                                data: [ltPrevFatturato, 0], // RM non ha dati 2024
+                                data: [ltPrevFatturato, 0],
                                 backgroundColor: '#cbd5e1',
                                 borderRadius: 8,
                                 maxBarThickness: 80
@@ -1791,9 +1942,7 @@ Altri;12000
                                 max: maxValue,
                                 ticks: {
                                     callback: (value) => {
-                                        if (value >= 100000) return `€${Math.round(value/1000)}k`;
-                                        if (value >= 25000) return `€${Math.round(value/1000)}k`;
-                                        return `€${Math.round(value/1000)}k`;
+                                        return this.formatEuroK(value);
                                     },
                                     color: '#6b7280'
                                 },
@@ -1833,7 +1982,7 @@ Altri;12000
                 
                 // Update growth badges for clients
                 const ltGrowthEl = document.getElementById('lt-growth');
-                if (ltClientGrowth >= 0) {
+                if (parseFloat(ltClientGrowth) >= 0) {
                     ltGrowthEl.textContent = `+${ltClientGrowth}%`;
                     ltGrowthEl.style.background = '#f0fdf4';
                     ltGrowthEl.style.color = '#16a34a';
