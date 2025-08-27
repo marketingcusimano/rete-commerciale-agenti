@@ -7,7 +7,7 @@ Codice Agente;Ragione Sociale;Dalla data;Alla data;;;;;
 === VERIFICA OBIETTIVI ===;;;;;;;;
 Provincia;AnnoPrec.;AnnoCorr.;Obiettivo;% su obiet.;ClientiAnnoPrec.;ClientiAnnoCorr.;Obiettivo;% su obiet.
 Generale;99.238,72;190.159,79;;;352;20;;
-LT;79.029,16;182.389,23;150.000,00;58%;23;18;35;51%
+LT;79.029,16;182.389,23;150.000,00;58%;23;48;35;51%
 ;;;;;;;;
 === CLIENTI PER PROVINCIA ===;;;;;;;;
 Provincia;Clienti Serviti;Fatturato;;;;;;
@@ -99,6 +99,7 @@ Clienti Totali;20;;;;;;;
 Province Servite;2;;;;;;;
 
 Periodo;01/01/2025 - 17/08/2025;;;;;;;
+
 
 
 
