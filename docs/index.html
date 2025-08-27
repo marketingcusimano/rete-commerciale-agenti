@@ -1113,6 +1113,10 @@
                 const repoSlug = segs.length ? segs[0] : '';
 
                 const bases = [
+                    './docs/',
+                    'docs/',
+                    '/docs/',
+                    `/${repoSlug}/docs/`,
                     './',
                     '',
                     pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''),
@@ -1127,6 +1131,7 @@
                         } catch (e) {}
                     }
                 }
+                console.log('Candidate URLs:', [...new Set(urls)]);
                 return [...new Set(urls)];
             }
 
