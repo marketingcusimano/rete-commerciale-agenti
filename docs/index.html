@@ -811,9 +811,9 @@
                         </div>
                         
                         <!-- vs 2024 -->
-                        <div style="background: #fee2e2; padding: 1rem; border-radius: 0.75rem; border: 1px solid #fecaca;">
+                        <div style="background: #fee2e2; padding: 1rem; border-radius: 0.75rem; border: 1px solid #fecaca;" id="lt-comparison-box">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: #dc2626; font-weight: 600;">vs 2024: <span id="riepilogo-lt-clienti-2024">23</span> clienti</span>
+                                <span style="color: #dc2626; font-weight: 600;" id="lt-comparison-text">vs 2024: <span id="riepilogo-lt-clienti-2024">23</span> clienti</span>
                                 <span style="background: #fecaca; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 700;" id="riepilogo-lt-difference">-5 ↓</span>
                             </div>
                         </div>
@@ -1442,20 +1442,28 @@
                     this.csvData.latina.annoCorrente / this.csvData.latina.clientiCorrente : 0;
                 document.getElementById('riepilogo-lt-medio').textContent = this.formatEuroK(ltMedio);
 
-                // Calculate difference for Latina
+                // Calculate difference for Latina - CORREZIONE COLORI
                 const ltDifference = this.csvData.latina.clientiCorrente - this.csvData.latina.clientiPrecedenti;
                 const ltDifferenceEl = document.getElementById('riepilogo-lt-difference');
+                const ltComparisonBox = document.getElementById('lt-comparison-box');
+                const ltComparisonText = document.getElementById('lt-comparison-text');
+                
                 if (ltDifference >= 0) {
+                    // Positive change - GREEN
                     ltDifferenceEl.textContent = `+${ltDifference} ↑`;
                     ltDifferenceEl.style.background = '#a7f3d0';
                     ltDifferenceEl.style.color = '#059669';
-                    ltDifferenceEl.parentElement.style.background = '#d1fae5';
-                    ltDifferenceEl.parentElement.style.borderColor = '#a7f3d0';
-                    ltDifferenceEl.parentElement.querySelector('span').style.color = '#059669';
+                    ltComparisonBox.style.background = '#d1fae5';
+                    ltComparisonBox.style.borderColor = '#a7f3d0';
+                    ltComparisonText.style.color = '#059669';
                 } else {
+                    // Negative change - RED
                     ltDifferenceEl.textContent = `${ltDifference} ↓`;
                     ltDifferenceEl.style.background = '#fecaca';
                     ltDifferenceEl.style.color = '#dc2626';
+                    ltComparisonBox.style.background = '#fee2e2';
+                    ltComparisonBox.style.borderColor = '#fecaca';
+                    ltComparisonText.style.color = '#dc2626';
                 }
 
                 // Update Roma data
