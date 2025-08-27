@@ -1301,79 +1301,122 @@ COPERTURE;3;1;0;;;;;
 
             parseCSV(csvText) {
                 try {
-                    // Parse OBIETTIVI section
-                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
-                    if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
+                    console.log('🔍 Inizio parsing CSV, lunghezza:', csvText.length);
+                    console.log('📋 Prime 500 caratteri del CSV:', csvText.substring(0, 500));
+                    
+                    // Verifica presenza sezioni principali
+                    const hasObiettivi = csvText.includes('=== VERIFICA OBIETTIVI ===');
+                    const hasClienti = csvText.includes('=== CLIENTI PER PROVINCIA ===');
+                    const hasVendite = csvText.includes('=== DETTAGLIO VENDITE PER CLIENTE ===');
+                    const hasCategorie = csvText.includes('=== RIEPILOGO PER CATEGORIA ===');
+                    
+                    console.log('📊 Sezioni trovate:', { hasObiettivi, hasClienti, hasVendite, hasCategorie });
+                    
+                    // Parse OBIETTIVI section con pattern più flessibile
+                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)(?===.*===|$)/);
+                    if (!obiettiviMatch) {
+                        console.error('❌ Sezione VERIFICA OBIETTIVI non trovata');
+                        throw new Error('Sezione VERIFICA OBIETTIVI non trovata nel CSV');
+                    }
                     
                     const obiettiviText = obiettiviMatch[1];
+                    console.log('🎯 Testo sezione obiettivi:', obiettiviText.substring(0, 200));
                     
-                    // Parse GENERALE data
-                    const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
-                    if (!generaleMatch) throw new Error('Dati Generale non trovati');
+                    // Parse GENERALE data con pattern più robusto
+                    const generalePattern = /Generale[;\s]*([\d.,]+)[;\s]*([\d.,]+)[;\s]*[;\s]*[;\s]*(\d+)[;\s]*(\d+)/;
+                    const generaleMatch = obiettiviText.match(generalePattern);
+                    
+                    if (!generaleMatch) {
+                        console.error('❌ Dati Generale non trovati nel pattern:', generalePattern);
+                        console.log('🔍 Righe che contengono "Generale":', 
+                            obiettiviText.split('\n').filter(line => line.includes('Generale')));
+                        throw new Error('Dati Generale non trovati - controlla formato CSV');
+                    }
                     
                     const generale = {
                         annoPrecedente: this.parseNumber(generaleMatch[1]),
                         annoCorrente: this.parseNumber(generaleMatch[2]),
-                        clienti: parseInt(generaleMatch[4], 10)
+                        clienti: parseInt(generaleMatch[4], 10) || 0
                     };
+                    console.log('✅ Dati Generale parsati:', generale);
 
-                    // Parse LATINA data
-                    const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
-                    if (!ltMatch) throw new Error('Dati Latina non trovati');
+                    // Parse LATINA data con pattern più flessibile
+                    const ltPattern = /LT[;\s]*([\d.,]+)[;\s]*([\d.,]+)[;\s]*([\d.,]+)[;\s]*(\d+)%[;\s]*(\d+)[;\s]*(\d+)[;\s]*(\d+)[;\s]*(\d+)%/;
+                    const ltMatch = obiettiviText.match(ltPattern);
                     
-                    const latina = {
-                        annoPrecedente: this.parseNumber(ltMatch[1]),
-                        annoCorrente: this.parseNumber(ltMatch[2]),
-                        obiettivo: this.parseNumber(ltMatch[3]) * 1000, // Convert to euros
-                        percentualeObiettivo: parseInt(ltMatch[4], 10),
-                        clientiPrecedenti: parseInt(ltMatch[5], 10),
-                        clientiCorrente: parseInt(ltMatch[6], 10),
-                        obiettivoClienti: parseInt(ltMatch[7], 10),
-                        percentualeClienti: parseInt(ltMatch[8], 10)
+                    let latina = {
+                        annoPrecedente: 0, annoCorrente: 0, obiettivo: 0, percentualeObiettivo: 0,
+                        clientiPrecedenti: 0, clientiCorrente: 0, obiettivoClienti: 0, percentualeClienti: 0
                     };
+                    
+                    if (ltMatch) {
+                        latina = {
+                            annoPrecedente: this.parseNumber(ltMatch[1]),
+                            annoCorrente: this.parseNumber(ltMatch[2]),
+                            obiettivo: this.parseNumber(ltMatch[3]),
+                            percentualeObiettivo: parseInt(ltMatch[4], 10) || 0,
+                            clientiPrecedenti: parseInt(ltMatch[5], 10) || 0,
+                            clientiCorrente: parseInt(ltMatch[6], 10) || 0,
+                            obiettivoClienti: parseInt(ltMatch[7], 10) || 0,
+                            percentualeClienti: parseInt(ltMatch[8], 10) || 0
+                        };
+                        console.log('✅ Dati Latina parsati:', latina);
+                    } else {
+                        console.warn('⚠️ Dati Latina non trovati, uso valori predefiniti');
+                        console.log('🔍 Righe che contengono "LT":', 
+                            obiettiviText.split('\n').filter(line => line.includes('LT')));
+                    }
 
-                    // Parse ROMA data
-                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
+                    // Parse ROMA data con fallback
                     let roma = { annoCorrente: 0, clienti: 0 };
+                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)(?===.*===|$)/);
                     if (clientiMatch) {
-                        const rmMatch = clientiMatch[1].match(/RM;(\d+);([\d.,]+);;;;;;/);
+                        const rmMatch = clientiMatch[1].match(/RM[;\s]*(\d+)[;\s]*([\d.,]+)/);
                         if (rmMatch) {
                             roma = {
                                 annoCorrente: this.parseNumber(rmMatch[2]),
-                                clienti: parseInt(rmMatch[1], 10)
+                                clienti: parseInt(rmMatch[1], 10) || 0
                             };
+                            console.log('✅ Dati Roma parsati:', roma);
+                        } else {
+                            console.warn('⚠️ Dati RM non trovati nella sezione clienti');
                         }
                     }
 
-                    // Parse DETTAGLIO VENDITE PER CLIENTE - NUOVA SEZIONE
-                    const venditeMatch = csvText.match(/=== DETTAGLIO VENDITE PER CLIENTE ===([\s\S]*?)===.*===/);
+                    // Parse DETTAGLIO VENDITE PER CLIENTE
                     let vendite = [];
+                    const venditeMatch = csvText.match(/=== DETTAGLIO VENDITE PER CLIENTE ===([\s\S]*?)(?===.*===|$)/);
                     if (venditeMatch) {
                         const venditeText = venditeMatch[1];
-                        const lines = venditeText.split('\n').filter(line => 
-                            line.trim() && 
-                            !line.includes('===') && 
-                            !line.includes('Provincia;Ragione Sociale Cliente') && 
-                            line.includes(';') && 
-                            line.split(';').length >= 4
-                        );
+                        console.log('💼 Parsing vendite, righe trovate:', venditeText.split('\n').length);
+                        
+                        const lines = venditeText.split('\n').filter(line => {
+                            const trimmed = line.trim();
+                            return trimmed && 
+                                   !trimmed.includes('===') && 
+                                   !trimmed.includes('Provincia;Ragione Sociale Cliente') && 
+                                   trimmed.includes(';') && 
+                                   trimmed.split(';').length >= 4;
+                        });
 
                         const venditeMap = new Map();
-                        lines.forEach(line => {
+                        lines.forEach((line, index) => {
                             const parts = line.split(';');
                             if (parts.length >= 4) {
                                 const fatturato = this.parseNumber(parts[3]);
                                 if (!isNaN(fatturato) && fatturato > 0) {
                                     const cliente = parts[1].trim();
-                                    if (!venditeMap.has(cliente)) {
-                                        venditeMap.set(cliente, {
-                                            provincia: parts[0].trim(),
-                                            cliente: cliente,
-                                            categoria: parts[2].trim(),
-                                            fatturato: 0
-                                        });
+                                    if (cliente) {
+                                        if (!venditeMap.has(cliente)) {
+                                            venditeMap.set(cliente, {
+                                                provincia: parts[0].trim(),
+                                                cliente: cliente,
+                                                categoria: parts[2].trim(),
+                                                fatturato: 0
+                                            });
+                                        }
+                                        venditeMap.get(cliente).fatturato += fatturato;
                                     }
-                                    venditeMap.get(cliente).fatturato += fatturato;
                                 }
                             }
                         });
@@ -1381,22 +1424,29 @@ COPERTURE;3;1;0;;;;;
                         vendite = Array.from(venditeMap.values())
                             .sort((a, b) => b.fatturato - a.fatturato)
                             .slice(0, 10);
+                        
+                        console.log(`✅ Vendite parsate: ${vendite.length} clienti top`);
+                    } else {
+                        console.warn('⚠️ Sezione DETTAGLIO VENDITE non trovata');
                     }
 
-                    // Parse CATEGORIE data - NUOVA SEZIONE
-                    const categorieMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===([\s\S]*?)===.*===/);
+                    // Parse CATEGORIE data
                     let categorie = [];
+                    const categorieMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===([\s\S]*?)(?===.*===|$)/);
                     if (categorieMatch) {
                         const categorieSection = categorieMatch[1];
-                        const lines = categorieSection.split('\n').filter(line => 
-                            line.trim() && 
-                            !line.includes('===') && 
-                            !line.includes('Categoria;Importo Totale') && 
-                            line.includes(';') && 
-                            line.split(';').length >= 4
-                        );
+                        console.log('📋 Parsing categorie, righe trovate:', categorieSection.split('\n').length);
                         
-                        lines.forEach(line => {
+                        const lines = categorieSection.split('\n').filter(line => {
+                            const trimmed = line.trim();
+                            return trimmed && 
+                                   !trimmed.includes('===') && 
+                                   !trimmed.includes('Categoria;Importo Totale') && 
+                                   trimmed.includes(';') && 
+                                   trimmed.split(';').length >= 4;
+                        });
+                        
+                        lines.forEach((line, index) => {
                             const parts = line.split(';');
                             if (parts.length >= 4) {
                                 const categoria = parts[0].trim();
@@ -1416,12 +1466,25 @@ COPERTURE;3;1;0;;;;;
                         });
 
                         categorie.sort((a, b) => b.importo - a.importo);
+                        console.log(`✅ Categorie parsate: ${categorie.length} categorie`);
+                    } else {
+                        console.warn('⚠️ Sezione RIEPILOGO PER CATEGORIA non trovata');
                     }
 
-                    return { generale, latina, roma, categorie, vendite };
+                    const result = { generale, latina, roma, categorie, vendite };
+                    console.log('🎉 Parsing completato con successo:', {
+                        generale: !!result.generale,
+                        latina: !!result.latina,
+                        roma: !!result.roma,
+                        vendite: result.vendite.length,
+                        categorie: result.categorie.length
+                    });
+                    
+                    return result;
                     
                 } catch (e) {
-                    console.error('Parse error:', e);
+                    console.error('💥 Errore parsing CSV:', e);
+                    console.log('📄 Contenuto CSV completo per debug:', csvText);
                     return null;
                 }
             }
@@ -1436,6 +1499,21 @@ COPERTURE;3;1;0;;;;;
                 if (!value) return '€0k';
                 const k = Math.round(value / 1000);
                 return `€${k}k`;
+            }
+
+            // NEW: restituisce {value:Number|null, text:String} per gestire 0/negativi/NaN
+            calculateGrowthPercentageSafe(current, previous) {
+                if (previous === 0 || previous === null || previous === undefined) return { value: null, text: 'N/A' };
+                const v = ((current - previous) / previous) * 100;
+                const fixed = Number.isFinite(v) ? v.toFixed(1) : null;
+                return { value: fixed !== null ? parseFloat(fixed) : null, text: fixed !== null ? `${fixed}%` : 'N/A' };
+            }
+
+            // NEW: formatta con segno esplicito
+            formatSignedPercent(val) {
+                if (val === null || val === undefined) return 'N/A';
+                const sign = val > 0 ? '+' : '';
+                return `${sign}${val.toFixed(1)}%`;
             }
 
             calculateGrowthPercentage(current, previous) {
@@ -1486,13 +1564,13 @@ COPERTURE;3;1;0;;;;;
                 const data = this.getDisplayData();
                 if (!data) return;
 
-                // Calculate growth
-                const growthPercent = this.calculateGrowthPercentage(data.fatturato, data.fatturatoVs);
+                // Calculate growth with safe method
+                const growth = this.calculateGrowthPercentageSafe(data.fatturato, data.fatturatoVs);
                 
                 // Update Fatturato Card
                 document.getElementById('fatturato-value').textContent = this.formatEuroK(data.fatturato);
                 document.getElementById('fatturato-vs').textContent = this.formatEuroK(data.fatturatoVs);
-                document.getElementById('growth-badge').textContent = `+${growthPercent}%`;
+                document.getElementById('growth-badge').textContent = growth.value === null ? 'N/A' : this.formatSignedPercent(growth.value);
                 
                 if (data.obiettivo) {
                     document.getElementById('obiettivo-fatturato').textContent = this.formatEuroK(data.obiettivo);
@@ -1535,16 +1613,17 @@ COPERTURE;3;1;0;;;;;
                 // Update Top Performance Card (always show best province)
                 const topProvince = this.csvData.latina.annoCorrente > this.csvData.roma.annoCorrente ? 'LT' : 'RM';
                 const topData = topProvince === 'LT' ? this.csvData.latina : this.csvData.roma;
-                const topGrowth = topProvince === 'LT' ? 
-                    this.calculateGrowthPercentage(this.csvData.latina.annoCorrente, this.csvData.latina.annoPrecedente) : '0.0';
+                const topGrowthObj = topProvince === 'LT'
+                    ? this.calculateGrowthPercentageSafe(this.csvData.latina.annoCorrente, this.csvData.latina.annoPrecedente)
+                    : { value: null, text: 'N/A' };
                     
                 document.getElementById('top-province').textContent = topProvince;
-                document.getElementById('province-growth').textContent = `+${topGrowth}%`;
+                document.getElementById('province-growth').textContent = topProvince === 'RM' ? '+∞%' : (topGrowthObj.value === null ? 'N/A' : this.formatSignedPercent(topGrowthObj.value));
                 document.getElementById('province-amount').textContent = this.formatEuroK(topData.annoCorrente);
                 
                 const growthAmount = topProvince === 'LT' ? 
                     (this.csvData.latina.annoCorrente - this.csvData.latina.annoPrecedente) : 0;
-                document.getElementById('trend-growth').textContent = `+${this.formatEuroK(growthAmount)}`;
+                document.getElementById('trend-growth').textContent = growthAmount >= 0 ? `+${this.formatEuroK(growthAmount)}` : `-${this.formatEuroK(Math.abs(growthAmount))}`;
 
                 // Update Clienti Card
                 document.getElementById('clienti-count').textContent = data.clienti;
@@ -1622,51 +1701,116 @@ COPERTURE;3;1;0;;;;;
                 document.getElementById('categorie-fatturato-totale').textContent = this.formatEuroK(totale);
             }
 
-            createProvinceDistributionChart() {
-                const ctx = document.getElementById('provinceDistributionChart');
-                if (!ctx) return;
+            // REPLACE della vecchia createClientiChart()
+            _buildClientiChart(ctx) {
+                const ltClienti = this.csvData.latina.clientiCorrente;
+                const rmClienti = this.csvData.roma.clienti;
+                const ltPrevClienti = this.csvData.latina.clientiPrecedenti;
 
-                const ltFatturato = this.csvData.latina.annoCorrente;
-                const rmFatturato = this.csvData.roma.annoCorrente;
-                const total = ltFatturato + rmFatturato;
+                return new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['LT', 'RM'],
+                        datasets: [
+                            { label: '2024', data: [ltPrevClienti, 0], backgroundColor: '#cbd5e1', borderRadius: 8, maxBarThickness: 60 },
+                            { label: '2025', data: [ltClienti, rmClienti], backgroundColor: ['#22d3ee', '#22d3ee'], borderRadius: 8, maxBarThickness: 60 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.raw} clienti` } } },
+                        scales: {
+                            y: { beginAtZero: true, suggestedMax: Math.max(24, ltClienti, rmClienti, ltPrevClienti) + 2, ticks: { stepSize: 4, color: '#6b7280' }, grid: { color: '#e5e7eb' } },
+                            x: { ticks: { color: '#6b7280', font: { size: 12, weight: '600' } }, grid: { display: false } }
+                        },
+                        animation: { duration: 1200, easing: 'easeOutBounce' }
+                    }
+                });
+            }
 
-                const ltPercentage = total > 0 ? ((ltFatturato / total) * 100) : 0;
-                const rmPercentage = total > 0 ? ((rmFatturato / total) * 100) : 0;
+            // REPLACE della vecchia createFatturatoChart()
+            _buildFatturatoChart(ctx) {
+                const ltF = this.csvData.latina.annoCorrente;
+                const rmF = this.csvData.roma.annoCorrente;
+                const ltPrevF = this.csvData.latina.annoPrecedente;
+                const maxValue = Math.max(ltF, rmF, ltPrevF) * 1.25;
 
-                new Chart(ctx, {
+                return new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['LT', 'RM'],
+                        datasets: [
+                            { label: '2024', data: [ltPrevF, 0], backgroundColor: '#cbd5e1', borderRadius: 8, maxBarThickness: 80 },
+                            { label: '2025', data: [ltF, rmF], backgroundColor: ['#8b5cf6', '#6366f1'], borderRadius: 8, maxBarThickness: 80 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${this.formatEuroK(c.raw)}` } } },
+                        scales: {
+                            y: {
+                                beginAtZero: true, suggestedMax: maxValue,
+                                ticks: { callback: (v) => `€${Math.round(v/1000)}k`, color: '#6b7280' },
+                                grid: { color: '#e5e7eb' }
+                            },
+                            x: { ticks: { color: '#6b7280', font: { size: 12, weight: '600' } }, grid: { display: false } }
+                        },
+                        animation: { duration: 1200, easing: 'easeOutQuart' }
+                    }
+                });
+            }
+
+            // REPLACE della vecchia createProvinceDistributionChart()
+            _buildDistribuzioneProvinceChart(ctx) {
+                const lt = this.csvData.latina.annoCorrente;
+                const rm = this.csvData.roma.annoCorrente;
+                const total = lt + rm || 1;
+
+                return new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Latina (LT)', 'Roma (RM)'],
                         datasets: [{
-                            data: [ltFatturato, rmFatturato],
+                            data: [lt, rm],
                             backgroundColor: ['#a855f7', '#22d3ee'],
                             borderColor: ['#7c3aed', '#0891b2'],
-                            borderWidth: 3,
-                            cutout: '60%'
+                            borderWidth: 3, cutout: '60%'
                         }]
                     },
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
+                        responsive: true, maintainAspectRatio: false,
                         plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => {
-                                        const value = this.formatEuroK(context.raw);
-                                        const percentage = total > 0 ? 
-                                            ((context.raw / total) * 100).toFixed(1) : '0';
-                                        return `${context.label}: ${value} (${percentage}%)`;
-                                    }
-                                }
-                            }
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (c) => `${c.label}: ${this.formatEuroK(c.raw)} (${((c.raw/total)*100).toFixed(1)}%)` } }
                         },
-                        animation: {
-                            duration: 2000,
-                            easing: 'easeOutBounce'
-                        }
+                        animation: { duration: 800, easing: 'easeOutCubic' }
+                    }
+                });
+            }
+
+            // REPLACE della vecchia createMixProdottiChart()
+            _buildMixProdottiChart(ctx) {
+                const mix = this.calculateMixProdotti();
+                const total = (mix.core.importo + mix.others.importo) || 1;
+
+                return new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Mattone + Pavimentazione', 'Altri Prodotti'],
+                        datasets: [{
+                            data: [mix.core.importo, mix.others.importo],
+                            backgroundColor: ['#3b82f6', '#6b7280'],
+                            borderColor: ['#1e40af', '#4b5563'],
+                            borderWidth: 3, cutout: '50%'
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (c) => `${c.label}: ${this.formatEuro(c.raw)} (${((c.raw/total)*100).toFixed(1)}%)` } }
+                        },
+                        animation: { duration: 800, easing: 'easeOutCubic' }
                     }
                 });
             }
@@ -1687,6 +1831,7 @@ COPERTURE;3;1;0;;;;;
                 }
             }
 
+            // Mantiene i metodi originali necessari
             updateRiepilogoClienti() {
                 // Update Latina data
                 document.getElementById('riepilogo-lt-clienti-2025').textContent = this.csvData.latina.clientiCorrente;
@@ -1731,7 +1876,7 @@ COPERTURE;3;1;0;;;;;
                 document.getElementById('riepilogo-rm-medio').textContent = this.formatEuroK(rmMedio);
             }
 
-            createMixProdottiChart() {
+            formatEuro(value) {
                 const ctx = document.getElementById('mixProdottiChart');
                 if (!ctx) return;
 
@@ -1850,180 +1995,26 @@ COPERTURE;3;1;0;;;;;
                 return `${Math.round(value)} €`;
             }
 
-            createClientiChart() {
-                const ctx = document.getElementById('clientiChart');
-                if (!ctx) return;
-
-                const ltClienti = this.csvData.latina.clientiCorrente;
-                const rmClienti = this.csvData.roma.clienti;
-                const ltPrevClienti = this.csvData.latina.clientiPrecedenti;
-
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['LT', 'RM'],
-                        datasets: [
-                            {
-                                label: '2024',
-                                data: [ltPrevClienti, 0], // RM non ha dati 2024
-                                backgroundColor: '#cbd5e1',
-                                borderRadius: 8,
-                                maxBarThickness: 60
-                            },
-                            {
-                                label: '2025',
-                                data: [ltClienti, rmClienti],
-                                backgroundColor: ['#22d3ee', '#22d3ee'],
-                                borderRadius: 8,
-                                maxBarThickness: 60
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => `${context.dataset.label}: ${context.raw} clienti`
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 24,
-                                ticks: {
-                                    stepSize: 6,
-                                    color: '#6b7280'
-                                },
-                                grid: {
-                                    color: '#e5e7eb'
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    color: '#6b7280',
-                                    font: {
-                                        size: 12,
-                                        weight: '600'
-                                    }
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        },
-                        animation: {
-                            duration: 1500,
-                            easing: 'easeOutBounce'
-                        }
-                    }
-                });
-            }
-
-            createFatturatoChart() {
-                const ctx = document.getElementById('fatturatoChart');
-                if (!ctx) return;
-
-                const ltFatturato = this.csvData.latina.annoCorrente;
-                const rmFatturato = this.csvData.roma.annoCorrente;
-                const ltPrevFatturato = this.csvData.latina.annoPrecedente;
-
-                // Calculate max for Y axis
-                const maxValue = Math.max(ltFatturato, rmFatturato, ltPrevFatturato) * 1.2;
-
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['LT', 'RM'],
-                        datasets: [
-                            {
-                                label: '2024',
-                                data: [ltPrevFatturato, 0], // RM non ha dati 2024
-                                backgroundColor: '#cbd5e1',
-                                borderRadius: 8,
-                                maxBarThickness: 80
-                            },
-                            {
-                                label: '2025',
-                                data: [ltFatturato, rmFatturato],
-                                backgroundColor: ['#8b5cf6', '#6366f1'],
-                                borderRadius: 8,
-                                maxBarThickness: 80
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => `${context.dataset.label}: ${this.formatEuroK(context.raw)}`
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: maxValue,
-                                ticks: {
-                                    callback: (value) => {
-                                        if (value >= 100000) return `€${Math.round(value/1000)}k`;
-                                        if (value >= 25000) return `€${Math.round(value/1000)}k`;
-                                        return `€${Math.round(value/1000)}k`;
-                                    },
-                                    color: '#6b7280'
-                                },
-                                grid: {
-                                    color: '#e5e7eb'
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    color: '#6b7280',
-                                    font: {
-                                        size: 12,
-                                        weight: '600'
-                                    }
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        },
-                        animation: {
-                            duration: 2000,
-                            easing: 'easeOutQuart'
-                        }
-                    }
-                });
-            }
-
             updateProvinceDisplays() {
                 // Update Clienti displays
                 document.getElementById('lt-clienti-count').textContent = `${this.csvData.latina.clientiCorrente} clienti`;
                 document.getElementById('rm-clienti-count').textContent = `${this.csvData.roma.clienti} clienti`;
 
-                // Calculate client growth for LT
-                const ltClientGrowth = this.csvData.latina.clientiPrecedenti > 0 ? 
-                    this.calculateGrowthPercentage(this.csvData.latina.clientiCorrente, this.csvData.latina.clientiPrecedenti) : '0.0';
+                // Calculate client growth for LT using safe method
+                const ltClientGrowthObj = this.calculateGrowthPercentageSafe(this.csvData.latina.clientiCorrente, this.csvData.latina.clientiPrecedenti);
                 
                 // Update growth badges for clients
                 const ltGrowthEl = document.getElementById('lt-growth');
-                if (ltClientGrowth >= 0) {
-                    ltGrowthEl.textContent = `+${ltClientGrowth}%`;
+                if (ltClientGrowthObj.value === null) {
+                    ltGrowthEl.textContent = 'N/A';
+                    ltGrowthEl.style.background = '#f3f4f6';
+                    ltGrowthEl.style.color = '#6b7280';
+                } else if (ltClientGrowthObj.value >= 0) {
+                    ltGrowthEl.textContent = this.formatSignedPercent(ltClientGrowthObj.value);
                     ltGrowthEl.style.background = '#f0fdf4';
                     ltGrowthEl.style.color = '#16a34a';
                 } else {
-                    ltGrowthEl.textContent = `${ltClientGrowth}%`;
+                    ltGrowthEl.textContent = this.formatSignedPercent(ltClientGrowthObj.value);
                     ltGrowthEl.style.background = '#fef2f2';
                     ltGrowthEl.style.color = '#dc2626';
                 }
@@ -2036,9 +2027,9 @@ COPERTURE;3;1;0;;;;;
                 document.getElementById('lt-fatturato-prev').textContent = this.formatEuroK(this.csvData.latina.annoPrecedente);
                 document.getElementById('rm-fatturato-display').textContent = this.formatEuroK(this.csvData.roma.annoCorrente);
 
-                // Update fatturato growth
-                const ltFatturatoGrowth = this.calculateGrowthPercentage(this.csvData.latina.annoCorrente, this.csvData.latina.annoPrecedente);
-                document.getElementById('lt-fatturato-growth').textContent = `+${ltFatturatoGrowth}%`;
+                // Update fatturato growth using safe method
+                const ltFatturatoGrowthObj = this.calculateGrowthPercentageSafe(this.csvData.latina.annoCorrente, this.csvData.latina.annoPrecedente);
+                document.getElementById('lt-fatturato-growth').textContent = ltFatturatoGrowthObj.value === null ? 'N/A' : this.formatSignedPercent(ltFatturatoGrowthObj.value);
             }
 
             showLoading() {
