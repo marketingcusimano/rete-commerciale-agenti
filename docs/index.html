@@ -1445,25 +1445,17 @@
                 // Calculate difference for Latina
                 const ltDifference = this.csvData.latina.clientiCorrente - this.csvData.latina.clientiPrecedenti;
                 const ltDifferenceEl = document.getElementById('riepilogo-lt-difference');
-                const ltComparisonContainer = ltDifferenceEl.parentElement;
-                const ltComparisonText = ltComparisonContainer.querySelector('span');
-                
                 if (ltDifference >= 0) {
-                    // Positive change - GREEN
                     ltDifferenceEl.textContent = `+${ltDifference} ↑`;
                     ltDifferenceEl.style.background = '#a7f3d0';
                     ltDifferenceEl.style.color = '#059669';
-                    ltComparisonContainer.style.background = '#d1fae5';
-                    ltComparisonContainer.style.borderColor = '#a7f3d0';
-                    ltComparisonText.style.color = '#059669';
+                    ltDifferenceEl.parentElement.style.background = '#d1fae5';
+                    ltDifferenceEl.parentElement.style.borderColor = '#a7f3d0';
+                    ltDifferenceEl.parentElement.querySelector('span').style.color = '#059669';
                 } else {
-                    // Negative change - RED
                     ltDifferenceEl.textContent = `${ltDifference} ↓`;
                     ltDifferenceEl.style.background = '#fecaca';
                     ltDifferenceEl.style.color = '#dc2626';
-                    ltComparisonContainer.style.background = '#fee2e2';
-                    ltComparisonContainer.style.borderColor = '#fecaca';
-                    ltComparisonText.style.color = '#dc2626';
                 }
 
                 // Update Roma data
