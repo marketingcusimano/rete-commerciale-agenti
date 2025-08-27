@@ -1428,7 +1428,15 @@ Periodo,01/01/2025 - 24/08/2025`;
                         .sort((a, b) => b.importo - a.importo);
 
                     console.log('Final parsed data:', { generale, latina, roma, categorie, agentInfo, dettaglioVendite, categorieDettagliate: categorieDettagliateArray });
-                    return { generale, latina, roma, categorie, agentInfo, dettaglioVendite, categorieDettagliate: categorieDettagliateArray };
+                    return { 
+                        generale, 
+                        latina, 
+                        roma, 
+                        categorie, 
+                        agentInfo, 
+                        dettaglioVendite, 
+                        categorieDettagliate: categorieDettagliateArray 
+                    };
                     
                 } catch (e) {
                     console.error('Parse error:', e);
@@ -2076,7 +2084,20 @@ Periodo,01/01/2025 - 24/08/2025`;
 
             updateTopSalesTable() {
                 const tableBody = document.getElementById('top-sales-table');
-                if (!tableBody || !this.csvData.dettaglioVendite) return;
+                if (!tableBody) return;
+                
+                // Check if detailed sales data is available
+                if (!this.csvData.dettaglioVendite || this.csvData.dettaglioVendite.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="padding: 2rem; text-align: center; color: #6b7280;">
+                                <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <div>Dati vendite dettagliate non disponibili nel CSV</div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
                 
                 // Get top 10 sales
                 const topSales = this.csvData.dettaglioVendite.slice(0, 10);
@@ -2117,7 +2138,20 @@ Periodo,01/01/2025 - 24/08/2025`;
 
             updateCategoryDetailsTable() {
                 const tableBody = document.getElementById('category-details-table');
-                if (!tableBody || !this.csvData.categorieDettagliate) return;
+                if (!tableBody) return;
+                
+                // Check if detailed category data is available
+                if (!this.csvData.categorieDettagliate || this.csvData.categorieDettagliate.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="padding: 2rem; text-align: center; color: #6b7280;">
+                                <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <div>Dati categorie dettagliate non disponibili nel CSV</div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
                 
                 const totalAmount = this.csvData.categorieDettagliate.reduce((sum, cat) => sum + cat.importo, 0);
                 
@@ -2145,12 +2179,12 @@ Periodo,01/01/2025 - 24/08/2025`;
                             </td>
                             <td style="padding: 1rem; text-align: center;">
                                 <span style="background: #f3e8ff; color: #8b5cf6; padding: 0.25rem 0.75rem; border-radius: 1rem; font-weight: 700; font-size: 0.875rem;">
-                                    ${cat.ltClienti}
+                                    ${cat.ltClienti || 0}
                                 </span>
                             </td>
                             <td style="padding: 1rem; text-align: center;">
                                 <span style="background: #ecfeff; color: #22d3ee; padding: 0.25rem 0.75rem; border-radius: 1rem; font-weight: 700; font-size: 0.875rem;">
-                                    ${cat.rmClienti}
+                                    ${cat.rmClienti || 0}
                                 </span>
                             </td>
                         </tr>
