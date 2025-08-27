@@ -849,9 +849,7 @@
                 </div>
             </div>
 
-            <!-- Mix Prodotti Section -->
-            <div class="card" style="padding: 2rem; margin-top: 2rem;">
-                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: #1f2937;">Mix Prodotti</h3>
+
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
                     <!-- Doughnut Chart -->
@@ -1360,8 +1358,77 @@ Periodo,01/01/2025 - 24/08/2025`;
                         });
                     }
 
-                    console.log('Final parsed data:', { generale, latina, roma, categorie, agentInfo });
-                    return { generale, latina, roma, categorie, agentInfo };
+                    // Parse DETTAGLIO VENDITE section for top sales
+                    const dettaglioMatch = csvText.match(/=== DETTAGLIO VENDITE PER CLIENTE ===\s*([\s\S]*?)(?:===|$)/);
+                    let dettaglioVendite = [];
+                    let categorieDettagliate = new Map();
+                    
+                    if (dettaglioMatch) {
+                        const dettaglioText = dettaglioMatch[1];
+                        const lines = dettaglioText.split('\n').filter(line => 
+                            line.trim() && 
+                            !line.includes('Provincia,Ragione Sociale') && 
+                            !line.includes('===') &&
+                            line.split(',').length >= 4
+                        );
+                        
+                        lines.forEach(line => {
+                            const parts = line.split(',');
+                            if (parts.length >= 4) {
+                                const provincia = parts[0].trim();
+                                const cliente = parts[1].trim();
+                                const categoria = parts[2].trim();
+                                const fatturato = this.parseItalianNumber(parts[3].replace(/"/g, ''));
+                                
+                                if (provincia && cliente && categoria && fatturato > 0) {
+                                    dettaglioVendite.push({
+                                        provincia: provincia,
+                                        cliente: cliente,
+                                        categoria: categoria,
+                                        fatturato: fatturato
+                                    });
+                                    
+                                    // Aggregate for category details
+                                    const key = categoria;
+                                    if (!categorieDettagliate.has(key)) {
+                                        categorieDettagliate.set(key, {
+                                            nome: categoria,
+                                            importo: 0,
+                                            ltClienti: 0,
+                                            rmClienti: 0,
+                                            ltSet: new Set(),
+                                            rmSet: new Set()
+                                        });
+                                    }
+                                    const cat = categorieDettagliate.get(key);
+                                    cat.importo += fatturato;
+                                    
+                                    if (provincia === 'LT') {
+                                        cat.ltSet.add(cliente);
+                                    } else if (provincia === 'RM') {
+                                        cat.rmSet.add(cliente);
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // Convert sets to counts
+                        categorieDettagliate.forEach(cat => {
+                            cat.ltClienti = cat.ltSet.size;
+                            cat.rmClienti = cat.rmSet.size;
+                            delete cat.ltSet;
+                            delete cat.rmSet;
+                        });
+                        
+                        // Sort sales by amount descending
+                        dettaglioVendite.sort((a, b) => b.fatturato - a.fatturato);
+                    }
+
+                    const categorieDettagliateArray = Array.from(categorieDettagliate.values())
+                        .sort((a, b) => b.importo - a.importo);
+
+                    console.log('Final parsed data:', { generale, latina, roma, categorie, agentInfo, dettaglioVendite, categorieDettagliate: categorieDettagliateArray });
+                    return { generale, latina, roma, categorie, agentInfo, dettaglioVendite, categorieDettagliate: categorieDettagliateArray };
                     
                 } catch (e) {
                     console.error('Parse error:', e);
@@ -1564,6 +1631,8 @@ Periodo,01/01/2025 - 24/08/2025`;
                 this.updateMixProdottiData();
                 this.updateRiepilogoClienti();
                 this.updateDistribuzioneProvince();
+                this.updateCategoryDetailsTable();
+                this.updateTopSalesTable();
             }
 
             createProvinceDistributionChart() {
@@ -2003,6 +2072,117 @@ Periodo,01/01/2025 - 24/08/2025`;
                 // Update fatturato growth
                 const ltFatturatoGrowth = this.calculateGrowthPercentage(this.csvData.latina.annoCorrente, this.csvData.latina.annoPrecedente);
                 document.getElementById('lt-fatturato-growth').textContent = `+${ltFatturatoGrowth}%`;
+            }
+
+            updateTopSalesTable() {
+                const tableBody = document.getElementById('top-sales-table');
+                if (!tableBody || !this.csvData.dettaglioVendite) return;
+                
+                // Get top 10 sales
+                const topSales = this.csvData.dettaglioVendite.slice(0, 10);
+                
+                tableBody.innerHTML = topSales.map(sale => {
+                    const provinceColor = sale.provincia === 'LT' ? '#8b5cf6' : '#22d3ee';
+                    return `
+                        <tr style="border-bottom: 1px solid #e5e7eb; transition: background-color 0.2s ease;">
+                            <td style="padding: 1rem;">
+                                <span style="background: ${provinceColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 600;">
+                                    ${sale.provincia}
+                                </span>
+                            </td>
+                            <td style="padding: 1rem; font-weight: 500; color: #1f2937; font-size: 0.875rem;">
+                                ${sale.cliente}
+                            </td>
+                            <td style="padding: 1rem; color: #6b7280; font-size: 0.875rem;">
+                                ${sale.categoria}
+                            </td>
+                            <td style="padding: 1rem; text-align: right; font-weight: 700; color: #059669;">
+                                ${this.formatEuro(sale.fatturato)}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                // Add hover effects
+                const rows = tableBody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    row.addEventListener('mouseenter', () => {
+                        row.style.backgroundColor = '#f8fafc';
+                    });
+                    row.addEventListener('mouseleave', () => {
+                        row.style.backgroundColor = 'transparent';
+                    });
+                });
+            }
+
+            updateCategoryDetailsTable() {
+                const tableBody = document.getElementById('category-details-table');
+                if (!tableBody || !this.csvData.categorieDettagliate) return;
+                
+                const totalAmount = this.csvData.categorieDettagliate.reduce((sum, cat) => sum + cat.importo, 0);
+                
+                tableBody.innerHTML = this.csvData.categorieDettagliate.map((cat, index) => {
+                    const percentage = totalAmount > 0 ? ((cat.importo / totalAmount) * 100).toFixed(1) : 0;
+                    const rankColor = this.getCategoryRankColor(index);
+                    
+                    return `
+                        <tr style="border-bottom: 1px solid #e5e7eb; transition: background-color 0.2s ease;">
+                            <td style="padding: 1rem;">
+                                <div style="width: 28px; height: 28px; background: ${rankColor}; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem;">
+                                    ${index + 1}
+                                </div>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">
+                                    ${cat.nome}
+                                </div>
+                                <div style="color: #6b7280; font-size: 0.75rem;">
+                                    ${percentage}%
+                                </div>
+                            </td>
+                            <td style="padding: 1rem; text-align: right; font-weight: 700; color: #1f2937;">
+                                ${this.formatEuro(cat.importo)}
+                            </td>
+                            <td style="padding: 1rem; text-align: center;">
+                                <span style="background: #f3e8ff; color: #8b5cf6; padding: 0.25rem 0.75rem; border-radius: 1rem; font-weight: 700; font-size: 0.875rem;">
+                                    ${cat.ltClienti}
+                                </span>
+                            </td>
+                            <td style="padding: 1rem; text-align: center;">
+                                <span style="background: #ecfeff; color: #22d3ee; padding: 0.25rem 0.75rem; border-radius: 1rem; font-weight: 700; font-size: 0.875rem;">
+                                    ${cat.rmClienti}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                // Add hover effects
+                const rows = tableBody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    row.addEventListener('mouseenter', () => {
+                        row.style.backgroundColor = '#f8fafc';
+                    });
+                    row.addEventListener('mouseleave', () => {
+                        row.style.backgroundColor = 'transparent';
+                    });
+                });
+            }
+
+            getCategoryRankColor(index) {
+                const colors = [
+                    '#f59e0b', // Gold for #1
+                    '#6b7280', // Silver for #2  
+                    '#cd7f32', // Bronze for #3
+                    '#3b82f6', // Blue for others
+                    '#8b5cf6', 
+                    '#22d3ee',
+                    '#10b981',
+                    '#f97316',
+                    '#ec4899',
+                    '#84cc16'
+                ];
+                return colors[index] || '#6b7280';
             }
 
             showLoading() {
