@@ -862,8 +862,7 @@
                 this.isLoading = false;
                 this.csvFileNames = [
                     '631.00238_CARABOT-NATALINO.csv',
-                    '631.00238_CARABOT NATALINO.csv',
-                    '631.00238_CARABOTNATALINO.csv'
+                    '631.00238_CARABOT NATALINO.csv'
                 ];
                 this.init();
             }
@@ -1037,95 +1036,82 @@
 
             parseCSV(csvText) {
                 try {
-                    console.log('Parsing CSV, lunghezza:', csvText.length);
+                    // Parse OBIETTIVI section
+                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
+                    if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
                     
-                    // Parse GENERALE data (cerca la riga che inizia con "Generale;")
-                    const generaleMatch = csvText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
-                    if (!generaleMatch) {
-                        console.error('Regex Generale non trovata, provo formato alternativo');
-                        throw new Error('Dati Generale non trovati');
-                    }
+                    const obiettiviText = obiettiviMatch[1];
+                    
+                    // Parse GENERALE data
+                    const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
+                    if (!generaleMatch) throw new Error('Dati Generale non trovati');
                     
                     const generale = {
                         annoPrecedente: this.parseNumber(generaleMatch[1]),
                         annoCorrente: this.parseNumber(generaleMatch[2]),
                         clienti: parseInt(generaleMatch[4], 10)
                     };
-                    console.log('Generale parsato:', generale);
 
-                    // Parse LATINA data (cerca la riga che inizia con "LT;")
-                    const ltMatch = csvText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
-                    if (!ltMatch) {
-                        console.error('Regex LT non trovata');
-                        throw new Error('Dati Latina non trovati');
-                    }
+                    // Parse LATINA data
+                    const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
+                    if (!ltMatch) throw new Error('Dati Latina non trovati');
                     
                     const latina = {
                         annoPrecedente: this.parseNumber(ltMatch[1]),
                         annoCorrente: this.parseNumber(ltMatch[2]),
-                        obiettivo: this.parseNumber(ltMatch[3]),
+                        obiettivo: this.parseNumber(ltMatch[3]) * 1000, // Convert to euros
                         percentualeObiettivo: parseInt(ltMatch[4], 10),
                         clientiPrecedenti: parseInt(ltMatch[5], 10),
                         clientiCorrente: parseInt(ltMatch[6], 10),
                         obiettivoClienti: parseInt(ltMatch[7], 10),
                         percentualeClienti: parseInt(ltMatch[8], 10)
                     };
-                    console.log('Latina parsata:', latina);
 
                     // Parse ROMA data
-                    const rmMatch = csvText.match(/RM;(\d+);([\d.,]+);;;;;;/);
+                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
                     let roma = { annoCorrente: 0, clienti: 0 };
-                    if (rmMatch) {
-                        roma = {
-                            annoCorrente: this.parseNumber(rmMatch[2]),
-                            clienti: parseInt(rmMatch[1], 10)
-                        };
-                    }
-                    console.log('Roma parsata:', roma);
-
-                    // Parse categorie - cerca tutte le righe con prodotti
-                    let categorie = [];
-                    const categorieLines = csvText.split('\n').filter(line => {
-                        return line.includes(';') && 
-                               (line.includes('MATTONE') || 
-                                line.includes('PAVIMENTAZIONE') || 
-                                line.includes('REFRATTARI') ||
-                                line.includes('FACCIAVISTA') ||
-                                line.includes('LINEA ARCHEO') ||
-                                line.includes('COPERTURE') ||
-                                line.includes('PIASTRELLE'));
-                    });
-                    
-                    console.log('Righe categorie trovate:', categorieLines.length);
-                    
-                    const categorieMap = {};
-                    categorieLines.forEach(line => {
-                        const parts = line.split(';');
-                        if (parts.length >= 2) {
-                            const categoria = parts[0].trim();
-                            const importo = this.parseNumber(parts[1]);
-                            if (categoria && importo > 0) {
-                                categorieMap[categoria] = (categorieMap[categoria] || 0) + importo;
-                            }
+                    if (clientiMatch) {
+                        const rmMatch = clientiMatch[1].match(/RM;(\d+);([\d.,]+);;;;;;/);
+                        if (rmMatch) {
+                            roma = {
+                                annoCorrente: this.parseNumber(rmMatch[2]),
+                                clienti: parseInt(rmMatch[1], 10)
+                            };
                         }
-                    });
-                    
-                    Object.keys(categorieMap).forEach(nome => {
-                        categorie.push({
-                            nome: nome,
-                            importo: categorieMap[nome]
+                    }
+
+                    // Parse CATEGORIE data for Mix Prodotti
+                    const categorieMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===([\s\S]*?)===.*===/);
+                    let categorie = [];
+                    if (categorieMatch) {
+                        const categorieSection = categorieMatch[1];
+                        const lines = categorieSection.split('\n').filter(line => 
+                            line.trim() && 
+                            !line.includes('===') && 
+                            !line.includes('Categoria') && 
+                            line.includes(';') && 
+                            line.split(';').length >= 2
+                        );
+                        
+                        lines.forEach(line => {
+                            const parts = line.split(';');
+                            if (parts.length >= 2) {
+                                const categoria = parts[0].trim();
+                                const importo = this.parseNumber(parts[1]);
+                                if (categoria && importo > 0) {
+                                    categorie.push({
+                                        nome: categoria,
+                                        importo: importo
+                                    });
+                                }
+                            }
                         });
-                    });
-                    
-                    console.log('Categorie parsate:', categorie);
-                    
-                    const result = { generale, latina, roma, categorie };
-                    console.log('Risultato finale parsing:', result);
-                    return result;
+                    }
+
+                    return { generale, latina, roma, categorie };
                     
                 } catch (e) {
-                    console.error('Errore parsing CSV:', e);
-                    console.error('Primi 1000 caratteri del CSV:', csvText.substring(0, 1000));
+                    console.error('Parse error:', e);
                     return null;
                 }
             }
@@ -1425,3 +1411,196 @@
                                 data: [ltClienti, rmClienti],
                                 backgroundColor: ['#22d3ee', '#22d3ee'],
                                 borderRadius: 8,
+                                maxBarThickness: 60
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `${context.dataset.label}: ${context.raw} clienti`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 24,
+                                ticks: {
+                                    stepSize: 6,
+                                    color: '#6b7280'
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#6b7280',
+                                    font: {
+                                        size: 12,
+                                        weight: '600'
+                                    }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1500,
+                            easing: 'easeOutBounce'
+                        }
+                    }
+                });
+            }
+
+            createFatturatoChart() {
+                const ctx = document.getElementById('fatturatoChart');
+                if (!ctx) return;
+
+                const ltFatturato = this.csvData.latina.annoCorrente;
+                const rmFatturato = this.csvData.roma.annoCorrente;
+                const ltPrevFatturato = this.csvData.latina.annoPrecedente;
+
+                // Calculate max for Y axis
+                const maxValue = Math.max(ltFatturato, rmFatturato, ltPrevFatturato) * 1.2;
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['LT', 'RM'],
+                        datasets: [
+                            {
+                                label: '2024',
+                                data: [ltPrevFatturato, 0], // RM non ha dati 2024
+                                backgroundColor: '#cbd5e1',
+                                borderRadius: 8,
+                                maxBarThickness: 80
+                            },
+                            {
+                                label: '2025',
+                                data: [ltFatturato, rmFatturato],
+                                backgroundColor: ['#8b5cf6', '#6366f1'],
+                                borderRadius: 8,
+                                maxBarThickness: 80
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `${context.dataset.label}: ${this.formatEuroK(context.raw)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: maxValue,
+                                ticks: {
+                                    callback: (value) => {
+                                        if (value >= 100000) return `€${Math.round(value/1000)}k`;
+                                        if (value >= 25000) return `€${Math.round(value/1000)}k`;
+                                        return `€${Math.round(value/1000)}k`;
+                                    },
+                                    color: '#6b7280'
+                                },
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#6b7280',
+                                    font: {
+                                        size: 12,
+                                        weight: '600'
+                                    }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 2000,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            updateProvinceDisplays() {
+                // Update Clienti displays
+                document.getElementById('lt-clienti-count').textContent = `${this.csvData.latina.clientiCorrente} clienti`;
+                document.getElementById('rm-clienti-count').textContent = `${this.csvData.roma.clienti} clienti`;
+
+                // Calculate client growth for LT
+                const ltClientGrowth = this.csvData.latina.clientiPrecedenti > 0 ? 
+                    this.calculateGrowthPercentage(this.csvData.latina.clientiCorrente, this.csvData.latina.clientiPrecedenti) : '0.0';
+                
+                // Update growth badges for clients
+                const ltGrowthEl = document.getElementById('lt-growth');
+                if (ltClientGrowth >= 0) {
+                    ltGrowthEl.textContent = `+${ltClientGrowth}%`;
+                    ltGrowthEl.style.background = '#f0fdf4';
+                    ltGrowthEl.style.color = '#16a34a';
+                } else {
+                    ltGrowthEl.textContent = `${ltClientGrowth}%`;
+                    ltGrowthEl.style.background = '#fef2f2';
+                    ltGrowthEl.style.color = '#dc2626';
+                }
+
+                // RM is new, so always positive
+                document.getElementById('rm-growth').textContent = '+∞%';
+
+                // Update Fatturato displays
+                document.getElementById('lt-fatturato-display').textContent = this.formatEuroK(this.csvData.latina.annoCorrente);
+                document.getElementById('lt-fatturato-prev').textContent = this.formatEuroK(this.csvData.latina.annoPrecedente);
+                document.getElementById('rm-fatturato-display').textContent = this.formatEuroK(this.csvData.roma.annoCorrente);
+
+                // Update fatturato growth
+                const ltFatturatoGrowth = this.calculateGrowthPercentage(this.csvData.latina.annoCorrente, this.csvData.latina.annoPrecedente);
+                document.getElementById('lt-fatturato-growth').textContent = `+${ltFatturatoGrowth}%`;
+            }
+
+            showLoading() {
+                document.getElementById('loading-state').style.display = 'block';
+                document.getElementById('error-state').style.display = 'none';
+                document.getElementById('main-content').style.display = 'none';
+            }
+
+            showError(message) {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('error-state').style.display = 'block';
+                document.getElementById('main-content').style.display = 'none';
+                document.getElementById('error-message').textContent = message;
+            }
+
+            showSuccess() {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('error-state').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            new ExecutiveDashboard();
+        });
+    </script>
+</body>
+</html>
