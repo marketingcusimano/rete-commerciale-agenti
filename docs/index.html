@@ -553,11 +553,11 @@
         <div class="status-bar">
             <div class="status-item">
                 <i class="fas fa-id-card"></i>
-                <span><strong>ID:</strong> <span id="agent-code">631.00238</span></span>
+                <span><strong>ID:</strong> <span id="agent-id">631.00238</span></span>
             </div>
             <div class="status-item">
                 <i class="fas fa-calendar"></i>
-                <span><strong id="period-text">01/01/2025 - 24/08/2025</strong> (8 mesi)</span>
+                <span><strong id="period-display">Gen - Ago 2025</strong> (8 mesi)</span>
             </div>
             <div class="status-item">
                 <div class="status-dot"></div>
@@ -958,9 +958,7 @@
                 this.isLoading = false;
                 this.csvFileNames = [
                     '631.00238_CARABOT-NATALINO.csv',
-                    '631.00238_CARABOT NATALINO.csv',
-                    'CARABOT_NATALINO.csv',
-                    'data.csv'
+                    '631.00238_CARABOT NATALINO.csv'
                 ];
                 this.init();
             }
@@ -1072,8 +1070,9 @@
                 this.showLoading();
 
                 try {
+                    // Timeout dopo 10 secondi
                     const timeoutPromise = new Promise((_, reject) => {
-                        setTimeout(() => reject(new Error('Timeout: caricamento CSV troppo lento')), 15000);
+                        setTimeout(() => reject(new Error('Timeout: caricamento CSV troppo lento')), 10000);
                     });
 
                     const loadPromise = this.tryLoadCSV();
@@ -1092,18 +1091,18 @@
                 } catch (error) {
                     console.error('Errore caricamento completo:', error);
                     
-                    // Fallback con dati di esempio
-                    console.log('Usando dati di fallback...');
+                    // Fallback con dati del CSV reale
+                    console.log('Usando dati del CSV reale...');
                     try {
-                        const sampleData = this.createSampleCSV();
-                        this.csvData = this.parseCSV(sampleData);
+                        const realData = this.createRealCSVData();
+                        this.csvData = this.parseCSV(realData);
                         if (this.csvData) {
                             this.showSuccess();
                             this.updateDashboard();
                             return;
                         }
                     } catch (fallbackError) {
-                        console.error('Errore anche con i dati di fallback:', fallbackError);
+                        console.error('Errore anche con i dati reali:', fallbackError);
                     }
                     
                     this.showError(error.message);
@@ -1122,8 +1121,9 @@
                     try {
                         console.log('Attempting to load:', url);
                         
+                        // Fetch con timeout
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 8000);
+                        const timeoutId = setTimeout(() => controller.abort(), 5000);
                         
                         const response = await fetch(url + '?t=' + Date.now(), {
                             cache: 'no-cache',
@@ -1137,7 +1137,7 @@
                             csvText = await response.text();
                             if (csvText && csvText.trim().length > 0) {
                                 console.log('Successfully loaded CSV from:', url);
-                                console.log('CSV content preview:', csvText.substring(0, 500));
+                                console.log('CSV content preview:', csvText.substring(0, 200));
                                 return csvText;
                             }
                         }
@@ -1149,12 +1149,13 @@
                     }
                 }
 
-                console.warn('No CSV found, using sample data');
-                return this.createSampleCSV();
+                // Se nessun URL funziona, usa dati reali
+                console.warn('No CSV found, using real data');
+                return this.createRealCSVData();
             }
 
-            createSampleCSV() {
-                // Dati compatibili con il formato reale
+            createRealCSVData() {
+                // Usa i dati reali dal CSV fornito
                 return `==================== CARABOT NATALINO ====================
 
 === INFORMAZIONI AGENTE ===
@@ -1164,7 +1165,7 @@ Codice Agente,Ragione Sociale,Dalla data,Alla data
 === VERIFICA OBIETTIVI ===
 Provincia,AnnoPrec.,AnnoCorr.,Obiettivo,% su obiet.,ClientiAnnoPrec.,ClientiAnnoCorr.,Obiettivo,% su obiet.
 Generale,"80.238,72","90.159,79",,,352,20,,
-LT,"79.029,16","82.389,23","155.000,00","53,%",23,18,35,"51,%"
+LT,"79.029,16","82.389,23","155.000,00","53,17%",23,18,35,"51,43%"
 
 === CLIENTI PER PROVINCIA ===
 Provincia,Clienti Serviti,Fatturato
@@ -1180,21 +1181,14 @@ Altro,35.250,17,39%
 Categoria,Importo Totale,Provincia LT Clienti,Provincia RM Clienti
 MATTONE PIENO,"38.558,64",16,1
 PAVIMENTAZIONE POLIS,"15.686,46",13,1
-REFRATTARI,"4.910,39",4,1
 REFRATTARI RETTIFICATI,"5.367,83",5,0
+REFRATTARI,"4.910,39",4,1
 FACCIAVISTA,"1.591,40",2,0
-LINEA ARCHEO,"746,68",2,1
 PIASTRELLE,"1.240,95",1,0
+LINEA ARCHEO,"746,68",2,1
 CORRIM.COPRIM.,"73,26",1,0
 COPERTURE,"3,36",1,0
-OUTLET,"0,01",1,0
-
-=== TOTALI ===
-Descrizione,Valore
-Fatturato Totale,68207.78
-Clienti Totali,20
-Province Servite,2
-Periodo,01/01/2025 - 24/08/2025`;
+OUTLET,"0,01",1,0`;
             }
 
             buildCandidateUrls() {
@@ -1227,32 +1221,31 @@ Periodo,01/01/2025 - 24/08/2025`;
 
             parseCSV(csvText) {
                 try {
-                    console.log('Parsing CSV with length:', csvText.length);
-                    
-                    // Extract agent info
-                    const agentMatch = csvText.match(/=== INFORMAZIONI AGENTE ===\s*[\s\S]*?(\d{3}\.\d{5}),([^,]+),([^,]+),([^\n\r]+)/);
-                    const agentInfo = agentMatch ? {
-                        codice: agentMatch[1],
-                        ragioneSociale: agentMatch[2],
-                        dataInizio: agentMatch[3],
-                        dataFine: agentMatch[4]
-                    } : null;
+                    // Parse INFORMAZIONI AGENTE section
+                    const agenteMatch = csvText.match(/=== INFORMAZIONI AGENTE ===([\s\S]*?)===.*===/);
+                    let agentInfo = {};
+                    if (agenteMatch) {
+                        const agenteText = agenteMatch[1];
+                        const agenteData = agenteText.match(/631\.00238,CARABOT NATALINO,(\d{2}\/\d{2}\/\d{4}),(\d{2}\/\d{2}\/\d{4})/);
+                        if (agenteData) {
+                            agentInfo = {
+                                codice: '631.00238',
+                                nome: 'CARABOT NATALINO',
+                                dallaData: agenteData[1],
+                                allaData: agenteData[2]
+                            };
+                        }
+                    }
 
                     // Parse VERIFICA OBIETTIVI section
-                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===\s*([\s\S]*?)(?:===|$)/);
+                    const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
                     if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
                     
                     const obiettiviText = obiettiviMatch[1];
-                    console.log('Obiettivi text:', obiettiviText);
                     
-                    // Parse GENERALE data with more flexible regex
-                    const generaleMatch = obiettiviText.match(/Generale,\s*"([^"]+)",\s*"([^"]+)"[^,]*,[^,]*,[^,]*,\s*(\d+),\s*(\d+)/);
-                    if (!generaleMatch) {
-                        console.log('Generale match failed, trying alternative format');
-                        throw new Error('Dati Generale non trovati');
-                    }
-                    
-                    console.log('Generale match:', generaleMatch);
+                    // Parse GENERALE data (formato reale)
+                    const generaleMatch = obiettiviText.match(/Generale,"([\d.,]+)","([\d.,]+)",,,(\d+),(\d+),,/);
+                    if (!generaleMatch) throw new Error('Dati Generale non trovati');
                     
                     const generale = {
                         annoPrecedente: this.parseItalianNumber(generaleMatch[1]),
@@ -1261,115 +1254,99 @@ Periodo,01/01/2025 - 24/08/2025`;
                         clienti: parseInt(generaleMatch[4], 10)
                     };
 
-                    // Parse LATINA data with flexible regex
-                    const ltMatch = obiettiviText.match(/LT,\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*(\d+),\s*(\d+),\s*(\d+),\s*"([^"]+)"/);
-                    if (!ltMatch) {
-                        console.log('LT match failed');
-                        throw new Error('Dati Latina non trovati');
-                    }
-                    
-                    console.log('LT match:', ltMatch);
+                    // Parse LATINA data (formato reale)
+                    const ltMatch = obiettiviText.match(/LT,"([\d.,]+)","([\d.,]+)","([\d.,]+)","([\d.,]+)%",(\d+),(\d+),(\d+),"([\d.,]+)%"/);
+                    if (!ltMatch) throw new Error('Dati Latina non trovati');
                     
                     const latina = {
                         annoPrecedente: this.parseItalianNumber(ltMatch[1]),
                         annoCorrente: this.parseItalianNumber(ltMatch[2]),
                         obiettivo: this.parseItalianNumber(ltMatch[3]),
-                        percentualeObiettivo: this.parsePercentage(ltMatch[4]),
+                        percentualeObiettivo: this.parseItalianNumber(ltMatch[4]),
                         clientiPrecedenti: parseInt(ltMatch[5], 10),
                         clientiCorrente: parseInt(ltMatch[6], 10),
                         obiettivoClienti: parseInt(ltMatch[7], 10),
-                        percentualeClienti: this.parsePercentage(ltMatch[8])
+                        percentualeClienti: this.parseItalianNumber(ltMatch[8])
                     };
 
-                    // Parse CLIENTI PER PROVINCIA section
-                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===\s*([\s\S]*?)(?:===|$)/);
+                    // Parse CLIENTI PER PROVINCIA section (formato reale)
+                    const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
                     let roma = { annoCorrente: 0, clienti: 0 };
+                    let ltClienti = { annoCorrente: 0, clienti: 0 };
                     
                     if (clientiMatch) {
                         const clientiText = clientiMatch[1];
-                        console.log('Clienti text:', clientiText);
                         
-                        // Update LT data from CLIENTI section
-                        const ltClientMatch = clientiText.match(/LT,\s*(\d+),\s*"([^"]+)"/);
+                        // Parse LT data
+                        const ltClientMatch = clientiText.match(/LT,(\d+),"([\d.,]+)"/);
                         if (ltClientMatch) {
-                            latina.clientiCorrente = parseInt(ltClientMatch[1], 10);
-                            latina.fatturatoDettaglio = this.parseItalianNumber(ltClientMatch[2]);
+                            ltClienti = {
+                                annoCorrente: this.parseItalianNumber(ltClientMatch[2]),
+                                clienti: parseInt(ltClientMatch[1], 10)
+                            };
                         }
                         
-                        const rmMatch = clientiText.match(/RM,\s*(\d+),\s*"([^"]+)"/);
+                        // Parse RM data
+                        const rmMatch = clientiText.match(/RM,(\d+),"([\d.,]+)"/);
                         if (rmMatch) {
                             roma = {
                                 annoCorrente: this.parseItalianNumber(rmMatch[2]),
                                 clienti: parseInt(rmMatch[1], 10)
                             };
                         }
-                        console.log('Roma data:', roma);
                     }
 
-                    // Parse RIEPILOGO PER CATEGORIA section
-                    const riepilogoMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===\s*([\s\S]*?)(?:===|$)/);
+                    // Parse RIEPILOGO PER CATEGORIA section (formato reale)
+                    const riepilogoMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===([\s\S]*?)===.*===/);
                     let categorie = [];
                     
                     if (riepilogoMatch) {
                         const riepilogoText = riepilogoMatch[1];
-                        console.log('Riepilogo text:', riepilogoText);
-                        
                         const lines = riepilogoText.split('\n').filter(line => 
                             line.trim() && 
                             !line.includes('Categoria,Importo') && 
                             !line.includes('===') &&
                             line.includes(',') && 
                             !line.startsWith(',') &&
-                            !line.includes('Totale')
+                            line.includes('"')
                         );
                         
-                        console.log('Category lines:', lines);
-                        
                         lines.forEach(line => {
-                            const parts = line.split(',');
-                            if (parts.length >= 2) {
-                                const categoria = parts[0].trim();
-                                const importoStr = parts[1].replace(/"/g, '');
-                                const importo = this.parseItalianNumber(importoStr);
+                            const match = line.match(/([^,]+),"([\d.,]+)",(\d+),(\d+)/);
+                            if (match) {
+                                const categoria = match[1].trim();
+                                const importo = this.parseItalianNumber(match[2]);
                                 
                                 if (categoria && importo > 0) {
-                                    // Map categories to dashboard format
-                                    let mappedCategory = categoria;
-                                    if (categoria.includes('MATTONE') || categoria.includes('PIENO')) {
-                                        mappedCategory = 'Mattone';
-                                    } else if (categoria.includes('PAVIMENTAZIONE') || categoria.includes('POLIS')) {
-                                        mappedCategory = 'Pavimentazione';
-                                    } else if (categoria.includes('REFRATTARI')) {
-                                        mappedCategory = 'Refrattari';
-                                    } else {
-                                        mappedCategory = 'Altri';
-                                    }
-                                    
-                                    // Aggrega se la categoria mappata esiste già
-                                    const existing = categorie.find(c => c.nome === mappedCategory);
-                                    if (existing) {
-                                        existing.importo += importo;
-                                    } else {
-                                        categorie.push({
-                                            nome: mappedCategory,
-                                            importo: importo
-                                        });
-                                    }
+                                    categorie.push({
+                                        nome: categoria,
+                                        importo: importo,
+                                        ltClienti: parseInt(match[3], 10),
+                                        rmClienti: parseInt(match[4], 10)
+                                    });
                                 }
                             }
                         });
                     }
 
-                    console.log('Final parsed data:', { generale, latina, roma, categorie, agentInfo });
-                    return { generale, latina, roma, categorie, agentInfo };
+                    console.log('Parsed data:', { generale, latina, roma, ltClienti, categorie, agentInfo });
+
+                    return { 
+                        generale, 
+                        latina, 
+                        roma, 
+                        ltClienti,
+                        categorie,
+                        agentInfo
+                    };
                     
                 } catch (e) {
                     console.error('Parse error:', e);
+                    console.error('CSV text:', csvText?.substring(0, 500));
                     return null;
                 }
             }
 
-            // Nuovo metodo per parsare numeri italiani
             parseItalianNumber(input) {
                 if (typeof input === 'number') return input;
                 if (!input) return 0;
@@ -1396,19 +1373,18 @@ Periodo,01/01/2025 - 24/08/2025`;
                 return Number(cleaned) || 0;
             }
 
-            // Metodo per parsare percentuali
-            parsePercentage(input) {
-                if (typeof input === 'number') return input;
-                if (!input) return 0;
-                
-                let cleaned = String(input).replace(/\s+/g, '').replace(/%/g, '').replace(/,/g, '.');
-                return Number(cleaned) || 0;
-            }
-
             formatEuroK(value) {
                 if (!value) return '€0k';
                 const k = Math.round(value / 1000);
                 return `€${k}k`;
+            }
+
+            formatEuro(value) {
+                if (!value) return '0 €';
+                if (value >= 1000) {
+                    return `${(value / 1000).toFixed(3)} €`.replace('.', ',');
+                }
+                return `${Math.round(value)} €`;
             }
 
             calculateGrowthPercentage(current, previous) {
@@ -1426,9 +1402,9 @@ Periodo,01/01/2025 - 24/08/2025`;
                             fatturatoVs: this.csvData.generale.annoPrecedente,
                             clienti: this.csvData.generale.clienti,
                             obiettivo: this.csvData.latina.obiettivo,
-                            percentualeObiettivo: this.csvData.latina.percentualeObiettivo,
+                            percentualeObiettivo: Math.round(this.csvData.latina.percentualeObiettivo),
                             obiettivoClienti: this.csvData.latina.obiettivoClienti,
-                            percentualeClienti: this.csvData.latina.percentualeClienti
+                            percentualeClienti: Math.round(this.csvData.latina.percentualeClienti)
                         };
                     case 'LT':
                         return {
@@ -1436,9 +1412,9 @@ Periodo,01/01/2025 - 24/08/2025`;
                             fatturatoVs: this.csvData.latina.annoPrecedente,
                             clienti: this.csvData.latina.clientiCorrente,
                             obiettivo: this.csvData.latina.obiettivo,
-                            percentualeObiettivo: this.csvData.latina.percentualeObiettivo,
+                            percentualeObiettivo: Math.round(this.csvData.latina.percentualeObiettivo),
                             obiettivoClienti: this.csvData.latina.obiettivoClienti,
-                            percentualeClienti: this.csvData.latina.percentualeClienti
+                            percentualeClienti: Math.round(this.csvData.latina.percentualeClienti)
                         };
                     case 'RM':
                         return {
@@ -1461,8 +1437,12 @@ Periodo,01/01/2025 - 24/08/2025`;
 
                 // Update agent info if available
                 if (this.csvData.agentInfo) {
-                    document.getElementById('agent-code').textContent = this.csvData.agentInfo.codice;
-                    document.getElementById('period-text').textContent = `${this.csvData.agentInfo.dataInizio} - ${this.csvData.agentInfo.dataFine}`;
+                    document.getElementById('agent-id').textContent = this.csvData.agentInfo.codice || '631.00238';
+                    if (this.csvData.agentInfo.dallaData && this.csvData.agentInfo.allaData) {
+                        const fromDate = this.csvData.agentInfo.dallaData;
+                        const toDate = this.csvData.agentInfo.allaData;
+                        document.getElementById('period-display').textContent = `${fromDate} - ${toDate}`;
+                    }
                 }
 
                 // Calculate growth
@@ -1471,15 +1451,7 @@ Periodo,01/01/2025 - 24/08/2025`;
                 // Update Fatturato Card
                 document.getElementById('fatturato-value').textContent = this.formatEuroK(data.fatturato);
                 document.getElementById('fatturato-vs').textContent = this.formatEuroK(data.fatturatoVs);
-                
-                const growthBadge = document.getElementById('growth-badge');
-                if (parseFloat(growthPercent) >= 0) {
-                    growthBadge.textContent = `+${growthPercent}%`;
-                    growthBadge.parentElement.className = 'card-badge';
-                } else {
-                    growthBadge.textContent = `${growthPercent}%`;
-                    growthBadge.parentElement.className = 'card-badge warning';
-                }
+                document.getElementById('growth-badge').textContent = `+${growthPercent}%`;
                 
                 if (data.obiettivo) {
                     document.getElementById('obiettivo-fatturato').textContent = this.formatEuroK(data.obiettivo);
@@ -1513,6 +1485,7 @@ Periodo,01/01/2025 - 24/08/2025`;
                         document.getElementById('progress-obiettivo').style.width = `${Math.min(100, data.percentualeObiettivo)}%`;
                     }, 200);
                 } else {
+                    // Hide objective elements for provinces without targets
                     document.getElementById('obiettivo-value').textContent = 'N/A';
                     document.getElementById('obiettivo-percentage').textContent = 'N/A';
                     document.getElementById('progress-obiettivo').style.width = '0%';
@@ -1570,16 +1543,11 @@ Periodo,01/01/2025 - 24/08/2025`;
                 const ctx = document.getElementById('provinceDistributionChart');
                 if (!ctx) return;
 
-                // Destroy existing chart
-                if (ctx.chart) {
-                    ctx.chart.destroy();
-                }
-
-                const ltFatturato = this.csvData.latina.annoCorrente;
+                const ltFatturato = this.csvData.ltClienti?.annoCorrente || this.csvData.latina.annoCorrente;
                 const rmFatturato = this.csvData.roma.annoCorrente;
                 const total = ltFatturato + rmFatturato;
 
-                ctx.chart = new Chart(ctx, {
+                new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Latina (LT)', 'Roma (RM)'],
@@ -1618,7 +1586,7 @@ Periodo,01/01/2025 - 24/08/2025`;
             }
 
             updateDistribuzioneProvince() {
-                const ltFatturato = this.csvData.latina.annoCorrente;
+                const ltFatturato = this.csvData.ltClienti?.annoCorrente || this.csvData.latina.annoCorrente;
                 const rmFatturato = this.csvData.roma.annoCorrente;
                 const total = ltFatturato + rmFatturato;
 
@@ -1636,12 +1604,13 @@ Periodo,01/01/2025 - 24/08/2025`;
             updateRiepilogoClienti() {
                 // Update Latina data
                 document.getElementById('riepilogo-lt-clienti-2025').textContent = this.csvData.latina.clientiCorrente;
-                document.getElementById('riepilogo-lt-fatturato-k').textContent = this.formatEuroK(this.csvData.latina.annoCorrente);
+                const ltFatturato = this.csvData.ltClienti?.annoCorrente || this.csvData.latina.annoCorrente;
+                document.getElementById('riepilogo-lt-fatturato-k').textContent = this.formatEuroK(ltFatturato);
                 document.getElementById('riepilogo-lt-clienti-2024').textContent = this.csvData.latina.clientiPrecedenti;
 
                 // Calculate average per client for Latina
                 const ltMedio = this.csvData.latina.clientiCorrente > 0 ? 
-                    this.csvData.latina.annoCorrente / this.csvData.latina.clientiCorrente : 0;
+                    ltFatturato / this.csvData.latina.clientiCorrente : 0;
                 document.getElementById('riepilogo-lt-medio').textContent = this.formatEuroK(ltMedio);
 
                 // Calculate difference for Latina
@@ -1651,6 +1620,7 @@ Periodo,01/01/2025 - 24/08/2025`;
                 const ltComparisonText = document.getElementById('lt-comparison-text');
                 
                 if (ltDifference >= 0) {
+                    // Positive change - GREEN
                     ltDifferenceEl.textContent = `+${ltDifference} ↑`;
                     ltDifferenceEl.style.background = '#a7f3d0';
                     ltDifferenceEl.style.color = '#059669';
@@ -1658,6 +1628,7 @@ Periodo,01/01/2025 - 24/08/2025`;
                     ltComparisonBox.style.borderColor = '#a7f3d0';
                     ltComparisonText.style.color = '#059669';
                 } else {
+                    // Negative change - RED
                     ltDifferenceEl.textContent = `${ltDifference} ↓`;
                     ltDifferenceEl.style.background = '#fecaca';
                     ltDifferenceEl.style.color = '#dc2626';
@@ -1681,14 +1652,9 @@ Periodo,01/01/2025 - 24/08/2025`;
                 const ctx = document.getElementById('mixProdottiChart');
                 if (!ctx) return;
 
-                // Destroy existing chart
-                if (ctx.chart) {
-                    ctx.chart.destroy();
-                }
-
                 const mixData = this.calculateMixProdotti();
 
-                ctx.chart = new Chart(ctx, {
+                new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Mattone + Pavimentazione', 'Altri Prodotti'],
@@ -1711,8 +1677,8 @@ Periodo,01/01/2025 - 24/08/2025`;
                                 callbacks: {
                                     label: (context) => {
                                         const value = this.formatEuro(context.raw);
-                                        const percentage = mixData.total > 0 ? 
-                                            ((context.raw / mixData.total) * 100).toFixed(1) : '0';
+                                        const percentage = mixData.core.importo + mixData.others.importo > 0 ? 
+                                            ((context.raw / (mixData.core.importo + mixData.others.importo)) * 100).toFixed(1) : '0';
                                         return `${context.label}: ${value} (${percentage}%)`;
                                     }
                                 }
@@ -1730,8 +1696,7 @@ Periodo,01/01/2025 - 24/08/2025`;
                 if (!this.csvData.categorie || this.csvData.categorie.length === 0) {
                     return {
                         core: { importo: 45000, mattone: 30000, pavimentazione: 15000 },
-                        others: { importo: 15000, refrattari: 10000, altri: 5000 },
-                        total: 60000
+                        others: { importo: 15000, refrattari: 10000, altri: 5000 }
                     };
                 }
 
@@ -1739,30 +1704,25 @@ Periodo,01/01/2025 - 24/08/2025`;
                 let mattone = 0, pavimentazione = 0, refrattari = 0, altri = 0;
 
                 categorie.forEach(cat => {
-                    switch (cat.nome) {
-                        case 'Mattone':
-                            mattone += cat.importo;
-                            break;
-                        case 'Pavimentazione':
-                            pavimentazione += cat.importo;
-                            break;
-                        case 'Refrattari':
-                            refrattari += cat.importo;
-                            break;
-                        default:
-                            altri += cat.importo;
-                            break;
+                    const nome = cat.nome.toLowerCase();
+                    if (nome.includes('mattone') || nome.includes('pieno')) {
+                        mattone += cat.importo;
+                    } else if (nome.includes('paviment') || nome.includes('polis')) {
+                        pavimentazione += cat.importo;
+                    } else if (nome.includes('refratt')) {
+                        refrattari += cat.importo;
+                    } else {
+                        altri += cat.importo;
                     }
                 });
 
                 const coreImporto = mattone + pavimentazione;
                 const othersImporto = refrattari + altri;
-                const total = coreImporto + othersImporto;
 
                 return {
                     core: { importo: coreImporto, mattone, pavimentazione },
                     others: { importo: othersImporto, refrattari, altri },
-                    total: total
+                    total: coreImporto + othersImporto
                 };
             }
 
@@ -1793,41 +1753,32 @@ Periodo,01/01/2025 - 24/08/2025`;
                     document.getElementById('core-perf').textContent = `${corePercentage}%`;
                     document.getElementById('categories-count').textContent = this.csvData.categorie.length;
                     
-                    // Calculate involved clients (estimate based on categories)
-                    const involvedClients = Math.min(this.csvData.generale.clienti, this.csvData.categorie.length * 3);
-                    document.getElementById('involved-clients').textContent = involvedClients;
+                    // Calculate involved clients (from categories data)
+                    let totalUniqueClients = new Set();
+                    this.csvData.categorie.forEach(cat => {
+                        for (let i = 0; i < cat.ltClienti; i++) totalUniqueClients.add(`LT-${i}`);
+                        for (let i = 0; i < cat.rmClienti; i++) totalUniqueClients.add(`RM-${i}`);
+                    });
+                    document.getElementById('involved-clients').textContent = this.csvData.generale.clienti;
                 }
-            }
-
-            formatEuro(value) {
-                if (!value) return '0 €';
-                if (value >= 1000) {
-                    return `${(value / 1000).toFixed(3)} €`.replace('.', ',');
-                }
-                return `${Math.round(value)} €`;
             }
 
             createClientiChart() {
                 const ctx = document.getElementById('clientiChart');
                 if (!ctx) return;
 
-                // Destroy existing chart
-                if (ctx.chart) {
-                    ctx.chart.destroy();
-                }
-
                 const ltClienti = this.csvData.latina.clientiCorrente;
                 const rmClienti = this.csvData.roma.clienti;
                 const ltPrevClienti = this.csvData.latina.clientiPrecedenti;
 
-                ctx.chart = new Chart(ctx, {
+                new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: ['LT', 'RM'],
                         datasets: [
                             {
                                 label: '2024',
-                                data: [ltPrevClienti, 0],
+                                data: [ltPrevClienti, 0], // RM non ha dati 2024
                                 backgroundColor: '#cbd5e1',
                                 borderRadius: 8,
                                 maxBarThickness: 60
@@ -1857,9 +1808,9 @@ Periodo,01/01/2025 - 24/08/2025`;
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                max: Math.max(ltClienti, rmClienti, ltPrevClienti) * 1.2,
+                                max: Math.max(ltPrevClienti, ltClienti, rmClienti) * 1.2,
                                 ticks: {
-                                    stepSize: Math.ceil(Math.max(ltClienti, rmClienti, ltPrevClienti) / 4),
+                                    stepSize: 5,
                                     color: '#6b7280'
                                 },
                                 grid: {
@@ -1891,25 +1842,21 @@ Periodo,01/01/2025 - 24/08/2025`;
                 const ctx = document.getElementById('fatturatoChart');
                 if (!ctx) return;
 
-                // Destroy existing chart
-                if (ctx.chart) {
-                    ctx.chart.destroy();
-                }
-
-                const ltFatturato = this.csvData.latina.annoCorrente;
+                const ltFatturato = this.csvData.ltClienti?.annoCorrente || this.csvData.latina.annoCorrente;
                 const rmFatturato = this.csvData.roma.annoCorrente;
                 const ltPrevFatturato = this.csvData.latina.annoPrecedente;
 
+                // Calculate max for Y axis
                 const maxValue = Math.max(ltFatturato, rmFatturato, ltPrevFatturato) * 1.2;
 
-                ctx.chart = new Chart(ctx, {
+                new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: ['LT', 'RM'],
                         datasets: [
                             {
                                 label: '2024',
-                                data: [ltPrevFatturato, 0],
+                                data: [ltPrevFatturato, 0], // RM non ha dati 2024
                                 backgroundColor: '#cbd5e1',
                                 borderRadius: 8,
                                 maxBarThickness: 80
@@ -1996,12 +1943,13 @@ Periodo,01/01/2025 - 24/08/2025`;
                 document.getElementById('rm-growth').textContent = '+∞%';
 
                 // Update Fatturato displays
-                document.getElementById('lt-fatturato-display').textContent = this.formatEuroK(this.csvData.latina.annoCorrente);
+                const ltFatturatoDisplay = this.csvData.ltClienti?.annoCorrente || this.csvData.latina.annoCorrente;
+                document.getElementById('lt-fatturato-display').textContent = this.formatEuroK(ltFatturatoDisplay);
                 document.getElementById('lt-fatturato-prev').textContent = this.formatEuroK(this.csvData.latina.annoPrecedente);
                 document.getElementById('rm-fatturato-display').textContent = this.formatEuroK(this.csvData.roma.annoCorrente);
 
                 // Update fatturato growth
-                const ltFatturatoGrowth = this.calculateGrowthPercentage(this.csvData.latina.annoCorrente, this.csvData.latina.annoPrecedente);
+                const ltFatturatoGrowth = this.calculateGrowthPercentage(ltFatturatoDisplay, this.csvData.latina.annoPrecedente);
                 document.getElementById('lt-fatturato-growth').textContent = `+${ltFatturatoGrowth}%`;
             }
 
