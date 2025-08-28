@@ -942,39 +942,29 @@
                 
                 console.log('Loading CSV from:', csvUrl);
                 
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 8000);
-                    
-                    const response = await fetch(csvUrl + '?t=' + Date.now(), {
-                        cache: 'no-cache',
-                        signal: controller.signal
-                    });
-                    
-                    clearTimeout(timeoutId);
-                    
-                    console.log(`Response status: ${response.status}, OK: ${response.ok}`);
-                    
-                    if (response.ok) {
-                        const csvText = await response.text();
-                        if (csvText && csvText.trim().length > 0) {
-                            console.log('Successfully loaded CSV, content preview:', csvText.substring(0, 200));
-                            return csvText;
-                        } else {
-                            console.warn('CSV file is empty');
-                        }
-                    } else {
-                        console.error('Failed to fetch CSV:', response.status, response.statusText);
-                    }
-                } catch (e) {
-                    console.error('Error loading CSV:', e.message);
-                    if (e.name === 'AbortError') {
-                        console.warn('CSV load timed out');
-                    }
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                
+                const response = await fetch(csvUrl + '?t=' + Date.now(), {
+                    cache: 'no-cache',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                console.log(`Response status: ${response.status}, OK: ${response.ok}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Server ha risposto con status ${response.status}: ${response.statusText}`);
                 }
-
-                console.warn('CSV load failed, using fallback data');
-                return this.createSampleCSV();
+                
+                const csvText = await response.text();
+                if (!csvText || csvText.trim().length === 0) {
+                    throw new Error('Il file CSV è vuoto o non contiene dati validi');
+                }
+                
+                console.log('CSV caricato con successo, preview:', csvText.substring(0, 200));
+                return csvText;
             }
 
             createSampleCSV() {
@@ -1047,18 +1037,42 @@ FACCIAVISTA;2;0;4500
 
             parseCSV(csvText) {
                 try {
+                    console.log('Parsing CSV with content:', csvText.substring(0, 500));
+                    
                     const data = {
                         generale: {},
                         latina: {},
                         roma: {},
                         clienti: [],
-                        categorie: []
+                        categorie: [],
+                        agente: {}
                     };
 
-                    // Parse OBIETTIVI section
+                    // Parse INFORMAZIONI AGENTE section
+                    const agenteMatch = csvText.match(/=== INFORMAZIONI AGENTE ===([\s\S]*?)===.*===/);
+                    if (agenteMatch) {
+                        const agenteText = agenteMatch[1];
+                        const lines = agenteText.split('\n').filter(line => line.trim() && !line.includes('Codice Agente'));
+                        
+                        lines.forEach(line => {
+                            const parts = line.split(',');
+                            if (parts.length >= 2) {
+                                data.agente = {
+                                    codice: parts[0]?.trim(),
+                                    ragioneSociale: parts[1]?.trim(),
+                                    dallaData: parts[2]?.trim(),
+                                    allaData: parts[3]?.trim()
+                                };
+                            }
+                        });
+                        console.log('Parsed agent info:', data.agente);
+                    }
+
+                    // Parse VERIFICA OBIETTIVI section (if exists)
                     const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
                     if (obiettiviMatch) {
                         const obiettiviText = obiettiviMatch[1];
+                        console.log('Found obiettivi section:', obiettiviText.substring(0, 200));
                         
                         // Parse GENERALE data
                         const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
@@ -1069,6 +1083,7 @@ FACCIAVISTA;2;0;4500
                                 clienti: parseInt(generaleMatch[3], 10),
                                 obiettivoClienti: parseInt(generaleMatch[4], 10)
                             };
+                            console.log('Parsed generale:', data.generale);
                         }
 
                         // Parse LATINA data
@@ -1084,10 +1099,30 @@ FACCIAVISTA;2;0;4500
                                 obiettivoClienti: parseInt(ltMatch[7], 10),
                                 percentualeClienti: parseInt(ltMatch[8], 10)
                             };
+                            console.log('Parsed latina:', data.latina);
                         }
+                    } else {
+                        console.warn('VERIFICA OBIETTIVI section not found, using defaults');
+                        // Set default values since section is missing
+                        data.generale = {
+                            annoPrecedente: 0,
+                            annoCorrente: 0,
+                            clienti: 0,
+                            obiettivoClienti: 0
+                        };
+                        data.latina = {
+                            annoPrecedente: 0,
+                            annoCorrente: 0,
+                            obiettivo: 0,
+                            percentualeObiettivo: 0,
+                            clientiPrecedenti: 0,
+                            clientiCorrente: 0,
+                            obiettivoClienti: 0,
+                            percentualeClienti: 0
+                        };
                     }
 
-                    // Parse ROMA data from CLIENTI PER PROVINCIA section
+                    // Parse ROMA data from CLIENTI PER PROVINCIA section (if exists)
                     const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
                     if (clientiMatch) {
                         const rmMatch = clientiMatch[1].match(/RM;(\d+);([\d.,]+);;;;;;/);
@@ -1096,10 +1131,13 @@ FACCIAVISTA;2;0;4500
                                 clienti: parseInt(rmMatch[1], 10),
                                 annoCorrente: this.parseNumber(rmMatch[2])
                             };
+                            console.log('Parsed roma:', data.roma);
                         }
+                    } else {
+                        data.roma = { clienti: 0, annoCorrente: 0 };
                     }
 
-                    // Parse VENDITE PER CLIENTE section
+                    // Parse VENDITE PER CLIENTE section (if exists)
                     const venditeMatch = csvText.match(/=== VENDITE PER CLIENTE ===([\s\S]*?)===.*===/);
                     if (venditeMatch) {
                         const venditeLines = venditeMatch[1].split('\n').filter(line => 
@@ -1119,9 +1157,10 @@ FACCIAVISTA;2;0;4500
                                 });
                             }
                         });
+                        console.log('Parsed clienti:', data.clienti.length, 'records');
                     }
 
-                    // Parse CATEGORIE data
+                    // Parse CATEGORIE data (if exists)
                     const categorieMatch = csvText.match(/=== RIEPILOGO PER CATEGORIA ===([\s\S]*?)$/);
                     if (categorieMatch) {
                         const categorieLines = categorieMatch[1].split('\n').filter(line => 
@@ -1141,13 +1180,15 @@ FACCIAVISTA;2;0;4500
                                 });
                             }
                         });
+                        console.log('Parsed categorie:', data.categorie.length, 'records');
                     }
 
+                    console.log('Final parsed data structure:', data);
                     return data;
                     
                 } catch (e) {
                     console.error('Parse error:', e);
-                    return null;
+                    throw new Error('Errore nel parsing del CSV: ' + e.message);
                 }
             }
 
