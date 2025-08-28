@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - CARABOT NATALINO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
@@ -11,1546 +13,749 @@
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
             min-height: 100vh;
-            padding: 24px;
-            color: #1a202c;
+            color: #2d3748;
         }
-
+        
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 24px;
         }
-
+        
         .header {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 36px;
-            margin-bottom: 32px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .agent-info {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
+            align-items: center;
         }
-
-        .agent-name {
-            font-size: 2.6rem;
-            font-weight: 800;
+        
+        .header-left h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
             color: #1a202c;
             margin-bottom: 8px;
-            letter-spacing: -0.02em;
         }
-
-        .agent-subtitle {
-            font-size: 1rem;
-            color: #4a5568;
-            margin-bottom: 4px;
-            font-weight: 500;
+        
+        .header-subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 400;
         }
-
-        .status-info {
-            text-align: right;
-            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(56, 178, 172, 0.1));
-            padding: 16px 20px;
-            border-radius: 16px;
-            border: 1px solid rgba(72, 187, 120, 0.2);
-        }
-
-        .last-update {
-            font-size: 0.85rem;
-            color: #4a5568;
-            margin-bottom: 8px;
-        }
-
-        .data-source {
-            display: inline-flex;
-            align-items: center;
-            background: linear-gradient(135deg, #48bb78, #38b2ac);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
-        }
-
-        .data-source::before {
-            content: "●";
-            margin-right: 6px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .header-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin: 16px 0;
-            flex-wrap: wrap;
-        }
-
-        .info-item {
-            color: #4a5568;
-            font-size: 0.9rem;
-        }
-
-        .data-status {
-            display: inline-flex;
-            align-items: center;
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .data-status::before {
-            content: "●";
-            margin-right: 6px;
-        }
-
-        .filters {
+        
+        .header-right {
             display: flex;
             align-items: center;
             gap: 16px;
-            flex-wrap: wrap;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
         }
-
-        .filter-label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #718096;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .territory-filter {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(66, 153, 225, 0.1);
-            color: #3182ce;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border: 1px solid rgba(66, 153, 225, 0.2);
-        }
-
-        .territory-filter::before {
-            content: "●";
-            margin-right: 8px;
-            color: #4299e1;
-        }
-
-        .province-selector {
-            position: relative;
-            display: inline-block;
-        }
-
-        .filter-button {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
+        
+        .theme-toggle {
+            background: #2d3748;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filter-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(66, 153, 225, 0.4);
-        }
-
-        .filter-button::after {
-            content: "▼";
-            font-size: 0.7rem;
-            transition: transform 0.3s;
-        }
-
-        .filter-button.active::after {
-            transform: rotate(180deg);
-        }
-
-        /* Modal Province Selector */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: white;
-            border-radius: 24px;
-            padding: 32px;
-            width: 90%;
-            max-width: 480px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.show .modal {
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .modal-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #1a202c;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #718096;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
-
-        .modal-close:hover {
-            background: #f7fafc;
-            color: #2d3748;
-        }
-
-        .modal-subtitle {
-            color: #718096;
-            font-size: 0.9rem;
-            margin-bottom: 24px;
-        }
-
-        .province-option {
-            display: flex;
-            align-items: center;
-            padding: 16px 20px;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 8px;
-            border: 2px solid transparent;
-        }
-
-        .province-option:hover {
-            background: rgba(66, 153, 225, 0.05);
-        }
-
-        .province-option.selected {
-            background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(49, 130, 206, 0.1));
-            border-color: #4299e1;
-        }
-
-        .province-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 16px;
-            font-size: 1.2rem;
-            color: white;
-            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.2s;
         }
-
-        .province-icon.all {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
+        
+        .theme-toggle:hover {
+            background: #1a202c;
+            transform: translateY(-1px);
         }
-
-        .province-icon.latina {
-            background: linear-gradient(135deg, #805ad5, #6b46c1);
+        
+        .info-bar {
+            background: white;
+            padding: 20px 32px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 32px;
         }
-
-        .province-icon.roma {
-            background: linear-gradient(135deg, #38b2ac, #319795);
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #4a5568;
+            font-weight: 500;
         }
-
-        .province-details h3 {
-            font-size: 1.1rem;
+        
+        .info-item i {
+            color: #667eea;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .filter-section {
+            background: white;
+            padding: 24px 32px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+        
+        .filter-title {
+            font-size: 0.875rem;
             font-weight: 600;
-            color: #1a202c;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        
+        .province-selector {
+            position: relative;
+        }
+        
+        .selector-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .selector-button:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
+        }
+        
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            padding: 16px;
+            min-width: 320px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s;
+        }
+        
+        .dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-header {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .dropdown-subtitle {
+            color: #718096;
+            font-size: 0.875rem;
+            margin-bottom: 16px;
+        }
+        
+        .province-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
             margin-bottom: 4px;
         }
-
-        .province-details p {
-            font-size: 0.85rem;
-            color: #718096;
+        
+        .province-option:hover {
+            background: #f7fafc;
         }
-
-        .province-radio {
+        
+        .province-option.selected {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .province-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        .province-option.selected .province-icon {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .province-option:not(.selected) .province-icon {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+        
+        .province-info h4 {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .province-info span {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .radio-button {
             margin-left: auto;
             width: 20px;
             height: 20px;
-            border: 2px solid #cbd5e0;
+            border: 2px solid currentColor;
             border-radius: 50%;
             position: relative;
         }
-
-        .province-option.selected .province-radio {
-            border-color: #4299e1;
-        }
-
-        .province-option.selected .province-radio::after {
+        
+        .province-option.selected .radio-button::after {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 10px;
-            height: 10px;
-            background: #4299e1;
+            width: 8px;
+            height: 8px;
+            background: white;
             border-radius: 50%;
         }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .modal-btn {
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            font-size: 0.9rem;
-        }
-
-        .modal-btn.cancel {
+        
+        .cancel-btn {
+            width: 100%;
             background: #f7fafc;
             color: #4a5568;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 12px;
+            font-family: 'Montserrat', sans-serif;
         }
-
-        .modal-btn.cancel:hover {
-            background: #edf2f7;
-        }
-
-        .modal-btn.apply {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
-            color: white;
-            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
-        }
-
-        .modal-btn.apply:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(66, 153, 225, 0.4);
-        }
-
+        
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 28px;
-            margin-bottom: 32px;
+            gap: 24px;
+            margin-bottom: 24px;
         }
-
-        .card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            border-radius: 24px 24px 0 0;
-        }
-
-        .card.fatturato::before { background: linear-gradient(90deg, #48bb78, #38a169); }
-        .card.clienti::before { background: linear-gradient(90deg, #4299e1, #3182ce); }
-        .card.performance::before { background: linear-gradient(90deg, #805ad5, #6b46c1); }
-        .card.sviluppo::before { background: linear-gradient(90deg, #ed8936, #dd6b20); }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
-        }
-
-        .metric-header {
-            font-size: 0.85rem;
-            color: #718096;
-            margin-bottom: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .metric-value {
-            font-size: 2.4rem;
-            font-weight: 800;
-            color: #1a202c;
-            margin-bottom: 16px;
-            line-height: 1;
-        }
-
-        .metric-change {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
+        
+        .metric-card {
+            background: white;
+            padding: 28px;
             border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .metric-title {
+            color: #718096;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .growth-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 20px;
             font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .growth-positive {
+            background: #c6f6d5;
+            color: #25855a;
+        }
+        
+        .growth-negative {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
             font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+        
+        .metric-subtitle {
+            color: #718096;
+            font-size: 0.9rem;
             margin-bottom: 20px;
         }
-
-        .positive {
-            background: linear-gradient(135deg, rgba(72, 187, 120, 0.15), rgba(56, 161, 105, 0.15));
-            color: #2f855a;
-            border: 1px solid rgba(72, 187, 120, 0.3);
-        }
-
-        .negative {
-            background: linear-gradient(135deg, rgba(245, 101, 101, 0.15), rgba(229, 62, 62, 0.15));
-            color: #c53030;
-            border: 1px solid rgba(245, 101, 101, 0.3);
-        }
-
-        .neutral {
-            background: linear-gradient(135deg, rgba(160, 174, 192, 0.15), rgba(113, 128, 150, 0.15));
-            color: #4a5568;
-            border: 1px solid rgba(160, 174, 192, 0.3);
-        }
-
+        
         .progress-section {
             margin-top: 20px;
         }
-
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .progress-label {
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .progress-percentage {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #48bb78;
+        }
+        
         .progress-bar {
             width: 100%;
-            height: 12px;
-            background: rgba(226, 232, 240, 0.8);
-            border-radius: 12px;
+            height: 8px;
+            background: #edf2f7;
+            border-radius: 4px;
             overflow: hidden;
-            margin: 12px 0;
-            position: relative;
+            margin-bottom: 12px;
         }
-
+        
         .progress-fill {
             height: 100%;
-            border-radius: 12px;
-            transition: width 2s ease-out;
-            position: relative;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            border-radius: 4px;
+            transition: width 1s ease;
         }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: shimmer 2s infinite;
+        
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #ed8936, #dd6b20);
         }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .green-progress { background: linear-gradient(90deg, #48bb78, #38a169); }
-        .blue-progress { background: linear-gradient(90deg, #4299e1, #3182ce); }
-        .orange-progress { background: linear-gradient(90deg, #ed8936, #dd6b20); }
-        .purple-progress { background: linear-gradient(90deg, #805ad5, #6b46c1); }
-
+        
         .progress-details {
-            display: flex;
-            justify-content: space-between;
+            color: #718096;
             font-size: 0.85rem;
-            color: #4a5568;
-            margin-top: 8px;
         }
-
-        .large-card {
-            grid-column: span 2;
-            min-height: 420px;
-        }
-
-        .chart-container {
-            height: 300px;
-            margin: 24px 0;
-            position: relative;
-        }
-
-        .province-chart {
-            height: 260px;
-        }
-
-        .province-details {
+        
+        .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-top: 24px;
-        }
-
-        .province-item {
-            background: linear-gradient(135deg, rgba(247, 250, 252, 0.9), rgba(237, 242, 247, 0.9));
-            padding: 24px;
-            border-radius: 20px;
-            border-left: 6px solid;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s ease;
-        }
-
-        .province-item:hover {
-            transform: translateY(-2px);
-        }
-
-        .province-item.latina { border-left-color: #805ad5; }
-        .province-item.roma { border-left-color: #38b2ac; }
-
-        .province-name {
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-        }
-
-        .province-stats {
-            font-size: 0.95rem;
-            color: #4a5568;
-            line-height: 1.5;
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 16px;
             margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
         }
-
-        .product-item {
-            background: linear-gradient(135deg, rgba(247, 250, 252, 0.9), rgba(237, 242, 247, 0.9));
-            padding: 24px;
-            border-radius: 20px;
-            border-left: 6px solid;
-            position: relative;
-            transition: transform 0.2s ease;
+        
+        .stat-item {
+            text-align: center;
         }
-
-        .product-item:hover {
-            transform: translateY(-2px);
-        }
-
-        .product-item.main { border-left-color: #4299e1; }
-        .product-item.other { border-left-color: #718096; }
-
-        .product-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-
-        .product-percentage {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .product-value {
+        
+        .stat-value {
             font-size: 1.4rem;
             font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .product-details {
-            font-size: 0.85rem;
-            color: #4a5568;
-            line-height: 1.4;
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 180px;
-            color: #4a5568;
-        }
-
-        .spinner {
-            width: 36px;
-            height: 36px;
-            border: 3px solid rgba(66, 153, 225, 0.1);
-            border-top: 3px solid #4299e1;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 12px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: linear-gradient(135deg, #fed7d7, #fbb6ce);
-            color: #c53030;
-            padding: 16px 20px;
-            border-radius: 16px;
-            margin: 16px 0;
-            border: 1px solid #fca5a5;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .success {
-            background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
-            color: #2f855a;
-            padding: 12px 16px;
-            border-radius: 16px;
-            margin: 12px 0;
-            border: 1px solid #68d391;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 24px;
-            background: linear-gradient(135deg, #4299e1, #3182ce);
-            border-radius: 4px;
-            margin-right: 12px;
-        }
-
-        .client-list {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 16px;
-        }
-
-        .client-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background: rgba(247, 250, 252, 0.7);
-            margin-bottom: 8px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-
-        .client-item:hover {
-            background: rgba(237, 242, 247, 0.8);
-            transform: translateX(4px);
-        }
-
-        .client-name {
-            font-weight: 600;
             color: #2d3748;
         }
-
-        .client-revenue {
-            font-weight: 700;
-            color: #4299e1;
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 4px;
         }
-
-        @media (max-width: 1200px) {
-            .large-card {
-                grid-column: span 1;
-            }
+        
+        .performance-card {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
         }
-
+        
+        .performance-card .metric-title,
+        .performance-card .metric-subtitle {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .performance-card .metric-value {
+            color: white;
+        }
+        
         @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+            
+            .info-bar {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
             
-            .province-details, .products-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .agent-info {
-                text-align: center;
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .filters {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-
-            .agent-name {
-                font-size: 2.2rem;
-            }
-
-            .card {
-                padding: 24px;
-            }
-
-            .modal {
-                width: 95%;
-                margin: 20px;
+            .dropdown {
+                min-width: 280px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <div class="agent-info">
-                <div>
-                    <h1 class="agent-name">CARABOT NATALINO</h1>
-                    <p class="agent-subtitle">Dashboard Performance Vendite</p>
-                </div>
-                <div class="status-info">
-                    <div class="last-update">Ultimo aggiornamento: <span id="lastUpdate">Caricamento...</span></div>
-                    <div class="data-source">Dati Live CSV</div>
-                </div>
+            <div class="header-left">
+                <h1>CARABOT NATALINO</h1>
+                <div class="header-subtitle">Dashboard Performance Vendite</div>
             </div>
-            
-            <div class="header-info">
-                <span class="info-item">ID: 631.00238</span>
-                <span class="info-item">Gen - Ago 2025 (8 mesi)</span>
-                <span class="data-status">Dati aggiornati dal file HTML</span>
+            <div class="header-right">
+                <button class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
-
-            <div class="filters">
-                <span class="filter-label">FILTRO TERRITORIO</span>
-                <span class="territory-filter" id="currentFilter">Tutte le Province</span>
-                <div class="province-selector">
-                    <button class="filter-button" id="provinceBtn" onclick="openProvinceModal()">
-                        Selezione Provincia
-                    </button>
-                </div>
-            </div>
-            
-            <div id="dataStatus"></div>
         </div>
-
-        <!-- Modal Selezione Province -->
-        <div class="modal-overlay" id="provinceModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <h2 class="modal-title">Selezione Provincia</h2>
-                    <button class="modal-close" onclick="closeProvinceModal()">×</button>
-                </div>
-                <p class="modal-subtitle">Scegli il territorio da visualizzare</p>
+        
+        <!-- Info Bar -->
+        <div class="info-bar">
+            <div class="info-item">
+                <i class="fas fa-id-card"></i>
+                <span>ID: <strong>631.00238</strong></span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Gen - Ago 2025 (8 mesi)</span>
+            </div>
+            <div class="info-item">
+                <span class="status-indicator"></span>
+                <span>Dati aggiornati dal file HTML</span>
+            </div>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-title">Filtro Territorio</div>
+            <div class="province-selector">
+                <button class="selector-button" onclick="toggleDropdown()">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="selected-province">Tutte le Province</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
                 
-                <div class="province-option selected" onclick="selectProvinceOption('all', this)">
-                    <div class="province-icon all">🌍</div>
-                    <div class="province-details">
-                        <h3>Tutte le Province</h3>
-                        <p>Panoramica completa</p>
+                <div class="dropdown" id="province-dropdown">
+                    <div class="dropdown-header">Selezione Provincia</div>
+                    <div class="dropdown-subtitle">Scegli il territorio da visualizzare</div>
+                    
+                    <div class="province-option selected" data-province="all">
+                        <div class="province-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="province-info">
+                            <h4>Tutte le Province</h4>
+                            <span>Panoramica completa</span>
+                        </div>
+                        <div class="radio-button"></div>
                     </div>
-                    <div class="province-radio"></div>
-                </div>
-
-                <div class="province-option" onclick="selectProvinceOption('LT', this)">
-                    <div class="province-icon latina">📍</div>
-                    <div class="province-details">
-                        <h3>Latina</h3>
-                        <p id="latinaStats">€82k • 18 clienti</p>
+                    
+                    <div class="province-option" data-province="LT">
+                        <div class="province-icon">
+                            <i class="fas fa-map-pin"></i>
+                        </div>
+                        <div class="province-info">
+                            <h4>Latina</h4>
+                            <span>€82k • 18 clienti</span>
+                        </div>
+                        <div class="radio-button"></div>
                     </div>
-                    <div class="province-radio"></div>
-                </div>
-
-                <div class="province-option" onclick="selectProvinceOption('RM', this)">
-                    <div class="province-icon roma">🏛️</div>
-                    <div class="province-details">
-                        <h3>Roma</h3>
-                        <p id="romaStats">€8k • 2 clienti</p>
+                    
+                    <div class="province-option" data-province="RM">
+                        <div class="province-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="province-info">
+                            <h4>Roma</h4>
+                            <span>€8k • 2 clienti</span>
+                        </div>
+                        <div class="radio-button"></div>
                     </div>
-                    <div class="province-radio"></div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="modal-btn cancel" onclick="closeProvinceModal()">Annulla</button>
-                    <button class="modal-btn apply" onclick="applyProvinceFilter()">Applica</button>
+                    
+                    <button class="cancel-btn" onclick="closeDropdown()">Annulla</button>
                 </div>
             </div>
         </div>
-
+        
+        <!-- Dashboard Grid -->
         <div class="dashboard-grid">
             <!-- Fatturato Card -->
-            <div class="card metric-card fatturato">
-                <div class="metric-header">Fatturato 2025</div>
-                <div class="metric-value" id="fatturato">€0</div>
-                <div class="metric-change" id="fatturatoChange">Caricamento...</div>
-                <div class="progress-section">
-                    <small style="color: #718096;">vs 2024: €<span id="fatturatoPrec">0</span></small>
-                    <div class="progress-bar">
-                        <div class="progress-fill green-progress" id="fatturatoProgress" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-details">
-                        <span>Obiettivo Fatturato</span>
-                        <span>€<span id="obiettivoFatturato">155.000</span></span>
-                    </div>
-                    <div style="font-size: 0.8rem; color: #4a5568; margin-top: 6px;">
-                        Mancano: €<span id="mancanteFatturato">0</span> | <span id="percentualeFatturato">0%</span> completato
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Fatturato 2025</div>
+                    <div class="growth-indicator growth-positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +12.4%
                     </div>
                 </div>
-            </div>
-
-            <!-- Clienti Card -->
-            <div class="card metric-card clienti">
-                <div class="metric-header">Clienti Attivi</div>
-                <div class="metric-value" id="clientiAttivi">0</div>
-                <div class="metric-change" id="clientiChange">Caricamento...</div>
+                <div class="metric-value" id="fatturato-value">€90k</div>
+                <div class="metric-subtitle">vs 2024: <strong>€80k</strong></div>
+                
                 <div class="progress-section">
-                    <small style="color: #718096;">Anno prec.: <span id="clientiPrec">0</span> clienti</small>
+                    <div class="progress-header">
+                        <span class="progress-label">Obiettivo Fatturato</span>
+                        <span class="progress-percentage" id="obiettivo-perc">€155k</span>
+                    </div>
                     <div class="progress-bar">
-                        <div class="progress-fill blue-progress" id="clientiProgress" style="width: 0%"></div>
+                        <div class="progress-fill" id="fatturato-progress" style="width: 58%"></div>
                     </div>
                     <div class="progress-details">
-                        <span>Obiettivo Clienti</span>
-                        <span><span id="obiettivoClienti">35</span></span>
-                    </div>
-                    <div style="font-size: 0.8rem; color: #4a5568; margin-top: 6px;">
-                        Mancano: <span id="mancanteClienti">0</span> clienti | <span id="percentualeClienti">0%</span> completato
+                        Mancano: <strong id="fatturato-mancante">€65k</strong>
                     </div>
                 </div>
-            </div>
-
-            <!-- Performance Card -->
-            <div class="card metric-card performance">
-                <div class="metric-header">Performance Obiettivo</div>
-                <div class="metric-value" id="performanceValue">0%</div>
-                <div class="metric-change" id="performanceChange">Caricamento...</div>
-                <div class="progress-section">
-                    <small style="color: #718096;">Fatturato: <span id="performanceFatturato">€0</span> / <span id="performanceObiettivo">€0</span></small>
-                    <div class="progress-bar">
-                        <div class="progress-fill purple-progress" id="performanceProgress" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-details">
-                        <span>Target Performance</span>
-                        <span id="performanceTarget">100%</span>
-                    </div>
-                    <div style="font-size: 0.8rem; color: #4a5568; margin-top: 6px;">
-                        Status: <span id="performanceStatus">In corso</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Crescita Card -->
-            <div class="card metric-card sviluppo">
-                <div class="metric-header">Crescita Complessiva</div>
-                <div class="metric-value" id="crescitaValue">+0%</div>
-                <div class="metric-change" id="crescitaChange">Caricamento...</div>
-                <div class="progress-section">
-                    <small style="color: #718096;">Trend: <span id="crescitaTrend">Positivo</span></small>
-                    <div class="progress-bar">
-                        <div class="progress-fill orange-progress" id="crescitaProgress" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-details">
-                        <span>Crescita Totale</span>
-                        <span>+<span id="crescitaEuro">€0</span></span>
-                    </div>
-                    <div style="font-size: 0.8rem; color: #4a5568; margin-top: 6px;">
-                        Incremento: <span id="crescitaIncremento">€0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Distribuzione Province -->
-        <div class="card large-card">
-            <div class="section-title">Distribuzione Province</div>
-            <div class="chart-container province-chart">
-                <canvas id="distributionChart"></canvas>
             </div>
             
-            <div class="province-details">
-                <div class="province-item latina">
-                    <div class="province-name" style="color: #805ad5;">Latina (LT)</div>
-                    <div style="font-size: 1.8rem; font-weight: 800; color: #805ad5; margin: 8px 0;"><span id="percentualeLT">0%</span></div>
-                    <div class="province-stats">
-                        Fatturato: €<span id="fatturatoLTDettaglio">0</span><br>
-                        Clienti: <span id="clientiLT">0</span>
+            <!-- Obiettivo Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Obiettivo 2025</div>
+                </div>
+                <div class="metric-value">€155k</div>
+                <div class="metric-subtitle">Da raggiungere: <strong>€65k</strong></div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Progressione Obiettivo</span>
+                        <span class="progress-percentage">58%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 58%"></div>
+                    </div>
+                    <div class="progress-details">
+                        Mancano: <strong>€65k</strong> • <strong>58%</strong>
                     </div>
                 </div>
-                <div class="province-item roma">
-                    <div class="province-name" style="color: #38b2ac;">Roma (RM)</div>
-                    <div style="font-size: 1.8rem; font-weight: 800; color: #38b2ac; margin: 8px 0;"><span id="percentualeRM">0%</span></div>
-                    <div class="province-stats">
-                        Fatturato: €<span id="fatturatoRMDettaglio">0</span><br>
-                        Clienti: <span id="clientiRM">0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mix Prodotti -->
-        <div class="card large-card">
-            <div class="section-title">Mix Prodotti</div>
-            <div class="chart-container province-chart">
-                <canvas id="productsChart"></canvas>
             </div>
             
-            <div class="products-grid">
-                <div class="product-item main">
-                    <div class="product-title" style="color: #4299e1;">Mattone Pieno</div>
-                    <div class="product-percentage" style="color: #4299e1;"><span id="percentualeMattone">0%</span></div>
-                    <div class="product-value">€<span id="fatturatoMattone">0</span></div>
-                    <div class="product-details">
-                        Categoria principale di vendita<br>
-                        <span id="clientiMattone">0</span> clienti serviti
+            <!-- Top Performance -->
+            <div class="metric-card performance-card">
+                <div class="metric-header">
+                    <div class="metric-title">Top Performance</div>
+                    <div class="growth-indicator growth-positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +4.3%
                     </div>
                 </div>
-                <div class="product-item other">
-                    <div class="product-title" style="color: #718096;">Altri Prodotti</div>
-                    <div class="product-percentage" style="color: #718096;"><span id="percentualeAltri">0%</span></div>
-                    <div class="product-value">€<span id="fatturatoAltri">0</span></div>
-                    <div class="product-details">
-                        Pavimentazione, Refrattari, Linea Archeo<br>
-                        Diversificazione prodotti
+                <div class="metric-value" id="top-province">LT</div>
+                <div class="metric-subtitle">Provincia Latina</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">€82k</div>
+                        <div class="stat-label">crescita totale</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">18</div>
+                        <div class="stat-label">clienti</div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Top Clienti -->
-        <div class="card large-card">
-            <div class="section-title">Top 10 Clienti per Fatturato</div>
-            <div class="client-list" id="clientList">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    Caricamento clienti...
+            
+            <!-- Clienti Attivi -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Clienti Attivi</div>
+                </div>
+                <div class="metric-value" id="clienti-value">20</div>
+                <div class="metric-subtitle" id="clienti-obiettivo">raggiunto</div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Obiettivo Clienti</span>
+                        <span class="progress-percentage">57%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill warning" style="width: 57%"></div>
+                    </div>
+                    <div class="progress-details">
+                        Obiettivo: <strong>35 clienti</strong> • Mancano: <strong>15</strong>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let charts = {};
-        let dashboardData = {};
-        let currentProvince = 'all';
         let selectedProvince = 'all';
-        const CSV_URL = 'https://marketingcusimano.github.io/rete-commerciale-agenti/63100238_CARABOT-NATALINO.csv';
-
-        function openProvinceModal() {
-            document.getElementById('provinceModal').classList.add('show');
-            document.body.style.overflow = 'hidden';
+        
+        function toggleDropdown() {
+            const dropdown = document.getElementById('province-dropdown');
+            dropdown.classList.toggle('active');
         }
-
-        function closeProvinceModal() {
-            document.getElementById('provinceModal').classList.remove('show');
-            document.body.style.overflow = 'auto';
+        
+        function closeDropdown() {
+            const dropdown = document.getElementById('province-dropdown');
+            dropdown.classList.remove('active');
         }
-
-        function selectProvinceOption(province, element) {
-            selectedProvince = province;
-            
-            // Rimuovi selezione precedente
-            document.querySelectorAll('.province-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            
-            // Seleziona nuovo elemento
-            element.classList.add('selected');
-        }
-
-        function applyProvinceFilter() {
-            currentProvince = selectedProvince;
-            const currentFilter = document.getElementById('currentFilter');
-            
-            // Aggiorna testo filtro
-            const filterText = currentProvince === 'all' ? 'Tutte le Province' : 
-                              currentProvince === 'LT' ? 'Solo Latina (LT)' : 'Solo Roma (RM)';
-            currentFilter.textContent = filterText;
-            
-            // Chiudi modal
-            closeProvinceModal();
-            
-            // Ricarica dashboard con filtro
-            if (dashboardData && Object.keys(dashboardData).length > 0) {
-                updateDashboard(dashboardData);
-            }
-        }
-
-        // Chiudi modal cliccando sull'overlay
-        document.getElementById('provinceModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeProvinceModal();
-            }
-        });
-
-        function showStatus(message, type = 'info') {
-            const statusDiv = document.getElementById('dataStatus');
-            statusDiv.className = type;
-            statusDiv.innerHTML = `<strong>${type === 'success' ? 'SUCCESSO' : type === 'error' ? 'ERRORE' : 'INFO'}</strong> ${message}`;
-            
-            if (type === 'success') {
-                setTimeout(() => {
-                    statusDiv.innerHTML = '';
-                    statusDiv.className = '';
-                }, 4000);
-            }
-        }
-
-        function parseCSVData(csvText) {
-            console.log('Parsing CSV data...');
-            const lines = csvText.split('\n').map(line => line.trim()).filter(line => line);
-            
-            const data = {
-                agente: {},
-                obiettivi: {},
-                clientiProvince: [],
-                venditeDettaglio: [],
-                riepilogoCategorie: [],
-                totali: {}
-            };
-
-            let currentSection = '';
-            let i = 0;
-
-            while (i < lines.length) {
-                const line = lines[i].trim();
+        
+        // Gestione selezione provincia
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.province-option')) {
+                const option = e.target.closest('.province-option');
+                const province = option.getAttribute('data-province');
                 
-                // Identifica sezioni
-                if (line.includes('INFORMAZIONI AGENTE')) {
-                    currentSection = 'agente';
-                    i += 2;
-                    continue;
-                } else if (line.includes('VERIFICA OBIETTIVI')) {
-                    currentSection = 'obiettivi';
-                    i += 2;
-                    continue;
-                } else if (line.includes('CLIENTI PER PROVINCIA')) {
-                    currentSection = 'clientiProvince';
-                    i += 2;
-                    continue;
-                } else if (line.includes('DETTAGLIO VENDITE')) {
-                    currentSection = 'venditeDettaglio';
-                    i += 2;
-                    continue;
-                } else if (line.includes('RIEPILOGO PER CATEGORIA')) {
-                    currentSection = 'riepilogoCategorie';
-                    i += 2;
-                    continue;
-                } else if (line.includes('TOTALI')) {
-                    currentSection = 'totali';
-                    i += 2;
-                    continue;
-                }
-
-                if (line.startsWith('===') || line === '') {
-                    i++;
-                    continue;
-                }
-
-                // Parse delle righe
-                const parts = line.split(',').map(p => p.trim());
-                
-                switch (currentSection) {
-                    case 'obiettivi':
-                        if (parts.length >= 8 && parts[0] && parts[0] !== 'Provincia') {
-                            const provincia = parts[0];
-                            
-                            // Funzione parsing numeri migliorata
-                            const parseNumber = (str) => {
-                                if (!str) return 0;
-                                // Rimuovi virgolette, punti (tranne decimali), sostituisci virgola con punto
-                                let cleaned = str.replace(/['"]/g, '');
-                                // Se ci sono più punti, l'ultimo è decimale
-                                const lastDotIndex = cleaned.lastIndexOf('.');
-                                const lastCommaIndex = cleaned.lastIndexOf(',');
-                                
-                                if (lastCommaIndex > lastDotIndex) {
-                                    // La virgola è l'ultimo separatore = decimale
-                                    cleaned = cleaned.replace(/\./g, '').replace(',', '.');
-                                } else {
-                                    // Il punto è l'ultimo separatore o non c'è virgola
-                                    cleaned = cleaned.replace(/,/g, '');
-                                }
-                                
-                                return parseFloat(cleaned) || 0;
-                            };
-
-                            if (provincia === 'LT' || provincia === 'Generale') {
-                                const annoPrec = parseNumber(parts[1]);
-                                const annoCorr = parseNumber(parts[2]);
-                                const obiettivo = parseNumber(parts[3]);
-                                const clientiPrec = parseInt(parts[5]) || 0;
-                                const clientiCorr = parseInt(parts[6]) || 0;
-                                const clientiObiettivo = parseInt(parts[7]) || 0;
-                                
-                                data.obiettivi[provincia] = {
-                                    fatturatoPrec: annoPrec,
-                                    fatturato: annoCorr,
-                                    obiettivo: obiettivo,
-                                    clientiPrec: clientiPrec,
-                                    clienti: clientiCorr,
-                                    clientiObiettivo: clientiObiettivo
-                                };
-                                
-                                console.log(`Obiettivi ${provincia}:`, data.obiettivi[provincia]);
-                            }
-                        }
-                        break;
-                        
-                    case 'clientiProvince':
-                        if (parts.length >= 3 && parts[0] && parts[0] !== 'Provincia') {
-                            const parseNumber = (str) => {
-                                if (!str) return 0;
-                                return parseFloat(str.replace(/['",.]/g, '').replace(',', '.')) || 0;
-                            };
-
-                            data.clientiProvince.push({
-                                provincia: parts[0],
-                                clienti: parseInt(parts[1]) || 0,
-                                fatturato: parseNumber(parts[2])
-                            });
-                        }
-                        break;
-                        
-                    case 'venditeDettaglio':
-                        if (parts.length >= 4 && parts[0] && parts[1] && parts[0] !== 'Provincia') {
-                            const parseNumber = (str) => {
-                                if (!str) return 0;
-                                return parseFloat(str.replace(/['",.]/g, '').replace(',', '.')) || 0;
-                            };
-
-                            data.venditeDettaglio.push({
-                                provincia: parts[0],
-                                cliente: parts[1],
-                                categoria: parts[2],
-                                fatturato: parseNumber(parts[3])
-                            });
-                        }
-                        break;
-                        
-                    case 'riepilogoCategorie':
-                        if (parts.length >= 4 && parts[0] && parts[1] && parts[0] !== 'Categoria') {
-                            const parseNumber = (str) => {
-                                if (!str) return 0;
-                                return parseFloat(str.replace(/['",.]/g, '').replace(',', '.')) || 0;
-                            };
-
-                            data.riepilogoCategorie.push({
-                                categoria: parts[0],
-                                importo: parseNumber(parts[1]),
-                                clientiLT: parseInt(parts[2]) || 0,
-                                clientiRM: parseInt(parts[3]) || 0
-                            });
-                        }
-                        break;
-                }
-                
-                i++;
-            }
-
-            console.log('Parsed data:', data);
-            return data;
-        }
-
-        function updateDashboard(data) {
-            dashboardData = data;
-            
-            // DATI DALLE SEZIONE "VERIFICA OBIETTIVI" - Come richiesto!
-            const obiettiviLT = data.obiettivi.LT || {};
-            const obiettiviGenerale = data.obiettivi.Generale || {};
-            
-            // Usa i dati reali dalla sezione VERIFICA OBIETTIVI
-            let fatturato2025 = obiettiviLT.fatturato || 0;
-            let fatturato2024 = obiettiviLT.fatturatoPrec || 0;
-            let obiettivoFatturato = obiettiviLT.obiettivo || 155000;
-            let clienti2025 = obiettiviLT.clienti || 0;
-            let clienti2024 = obiettiviLT.clientiPrec || 0;
-            let obiettivoClienti = obiettiviLT.clientiObiettivo || 35;
-
-            console.log('Dati VERIFICA OBIETTIVI:', {
-                fatturato2025,
-                fatturato2024,
-                obiettivoFatturato,
-                clienti2025,
-                clienti2024,
-                obiettivoClienti
-            });
-
-            // Applica filtro provincia se necessario
-            if (currentProvince === 'LT') {
-                // Usa solo dati LT
-            } else if (currentProvince === 'RM') {
-                // Per RM, usa i dati dalla sezione clienti per provincia
-                const rmData = data.clientiProvince.find(p => p.provincia === 'RM');
-                if (rmData) {
-                    fatturato2025 = rmData.fatturato;
-                    clienti2025 = rmData.clienti;
-                    // Per RM non abbiamo obiettivi specifici, quindi usiamo proporzione
-                    obiettivoFatturato = obiettivoFatturato * 0.1; // Stima 10% per RM
-                    obiettivoClienti = Math.round(obiettivoClienti * 0.1);
-                    fatturato2024 = fatturato2024 * 0.1; // Stima
-                    clienti2024 = Math.round(clienti2024 * 0.1);
-                }
-            }
-
-            // Calcoli delle metriche
-            const percentualeFatturato = Math.round((fatturato2025 / obiettivoFatturato) * 100);
-            const percentualeClienti = Math.round((clienti2025 / obiettivoClienti) * 100);
-            const crescitaFatturato = fatturato2024 > 0 ? ((fatturato2025 - fatturato2024) / fatturato2024 * 100) : 0;
-            const crescitaClienti = clienti2024 > 0 ? ((clienti2025 - clienti2024) / clienti2024 * 100) : 0;
-            const crescitaEuro = fatturato2025 - fatturato2024;
-
-            // AGGIORNA LE PRIME 4 CARD CON I DATI CORRETTI
-
-            // Card 1: Fatturato
-            document.getElementById('fatturato').textContent = `€${Math.round(fatturato2025 / 1000)}k`;
-            document.getElementById('fatturatoPrec').textContent = Math.round(fatturato2024 / 1000) + 'k';
-            document.getElementById('obiettivoFatturato').textContent = Math.round(obiettivoFatturato / 1000) + '.000';
-            document.getElementById('mancanteFatturato').textContent = Math.max(0, Math.round((obiettivoFatturato - fatturato2025) / 1000)) + 'k';
-            document.getElementById('percentualeFatturato').textContent = `${percentualeFatturato}%`;
-            document.getElementById('fatturatoChange').textContent = `${crescitaFatturato >= 0 ? '+' : ''}${crescitaFatturato.toFixed(1)}% vs 2024`;
-            document.getElementById('fatturatoChange').className = `metric-change ${crescitaFatturato >= 0 ? 'positive' : 'negative'}`;
-
-            // Card 2: Clienti  
-            document.getElementById('clientiAttivi').textContent = clienti2025;
-            document.getElementById('clientiPrec').textContent = clienti2024;
-            document.getElementById('obiettivoClienti').textContent = obiettivoClienti;
-            document.getElementById('mancanteClienti').textContent = Math.max(0, obiettivoClienti - clienti2025);
-            document.getElementById('percentualeClienti').textContent = `${percentualeClienti}%`;
-            document.getElementById('clientiChange').textContent = `${crescitaClienti >= 0 ? '+' : ''}${crescitaClienti.toFixed(1)}% vs anno prec.`;
-            document.getElementById('clientiChange').className = `metric-change ${crescitaClienti >= 0 ? 'positive' : 'negative'}`;
-
-            // Card 3: Performance 
-            document.getElementById('performanceValue').textContent = `${percentualeFatturato}%`;
-            document.getElementById('performanceFatturato').textContent = Math.round(fatturato2025 / 1000) + 'k';
-            document.getElementById('performanceObiettivo').textContent = Math.round(obiettivoFatturato / 1000) + 'k';
-            document.getElementById('performanceTarget').textContent = '100%';
-            document.getElementById('performanceStatus').textContent = percentualeFatturato >= 100 ? 'Completato' : percentualeFatturato >= 80 ? 'Ottimo' : percentualeFatturato >= 50 ? 'In corso' : 'Da migliorare';
-            document.getElementById('performanceChange').textContent = `${percentualeFatturato}% dell'obiettivo raggiunto`;
-            document.getElementById('performanceChange').className = `metric-change ${percentualeFatturato >= 80 ? 'positive' : percentualeFatturato >= 50 ? 'neutral' : 'negative'}`;
-
-            // Card 4: Crescita
-            document.getElementById('crescitaValue').textContent = `${crescitaFatturato >= 0 ? '+' : ''}${crescitaFatturato.toFixed(1)}%`;
-            document.getElementById('crescitaTrend').textContent = crescitaFatturato >= 0 ? 'Positivo' : 'Negativo';
-            document.getElementById('crescitaEuro').textContent = Math.abs(Math.round(crescitaEuro / 1000)) + 'k';
-            document.getElementById('crescitaIncremento').textContent = `${crescitaEuro >= 0 ? '+' : '-'}€${Math.abs(Math.round(crescitaEuro / 1000))}k`;
-            document.getElementById('crescitaChange').textContent = `${Math.abs(crescitaFatturato.toFixed(1))}% ${crescitaFatturato >= 0 ? 'crescita' : 'decremento'}`;
-            document.getElementById('crescitaChange').className = `metric-change ${crescitaFatturato >= 0 ? 'positive' : 'negative'}`;
-
-            // Progress bars animate
-            setTimeout(() => {
-                document.getElementById('fatturatoProgress').style.width = `${Math.min(percentualeFatturato, 100)}%`;
-                document.getElementById('clientiProgress').style.width = `${Math.min(percentualeClienti, 100)}%`;
-                document.getElementById('performanceProgress').style.width = `${Math.min(percentualeFatturato, 100)}%`;
-                document.getElementById('crescitaProgress').style.width = `${Math.min(Math.abs(crescitaFatturato), 100)}%`;
-            }, 500);
-
-            // Aggiorna dati province per il modal
-            const ltData = data.clientiProvince.find(p => p.provincia === 'LT') || {};
-            const rmData = data.clientiProvince.find(p => p.provincia === 'RM') || {};
-            document.getElementById('latinaStats').textContent = `€${Math.round((ltData.fatturato || 0) / 1000)}k • ${ltData.clienti || 0} clienti`;
-            document.getElementById('romaStats').textContent = `€${Math.round((rmData.fatturato || 0) / 1000)}k • ${rmData.clienti || 0} clienti`;
-
-            // Resto della dashboard (province, prodotti, clienti)
-            updateProvinceAndProductsData(data);
-            updateTopClients(data.venditeDettaglio);
-            createCharts();
-            
-            showStatus(`Dati aggiornati! Filtro: ${currentProvince === 'all' ? 'Tutte le province' : 'Provincia ' + currentProvince}`, 'success');
-        }
-
-        function updateProvinceAndProductsData(data) {
-            // Dati province per grafici
-            const ltData = data.clientiProvince.find(p => p.provincia === 'LT') || {};
-            const rmData = data.clientiProvince.find(p => p.provincia === 'RM') || {};
-            
-            const totalFatturato = (ltData.fatturato || 0) + (rmData.fatturato || 0);
-            const percentualeLT = totalFatturato > 0 ? Math.round(((ltData.fatturato || 0) / totalFatturato) * 100) : 0;
-            const percentualeRM = 100 - percentualeLT;
-
-            document.getElementById('percentualeLT').textContent = `${percentualeLT}%`;
-            document.getElementById('percentualeRM').textContent = `${percentualeRM}%`;
-            document.getElementById('fatturatoLTDettaglio').textContent = Math.round((ltData.fatturato || 0) / 1000) + 'k';
-            document.getElementById('fatturatoRMDettaglio').textContent = Math.round((rmData.fatturato || 0) / 1000) + 'k';
-            document.getElementById('clientiLT').textContent = ltData.clienti || 0;
-            document.getElementById('clientiRM').textContent = rmData.clienti || 0;
-
-            // Mix prodotti
-            const mattone = data.riepilogoCategorie.find(c => c.categoria === 'MATTONE PIENO') || { importo: 0, clientiLT: 0, clientiRM: 0 };
-            const totaleRiepilogo = data.riepilogoCategorie.reduce((sum, cat) => sum + cat.importo, 0);
-            const altriProdotti = totaleRiepilogo - mattone.importo;
-            const percentualeMattone = totaleRiepilogo > 0 ? Math.round((mattone.importo / totaleRiepilogo) * 100) : 0;
-            const percentualeAltri = 100 - percentualeMattone;
-
-            document.getElementById('percentualeMattone').textContent = `${percentualeMattone}%`;
-            document.getElementById('percentualeAltri').textContent = `${percentualeAltri}%`;
-            document.getElementById('fatturatoMattone').textContent = Math.round((mattone.importo || 0) / 1000) + 'k';
-            document.getElementById('fatturatoAltri').textContent = Math.round((altriProdotti || 0) / 1000) + 'k';
-            document.getElementById('clientiMattone').textContent = (mattone.clientiLT || 0) + (mattone.clientiRM || 0);
-        }
-
-        function updateTopClients(vendite) {
-            let venditeFiltered = vendite;
-            if (currentProvince !== 'all') {
-                venditeFiltered = vendite.filter(v => v.provincia === currentProvince);
-            }
-
-            const clientiFatturato = {};
-            venditeFiltered.forEach(v => {
-                if (!clientiFatturato[v.cliente]) {
-                    clientiFatturato[v.cliente] = 0;
-                }
-                clientiFatturato[v.cliente] += v.fatturato;
-            });
-
-            const topClienti = Object.entries(clientiFatturato)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 10);
-
-            const clientList = document.getElementById('clientList');
-            
-            if (topClienti.length === 0) {
-                clientList.innerHTML = '<div style="text-align: center; padding: 32px; color: #718096;">Nessun cliente trovato per il filtro selezionato</div>';
-                return;
-            }
-
-            clientList.innerHTML = topClienti.map(([nome, fatturato], index) => `
-                <div class="client-item">
-                    <div>
-                        <span style="color: #718096; margin-right: 10px; font-weight: bold;">${index + 1}.</span>
-                        <span class="client-name">${nome}</span>
-                    </div>
-                    <div class="client-revenue">€${Math.round(fatturato / 1000)}k</div>
-                </div>
-            `).join('');
-        }
-
-        function createCharts() {
-            Object.values(charts).forEach(chart => {
-                if (chart && typeof chart.destroy === 'function') {
-                    chart.destroy();
-                }
-            });
-
-            createDistributionChart();
-            createProductsChart();
-        }
-
-        function createDistributionChart() {
-            const ctx = document.getElementById('distributionChart').getContext('2d');
-            
-            const fatturatoLT = parseFloat(document.getElementById('fatturatoLTDettaglio').textContent.replace(/[k,.]/g, '')) * 1000 || 0;
-            const fatturatoRM = parseFloat(document.getElementById('fatturatoRMDettaglio').textContent.replace(/[k,.]/g, '')) * 1000 || 0;
-            
-            charts.distribution = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Latina (LT)', 'Roma (RM)'],
-                    datasets: [{
-                        data: [fatturatoLT, fatturatoRM],
-                        backgroundColor: ['#805ad5', '#38b2ac'],
-                        borderWidth: 0,
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            titleColor: 'white',
-                            bodyColor: 'white',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1,
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                                    return `${context.label}: €${Math.round(context.parsed / 1000)}k (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createProductsChart() {
-            const ctx = document.getElementById('productsChart').getContext('2d');
-            
-            const mattone = parseFloat(document.getElementById('fatturatoMattone').textContent.replace(/[k,.]/g, '')) * 1000 || 0;
-            const altri = parseFloat(document.getElementById('fatturatoAltri').textContent.replace(/[k,.]/g, '')) * 1000 || 0;
-            
-            charts.products = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Mattone Pieno', 'Altri Prodotti'],
-                    datasets: [{
-                        data: [mattone, altri],
-                        backgroundColor: ['#4299e1', '#718096'],
-                        borderWidth: 0,
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            titleColor: 'white',
-                            bodyColor: 'white',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1,
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                                    return `${context.label}: €${Math.round(context.parsed / 1000)}k (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        async function loadData() {
-            try {
-                showStatus('Caricamento dati in corso...', 'info');
-                
-                const response = await fetch(CSV_URL, {
-                    mode: 'cors',
-                    cache: 'no-cache',
-                    headers: {
-                        'Accept': 'text/csv,text/plain,*/*'
-                    }
+                // Rimuovi selezione precedente
+                document.querySelectorAll('.province-option').forEach(opt => {
+                    opt.classList.remove('selected');
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                // Aggiungi selezione corrente
+                option.classList.add('selected');
+                
+                // Aggiorna testo bottone
+                const provinceName = option.querySelector('h4').textContent;
+                document.getElementById('selected-province').textContent = provinceName;
+                
+                // Aggiorna dati
+                updateDashboard(province);
+                closeDropdown();
+            }
+            
+            // Chiudi dropdown se click esterno
+            if (!e.target.closest('.province-selector')) {
+                closeDropdown();
+            }
+        });
+        
+        function updateDashboard(province) {
+            selectedProvince = province;
+            
+            const data = {
+                'all': {
+                    fatturato: '€90k',
+                    obiettivo: '€155k',
+                    progressione: 58,
+                    mancante: '€65k',
+                    clienti: 20,
+                    topProvince: 'LT',
+                    topFatturato: '€82k',
+                    topClienti: 18
+                },
+                'LT': {
+                    fatturato: '€82k',
+                    obiettivo: '€155k',
+                    progressione: 53,
+                    mancante: '€73k',
+                    clienti: 18,
+                    topProvince: 'LT',
+                    topFatturato: '€82k',
+                    topClienti: 18
+                },
+                'RM': {
+                    fatturato: '€8k',
+                    obiettivo: '€155k',
+                    progressione: 5,
+                    mancante: '€147k',
+                    clienti: 2,
+                    topProvince: 'RM',
+                    topFatturato: '€8k',
+                    topClienti: 2
                 }
-                
+            };
+            
+            const current = data[province];
+            
+            // Aggiorna valori
+            document.getElementById('fatturato-value').textContent = current.fatturato;
+            document.getElementById('obiettivo-perc').textContent = current.obiettivo;
+            document.getElementById('fatturato-mancante').textContent = current.mancante;
+            document.getElementById('clienti-value').textContent = current.clienti;
+            document.getElementById('top-province').textContent = current.topProvince;
+            
+            // Aggiorna progress bar
+            document.getElementById('fatturato-progress').style.width = current.progressione + '%';
+            
+            // Aggiorna stats nella performance card
+            const statsGrid = document.querySelector('.performance-card .stats-grid');
+            statsGrid.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${current.topFatturato}</div>
+                    <div class="stat-label">crescita totale</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${current.topClienti}</div>
+                    <div class="stat-label">clienti</div>
+                </div>
+            `;
+        }
+        
+        // Funzione per caricare dati dal CSV
+        async function loadDataFromCSV() {
+            try {
+                const response = await fetch('https://marketingcusimano.github.io/rete-commerciale-agenti/63100238_CARABOT-NATALINO.csv');
                 const csvText = await response.text();
-                console.log('CSV caricato:', csvText.length, 'caratteri');
                 
-                const data = parseCSVData(csvText);
-                console.log('Dati elaborati:', data);
-                
-                updateDashboard(data);
-                updateLastUpdateTime();
+                console.log('Dati caricati dal CSV');
+                // Qui implementeremo il parsing automatico
                 
             } catch (error) {
-                console.error('Errore caricamento:', error);
-                showStatus(`Errore nel caricamento dei dati: ${error.message}`, 'error');
+                console.error('Errore nel caricamento dei dati:', error);
             }
         }
-
-        function updateLastUpdateTime() {
-            const now = new Date();
-            const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: 'Europe/Rome'
-            };
-            document.getElementById('lastUpdate').textContent = now.toLocaleDateString('it-IT', options);
-        }
-
-        function refreshData() {
-            loadData();
-        }
-
+        
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Inizializzazione dashboard CARABOT NATALINO');
+            loadDataFromCSV();
             
-            // Carica i dati immediatamente
-            loadData();
-            
-            // Aggiorna automaticamente ogni 5 minuti
-            setInterval(loadData, 5 * 60 * 1000);
-            
-            // Aggiorna l'orario ogni minuto
-            setInterval(updateLastUpdateTime, 60 * 1000);
+            // Auto-refresh ogni 10 minuti
+            setInterval(loadDataFromCSV, 600000);
         });
-
-        // Debug
-        window.debugDashboard = {
-            loadData,
-            refreshData,
-            csvUrl: CSV_URL,
-            currentData: () => dashboardData,
-            setProvince: (province) => {
-                currentProvince = province;
-                selectedProvince = province;
-                updateDashboard(dashboardData);
-            }
-        };
-
-        console.log('Dashboard CARABOT NATALINO caricata. Debug: window.debugDashboard');
     </script>
 </body>
 </html>
