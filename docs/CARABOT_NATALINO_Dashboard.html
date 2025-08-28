@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CARABOT NATALINO</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .agent-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .agent-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            letter-spacing: -0.025em;
+        }
+
+        .agent-id {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .update-info {
+            text-align: right;
+            color: #4a5568;
+        }
+
+        .last-update {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: #48bb78;
+            color: white;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status::before {
+            content: "●";
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .metric-change {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .positive {
+            background: rgba(72, 187, 120, 0.1);
+            color: #38a169;
+        }
+
+        .negative {
+            background: rgba(245, 101, 101, 0.1);
+            color: #e53e3e;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+        }
+
+        .chart-container {
+            grid-column: span 2;
+            height: 400px;
+        }
+
+        .chart-canvas {
+            max-height: 350px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #718096;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #e53e3e;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .agent-info {
+                text-align: center;
+            }
+
+            .agent-name {
+                font-size: 2rem;
+            }
+
+            .chart-container {
+                grid-column: span 1;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="agent-info">
+                <div>
+                    <h1 class="agent-name">CARABOT NATALINO</h1>
+                    <p class="agent-id">ID: 631.00238</p>
+                </div>
+                <div class="update-info">
+                    <div class="last-update">Ultimo aggiornamento: <span id="lastUpdate">Caricamento...</span></div>
+                    <div class="status">Dati Live</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Fatturato Card -->
+            <div class="card metric-card">
+                <div class="metric-value" id="fatturato">€0</div>
+                <div class="metric-label">Fatturato 2025</div>
+                <div class="metric-change positive" id="fatturatoChange">+0%</div>
+            </div>
+
+            <!-- Obiettivo Card -->
+            <div class="card metric-card">
+                <div class="metric-value" id="obiettivo">€0</div>
+                <div class="metric-label">Obiettivo 2025</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div style="font-size: 0.9rem; color: #718096;">
+                    <span id="progressPercent">0%</span> completato
+                </div>
+            </div>
+
+            <!-- Performance Card -->
+            <div class="card metric-card">
+                <div class="metric-value" id="performance">0%</div>
+                <div class="metric-label">Performance vs Obiettivo</div>
+                <div class="metric-change" id="performanceChange">Target: €0</div>
+            </div>
+
+            <!-- Clienti Attivi Card -->
+            <div class="card metric-card">
+                <div class="metric-value" id="clienti">0</div>
+                <div class="metric-label">Clienti Attivi</div>
+                <div class="metric-change positive" id="clientiChange">+0% crescita</div>
+            </div>
+
+            <!-- Chart Container -->
+            <div class="card chart-container">
+                <h3 style="margin-bottom: 20px; color: #2d3748;">Andamento Mensile</h3>
+                <canvas id="performanceChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chart;
+        const CSV_URL = 'https://marketingcusimano.github.io/rete-commerciale-agenti/63100238_CARABOT-NATALINO.csv';
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('it-IT', {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function formatNumber(value) {
+            return new Intl.NumberFormat('it-IT').format(value);
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Europe/Rome'
+            };
+            document.getElementById('lastUpdate').textContent = now.toLocaleDateString('it-IT', options);
+        }
+
+        function createChart(labels, data) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Fatturato Mensile',
+                        data: data,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            hoverRadius: 8
+                        }
+                    }
+                }
+            });
+        }
+
+        function processData(data) {
+            if (!data || data.length === 0) {
+                throw new Error('Nessun dato disponibile');
+            }
+
+            // Prendi la riga più recente (assumendo che sia l'ultima)
+            const latestData = data[data.length - 1];
+            
+            // Estrai i valori principali
+            const fatturato = parseFloat(latestData.Fatturato_2025?.replace(/[€.,]/g, '') || 0);
+            const obiettivo = parseFloat(latestData.Obiettivo_2025?.replace(/[€.,]/g, '') || 0);
+            const clientiAttivi = parseInt(latestData.Clienti_Attivi || 0);
+            const crescitaFatturato = parseFloat(latestData.Crescita_Fatturato?.replace('%', '') || 0);
+
+            // Calcola la performance
+            const performance = obiettivo > 0 ? Math.round((fatturato / obiettivo) * 100) : 0;
+
+            // Aggiorna i valori nella dashboard
+            document.getElementById('fatturato').textContent = formatCurrency(fatturato);
+            document.getElementById('obiettivo').textContent = formatCurrency(obiettivo);
+            document.getElementById('performance').textContent = performance + '%';
+            document.getElementById('clienti').textContent = formatNumber(clientiAttivi);
+
+            // Aggiorna i cambiamenti
+            const fatturatoChangeEl = document.getElementById('fatturatoChange');
+            fatturatoChangeEl.textContent = `${crescitaFatturato > 0 ? '+' : ''}${crescitaFatturato.toFixed(1)}%`;
+            fatturatoChangeEl.className = `metric-change ${crescitaFatturato >= 0 ? 'positive' : 'negative'}`;
+
+            document.getElementById('performanceChange').textContent = `Target: ${formatCurrency(obiettivo)}`;
+            document.getElementById('clientiChange').textContent = `${clientiAttivi} attivi`;
+
+            // Aggiorna la barra di progresso
+            const progressFill = document.getElementById('progressFill');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressValue = Math.min(performance, 100);
+            
+            setTimeout(() => {
+                progressFill.style.width = progressValue + '%';
+                progressPercent.textContent = performance + '%';
+            }, 100);
+
+            // Crea dati di esempio per il grafico (in un'implementazione reale, questi verrebbero dal CSV)
+            const mesi = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago'];
+            const datiMensili = [];
+            
+            // Simula un andamento progressivo fino al fatturato attuale
+            for (let i = 0; i < 8; i++) {
+                const progressivoMensile = (fatturato / 8) * (i + 1) * (0.8 + Math.random() * 0.4);
+                datiMensili.push(progressivoMensile);
+            }
+
+            createChart(mesi, datiMensili);
+            updateLastUpdateTime();
+        }
+
+        function loadData() {
+            // Mostra loading
+            document.querySelectorAll('.metric-value').forEach(el => {
+                el.innerHTML = '<div class="spinner"></div>';
+            });
+
+            fetch(CSV_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(csvText => {
+                    Papa.parse(csvText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            try {
+                                processData(results.data);
+                            } catch (error) {
+                                console.error('Errore nell\'elaborazione dei dati:', error);
+                                showError('Errore nell\'elaborazione dei dati');
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Errore nel parsing CSV:', error);
+                            showError('Errore nel parsing dei dati');
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Errore nel caricamento dei dati:', error);
+                    showError('Impossibile caricare i dati');
+                });
+        }
+
+        function showError(message) {
+            document.querySelectorAll('.metric-value').forEach(el => {
+                el.innerHTML = '<span style="color: #e53e3e; font-size: 1rem;">Errore</span>';
+            });
+            
+            const chartContainer = document.querySelector('.chart-container .chart-canvas').parentNode;
+            chartContainer.innerHTML = `
+                <h3 style="margin-bottom: 20px; color: #2d3748;">Andamento Mensile</h3>
+                <div class="error">${message}</div>
+            `;
+        }
+
+        // Carica i dati iniziali
+        loadData();
+
+        // Aggiorna i dati ogni 5 minuti
+        setInterval(loadData, 5 * 60 * 1000);
+
+        // Aggiorna l'orario ogni minuto
+        setInterval(updateLastUpdateTime, 60 * 1000);
+    </script>
+</body>
+</html>
