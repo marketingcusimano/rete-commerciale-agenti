@@ -435,7 +435,7 @@
         
         .performance-card .metric-title,
         .performance-card .metric-subtitle {
-            color: rgba(255,255,255,0.95);
+            color: white;
         }
         
         .performance-card .metric-value {
@@ -455,7 +455,7 @@
         }
         
         .performance-card .stat-label {
-            color: rgba(255,255,255,0.8);
+            color: white;
         }
         
         .trend-card {
@@ -478,7 +478,7 @@
         
         .trend-card .metric-title,
         .trend-card .metric-subtitle {
-            color: rgba(255,255,255,0.95);
+            color: white;
         }
         
         .trend-card .metric-value {
@@ -492,8 +492,17 @@
             backdrop-filter: blur(10px);
         }
         
+        .trend-card .stat-value {
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .trend-card .stat-label {
+            color: white;
+        }
+        
         .efficiency-card {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
             color: white;
             position: relative;
             overflow: hidden;
@@ -512,7 +521,7 @@
         
         .efficiency-card .metric-title,
         .efficiency-card .metric-subtitle {
-            color: rgba(255,255,255,0.95);
+            color: white;
         }
         
         .efficiency-card .metric-value {
@@ -524,6 +533,15 @@
             background: rgba(255,255,255,0.2);
             color: white;
             backdrop-filter: blur(10px);
+        }
+        
+        .efficiency-card .stat-value {
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .efficiency-card .stat-label {
+            color: white;
         }
         
         @media (max-width: 768px) {
@@ -544,12 +562,376 @@
             }
             
             .dashboard-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
             }
             
             .dropdown {
                 min-width: 280px;
             }
+            
+            .geographic-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-grid,
+            .geographic-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+        
+        /* Sezioni Aggiuntive */
+        .section-header {
+            margin: 48px 0 24px 0;
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+        
+        .section-subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+        
+        /* Sezione Geografica */
+        .geographic-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        
+        .province-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        
+        .province-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        .lt-card {
+            border-left-color: #48bb78;
+        }
+        
+        .rm-card {
+            border-left-color: #3182ce;
+        }
+        
+        .province-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .province-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f7fafc;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .lt-card .province-badge {
+            background: #c6f6d5;
+            color: #25855a;
+        }
+        
+        .rm-card .province-badge {
+            background: #bee3f8;
+            color: #2c5aa0;
+        }
+        
+        .province-percentage {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .province-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        
+        .province-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        
+        .province-metric {
+            text-align: center;
+        }
+        
+        .province-metric .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .province-metric .metric-label {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 4px;
+        }
+        
+        .comparison-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .comparison-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .comparison-item {
+            display: grid;
+            grid-template-columns: 80px 1fr 50px;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .comparison-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        
+        .color-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        
+        .lt-color {
+            background: #48bb78;
+        }
+        
+        .rm-color {
+            background: #3182ce;
+        }
+        
+        .comparison-bar {
+            height: 8px;
+            background: #edf2f7;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        
+        .lt-bar {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+        }
+        
+        .rm-bar {
+            background: linear-gradient(90deg, #3182ce, #2c5aa0);
+        }
+        
+        .comparison-value {
+            font-weight: 600;
+            color: #2d3748;
+            text-align: right;
+        }
+        
+        .comparison-summary {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            color: #4a5568;
+            text-align: center;
+        }
+        
+        /* Sezione Prodotti */
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .chart-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        
+        .primary-product {
+            background: #667eea;
+        }
+        
+        .secondary-product {
+            background: #48bb78;
+        }
+        
+        .category-details {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .details-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        
+        .category-item {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .category-item.primary {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-left: 4px solid #667eea;
+        }
+        
+        .category-item.secondary {
+            background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+            border-left: 4px solid #48bb78;
+        }
+        
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .category-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .category-percentage {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .category-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+        
+        .progress-bar-category {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill-category {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+        
+        .primary-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .secondary-fill {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+        }
+        
+        .category-insights {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .insight-item i {
+            color: #667eea;
         }
     </style>
 </head>
@@ -622,7 +1004,7 @@
                     
                     <div class="province-option" data-province="RM">
                         <div class="province-icon">
-                            <i class="fas fa-map-marker-alt" style="color: #ed8936;"></i>
+                            <i class="fas fa-map-marker-alt" style="color: #3182ce;"></i>
                         </div>
                         <div class="province-info">
                             <h4>Roma</h4>
@@ -686,6 +1068,28 @@
                 </div>
             </div>
             
+            <!-- Clienti Attivi -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Clienti Attivi</div>
+                </div>
+                <div class="metric-value" id="clienti-value">20</div>
+                <div class="metric-subtitle" id="clienti-obiettivo">raggiunto</div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Obiettivo Clienti</span>
+                        <span class="progress-percentage">57%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill warning" style="width: 57%"></div>
+                    </div>
+                    <div class="progress-details">
+                        Obiettivo: <strong>35 clienti</strong> • Mancano: <strong>15</strong>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Top Performance -->
             <div class="metric-card performance-card">
                 <div class="metric-header">
@@ -706,28 +1110,6 @@
                     <div class="stat-item">
                         <div class="stat-value">18</div>
                         <div class="stat-label">clienti</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Clienti Attivi -->
-            <div class="metric-card">
-                <div class="metric-header">
-                    <div class="metric-title">Clienti Attivi</div>
-                </div>
-                <div class="metric-value" id="clienti-value">20</div>
-                <div class="metric-subtitle" id="clienti-obiettivo">raggiunto</div>
-                
-                <div class="progress-section">
-                    <div class="progress-header">
-                        <span class="progress-label">Obiettivo Clienti</span>
-                        <span class="progress-percentage">57%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill warning" style="width: 57%"></div>
-                    </div>
-                    <div class="progress-details">
-                        Obiettivo: <strong>35 clienti</strong> • Mancano: <strong>15</strong>
                     </div>
                 </div>
             </div>
@@ -776,6 +1158,162 @@
                     <div class="stat-item">
                         <div class="stat-value">2.3</div>
                         <div class="stat-label">Clienti/Mese</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sezione Geografica -->
+        <div class="section-header">
+            <h2 class="section-title">Distribuzione Geografica</h2>
+            <div class="section-subtitle">Performance per provincia</div>
+        </div>
+        
+        <div class="geographic-grid">
+            <!-- Provincia Latina Card -->
+            <div class="province-card lt-card">
+                <div class="province-header">
+                    <div class="province-badge">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>LT</span>
+                    </div>
+                    <div class="province-percentage">88.6%</div>
+                </div>
+                <h3 class="province-name">Latina</h3>
+                <div class="province-stats">
+                    <div class="province-metric">
+                        <div class="metric-value">€60.4k</div>
+                        <div class="metric-label">Fatturato</div>
+                    </div>
+                    <div class="province-metric">
+                        <div class="metric-value">18</div>
+                        <div class="metric-label">Clienti</div>
+                    </div>
+                    <div class="province-metric">
+                        <div class="metric-value">€3.4k</div>
+                        <div class="metric-label">Media Cliente</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Provincia Roma Card -->
+            <div class="province-card rm-card">
+                <div class="province-header">
+                    <div class="province-badge">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>RM</span>
+                    </div>
+                    <div class="province-percentage">11.4%</div>
+                </div>
+                <h3 class="province-name">Roma</h3>
+                <div class="province-stats">
+                    <div class="province-metric">
+                        <div class="metric-value">€7.8k</div>
+                        <div class="metric-label">Fatturato</div>
+                    </div>
+                    <div class="province-metric">
+                        <div class="metric-value">2</div>
+                        <div class="metric-label">Clienti</div>
+                    </div>
+                    <div class="province-metric">
+                        <div class="metric-value">€3.9k</div>
+                        <div class="metric-label">Media Cliente</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Confronto Geografico -->
+            <div class="comparison-card">
+                <h3 class="comparison-title">Confronto Province</h3>
+                <div class="comparison-item">
+                    <div class="comparison-label">
+                        <span class="color-indicator lt-color"></span>
+                        Latina
+                    </div>
+                    <div class="comparison-bar">
+                        <div class="bar-fill lt-bar" style="width: 88.6%"></div>
+                    </div>
+                    <div class="comparison-value">88.6%</div>
+                </div>
+                <div class="comparison-item">
+                    <div class="comparison-label">
+                        <span class="color-indicator rm-color"></span>
+                        Roma
+                    </div>
+                    <div class="comparison-bar">
+                        <div class="bar-fill rm-bar" style="width: 11.4%"></div>
+                    </div>
+                    <div class="comparison-value">11.4%</div>
+                </div>
+                <div class="comparison-summary">
+                    <strong>Latina</strong> rappresenta la provincia principale con il maggior numero di clienti e fatturato.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sezione Prodotti -->
+        <div class="section-header">
+            <h2 class="section-title">Ripartizione Prodotti</h2>
+            <div class="section-subtitle">Analisi del mix di vendita</div>
+        </div>
+        
+        <div class="products-grid">
+            <!-- Grafico Prodotti -->
+            <div class="chart-card">
+                <h3 class="chart-title">Mix Prodotti</h3>
+                <div class="chart-container">
+                    <canvas id="productsChart" width="300" height="300"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color primary-product"></span>
+                        <span>Pieni e Coppi (61%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color secondary-product"></span>
+                        <span>Altri Prodotti (39%)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dettaglio Categorie -->
+            <div class="category-details">
+                <h3 class="details-title">Dettaglio Categorie</h3>
+                
+                <div class="category-item primary">
+                    <div class="category-header">
+                        <div class="category-name">Pieni e Coppi</div>
+                        <div class="category-percentage">61%</div>
+                    </div>
+                    <div class="category-value">€54.909,62</div>
+                    <div class="category-progress">
+                        <div class="progress-bar-category">
+                            <div class="progress-fill-category primary-fill" style="width: 61%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-item secondary">
+                    <div class="category-header">
+                        <div class="category-name">Altri Prodotti</div>
+                        <div class="category-percentage">39%</div>
+                    </div>
+                    <div class="category-value">€35.250,17</div>
+                    <div class="category-progress">
+                        <div class="progress-bar-category">
+                            <div class="progress-fill-category secondary-fill" style="width: 39%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-insights">
+                    <div class="insight-item">
+                        <i class="fas fa-chart-pie"></i>
+                        <span><strong>Pieni e Coppi</strong> è la categoria dominante</span>
+                    </div>
+                    <div class="insight-item">
+                        <i class="fas fa-balance-scale"></i>
+                        <span>Buona diversificazione del portafoglio prodotti</span>
                     </div>
                 </div>
             </div>
@@ -889,7 +1427,7 @@
         // Funzione per caricare dati dal CSV
         async function loadDataFromCSV() {
             try {
-                const response = await fetch('https://marketingcusimano.github.io/rete-commerciale-agenti/63100238_CARABOT-NATALINO.csv');
+                const response = await fetch('https://marketingcusimano.github.io/rete-commerciali-agenti/63100238_CARABOT-NATALINO.csv');
                 const csvText = await response.text();
                 
                 console.log('Dati caricati dal CSV');
@@ -903,10 +1441,50 @@
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', function() {
             loadDataFromCSV();
+            initializeProductsChart();
             
             // Auto-refresh ogni 10 minuti
             setInterval(loadDataFromCSV, 600000);
         });
+        
+        // Grafico Prodotti
+        function initializeProductsChart() {
+            const ctx = document.getElementById('productsChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pieni e Coppi', 'Altri Prodotti'],
+                    datasets: [{
+                        data: [61, 39],
+                        backgroundColor: ['#667eea', '#48bb78'],
+                        borderWidth: 0,
+                        cutout: '65%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        arc: {
+                            borderWidth: 0
+                        }
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
