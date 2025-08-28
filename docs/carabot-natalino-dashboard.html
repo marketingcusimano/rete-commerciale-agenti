@@ -880,40 +880,78 @@
                 const csvContent = await response.text();
                 console.log('CSV caricato, dimensione:', csvContent.length, 'caratteri');
                 
-                // Parsing semplificato del CSV
+                // Parsing specifico per il formato del CSV
                 const lines = csvContent.split('\n');
                 const data = [];
-                let headers = [];
                 
-                // Trova le intestazioni (prima riga non vuota con separatori)
-                let headerIndex = -1;
+                // Trova la sezione "DETTAGLIO VENDITE PER CLIENTE"
+                let detailSectionStart = -1;
+                let detailSectionEnd = -1;
+                
                 for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (line && line.includes(';') && line.split(';').length > 3) {
-                        headers = line.split(';').map(h => h.trim().replace(/"/g, ''));
-                        headerIndex = i;
+                    if (lines[i].includes('DETTAGLIO VENDITE PER CLIENTE')) {
+                        detailSectionStart = i + 1; // Salta l'intestazione della sezione
+                        console.log('Trovata sezione dettaglio vendite alla riga:', i);
                         break;
                     }
                 }
                 
-                if (headerIndex >= 0) {
-                    // Processa le righe di dati
-                    for (let i = headerIndex + 1; i < lines.length; i++) {
+                // Trova la fine della sezione (prossima sezione che inizia con ===)
+                if (detailSectionStart >= 0) {
+                    for (let i = detailSectionStart + 1; i < lines.length; i++) {
+                        if (lines[i].includes('===') || lines[i].includes('RIEPILOGO')) {
+                            detailSectionEnd = i;
+                            break;
+                        }
+                    }
+                    if (detailSectionEnd === -1) detailSectionEnd = lines.length;
+                    
+                    console.log('Sezione dettaglio vendite: righe', detailSectionStart, '-', detailSectionEnd);
+                    
+                    // Parse dei dati vendite
+                    const headers = ['Provincia', 'Ragione Sociale Cliente', 'Categoria ARTICOLI', 'Fatturato'];
+                    
+                    for (let i = detailSectionStart + 1; i < detailSectionEnd; i++) {
                         const line = lines[i].trim();
-                        if (line && !line.includes('===')) {
-                            const values = line.split(';').map(v => v.trim().replace(/"/g, ''));
-                            if (values.length >= headers.length) {
-                                const row = {};
-                                headers.forEach((header, index) => {
-                                    row[header] = values[index] || '';
-                                });
+                        if (line && !line.includes('===') && line.includes(',')) {
+                            const parts = line.split(',');
+                            if (parts.length >= 4) {
+                                // Ricostruisci i campi considerando che il fatturato può contenere virgole
+                                const provincia = parts[0];
+                                let cliente = '';
+                                let categoria = '';
+                                let fatturato = '';
+                                
+                                // Il fatturato è sempre l'ultima parte (con le virgole)
+                                fatturato = parts[parts.length - 1].replace(/"/g, '');
+                                
+                                // Categoria è la penultima parte
+                                categoria = parts[parts.length - 2];
+                                
+                                // Cliente è tutto quello che sta nel mezzo
+                                for (let j = 1; j < parts.length - 2; j++) {
+                                    cliente += (j > 1 ? ',' : '') + parts[j];
+                                }
+                                cliente = cliente.replace(/"/g, '');
+                                categoria = categoria.replace(/"/g, '');
+                                
+                                const row = {
+                                    'Provincia': provincia,
+                                    'Cliente': cliente,
+                                    'Categoria': categoria,
+                                    'Fatturato': fatturato
+                                };
                                 data.push(row);
                             }
                         }
                     }
                 }
                 
-                console.log('Dati elaborati:', data.length, 'righe');
+                console.log('Dati elaborati dalla sezione vendite:', data.length, 'righe');
+                
+                // Aggiungi anche i dati dalle altre sezioni per completezza
+                parseOtherSections(lines, data);
+                
                 csvData = data;
                 
                 // Aggiorna la dashboard
@@ -930,29 +968,79 @@
             }
         }
         
+        // Funzione per estrarre i dati riassuntivi dalle altre sezioni
+        function parseOtherSections(lines, data) {
+            // Estrai i totali dalla sezione TOTALI
+            const totalsSection = lines.find(line => line.includes('Fatturato Totale'));
+            if (totalsSection) {
+                console.log('Trovati totali:', totalsSection);
+            }
+            
+            // Estrai dati clienti per provincia dalla sezione CLIENTI PER PROVINCIA
+            let clientiProvinciaStart = -1;
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes('CLIENTI PER PROVINCIA')) {
+                    clientiProvinciaStart = i + 1;
+                    break;
+                }
+            }
+            
+            if (clientiProvinciaStart >= 0) {
+                // Salta l'header e leggi i dati
+                for (let i = clientiProvinciaStart + 1; i < lines.length && !lines[i].includes('==='); i++) {
+                    const line = lines[i].trim();
+                    if (line && line.includes(',')) {
+                        console.log('Riga clienti provincia:', line);
+                    }
+                }
+            }
+        }
+        
+        // Funzione per convertire valori europei (virgola decimale) in numeri
+        function parseEuropeanNumber(value) {
+            if (!value) return 0;
+            // Rimuove tutto tranne numeri, virgole e punti
+            const cleaned = value.toString().replace(/[^0-9,.]/g, '');
+            
+            // Se ha sia punto che virgola, considera il punto come separatore delle migliaia
+            if (cleaned.includes('.') && cleaned.includes(',')) {
+                return parseFloat(cleaned.replace(/\./g, '').replace(',', '.')) || 0;
+            }
+            // Se ha solo la virgola, la considera come separatore decimale
+            else if (cleaned.includes(',') && !cleaned.includes('.')) {
+                return parseFloat(cleaned.replace(',', '.')) || 0;
+            }
+            // Altrimenti parsing normale
+            else {
+                return parseFloat(cleaned) || 0;
+            }
+        }
+        
         // Funzione per aggiornare la dashboard con i dati
         function updateDashboardFromData(data) {
             let totalFatturato = 0;
             let clientiUnici = new Set();
             let provinceStats = { LT: { fatturato: 0, clienti: new Set() }, RM: { fatturato: 0, clienti: new Set() } };
+            let prodottiStats = { 'Pieni e Coppi': 0, 'Altri Prodotti': 0 };
             
-            // Elabora i dati
-            data.forEach(row => {
-                // Cerca il fatturato (prova diverse colonne possibili)
-                let fatturato = 0;
-                const possibleColumns = ['Fatturato', 'Importo', 'Totale', 'Valore'];
-                for (const col of possibleColumns) {
-                    if (row[col]) {
-                        const val = parseFloat(row[col].toString().replace(/[€\.,\s]/g, ''));
-                        if (!isNaN(val) && val > 0) {
-                            fatturato = val;
-                            break;
-                        }
-                    }
-                }
+            console.log('Elaborando', data.length, 'righe di dati...');
+            
+            // Elabora i dati delle vendite
+            data.forEach((row, index) => {
+                const fatturato = parseEuropeanNumber(row.Fatturato);
+                const cliente = row.Cliente || '';
+                const provincia = row.Provincia || '';
+                const categoria = row.Categoria || '';
                 
-                const cliente = row['Cliente'] || row['Ragione Sociale'] || row['Nome'] || '';
-                const provincia = row['Provincia'] || row['Prov'] || row['PR'] || '';
+                if (index < 3) {
+                    console.log(`Riga ${index}:`, {
+                        cliente: cliente.substring(0, 20),
+                        provincia,
+                        categoria: categoria.substring(0, 15),
+                        fatturatoRaw: row.Fatturato,
+                        fatturatoParsed: fatturato
+                    });
+                }
                 
                 if (fatturato > 0) {
                     totalFatturato += fatturato;
@@ -963,13 +1051,31 @@
                 }
                 
                 // Statistiche province
-                if (provincia === 'LT' || provincia === 'Latina') {
+                if (provincia === 'LT') {
                     provinceStats.LT.fatturato += fatturato;
                     if (cliente) provinceStats.LT.clienti.add(cliente);
-                } else if (provincia === 'RM' || provincia === 'Roma') {
+                } else if (provincia === 'RM') {
                     provinceStats.RM.fatturato += fatturato;
                     if (cliente) provinceStats.RM.clienti.add(cliente);
                 }
+                
+                // Categorizza prodotti
+                if (categoria) {
+                    const catLower = categoria.toLowerCase();
+                    if (catLower.includes('mattone') || catLower.includes('pieno') || 
+                        catLower.includes('coppi') || catLower.includes('coperture')) {
+                        prodottiStats['Pieni e Coppi'] += fatturato;
+                    } else {
+                        prodottiStats['Altri Prodotti'] += fatturato;
+                    }
+                }
+            });
+            
+            console.log('Totali calcolati:', {
+                fatturato: totalFatturato,
+                clienti: clientiUnici.size,
+                LT: { fatturato: provinceStats.LT.fatturato, clienti: provinceStats.LT.clienti.size },
+                RM: { fatturato: provinceStats.RM.fatturato, clienti: provinceStats.RM.clienti.size }
             });
             
             // Aggiorna i valori nella dashboard
@@ -989,8 +1095,9 @@
             document.getElementById('obiettivo-mancante').textContent = `€${Math.round(mancante/1000)}k`;
             document.getElementById('obiettivo-percent').textContent = `${progressione}%`;
             
-            // Crescita (calcolo mockup)
-            const crescita = 12.4; // Puoi calcolare questo in base ai dati storici
+            // Calcola crescita vs 2024 (dal CSV: era €80.238,72, ora €90.159,79)
+            const fatturato2024 = 80238.72;
+            const crescita = ((totalFatturato - fatturato2024) / fatturato2024 * 100).toFixed(1);
             document.getElementById('growth-rate').textContent = `+${crescita}%`;
             
             // Clienti
@@ -1000,16 +1107,21 @@
             document.getElementById('clienti-perc').textContent = `${progressioneClienti}%`;
             document.getElementById('clienti-mancanti').textContent = Math.max(0, obiettivoClienti - clientiUnici.size);
             
-            // Media mensile (8 mesi)
+            // Media mensile (8 mesi: Gennaio-Agosto)
             const mesi = 8;
             const mediaMensile = Math.round(totalFatturato / mesi / 1000);
             document.getElementById('media-mensile').textContent = `€${mediaMensile}k`;
+            
+            // Vs 2024 media mensile
+            const mediaMensile2024 = 10.6; // €10.6k dal CSV
+            const crescitaMensile = ((mediaMensile - mediaMensile2024) / mediaMensile2024 * 100).toFixed(1);
+            document.getElementById('vs-2024').textContent = `+${crescitaMensile}%`;
             
             // Efficienza
             const mediaCliente = clientiUnici.size > 0 ? Math.round(totalFatturato / clientiUnici.size / 1000) : 0;
             document.getElementById('media-cliente').textContent = `€${mediaCliente}k`;
             
-            const mediaGiorno = Math.round(totalFatturato / (30 * mesi));
+            const mediaGiorno = Math.round(totalFatturato / (31 * mesi)); // ~31 giorni per mese
             document.getElementById('media-giorno').textContent = `€${mediaGiorno}`;
             
             const clientiMese = Math.round(clientiUnici.size / mesi * 10) / 10;
@@ -1027,7 +1139,7 @@
             document.getElementById('lt-stats').textContent = `€${Math.round(provinceStats.LT.fatturato/1000)}k • ${provinceStats.LT.clienti.size} clienti`;
             document.getElementById('rm-stats').textContent = `€${Math.round(provinceStats.RM.fatturato/1000)}k • ${provinceStats.RM.clienti.size} clienti`;
             
-            console.log('Dashboard aggiornata con i dati CSV');
+            console.log('Dashboard aggiornata con i dati CSV reali');
         }
         
         // Refresh manuale
