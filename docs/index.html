@@ -113,6 +113,109 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        body.dark-mode .filter-label {
+            color: #d1d5db;
+        }
+
+        .province-selector {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .province-selector:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Province Selection Popup */
+        .province-popup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            padding: 1rem;
+            display: none;
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 1rem;
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        body.dark-mode .popup-content {
+            background: #1e293b;
+            color: #f8fafc;
+        }
+
+        .province-option {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: white;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 0.75rem;
+        }
+
+        body.dark-mode .province-option {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f8fafc;
+        }
+
+        .province-option:hover {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+
+        body.dark-mode .province-option:hover {
+            background: #4b5563;
+        }
+
+        .province-option.selected {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+
+        body.dark-mode .province-option.selected {
+            background: #4b5563;
+        }
         
         .cards-grid { 
             display: grid; 
@@ -358,6 +461,18 @@
                 <div class="status-dot"></div>
                 <span>Dati CSV aggiornati</span>
             </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div>
+                <div class="filter-label">Filtro Territorio</div>
+                <div style="color: #3b82f6; font-weight: 600; margin-top: 0.25rem;" id="current-filter">Tutte le Province</div>
+            </div>
+            <button class="province-selector" id="province-selector">
+                <i class="fas fa-chevron-down"></i>
+                <span>Selezione Provincia</span>
+            </button>
         </div>
 
         <div id="loading-state" class="loading-container">
@@ -657,10 +772,33 @@
         </div>
     </div>
 
+    <!-- Province Selection Popup -->
+    <div id="province-popup" class="province-popup">
+        <div class="popup-content">
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">Seleziona Provincia</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <button class="province-option" data-province="all">
+                    <strong>Tutte le Province</strong>
+                    <div style="color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem;" id="all-desc">€0k • 0 clienti</div>
+                </button>
+                <button class="province-option" data-province="LT">
+                    <strong>Latina (LT)</strong>
+                    <div style="color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem;" id="lt-desc">€0k • 0 clienti</div>
+                </button>
+                <button class="province-option" data-province="RM">
+                    <strong>Roma (RM)</strong>
+                    <div style="color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem;" id="rm-desc">€0k • 0 clienti</div>
+                </button>
+            </div>
+            <button id="close-popup" style="margin-top: 1.5rem; padding: 0.75rem 1.5rem; background: #374151; color: white; border: none; border-radius: 0.5rem; cursor: pointer; width: 100%;">Chiudi</button>
+        </div>
+    </div>
+
     <script>
         class Dashboard {
             constructor() {
                 this.csvData = null;
+                this.selectedProvince = 'all';
                 this.isLoading = false;
                 this.csvFileNames = [
                     '631.00238_CARABOT-NATALINO.csv',
@@ -668,6 +806,7 @@
                     'CARABOT-NATALINO.csv',
                     'carabot.csv'
                 ];
+                this.charts = {}; // Store chart instances
                 this.init();
             }
 
@@ -677,7 +816,27 @@
             }
 
             setupEventListeners() {
+                // Theme toggle
                 document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
+                
+                // Province selector
+                document.getElementById('province-selector').addEventListener('click', () => this.showProvincePopup());
+                document.getElementById('close-popup').addEventListener('click', () => this.hideProvincePopup());
+                
+                // Province options
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.province-option')) {
+                        const province = e.target.closest('.province-option').dataset.province;
+                        this.selectProvince(province);
+                    }
+                });
+
+                // Close popup on backdrop click
+                document.getElementById('province-popup').addEventListener('click', (e) => {
+                    if (e.target.id === 'province-popup') {
+                        this.hideProvincePopup();
+                    }
+                });
             }
 
             toggleTheme() {
@@ -693,6 +852,60 @@
                     body.classList.add('light-mode');
                     icon.className = 'fas fa-moon';
                 }
+            }
+
+            showProvincePopup() {
+                if (this.csvData) {
+                    this.updateProvinceOptions();
+                    document.getElementById('province-popup').style.display = 'block';
+                }
+            }
+
+            hideProvincePopup() {
+                document.getElementById('province-popup').style.display = 'none';
+            }
+
+            updateProvinceOptions() {
+                if (!this.csvData) return;
+                
+                const allDesc = document.getElementById('all-desc');
+                const ltDesc = document.getElementById('lt-desc');
+                const rmDesc = document.getElementById('rm-desc');
+                
+                if (allDesc) allDesc.textContent = `${this.formatEuroK(this.csvData.generale.annoCorrente)} • ${this.csvData.generale.clienti} clienti`;
+                if (ltDesc) ltDesc.textContent = `${this.formatEuroK(this.csvData.latina.annoCorrente)} • ${this.csvData.latina.clientiCorrente} clienti`;
+                if (rmDesc) rmDesc.textContent = `${this.formatEuroK(this.csvData.roma.annoCorrente)} • ${this.csvData.roma.clienti} clienti`;
+                
+                // Update selected state
+                document.querySelectorAll('.province-option').forEach(option => {
+                    const province = option.dataset.province;
+                    if (province === this.selectedProvince) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+            }
+
+            selectProvince(province) {
+                this.selectedProvince = province;
+                
+                const labels = { 
+                    all: 'Tutte le Province', 
+                    LT: 'Provincia Latina', 
+                    RM: 'Provincia Roma' 
+                };
+                
+                document.getElementById('current-filter').textContent = labels[province] || 'Tutte le Province';
+                this.hideProvincePopup();
+                this.updateDisplayForProvince();
+            }
+
+            updateDisplayForProvince() {
+                if (!this.csvData) return;
+                
+                // Filter data based on selected province and update display
+                this.updateDashboard();
             }
 
             async loadData() {
@@ -966,61 +1179,109 @@ FACCIAVISTA;2;0;4500
                 return (((current - previous) / previous) * 100).toFixed(1);
             }
 
+            getDisplayData() {
+                if (!this.csvData) return null;
+                
+                switch (this.selectedProvince) {
+                    case 'all':
+                        return {
+                            fatturato: this.csvData.generale.annoCorrente,
+                            fatturatoVs: this.csvData.generale.annoPrecedente,
+                            clienti: this.csvData.generale.clienti,
+                            clientiLT: this.csvData.latina.clientiCorrente,
+                            clientiRM: this.csvData.roma.clienti,
+                            obiettivo: this.csvData.latina.obiettivo,
+                            percentualeObiettivo: this.csvData.latina.percentualeObiettivo,
+                            obiettivoClienti: this.csvData.generale.obiettivoClienti
+                        };
+                    case 'LT':
+                        return {
+                            fatturato: this.csvData.latina.annoCorrente,
+                            fatturatoVs: this.csvData.latina.annoPrecedente,
+                            clienti: this.csvData.latina.clientiCorrente,
+                            clientiLT: this.csvData.latina.clientiCorrente,
+                            clientiRM: 0,
+                            obiettivo: this.csvData.latina.obiettivo,
+                            percentualeObiettivo: this.csvData.latina.percentualeObiettivo,
+                            obiettivoClienti: this.csvData.latina.obiettivoClienti
+                        };
+                    case 'RM':
+                        return {
+                            fatturato: this.csvData.roma.annoCorrente,
+                            fatturatoVs: 0,
+                            clienti: this.csvData.roma.clienti,
+                            clientiLT: 0,
+                            clientiRM: this.csvData.roma.clienti,
+                            obiettivo: null,
+                            percentualeObiettivo: null,
+                            obiettivoClienti: null
+                        };
+                    default:
+                        return null;
+                }
+            }
+
             updateDashboard() {
                 if (!this.csvData) return;
 
-                const data = this.csvData;
-                
+                const data = this.getDisplayData();
+                if (!data) return;
+
                 // Calculate growth
-                const growthPercent = this.calculateGrowthPercentage(data.generale.annoCorrente, data.generale.annoPrecedente);
+                const growthPercent = this.calculateGrowthPercentage(data.fatturato, data.fatturatoVs);
                 
                 // Update Fatturato Card
-                document.getElementById('fatturato-value').textContent = this.formatEuroK(data.generale.annoCorrente);
-                document.getElementById('fatturato-vs').textContent = this.formatEuroK(data.generale.annoPrecedente);
+                document.getElementById('fatturato-value').textContent = this.formatEuroK(data.fatturato);
+                document.getElementById('fatturato-vs').textContent = this.formatEuroK(data.fatturatoVs);
                 document.getElementById('growth-badge').textContent = `+${growthPercent}%`;
                 
-                if (data.latina.obiettivo) {
-                    document.getElementById('obiettivo-fatturato').textContent = this.formatEuroK(data.latina.obiettivo);
-                    document.getElementById('fatturato-remaining').textContent = this.formatEuroK(Math.max(0, data.latina.obiettivo - data.generale.annoCorrente));
-                    document.getElementById('fatturato-percentage').textContent = `${data.latina.percentualeObiettivo}%`;
+                if (data.obiettivo) {
+                    document.getElementById('obiettivo-fatturato').textContent = this.formatEuroK(data.obiettivo);
+                    document.getElementById('fatturato-remaining').textContent = this.formatEuroK(Math.max(0, data.obiettivo - data.fatturato));
+                    document.getElementById('fatturato-percentage').textContent = `${data.percentualeObiettivo}%`;
                     
                     // Animate progress bar
                     setTimeout(() => {
-                        document.getElementById('progress-fatturato').style.width = `${Math.min(100, data.latina.percentualeObiettivo)}%`;
+                        document.getElementById('progress-fatturato').style.width = `${Math.min(100, data.percentualeObiettivo)}%`;
                     }, 100);
                 }
 
                 // Update Obiettivo Card
-                if (data.latina.obiettivo) {
-                    document.getElementById('obiettivo-value').textContent = this.formatEuroK(data.latina.obiettivo);
-                    document.getElementById('obiettivo-percentage').textContent = `${data.latina.percentualeObiettivo}%`;
-                    document.getElementById('obiettivo-remaining').textContent = this.formatEuroK(Math.max(0, data.latina.obiettivo - data.generale.annoCorrente));
-                    document.getElementById('obiettivo-target').textContent = this.formatEuroK(data.latina.obiettivo);
-                    document.getElementById('obiettivo-mancano').textContent = this.formatEuroK(Math.max(0, data.latina.obiettivo - data.generale.annoCorrente));
-                    document.getElementById('obiettivo-perc-display').textContent = `${data.latina.percentualeObiettivo}%`;
+                if (data.obiettivo) {
+                    document.getElementById('obiettivo-value').textContent = this.formatEuroK(data.obiettivo);
+                    document.getElementById('obiettivo-percentage').textContent = `${data.percentualeObiettivo}%`;
+                    document.getElementById('obiettivo-remaining').textContent = this.formatEuroK(Math.max(0, data.obiettivo - data.fatturato));
+                    document.getElementById('obiettivo-target').textContent = this.formatEuroK(data.obiettivo);
+                    document.getElementById('obiettivo-mancano').textContent = this.formatEuroK(Math.max(0, data.obiettivo - data.fatturato));
+                    document.getElementById('obiettivo-perc-display').textContent = `${data.percentualeObiettivo}%`;
                     
                     // Update badge color
                     const badge = document.getElementById('obiettivo-badge');
-                    if (data.latina.percentualeObiettivo >= 80) {
+                    if (data.percentualeObiettivo >= 80) {
                         badge.className = 'card-badge';
                     } else {
                         badge.className = 'card-badge warning';
                     }
                     
                     setTimeout(() => {
-                        document.getElementById('progress-obiettivo').style.width = `${Math.min(100, data.latina.percentualeObiettivo)}%`;
+                        document.getElementById('progress-obiettivo').style.width = `${Math.min(100, data.percentualeObiettivo)}%`;
                     }, 200);
+                } else {
+                    // Hide objective elements for provinces without targets
+                    document.getElementById('obiettivo-value').textContent = 'N/A';
+                    document.getElementById('obiettivo-percentage').textContent = 'N/A';
+                    document.getElementById('progress-obiettivo').style.width = '0%';
                 }
 
                 // Update Clienti Card
-                document.getElementById('clienti-count').textContent = data.generale.clienti;
-                document.getElementById('clienti-lt').textContent = data.latina.clientiCorrente;
-                document.getElementById('clienti-rm').textContent = data.roma.clienti;
+                document.getElementById('clienti-count').textContent = data.clienti;
+                document.getElementById('clienti-lt').textContent = data.clientiLT;
+                document.getElementById('clienti-rm').textContent = data.clientiRM;
                 
-                if (data.generale.obiettivoClienti) {
-                    document.getElementById('clienti-target-value').textContent = data.generale.obiettivoClienti;
-                    const clientiPercentuale = Math.round((data.generale.clienti / data.generale.obiettivoClienti) * 100);
-                    document.getElementById('clienti-mancanti').textContent = `${Math.max(0, data.generale.obiettivoClienti - data.generale.clienti)} clienti`;
+                if (data.obiettivoClienti) {
+                    document.getElementById('clienti-target-value').textContent = data.obiettivoClienti;
+                    const clientiPercentuale = Math.round((data.clienti / data.obiettivoClienti) * 100);
+                    document.getElementById('clienti-mancanti').textContent = `${Math.max(0, data.obiettivoClienti - data.clienti)} clienti`;
                     document.getElementById('clienti-perc-display').textContent = `${clientiPercentuale}%`;
                     document.getElementById('clienti-percentage').textContent = clientiPercentuale;
                     
@@ -1031,16 +1292,16 @@ FACCIAVISTA;2;0;4500
 
                 // Update Province count
                 const provinceUnique = new Set();
-                if (data.latina.clientiCorrente > 0) provinceUnique.add('Latina');
-                if (data.roma.clienti > 0) provinceUnique.add('Roma');
+                if (this.csvData.latina.clientiCorrente > 0) provinceUnique.add('Latina');
+                if (this.csvData.roma.clienti > 0) provinceUnique.add('Roma');
                 document.getElementById('province-count').textContent = provinceUnique.size;
                 document.getElementById('province-list').textContent = Array.from(provinceUnique).join(' • ');
 
-                // Update province displays
+                // Update other components
                 this.updateProvinceDisplays();
                 this.updateTables();
                 this.updateMixProdotti();
-                this.createCharts();
+                this.createAllCharts();
             }
 
             updateProvinceDisplays() {
@@ -1082,11 +1343,19 @@ FACCIAVISTA;2;0;4500
             updateTables() {
                 const data = this.csvData;
 
+                // Filter clients based on selected province
+                let filteredClienti = [...data.clienti];
+                if (this.selectedProvince === 'LT') {
+                    filteredClienti = data.clienti.filter(c => c.provincia === 'LT');
+                } else if (this.selectedProvince === 'RM') {
+                    filteredClienti = data.clienti.filter(c => c.provincia === 'RM');
+                }
+
                 // Update Top 10 clients table
                 const tbody = document.getElementById('vendite-tbody');
                 tbody.innerHTML = '';
                 
-                const sortedClienti = [...data.clienti].sort((a, b) => b.fatturato - a.fatturato);
+                const sortedClienti = [...filteredClienti].sort((a, b) => b.fatturato - a.fatturato);
                 let totalTop10 = 0;
 
                 sortedClienti.forEach((cliente, index) => {
@@ -1107,13 +1376,29 @@ FACCIAVISTA;2;0;4500
                 document.getElementById('top-clienti-count').textContent = Math.min(10, sortedClienti.length);
                 document.getElementById('top-fatturato-total').textContent = this.formatEuroK(totalTop10);
 
+                // Filter categories based on selected province
+                let filteredCategorie = [...data.categorie];
+                if (this.selectedProvince === 'LT') {
+                    filteredCategorie = data.categorie.map(cat => ({
+                        ...cat,
+                        clientiRM: 0,
+                        fatturato: Math.round(cat.fatturato * (cat.clientiLT / (cat.clientiLT + cat.clientiRM || 1)))
+                    }));
+                } else if (this.selectedProvince === 'RM') {
+                    filteredCategorie = data.categorie.map(cat => ({
+                        ...cat,
+                        clientiLT: 0,
+                        fatturato: Math.round(cat.fatturato * (cat.clientiRM / (cat.clientiLT + cat.clientiRM || 1)))
+                    })).filter(cat => cat.clientiRM > 0);
+                }
+
                 // Update category table
                 const catTbody = document.getElementById('categoria-tbody');
                 catTbody.innerHTML = '';
                 
-                const totalFatturato = data.categorie.reduce((sum, cat) => sum + cat.fatturato, 0);
+                const totalFatturato = filteredCategorie.reduce((sum, cat) => sum + cat.fatturato, 0);
 
-                data.categorie.forEach(categoria => {
+                filteredCategorie.forEach(categoria => {
                     const percentage = totalFatturato > 0 ? ((categoria.fatturato / totalFatturato) * 100).toFixed(1) : '0.0';
                     const row = document.createElement('tr');
                     row.style.borderBottom = '1px solid rgba(107, 114, 128, 0.05)';
@@ -1133,10 +1418,24 @@ FACCIAVISTA;2;0;4500
             updateMixProdotti() {
                 const data = this.csvData;
                 
+                // Filter categories based on selected province
+                let activeCategorie = [...data.categorie];
+                if (this.selectedProvince === 'LT') {
+                    activeCategorie = data.categorie.map(cat => ({
+                        ...cat,
+                        fatturato: Math.round(cat.fatturato * (cat.clientiLT / (cat.clientiLT + cat.clientiRM || 1)))
+                    }));
+                } else if (this.selectedProvince === 'RM') {
+                    activeCategorie = data.categorie.map(cat => ({
+                        ...cat,
+                        fatturato: Math.round(cat.fatturato * (cat.clientiRM / (cat.clientiLT + cat.clientiRM || 1)))
+                    })).filter(cat => cat.clientiRM > 0);
+                }
+                
                 // Calculate mix based on categories
                 let mattone = 0, pavimentazione = 0, refrattari = 0, altri = 0;
 
-                data.categorie.forEach(cat => {
+                activeCategorie.forEach(cat => {
                     const nome = cat.categoria.toLowerCase();
                     if (nome.includes('mattone') || nome.includes('laterizio')) {
                         mattone += cat.fatturato;
@@ -1168,17 +1467,32 @@ FACCIAVISTA;2;0;4500
                     document.getElementById('altri-amount').textContent = this.formatEuroK(altri);
 
                     document.getElementById('core-perf').textContent = `${corePercentage}%`;
-                    document.getElementById('categories-count').textContent = data.categorie.length;
-                    document.getElementById('involved-clients').textContent = data.generale.clienti;
+                    document.getElementById('categories-count').textContent = activeCategorie.filter(c => c.fatturato > 0).length;
+                    
+                    // Calculate involved clients based on filter
+                    let involvedClients = 0;
+                    if (this.selectedProvince === 'all') {
+                        involvedClients = this.csvData.generale.clienti;
+                    } else if (this.selectedProvince === 'LT') {
+                        involvedClients = this.csvData.latina.clientiCorrente;
+                    } else if (this.selectedProvince === 'RM') {
+                        involvedClients = this.csvData.roma.clienti;
+                    }
+                    document.getElementById('involved-clients').textContent = involvedClients;
                 }
             }
 
-            createCharts() {
-                setTimeout(() => {
-                    this.createClientiChart();
-                    this.createFatturatoChart();
-                    this.createMixProdottiChart();
-                }, 500);
+            createAllCharts() {
+                // Destroy existing charts
+                Object.values(this.charts).forEach(chart => {
+                    if (chart) chart.destroy();
+                });
+                this.charts = {};
+
+                // Create new charts
+                this.createClientiChart();
+                this.createFatturatoChart();
+                this.createMixProdottiChart();
             }
 
             createClientiChart() {
@@ -1187,7 +1501,7 @@ FACCIAVISTA;2;0;4500
 
                 const data = this.csvData;
 
-                new Chart(ctx, {
+                this.charts.clienti = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: ['LT', 'RM'],
@@ -1230,6 +1544,63 @@ FACCIAVISTA;2;0;4500
                                 grid: { display: false }
                             }
                         },
+                        animation: { duration: 1500, easing: 'easeOutBounce' }
+                    }
+                });
+            }
+
+            createFatturatoChart() {
+                const ctx = document.getElementById('fatturatoChart');
+                if (!ctx) return;
+
+                const data = this.csvData;
+
+                this.charts.fatturato = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['LT', 'RM'],
+                        datasets: [
+                            {
+                                label: '2024',
+                                data: [data.latina.annoPrecedente, 0],
+                                backgroundColor: '#cbd5e1',
+                                borderRadius: 8,
+                                maxBarThickness: 80
+                            },
+                            {
+                                label: '2025',
+                                data: [data.latina.annoCorrente, data.roma.annoCorrente],
+                                backgroundColor: ['#8b5cf6', '#6366f1'],
+                                borderRadius: 8,
+                                maxBarThickness: 80
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `${context.dataset.label}: ${this.formatEuroK(context.raw)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: (value) => this.formatEuroK(value),
+                                    color: '#6b7280'
+                                },
+                                grid: { color: '#e5e7eb' }
+                            },
+                            x: {
+                                ticks: { color: '#6b7280', font: { size: 12, weight: '600' } },
+                                grid: { display: false }
+                            }
+                        },
                         animation: { duration: 2000, easing: 'easeOutQuart' }
                     }
                 });
@@ -1240,12 +1611,25 @@ FACCIAVISTA;2;0;4500
                 if (!ctx) return;
 
                 const data = this.csvData;
-                if (!data) return;
+                
+                // Filter categories based on selected province
+                let activeCategorie = [...data.categorie];
+                if (this.selectedProvince === 'LT') {
+                    activeCategorie = data.categorie.map(cat => ({
+                        ...cat,
+                        fatturato: Math.round(cat.fatturato * (cat.clientiLT / (cat.clientiLT + cat.clientiRM || 1)))
+                    }));
+                } else if (this.selectedProvince === 'RM') {
+                    activeCategorie = data.categorie.map(cat => ({
+                        ...cat,
+                        fatturato: Math.round(cat.fatturato * (cat.clientiRM / (cat.clientiLT + cat.clientiRM || 1)))
+                    })).filter(cat => cat.clientiRM > 0);
+                }
                 
                 // Calculate mix from categories
                 let mattone = 0, pavimentazione = 0, refrattari = 0, altri = 0;
 
-                data.categorie.forEach(cat => {
+                activeCategorie.forEach(cat => {
                     const nome = cat.categoria.toLowerCase();
                     if (nome.includes('mattone') || nome.includes('laterizio')) {
                         mattone += cat.fatturato;
@@ -1261,12 +1645,7 @@ FACCIAVISTA;2;0;4500
                 const coreAmount = mattone + pavimentazione;
                 const otherAmount = refrattari + altri;
 
-                // Clear existing chart
-                if (window.mixChartInstance) {
-                    window.mixChartInstance.destroy();
-                }
-
-                window.mixChartInstance = new Chart(ctx, {
+                this.charts.mixProdotti = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Mattone + Pavimentazione', 'Altri Prodotti'],
@@ -1325,61 +1704,4 @@ FACCIAVISTA;2;0;4500
         });
     </script>
 </body>
-</html>280', font: { size: 12, weight: '600' } },
-                                grid: { display: false }
-                            }
-                        },
-                        animation: { duration: 1500, easing: 'easeOutBounce' }
-                    }
-                });
-            }
-
-            createFatturatoChart() {
-                const ctx = document.getElementById('fatturatoChart');
-                if (!ctx) return;
-
-                const data = this.csvData;
-
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['LT', 'RM'],
-                        datasets: [
-                            {
-                                label: '2024',
-                                data: [data.latina.annoPrecedente, 0],
-                                backgroundColor: '#cbd5e1',
-                                borderRadius: 8,
-                                maxBarThickness: 80
-                            },
-                            {
-                                label: '2025',
-                                data: [data.latina.annoCorrente, data.roma.annoCorrente],
-                                backgroundColor: ['#8b5cf6', '#6366f1'],
-                                borderRadius: 8,
-                                maxBarThickness: 80
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => `${context.dataset.label}: ${this.formatEuroK(context.raw)}`
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: (value) => this.formatEuroK(value),
-                                    color: '#6b7280'
-                                },
-                                grid: { color: '#e5e7eb' }
-                            },
-                            x: {
-                                ticks: { color: '#6b7
+</html>
