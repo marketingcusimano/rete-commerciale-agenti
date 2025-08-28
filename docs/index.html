@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CARABOT NATALINO - Dashboard Executive</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
@@ -869,6 +870,22 @@ body {
                 </div>
             </div>
 
+            <!-- CHARTS SECTION -->
+            <div class="table-container" style="margin-bottom: 2rem;">
+                <div class="table-header">
+                    <div>
+                        <h3>Andamento Performance</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.25rem;">
+                            Confronto fatturato anno corrente vs precedente
+                        </p>
+                    </div>
+                </div>
+                
+                <div style="height: 300px; padding: 1rem;">
+                    <canvas id="performanceChart" style="max-height: 280px;"></canvas>
+                </div>
+            </div>
+
             <!-- VENDITE TABLE -->
             <div class="table-container">
                 <div class="table-header">
@@ -965,6 +982,7 @@ class DashboardManager {
 
     // Nomi possibili del file CSV
     this.csvFileNames = [
+      '63100238_CARABOT-NATALINO.csv',
       '631.00238_CARABOT-NATALINO.csv',
       '631.00238_CARABOT NATALINO.csv'
     ];
@@ -1288,6 +1306,7 @@ class DashboardManager {
   renderDashboard() {
     if (!this.csvData) return;
     this.renderKPICards();
+    this.renderChart();
     this.renderVenditeTable();
     this.updateProvinceOptions();
   }
@@ -1478,15 +1497,29 @@ class DashboardManager {
     if (typeof input === 'number') return input;
     if (!input) return 0;
     
-    // Rimuovi virgolette, spazi, euro, punti (migliaia) e converti virgola in punto (decimali)
-    const cleaned = String(input)
-      .replace(/"/g, '')
-      .replace(/\s+/g, '')
-      .replace(/€/g, '')
-      .replace(/\./g, '')
-      .replace(/,/g, '.');
+    let cleaned = String(input).trim();
     
-    const n = Number(cleaned);
+    // Rimuovi virgolette e simboli euro
+    cleaned = cleaned.replace(/"/g, '').replace(/€/g, '').replace(/\s+/g, '');
+    
+    // Se il numero contiene sia punti che virgole, il punto è separatore migliaia
+    if (cleaned.includes('.') && cleaned.includes(',')) {
+      // Formato italiano: 80.238,72
+      cleaned = cleaned.replace(/\./g, '').replace(/,/g, '.');
+    } else if (cleaned.includes(',') && !cleaned.includes('.')) {
+      // Solo virgola = separatore decimale: 1234,56
+      cleaned = cleaned.replace(/,/g, '.');
+    } else if (cleaned.includes('.') && !cleaned.includes(',')) {
+      // Solo punto = potrebbe essere migliaia (80.238) o decimale (80.25)
+      const parts = cleaned.split('.');
+      if (parts.length === 2 && parts[1].length === 3) {
+        // Probabilmente migliaia: 80.238
+        cleaned = cleaned.replace(/\./g, '');
+      }
+      // Altrimenti lasciamo il punto come decimale
+    }
+    
+    const n = parseFloat(cleaned);
     return Number.isFinite(n) ? n : 0;
   }
 
