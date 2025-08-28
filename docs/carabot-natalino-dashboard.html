@@ -272,9 +272,15 @@
         
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
             margin-bottom: 24px;
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
         .metric-card {
@@ -410,17 +416,114 @@
         }
         
         .performance-card {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .performance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
         }
         
         .performance-card .metric-title,
         .performance-card .metric-subtitle {
-            color: rgba(255,255,255,0.9);
+            color: rgba(255,255,255,0.95);
         }
         
         .performance-card .metric-value {
             color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .performance-card .growth-indicator {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .performance-card .stat-value {
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .performance-card .stat-label {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .trend-card {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .trend-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .trend-card .metric-title,
+        .trend-card .metric-subtitle {
+            color: rgba(255,255,255,0.95);
+        }
+        
+        .trend-card .metric-value {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .trend-card .growth-indicator {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .efficiency-card {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .efficiency-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .efficiency-card .metric-title,
+        .efficiency-card .metric-subtitle {
+            color: rgba(255,255,255,0.95);
+        }
+        
+        .efficiency-card .metric-value {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .efficiency-card .growth-indicator {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
         }
         
         @media (max-width: 768px) {
@@ -497,7 +600,7 @@
                     
                     <div class="province-option selected" data-province="all">
                         <div class="province-icon">
-                            <i class="fas fa-globe"></i>
+                            <i class="fas fa-globe-europe"></i>
                         </div>
                         <div class="province-info">
                             <h4>Tutte le Province</h4>
@@ -508,7 +611,7 @@
                     
                     <div class="province-option" data-province="LT">
                         <div class="province-icon">
-                            <i class="fas fa-map-pin"></i>
+                            <i class="fas fa-map-marker-alt" style="color: #48bb78;"></i>
                         </div>
                         <div class="province-info">
                             <h4>Latina</h4>
@@ -519,7 +622,7 @@
                     
                     <div class="province-option" data-province="RM">
                         <div class="province-icon">
-                            <i class="fas fa-building"></i>
+                            <i class="fas fa-map-marker-alt" style="color: #ed8936;"></i>
                         </div>
                         <div class="province-info">
                             <h4>Roma</h4>
@@ -625,6 +728,54 @@
                     </div>
                     <div class="progress-details">
                         Obiettivo: <strong>35 clienti</strong> • Mancano: <strong>15</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trend Mensile -->
+            <div class="metric-card trend-card">
+                <div class="metric-header">
+                    <div class="metric-title">Trend Mensile</div>
+                    <div class="growth-indicator">
+                        <i class="fas fa-chart-line"></i>
+                        Stabile
+                    </div>
+                </div>
+                <div class="metric-value">€11.3k</div>
+                <div class="metric-subtitle">Media mensile 2025</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">€10.6k</div>
+                        <div class="stat-label">Media 2024</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">+6.6%</div>
+                        <div class="stat-label">vs 2024</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Efficienza Vendite -->
+            <div class="metric-card efficiency-card">
+                <div class="metric-header">
+                    <div class="metric-title">Efficienza Vendite</div>
+                    <div class="growth-indicator">
+                        <i class="fas fa-trophy"></i>
+                        Alta
+                    </div>
+                </div>
+                <div class="metric-value">€4.5k</div>
+                <div class="metric-subtitle">Fatturato medio per cliente</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">€382</div>
+                        <div class="stat-label">Media/Giorno</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2.3</div>
+                        <div class="stat-label">Clienti/Mese</div>
                     </div>
                 </div>
             </div>
