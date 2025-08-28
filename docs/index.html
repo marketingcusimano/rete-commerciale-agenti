@@ -753,102 +753,6 @@
                 </div>
             </div>
 
-            <!-- Distribuzione Province Section -->
-            <div class="card" style="padding: 2rem; margin-top: 2rem;">
-                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: #1f2937;">Distribuzione Province</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
-                    <!-- Province Distribution Chart -->
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="provinceDistributionChart"></canvas>
-                    </div>
-                    
-                    <!-- Province Details Cards -->
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <!-- Latina Card -->
-                        <div style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff); padding: 1.5rem; border-radius: 1rem; border: 2px solid #a855f7;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <span style="font-size: 1.125rem; font-weight: 700; color: #7c3aed;">Latina (LT)</span>
-                                <span style="font-size: 1.5rem; font-weight: 900; color: #7c3aed;" id="dist-lt-percentage">91.4%</span>
-                            </div>
-                            <div style="font-size: 1.25rem; font-weight: 900; color: #1f2937; margin-bottom: 0.5rem;" id="dist-lt-amount">82.389 €</div>
-                        </div>
-
-                        <!-- Roma Card -->
-                        <div style="background: linear-gradient(135deg, #ecfeff, #cffafe); padding: 1.5rem; border-radius: 1rem; border: 2px solid #22d3ee;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <span style="font-size: 1.125rem; font-weight: 700; color: #0891b2;">Roma (RM)</span>
-                                <span style="font-size: 1.5rem; font-weight: 900; color: #0891b2;" id="dist-rm-percentage">8.6%</span>
-                            </div>
-                            <div style="font-size: 1.25rem; font-weight: 900; color: #1f2937; margin-bottom: 0.5rem;" id="dist-rm-amount">7.771 €</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Riepilogo Clienti per Provincia -->
-            <div class="card" style="padding: 2rem; margin-top: 2rem;">
-                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: #1f2937;">Riepilogo Clienti per Provincia</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                    <!-- Latina -->
-                    <div style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff); padding: 2rem; border-radius: 1.5rem; text-align: center;">
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #7c3aed; margin-bottom: 1rem;">Latina</div>
-                        
-                        <div style="display: flex; justify-content: space-around; margin-bottom: 1.5rem;">
-                            <div>
-                                <div style="font-size: 2.5rem; font-weight: 900; color: #1f2937;" id="riepilogo-lt-clienti-2025">18</div>
-                                <div style="font-size: 0.875rem; color: #6b7280;">clienti 2025</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 1.5rem; font-weight: 700; color: #1f2937;" id="riepilogo-lt-fatturato-k">€82k</div>
-                                <div style="font-size: 0.875rem; color: #6b7280;">fatturato</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 1.5rem; font-weight: 700; color: #7c3aed;" id="riepilogo-lt-medio">€5k</div>
-                                <div style="font-size: 0.875rem; color: #6b7280;">medio</div>
-                            </div>
-                        </div>
-                        
-                        <!-- vs 2024 -->
-                        <div style="background: #fee2e2; padding: 1rem; border-radius: 0.75rem; border: 1px solid #fecaca;" id="lt-comparison-box">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: #dc2626; font-weight: 600;" id="lt-comparison-text">vs 2024: <span id="riepilogo-lt-clienti-2024">23</span> clienti</span>
-                                <span style="background: #fecaca; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 700;" id="riepilogo-lt-difference">-5 ↓</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Roma -->
-                    <div style="background: linear-gradient(135deg, #ecfeff, #cffafe); padding: 2rem; border-radius: 1.5rem; text-align: center;">
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #0891b2; margin-bottom: 1rem;">Roma</div>
-                        
-                        <div style="display: flex; justify-content: space-around; margin-bottom: 1.5rem;">
-                            <div>
-                                <div style="font-size: 2.5rem; font-weight: 900; color: #1f2937;" id="riepilogo-rm-clienti-2025">2</div>
-                                <div style="font-size: 0.875rem; color: #6b7280;">clienti 2025</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 1.5rem; font-weight: 700; color: #1f2937;" id="riepilogo-rm-fatturato-k">€8k</div>
-                                <div style="font-size: 0.875rem; color: #6b7280;">fatturato</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 1.5rem; font-weight: 700; color: #0891b2;" id="riepilogo-rm-medio">€4k</div>
-                                <div style="font-size: 0.875rem; color: #6b7280;">medio</div>
-                            </div>
-                        </div>
-                        
-                        <!-- vs 2024 -->
-                        <div style="background: #d1fae5; padding: 1rem; border-radius: 0.75rem; border: 1px solid #a7f3d0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: #059669; font-weight: 600;">vs 2024: <span id="riepilogo-rm-clienti-2024">0</span> clienti</span>
-                                <span style="background: #a7f3d0; color: #059669; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 700;">+∞</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Mix Prodotti Section -->
             <div class="card" style="padding: 2rem; margin-top: 2rem;">
                 <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: #1f2937;">Mix Prodotti</h3>
@@ -1070,105 +974,41 @@
                 this.showLoading();
 
                 try {
-                    // Timeout dopo 10 secondi
-                    const timeoutPromise = new Promise((_, reject) => {
-                        setTimeout(() => reject(new Error('Timeout: caricamento CSV troppo lento')), 10000);
-                    });
-
-                    const loadPromise = this.tryLoadCSV();
+                    const candidates = this.buildCandidateUrls();
+                    let csvText = null;
                     
-                    const result = await Promise.race([loadPromise, timeoutPromise]);
-                    
-                    this.csvData = this.parseCSV(result);
-                    if (!this.csvData) {
-                        throw new Error('Errore nel parsing del CSV - struttura non riconosciuta');
+                    for (const url of candidates) {
+                        try {
+                            const response = await fetch(url + '?t=' + Date.now(), {
+                                cache: 'no-cache'
+                            });
+                            if (response.ok) {
+                                csvText = await response.text();
+                                if (csvText && csvText.trim().length > 0) break;
+                            }
+                        } catch (e) {
+                            console.warn('Failed to load:', url);
+                        }
                     }
 
-                    console.log('Parsed CSV data:', this.csvData);
+                    if (!csvText) {
+                        throw new Error('Impossibile caricare il file CSV');
+                    }
+
+                    this.csvData = this.parseCSV(csvText);
+                    if (!this.csvData) {
+                        throw new Error('Errore nel parsing del CSV');
+                    }
+
                     this.showSuccess();
                     this.updateDashboard();
                     
                 } catch (error) {
-                    console.error('Errore caricamento completo:', error);
-                    
-                    // Fallback con dati di esempio
-                    console.log('Usando dati di fallback...');
-                    try {
-                        const sampleData = this.createSampleCSV();
-                        this.csvData = this.parseCSV(sampleData);
-                        if (this.csvData) {
-                            this.showSuccess();
-                            this.updateDashboard();
-                            return;
-                        }
-                    } catch (fallbackError) {
-                        console.error('Errore anche con i dati di fallback:', fallbackError);
-                    }
-                    
+                    console.error('Errore caricamento:', error);
                     this.showError(error.message);
                 } finally {
                     this.isLoading = false;
                 }
-            }
-
-            async tryLoadCSV() {
-                const candidates = this.buildCandidateUrls();
-                let csvText = null;
-                
-                console.log('Trying to load CSV from these URLs:', candidates);
-                
-                for (const url of candidates) {
-                    try {
-                        console.log('Attempting to load:', url);
-                        
-                        // Fetch con timeout
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 5000);
-                        
-                        const response = await fetch(url + '?t=' + Date.now(), {
-                            cache: 'no-cache',
-                            signal: controller.signal
-                        });
-                        
-                        clearTimeout(timeoutId);
-                        
-                        console.log(`Response for ${url}:`, response.status, response.ok);
-                        if (response.ok) {
-                            csvText = await response.text();
-                            if (csvText && csvText.trim().length > 0) {
-                                console.log('Successfully loaded CSV from:', url);
-                                console.log('CSV content preview:', csvText.substring(0, 200));
-                                return csvText;
-                            }
-                        }
-                    } catch (e) {
-                        console.warn('Failed to load from:', url, e.message);
-                        if (e.name === 'AbortError') {
-                            console.warn('Request timed out for:', url);
-                        }
-                    }
-                }
-
-                // Se nessun URL funziona, usa dati di esempio
-                console.warn('No CSV found, using sample data');
-                return this.createSampleCSV();
-            }
-
-            createSampleCSV() {
-                return `=== VERIFICA OBIETTIVI ===
-Generale;79000;90000;;;18;20;;
-LT;79000;82000;150000;55%;23;18;35;51%
-
-=== CLIENTI PER PROVINCIA ===
-LT;18;82000;;;;;;;
-RM;2;8000;;;;;;;
-
-=== RIEPILOGO PER CATEGORIA ===
-Mattone;45000
-Pavimentazione;15000
-Refrattari;8000
-Altri;12000
-`;
             }
 
             buildCandidateUrls() {
@@ -1177,10 +1017,6 @@ Altri;12000
                 const repoSlug = segs.length ? segs[0] : '';
 
                 const bases = [
-                    './docs/',
-                    'docs/',
-                    '/docs/',
-                    `/${repoSlug}/docs/`,
                     './',
                     '',
                     pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''),
@@ -1195,7 +1031,6 @@ Altri;12000
                         } catch (e) {}
                     }
                 }
-                console.log('Candidate URLs:', [...new Set(urls)]);
                 return [...new Set(urls)];
             }
 
@@ -1428,122 +1263,8 @@ Altri;12000
                 this.createClientiChart();
                 this.createFatturatoChart();
                 this.createMixProdottiChart();
-                this.createProvinceDistributionChart();
                 this.updateProvinceDisplays();
                 this.updateMixProdottiData();
-                this.updateRiepilogoClienti();
-                this.updateDistribuzioneProvince();
-            }
-
-            createProvinceDistributionChart() {
-                const ctx = document.getElementById('provinceDistributionChart');
-                if (!ctx) return;
-
-                const ltFatturato = this.csvData.latina.annoCorrente;
-                const rmFatturato = this.csvData.roma.annoCorrente;
-                const total = ltFatturato + rmFatturato;
-
-                const ltPercentage = total > 0 ? ((ltFatturato / total) * 100) : 0;
-                const rmPercentage = total > 0 ? ((rmFatturato / total) * 100) : 0;
-
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Latina (LT)', 'Roma (RM)'],
-                        datasets: [{
-                            data: [ltFatturato, rmFatturato],
-                            backgroundColor: ['#a855f7', '#22d3ee'],
-                            borderColor: ['#7c3aed', '#0891b2'],
-                            borderWidth: 3,
-                            cutout: '60%'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => {
-                                        const value = this.formatEuroK(context.raw);
-                                        const percentage = total > 0 ? 
-                                            ((context.raw / total) * 100).toFixed(1) : '0';
-                                        return `${context.label}: ${value} (${percentage}%)`;
-                                    }
-                                }
-                            }
-                        },
-                        animation: {
-                            duration: 2000,
-                            easing: 'easeOutBounce'
-                        }
-                    }
-                });
-            }
-
-            updateDistribuzioneProvince() {
-                const ltFatturato = this.csvData.latina.annoCorrente;
-                const rmFatturato = this.csvData.roma.annoCorrente;
-                const total = ltFatturato + rmFatturato;
-
-                if (total > 0) {
-                    const ltPercentage = ((ltFatturato / total) * 100).toFixed(1);
-                    const rmPercentage = ((rmFatturato / total) * 100).toFixed(1);
-
-                    document.getElementById('dist-lt-percentage').textContent = `${ltPercentage}%`;
-                    document.getElementById('dist-rm-percentage').textContent = `${rmPercentage}%`;
-                    document.getElementById('dist-lt-amount').textContent = this.formatEuro(ltFatturato);
-                    document.getElementById('dist-rm-amount').textContent = this.formatEuro(rmFatturato);
-                }
-            }
-
-            updateRiepilogoClienti() {
-                // Update Latina data
-                document.getElementById('riepilogo-lt-clienti-2025').textContent = this.csvData.latina.clientiCorrente;
-                document.getElementById('riepilogo-lt-fatturato-k').textContent = this.formatEuroK(this.csvData.latina.annoCorrente);
-                document.getElementById('riepilogo-lt-clienti-2024').textContent = this.csvData.latina.clientiPrecedenti;
-
-                // Calculate average per client for Latina
-                const ltMedio = this.csvData.latina.clientiCorrente > 0 ? 
-                    this.csvData.latina.annoCorrente / this.csvData.latina.clientiCorrente : 0;
-                document.getElementById('riepilogo-lt-medio').textContent = this.formatEuroK(ltMedio);
-
-                // Calculate difference for Latina - CORREZIONE COLORI
-                const ltDifference = this.csvData.latina.clientiCorrente - this.csvData.latina.clientiPrecedenti;
-                const ltDifferenceEl = document.getElementById('riepilogo-lt-difference');
-                const ltComparisonBox = document.getElementById('lt-comparison-box');
-                const ltComparisonText = document.getElementById('lt-comparison-text');
-                
-                if (ltDifference >= 0) {
-                    // Positive change - GREEN
-                    ltDifferenceEl.textContent = `+${ltDifference} ↑`;
-                    ltDifferenceEl.style.background = '#a7f3d0';
-                    ltDifferenceEl.style.color = '#059669';
-                    ltComparisonBox.style.background = '#d1fae5';
-                    ltComparisonBox.style.borderColor = '#a7f3d0';
-                    ltComparisonText.style.color = '#059669';
-                } else {
-                    // Negative change - RED
-                    ltDifferenceEl.textContent = `${ltDifference} ↓`;
-                    ltDifferenceEl.style.background = '#fecaca';
-                    ltDifferenceEl.style.color = '#dc2626';
-                    ltComparisonBox.style.background = '#fee2e2';
-                    ltComparisonBox.style.borderColor = '#fecaca';
-                    ltComparisonText.style.color = '#dc2626';
-                }
-
-                // Update Roma data
-                document.getElementById('riepilogo-rm-clienti-2025').textContent = this.csvData.roma.clienti;
-                document.getElementById('riepilogo-rm-fatturato-k').textContent = this.formatEuroK(this.csvData.roma.annoCorrente);
-                document.getElementById('riepilogo-rm-clienti-2024').textContent = '0';
-
-                // Calculate average per client for Roma
-                const rmMedio = this.csvData.roma.clienti > 0 ? 
-                    this.csvData.roma.annoCorrente / this.csvData.roma.clienti : 0;
-                document.getElementById('riepilogo-rm-medio').textContent = this.formatEuroK(rmMedio);
             }
 
             createMixProdottiChart() {
