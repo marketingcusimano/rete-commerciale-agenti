@@ -1240,6 +1240,7 @@ FACCIAVISTA;2;0;4500
                 if (!ctx) return;
 
                 const data = this.csvData;
+                if (!data) return;
                 
                 // Calculate mix from categories
                 let mattone = 0, pavimentazione = 0, refrattari = 0, altri = 0;
@@ -1260,7 +1261,12 @@ FACCIAVISTA;2;0;4500
                 const coreAmount = mattone + pavimentazione;
                 const otherAmount = refrattari + altri;
 
-                new Chart(ctx, {
+                // Clear existing chart
+                if (window.mixChartInstance) {
+                    window.mixChartInstance.destroy();
+                }
+
+                window.mixChartInstance = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Mattone + Pavimentazione', 'Altri Prodotti'],
@@ -1319,4 +1325,61 @@ FACCIAVISTA;2;0;4500
         });
     </script>
 </body>
-</html>
+</html>280', font: { size: 12, weight: '600' } },
+                                grid: { display: false }
+                            }
+                        },
+                        animation: { duration: 1500, easing: 'easeOutBounce' }
+                    }
+                });
+            }
+
+            createFatturatoChart() {
+                const ctx = document.getElementById('fatturatoChart');
+                if (!ctx) return;
+
+                const data = this.csvData;
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['LT', 'RM'],
+                        datasets: [
+                            {
+                                label: '2024',
+                                data: [data.latina.annoPrecedente, 0],
+                                backgroundColor: '#cbd5e1',
+                                borderRadius: 8,
+                                maxBarThickness: 80
+                            },
+                            {
+                                label: '2025',
+                                data: [data.latina.annoCorrente, data.roma.annoCorrente],
+                                backgroundColor: ['#8b5cf6', '#6366f1'],
+                                borderRadius: 8,
+                                maxBarThickness: 80
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `${context.dataset.label}: ${this.formatEuroK(context.raw)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: (value) => this.formatEuroK(value),
+                                    color: '#6b7280'
+                                },
+                                grid: { color: '#e5e7eb' }
+                            },
+                            x: {
+                                ticks: { color: '#6b7
