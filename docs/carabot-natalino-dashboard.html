@@ -1442,6 +1442,43 @@
             }
         }
         
+        // Refresh manuale - SPOSTATO FUORI per accessibilità globale
+        async function manualRefresh() {
+            const button = document.querySelector('.refresh-button');
+            const statusText = document.getElementById('status-text');
+            
+            // Mostra stato loading
+            button.classList.add('loading');
+            button.innerHTML = '<i class="fas fa-sync-alt"></i><span>Aggiornando...</span>';
+            statusText.textContent = 'Caricamento dati in corso...';
+            
+            try {
+                await loadDataFromCSV();
+                
+                // Feedback successo
+                button.classList.remove('loading');
+                button.innerHTML = '<i class="fas fa-check"></i><span>Aggiornato!</span>';
+                button.style.background = '#48bb78';
+                
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-sync-alt"></i><span>Aggiorna</span>';
+                    button.style.background = '#48bb78';
+                }, 2000);
+                
+            } catch (error) {
+                // Feedback errore
+                button.classList.remove('loading');
+                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Errore</span>';
+                button.style.background = '#e53e3e';
+                statusText.textContent = 'Errore nel caricamento dati';
+                
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-sync-alt"></i><span>Aggiorna</span>';
+                    button.style.background = '#48bb78';
+                }, 3000);
+            }
+        }
+        
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', function() {
             loadDataFromCSV();
