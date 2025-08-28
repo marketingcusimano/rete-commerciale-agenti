@@ -870,22 +870,6 @@ body {
                 </div>
             </div>
 
-            <!-- CHARTS SECTION -->
-            <div class="table-container" style="margin-bottom: 2rem;">
-                <div class="table-header">
-                    <div>
-                        <h3>Andamento Performance</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.25rem;">
-                            Confronto fatturato anno corrente vs precedente
-                        </p>
-                    </div>
-                </div>
-                
-                <div style="height: 300px; padding: 1rem;">
-                    <canvas id="performanceChart" style="max-height: 280px;"></canvas>
-                </div>
-            </div>
-
             <!-- VENDITE TABLE -->
             <div class="table-container">
                 <div class="table-header">
@@ -1306,7 +1290,6 @@ class DashboardManager {
   renderDashboard() {
     if (!this.csvData) return;
     this.renderKPICards();
-    this.renderChart();
     this.renderVenditeTable();
     this.updateProvinceOptions();
   }
@@ -1351,87 +1334,6 @@ class DashboardManager {
 
     const provinciaLabel2 = document.getElementById('provincia-label-2');
     if (provinciaLabel2) provinciaLabel2.textContent = this.selectedProvince === 'all' ? 'TOT' : this.selectedProvince;
-  }
-
-  renderChart() {
-    const canvas = document.getElementById('performanceChart');
-    if (!canvas || !this.csvData) return;
-
-    // Distruggi il grafico precedente se esiste
-    if (window.performanceChart) {
-      window.performanceChart.destroy();
-    }
-
-    const data = this.getDisplayData();
-    
-    // Dati per il grafico a barre
-    const chartData = {
-      labels: ['Anno Precedente', 'Anno Corrente', 'Obiettivo'],
-      datasets: [{
-        label: 'Fatturato (€k)',
-        data: [
-          Math.round(data.annoPrecedente / 1000), 
-          Math.round(data.fatturato / 1000),
-          data.obiettivo ? Math.round(data.obiettivo / 1000) : 0
-        ],
-        backgroundColor: [
-          'rgba(107, 114, 128, 0.8)',
-          'rgba(59, 130, 246, 0.8)',
-          data.obiettivo ? 'rgba(16, 185, 129, 0.8)' : 'transparent'
-        ],
-        borderColor: [
-          'rgba(107, 114, 128, 1)',
-          'rgba(59, 130, 246, 1)',
-          data.obiettivo ? 'rgba(16, 185, 129, 1)' : 'transparent'
-        ],
-        borderWidth: 2
-      }]
-    };
-
-    window.performanceChart = new Chart(canvas, {
-      type: 'bar',
-      data: chartData,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          },
-          title: {
-            display: true,
-            text: `Performance ${this.selectedProvince === 'all' ? 'Generale' : this.selectedProvince}`,
-            font: {
-              size: 16,
-              weight: 'bold'
-            },
-            color: getComputedStyle(document.body).getPropertyValue('--text-primary')
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value) {
-                return '€' + value + 'k';
-              },
-              color: getComputedStyle(document.body).getPropertyValue('--text-secondary')
-            },
-            grid: {
-              color: 'rgba(107, 114, 128, 0.1)'
-            }
-          },
-          x: {
-            ticks: {
-              color: getComputedStyle(document.body).getPropertyValue('--text-secondary')
-            },
-            grid: {
-              display: false
-            }
-          }
-        }
-      }
-    });
   }
 
   renderVenditeTable() {
