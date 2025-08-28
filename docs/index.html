@@ -953,10 +953,7 @@ body {
 
     <script>
 // ==================== DASHBOARD CARABOT NATALINO - GITHUB PAGES ====================
-// Vanilla JS — CSV live, parser IT, formattazione "k" max 3 cifre ovunque
-// Fix: URL risolti automaticamente per GitHub Pages (repo-pages con /<repo>/),
-//      rimozione controllo troppo rigido sul contenuto del CSV,
-//      log dettagliati e messaggi d'errore più chiari.
+// Parser CSV corretto per il formato specifico del file CARABOT NATALINO
 
 class DashboardManager {
   constructor() {
@@ -966,7 +963,7 @@ class DashboardManager {
     this.lastUpdate = null;
     this.updateInterval = null;
 
-    // Nomi possibili del file CSV (vedi repo screenshot)
+    // Nomi possibili del file CSV
     this.csvFileNames = [
       '631.00238_CARABOT-NATALINO.csv',
       '631.00238_CARABOT NATALINO.csv'
@@ -1029,18 +1026,14 @@ class DashboardManager {
   // Costruisce una lista di URL candidati che funzionano su GitHub Pages
   buildCandidateUrls() {
     const { pathname, origin } = window.location;
-    // es.: /utente/repo/ => repoSlug = 'repo'
     const segs = pathname.split('/').filter(Boolean);
     const repoSlug = segs.length ? segs[0] : '';
 
     const bases = new Set([
       './',
       '',
-      // base calcolata dalla pagina corrente (termina con /)
       pathname.endsWith('/') ? pathname : pathname.replace(/[^/]*$/, ''),
-      // root del repo pages
       repoSlug ? `/${repoSlug}/` : '/',
-      // in alcuni setup rimane /<repo>/docs/
       repoSlug ? `/${repoSlug}/docs/` : '/docs/'
     ]);
 
@@ -1053,7 +1046,6 @@ class DashboardManager {
         } catch { /* ignore */ }
       }
     }
-    // dedup
     return Array.from(new Set(urls));
   }
 
@@ -1071,7 +1063,6 @@ class DashboardManager {
 
       console.log('🔎 CSV candidate URLs:', candidates);
 
-      // Prova in sequenza gli URL definiti
       for (const url of candidates) {
         const u = url + cacheBuster;
         try {
@@ -1096,9 +1087,8 @@ class DashboardManager {
 
       if (!text) throw lastError || new Error('Impossibile leggere il CSV');
 
-      // Log diagnostico
       console.log('✅ CSV caricato, len:', text.length);
-      console.log('📝 CSV head (200):', text.substring(0, 200));
+      console.log('📝 CSV head (500):', text.substring(0, 500));
 
       const parsedData = this.parseCSV(text);
       if (!parsedData) throw new Error('Parsing CSV fallito — controlla intestazioni/marker nel CSV');
@@ -1116,88 +1106,118 @@ class DashboardManager {
     }
   }
 
-  // ==================== CSV PARSING ====================
+  // ==================== CSV PARSING (CORRETTO) ====================
   parseCSV(csvText) {
     try {
-      // OBIETTIVI
-      const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)===.*===/);
-      if (!obiettiviMatch) throw new Error('Sezione obiettivi non trovata');
+      console.log('🔍 Inizio parsing CSV...');
+      
+      // Trova sezione VERIFICA OBIETTIVI
+      const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)(?==== |$)/);
+      if (!obiettiviMatch) throw new Error('Sezione "VERIFICA OBIETTIVI" non trovata');
+      
       const obiettiviText = obiettiviMatch[1];
+      console.log('📊 Sezione obiettivi trovata');
 
-      // GENERALE
-      const generaleMatch = obiettiviText.match(/Generale;([\d.,]+);([\d.,]+);;;(\d+);(\d+);;/);
-      if (!generaleMatch) throw new Error('Dati Generale non trovati');
+      // Parse GENERALE (seconda riga della sezione obiettivi)
+      const lines = obiettiviText.split('\n').filter(line => line.trim());
+      const generaleLine = lines.find(line => line.startsWith('Generale,'));
+      if (!generaleLine) throw new Error('Riga Generale non trovata');
+      
+      const generaleParts = generaleLine.split(',');
       const generale = {
-        annoPrecedente: this.parseNumber(generaleMatch[1]),
-        annoCorrente: this.parseNumber(generaleMatch[2]),
-        clienti: parseInt(generaleMatch[4], 10)
+        annoPrecedente: this.parseNumber(generaleParts[1]),
+        annoCorrente: this.parseNumber(generaleParts[2]),
+        clienti: parseInt(generaleParts[6]) || 0
       };
+      console.log('✅ Dati Generale:', generale);
 
-      // LATINA
-      const ltMatch = obiettiviText.match(/LT;([\d.,]+);([\d.,]+);([\d.,]+);(\d+)%;(\d+);(\d+);(\d+);(\d+)%/);
-      if (!ltMatch) throw new Error('Dati Latina non trovati');
-      const latinaObiettivoRaw = this.parseNumber(ltMatch[3]);
+      // Parse LATINA
+      const ltLine = lines.find(line => line.startsWith('LT,'));
+      if (!ltLine) throw new Error('Riga LT non trovata');
+      
+      const ltParts = ltLine.split(',');
       const latina = {
-        annoPrecedente: this.parseNumber(ltMatch[1]),
-        annoCorrente: this.parseNumber(ltMatch[2]),
-        obiettivo: latinaObiettivoRaw * 1000, // CSV in "migliaia" → euro
-        percentualeObiettivo: parseInt(ltMatch[4], 10),
-        clientiPrecedenti: parseInt(ltMatch[5], 10),
-        clientiCorrente: parseInt(ltMatch[6], 10),
-        obiettivoClienti: parseInt(ltMatch[7], 10)
+        annoPrecedente: this.parseNumber(ltParts[1]),
+        annoCorrente: this.parseNumber(ltParts[2]),
+        obiettivo: this.parseNumber(ltParts[3]) * 1000, // CSV in migliaia
+        percentualeObiettivo: parseInt(ltParts[4].replace('%', '').trim()) || 0,
+        clientiPrecedenti: parseInt(ltParts[5]) || 0,
+        clientiCorrente: parseInt(ltParts[6]) || 0,
+        obiettivoClienti: parseInt(ltParts[7]) || 0
       };
+      console.log('✅ Dati Latina:', latina);
 
-      // ROMA (da sezione Clienti per provincia)
-      const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)===.*===/);
+      // Parse CLIENTI PER PROVINCIA per Roma
+      const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)(?==== |$)/);
       let roma = { annoCorrente: 0, clienti: 0 };
       if (clientiMatch) {
         const clientiText = clientiMatch[1];
-        const rmMatch = clientiText.match(/RM;(\d+);([\d.,]+);;;;;;/);
-        if (rmMatch) {
+        const clientiLines = clientiText.split('\n').filter(line => line.trim() && !line.includes('Provincia,'));
+        const rmLine = clientiLines.find(line => line.startsWith('RM,'));
+        if (rmLine) {
+          const rmParts = rmLine.split(',');
           roma = {
-            annoCorrente: this.parseNumber(rmMatch[2]),
-            clienti: parseInt(rmMatch[1], 10)
+            annoCorrente: this.parseNumber(rmParts[2]),
+            clienti: parseInt(rmParts[1]) || 0
           };
         }
       }
+      console.log('✅ Dati Roma:', roma);
 
-      // DETTAGLIO VENDITE → top 10
-      const dettaglioStart = csvText.indexOf('=== DETTAGLIO VENDITE PER CLIENTE ===');
-      const dettaglioEnd = csvText.indexOf('=== RIEPILOGO PER CATEGORIA ===');
+      // Parse DETTAGLIO VENDITE
+      const dettaglioMatch = csvText.match(/=== DETTAGLIO VENDITE PER CLIENTE ===([\s\S]*?)(?==== |$)/);
       let vendite = [];
-      if (dettaglioStart !== -1 && dettaglioEnd !== -1) {
-        const dettaglioSection = csvText.substring(dettaglioStart, dettaglioEnd);
-        const lines = dettaglioSection.split('\n').filter(line =>
-          line.trim() && !line.includes('===') && !line.includes('Provincia;Ragione Sociale Cliente') && line.includes(';') && line.split(';').length >= 4
+      if (dettaglioMatch) {
+        const dettaglioText = dettaglioMatch[1];
+        const dettaglioLines = dettaglioText.split('\n').filter(line => 
+          line.trim() && 
+          !line.includes('Provincia,Ragione Sociale') &&
+          line.includes(',') &&
+          line.split(',').length >= 4
         );
+
         const venditeMap = new Map();
-        lines.forEach(line => {
-          const parts = line.split(';');
+        dettaglioLines.forEach(line => {
+          const parts = line.split(',');
           if (parts.length >= 4) {
             const fatturato = this.parseNumber(parts[3]);
             if (!isNaN(fatturato) && fatturato > 0) {
-              const cliente = parts[1].trim();
-              if (!venditeMap.has(cliente) || venditeMap.get(cliente).fatturato < fatturato) {
-                venditeMap.set(cliente, {
+              const cliente = parts[1].trim().replace(/"/g, ''); // Rimuove le virgolette
+              const key = cliente;
+              
+              if (!venditeMap.has(key)) {
+                venditeMap.set(key, {
                   provincia: parts[0].trim(),
                   cliente: cliente,
-                  categoria: parts[2].trim(),
-                  fatturato: fatturato
+                  categoria: parts[2].trim().replace(/"/g, ''),
+                  fatturato: 0
                 });
               }
+              venditeMap.get(key).fatturato += fatturato;
             }
           }
         });
-        vendite = Array.from(venditeMap.values()).sort((a,b)=>b.fatturato-a.fatturato).slice(0,10);
+        
+        vendite = Array.from(venditeMap.values())
+          .sort((a, b) => b.fatturato - a.fatturato)
+          .slice(0, 10);
       }
+      console.log('✅ Top 10 vendite:', vendite.length);
 
-      const result = { generale, latina, roma, vendite, timestamp: new Date() };
+      const result = { 
+        generale, 
+        latina, 
+        roma, 
+        vendite, 
+        timestamp: new Date() 
+      };
+      
+      console.log('🎉 Parsing completato con successo');
       return result;
+
     } catch (e) {
       console.error('❌ Errore parsing:', e);
-      // Stampa un hint in pagina
-      const err = document.getElementById('error-message');
-      if (err && e && e.message) err.textContent = e.message;
+      console.log('📋 CSV disponibile per debug:', csvText.substring(0, 1000));
       return null;
     }
   }
@@ -1235,13 +1255,13 @@ class DashboardManager {
       case 'success':
         if (mainEl) mainEl.style.display = 'block';
         if (connectionStatus) connectionStatus.textContent = 'Online';
-        if (statusBadge) { statusBadge.className = 'status-badge success'; statusBadge.textContent = 'CSV letto correttamente'; }
+        if (statusBadge) { statusBadge.className = 'status-badge success'; statusBadge.textContent = '✅ CSV letto correttamente'; }
         this.updateLastUpdateDisplay();
         break;
       case 'error':
         if (errorEl) errorEl.style.display = 'block';
         if (connectionStatus) connectionStatus.textContent = 'Errore';
-        if (statusBadge) { statusBadge.className = 'status-badge error'; statusBadge.textContent = 'Errore CSV'; }
+        if (statusBadge) { statusBadge.className = 'status-badge error'; statusBadge.textContent = '⚠️ Errore CSV'; }
         const err = byId('error-message');
         if (err) err.textContent = errorMessage || 'Errore sconosciuto';
         break;
@@ -1275,7 +1295,7 @@ class DashboardManager {
   renderKPICards() {
     const data = this.getDisplayData();
 
-    // Fatturato — in k
+    // Fatturato
     const fatturatoValue = document.getElementById('fatturato-value');
     if (fatturatoValue) fatturatoValue.textContent = this.formatEuroK3(data.fatturato);
 
@@ -1285,7 +1305,7 @@ class DashboardManager {
     const previousValue = document.getElementById('previous-value');
     if (previousValue) previousValue.textContent = this.formatEuroK3(data.annoPrecedente);
 
-    // Obiettivo — in k
+    // Obiettivo
     const obiettivoCard = document.getElementById('obiettivo-card');
     if (obiettivoCard) {
       if (data.obiettivo) {
@@ -1295,7 +1315,7 @@ class DashboardManager {
         const remVal = document.getElementById('remaining-value');
         if (obVal) obVal.textContent = this.formatEuroK3(data.obiettivo);
         if (obPerc) obPerc.textContent = (data.percentualeObiettivo || 0) + '%';
-        if (remVal) remVal.textContent = this.formatEuroK3((data.obiettivo || 0) - data.fatturato);
+        if (remVal) remVal.textContent = this.formatEuroK3(Math.max(0, (data.obiettivo || 0) - data.fatturato));
         const progressFill = document.getElementById('progress-fill');
         if (progressFill) progressFill.style.width = (data.percentualeObiettivo || 0) + '%';
       } else {
@@ -1345,12 +1365,24 @@ class DashboardManager {
     if (statusIcon) statusIcon.textContent = '✅';
 
     const tableStatusBadge = document.getElementById('table-status-badge');
-    if (tableStatusBadge) { tableStatusBadge.innerHTML = '<i class="fas fa-check-circle"></i><span>Live</span>'; tableStatusBadge.className = 'status-badge small success'; }
+    if (tableStatusBadge) { 
+      tableStatusBadge.innerHTML = '<i class="fas fa-check-circle"></i><span>Live</span>'; 
+      tableStatusBadge.className = 'status-badge small success'; 
+    }
   }
 
   // ==================== PROVINCE FILTER ====================
-  showProvincePopup() { if (!this.csvData) return; this.updateProvinceOptions(); const p = document.getElementById('province-popup'); if (p) p.style.display = 'flex'; }
-  hideProvincePopup() { const p = document.getElementById('province-popup'); if (p) p.style.display = 'none'; }
+  showProvincePopup() { 
+    if (!this.csvData) return; 
+    this.updateProvinceOptions(); 
+    const p = document.getElementById('province-popup'); 
+    if (p) p.style.display = 'flex'; 
+  }
+  
+  hideProvincePopup() { 
+    const p = document.getElementById('province-popup'); 
+    if (p) p.style.display = 'none'; 
+  }
 
   updateProvinceOptions() {
     if (!this.csvData) return;
@@ -1419,29 +1451,45 @@ class DashboardManager {
       const prev = this.csvData.latina.annoPrecedente || 0;
       const curr = this.csvData.latina.annoCorrente || 0;
       const crescita = prev > 0 ? (((curr - prev) / prev) * 100).toFixed(1) : '0.0';
-      return { fatturato: curr, annoPrecedente: prev, crescita, clienti: this.csvData.latina.clientiCorrente, obiettivo: this.csvData.latina.obiettivo, percentualeObiettivo: this.csvData.latina.percentualeObiettivo };
+      return { 
+        fatturato: curr, 
+        annoPrecedente: prev, 
+        crescita, 
+        clienti: this.csvData.latina.clientiCorrente, 
+        obiettivo: this.csvData.latina.obiettivo, 
+        percentualeObiettivo: this.csvData.latina.percentualeObiettivo 
+      };
     } else if (this.selectedProvince === 'RM') {
-      return { fatturato: this.csvData.roma.annoCorrente, annoPrecedente: 0, crescita: '0.0', clienti: this.csvData.roma.clienti, obiettivo: null, percentualeObiettivo: null };
+      return { 
+        fatturato: this.csvData.roma.annoCorrente, 
+        annoPrecedente: 0, 
+        crescita: '0.0', 
+        clienti: this.csvData.roma.clienti, 
+        obiettivo: null, 
+        percentualeObiettivo: null 
+      };
     }
 
     return { fatturato: 0, annoPrecedente: 0, crescita: '0.0', clienti: 0, obiettivo: null, percentualeObiettivo: null };
   }
 
   // ==================== UTILITY FUNCTIONS ====================
-  // Parser robusto per numeri in formato italiano
   parseNumber(input) {
     if (typeof input === 'number') return input;
     if (!input) return 0;
+    
+    // Rimuovi virgolette, spazi, euro, punti (migliaia) e converti virgola in punto (decimali)
     const cleaned = String(input)
+      .replace(/"/g, '')
       .replace(/\s+/g, '')
       .replace(/€/g, '')
       .replace(/\./g, '')
       .replace(/,/g, '.');
+    
     const n = Number(cleaned);
     return Number.isFinite(n) ? n : 0;
   }
 
-  // "k" con max 3 cifre (1,23k • 12,3k • 123k). Per importi in euro → sempre migliaia.
   formatK3(value) {
     const num = Number(value) || 0;
     const sign = num < 0 ? '-' : '';
@@ -1451,7 +1499,6 @@ class DashboardManager {
     if (k >= 100) out = String(Math.round(k));
     else if (k >= 10) out = (Math.round(k * 10) / 10).toString().replace('.', ',');
     else out = (Math.round(k * 100) / 100).toString().replace('.', ',');
-    // rimuovi zeri/virgola superflui
     out = out.replace(/,?0+$/, '');
     return sign + out + 'k';
   }
@@ -1471,22 +1518,6 @@ class DashboardManager {
 
     // Update time display ogni 30 secondi
     setInterval(() => this.updateLastUpdateDisplay(), 30 * 1000);
-
-    // Esegui piccoli test in console all'avvio (non bloccanti)
-    this.runUnitTests();
-  }
-
-  // ==================== TEST (console.assert) ====================
-  runUnitTests() {
-    try {
-      const approx = (a,b) => Math.abs(a-b) < 1e-6;
-      console.assert(approx(this.parseNumber('1.234,56'), 1234.56), 'parseNumber 1');
-      console.assert(this.parseNumber('€ 987.654,00') === 987654, 'parseNumber 2');
-      console.assert(this.formatK3(1234) === '1,23k', 'formatK3 1');
-      console.assert(this.formatK3(12345) === '12,3k', 'formatK3 2');
-      console.assert(this.formatK3(123456) === '123k', 'formatK3 3');
-      console.assert(this.formatEuroK3(1500) === '€1,5k', 'formatEuroK3');
-    } catch (e) { /* ignore in produzione */ }
   }
 
   // ==================== CLEANUP ====================
