@@ -57,6 +57,31 @@
             gap: 16px;
         }
         
+        .refresh-button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .refresh-button:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+        
+        .refresh-button.loading {
+            background: #4299e1;
+        }
+        
         .theme-toggle {
             background: #2d3748;
             color: white;
@@ -966,7 +991,7 @@
             </div>
             <div class="info-item">
                 <span class="status-indicator"></span>
-                <span id="status-text">Dati aggiornati automaticamente</span>
+                <span id="status-text">Caricamento dati...</span>
             </div>
         </div>
         
@@ -1001,7 +1026,7 @@
                         </div>
                         <div class="province-info">
                             <h4>Latina</h4>
-                            <span>€82k • 18 clienti</span>
+                            <span id="lt-stats">Caricamento...</span>
                         </div>
                         <div class="radio-button"></div>
                     </div>
@@ -1012,7 +1037,7 @@
                         </div>
                         <div class="province-info">
                             <h4>Roma</h4>
-                            <span>€8k • 2 clienti</span>
+                            <span id="rm-stats">Caricamento...</span>
                         </div>
                         <div class="radio-button"></div>
                     </div>
@@ -1030,10 +1055,10 @@
                     <div class="metric-title">Fatturato 2025</div>
                     <div class="growth-indicator growth-positive">
                         <i class="fas fa-arrow-up"></i>
-                        +12.4%
+                        <span id="growth-rate">+0%</span>
                     </div>
                 </div>
-                <div class="metric-value" id="fatturato-value">€90k</div>
+                <div class="metric-value" id="fatturato-value">€0</div>
                 <div class="metric-subtitle">vs 2024: <strong>€80k</strong></div>
                 
                 <div class="progress-section">
@@ -1042,10 +1067,10 @@
                         <span class="progress-percentage" id="obiettivo-perc">€155k</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="fatturato-progress" style="width: 58%"></div>
+                        <div class="progress-fill" id="fatturato-progress" style="width: 0%"></div>
                     </div>
                     <div class="progress-details">
-                        Mancano: <strong id="fatturato-mancante">€65k</strong>
+                        Mancano: <strong id="fatturato-mancante">€155k</strong>
                     </div>
                 </div>
             </div>
@@ -1056,18 +1081,18 @@
                     <div class="metric-title">Obiettivo 2025</div>
                 </div>
                 <div class="metric-value">€155k</div>
-                <div class="metric-subtitle">Da raggiungere: <strong>€65k</strong></div>
+                <div class="metric-subtitle">Da raggiungere: <strong id="da-raggiungere">€155k</strong></div>
                 
                 <div class="progress-section">
                     <div class="progress-header">
                         <span class="progress-label">Progressione Obiettivo</span>
-                        <span class="progress-percentage">58%</span>
+                        <span class="progress-percentage" id="progressione-perc">0%</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 58%"></div>
+                        <div class="progress-fill" id="obiettivo-progress" style="width: 0%"></div>
                     </div>
                     <div class="progress-details">
-                        Mancano: <strong>€65k</strong> • <strong>58%</strong>
+                        Mancano: <strong id="obiettivo-mancante">€155k</strong> • <strong id="obiettivo-percent">0%</strong>
                     </div>
                 </div>
             </div>
@@ -1077,19 +1102,19 @@
                 <div class="metric-header">
                     <div class="metric-title">Clienti Attivi</div>
                 </div>
-                <div class="metric-value" id="clienti-value">20</div>
-                <div class="metric-subtitle" id="clienti-obiettivo">raggiunto</div>
+                <div class="metric-value" id="clienti-value">0</div>
+                <div class="metric-subtitle" id="clienti-obiettivo">Obiettivo: 35 clienti</div>
                 
                 <div class="progress-section">
                     <div class="progress-header">
                         <span class="progress-label">Obiettivo Clienti</span>
-                        <span class="progress-percentage">57%</span>
+                        <span class="progress-percentage" id="clienti-perc">0%</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill warning" style="width: 57%"></div>
+                        <div class="progress-fill warning" id="clienti-progress" style="width: 0%"></div>
                     </div>
                     <div class="progress-details">
-                        Obiettivo: <strong>35 clienti</strong> • Mancano: <strong>15</strong>
+                        Obiettivo: <strong>35 clienti</strong> • Mancano: <strong id="clienti-mancanti">35</strong>
                     </div>
                 </div>
             </div>
@@ -1103,16 +1128,16 @@
                         +4.3%
                     </div>
                 </div>
-                <div class="metric-value" id="top-province">LT</div>
-                <div class="metric-subtitle">Provincia Latina</div>
+                <div class="metric-value" id="top-province">--</div>
+                <div class="metric-subtitle" id="top-province-name">Caricamento...</div>
                 
                 <div class="stats-grid">
                     <div class="stat-item">
-                        <div class="stat-value">€82k</div>
-                        <div class="stat-label">crescita totale</div>
+                        <div class="stat-value" id="top-fatturato">€0</div>
+                        <div class="stat-label">fatturato totale</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">18</div>
+                        <div class="stat-value" id="top-clienti">0</div>
                         <div class="stat-label">clienti</div>
                     </div>
                 </div>
@@ -1127,7 +1152,7 @@
                         Stabile
                     </div>
                 </div>
-                <div class="metric-value">€11.3k</div>
+                <div class="metric-value" id="media-mensile">€0</div>
                 <div class="metric-subtitle">Media mensile 2025</div>
                 
                 <div class="stats-grid">
@@ -1136,7 +1161,7 @@
                         <div class="stat-label">Media 2024</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">+6.6%</div>
+                        <div class="stat-value" id="vs-2024">+0%</div>
                         <div class="stat-label">vs 2024</div>
                     </div>
                 </div>
@@ -1151,16 +1176,16 @@
                         Alta
                     </div>
                 </div>
-                <div class="metric-value">€4.5k</div>
+                <div class="metric-value" id="media-cliente">€0</div>
                 <div class="metric-subtitle">Fatturato medio per cliente</div>
                 
                 <div class="stats-grid">
                     <div class="stat-item">
-                        <div class="stat-value">€382</div>
+                        <div class="stat-value" id="media-giorno">€0</div>
                         <div class="stat-label">Media/Giorno</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">2.3</div>
+                        <div class="stat-value" id="clienti-mese">0</div>
                         <div class="stat-label">Clienti/Mese</div>
                     </div>
                 </div>
@@ -1181,20 +1206,20 @@
                         <i class="fas fa-map-marker-alt"></i>
                         <span>LT</span>
                     </div>
-                    <div class="province-percentage">88.6%</div>
+                    <div class="province-percentage" id="lt-percentage">0%</div>
                 </div>
                 <h3 class="province-name">Latina</h3>
                 <div class="province-stats">
                     <div class="province-metric">
-                        <div class="metric-value">€60.4k</div>
+                        <div class="metric-value" id="lt-fatturato">€0</div>
                         <div class="metric-label">Fatturato</div>
                     </div>
                     <div class="province-metric">
-                        <div class="metric-value">18</div>
+                        <div class="metric-value" id="lt-clienti">0</div>
                         <div class="metric-label">Clienti</div>
                     </div>
                     <div class="province-metric">
-                        <div class="metric-value">€3.4k</div>
+                        <div class="metric-value" id="lt-media">€0</div>
                         <div class="metric-label">Media Cliente</div>
                     </div>
                 </div>
@@ -1207,20 +1232,20 @@
                         <i class="fas fa-map-marker-alt"></i>
                         <span>RM</span>
                     </div>
-                    <div class="province-percentage">11.4%</div>
+                    <div class="province-percentage" id="rm-percentage">0%</div>
                 </div>
                 <h3 class="province-name">Roma</h3>
                 <div class="province-stats">
                     <div class="province-metric">
-                        <div class="metric-value">€7.8k</div>
+                        <div class="metric-value" id="rm-fatturato">€0</div>
                         <div class="metric-label">Fatturato</div>
                     </div>
                     <div class="province-metric">
-                        <div class="metric-value">2</div>
+                        <div class="metric-value" id="rm-clienti">0</div>
                         <div class="metric-label">Clienti</div>
                     </div>
                     <div class="province-metric">
-                        <div class="metric-value">€3.9k</div>
+                        <div class="metric-value" id="rm-media">€0</div>
                         <div class="metric-label">Media Cliente</div>
                     </div>
                 </div>
@@ -1235,9 +1260,9 @@
                         Latina
                     </div>
                     <div class="comparison-bar">
-                        <div class="bar-fill lt-bar" style="width: 88.6%"></div>
+                        <div class="bar-fill lt-bar" id="lt-bar" style="width: 0%"></div>
                     </div>
-                    <div class="comparison-value">88.6%</div>
+                    <div class="comparison-value" id="lt-comparison-perc">0%</div>
                 </div>
                 <div class="comparison-item">
                     <div class="comparison-label">
@@ -1245,12 +1270,12 @@
                         Roma
                     </div>
                     <div class="comparison-bar">
-                        <div class="bar-fill rm-bar" style="width: 11.4%"></div>
+                        <div class="bar-fill rm-bar" id="rm-bar" style="width: 0%"></div>
                     </div>
-                    <div class="comparison-value">11.4%</div>
+                    <div class="comparison-value" id="rm-comparison-perc">0%</div>
                 </div>
                 <div class="comparison-summary">
-                    <strong>Latina</strong> rappresenta la provincia principale con il maggior numero di clienti e fatturato.
+                    <strong id="leading-province">Caricamento...</strong>
                 </div>
             </div>
         </div>
@@ -1271,11 +1296,11 @@
                 <div class="chart-legend">
                     <div class="legend-item">
                         <span class="legend-color primary-product"></span>
-                        <span>Pieni e Coppi (61%)</span>
+                        <span id="primary-legend">Pieni e Coppi (0%)</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color secondary-product"></span>
-                        <span>Altri Prodotti (39%)</span>
+                        <span id="secondary-legend">Altri Prodotti (0%)</span>
                     </div>
                 </div>
             </div>
@@ -1287,12 +1312,12 @@
                 <div class="category-item primary">
                     <div class="category-header">
                         <div class="category-name">Pieni e Coppi</div>
-                        <div class="category-percentage">61%</div>
+                        <div class="category-percentage" id="primary-perc">0%</div>
                     </div>
-                    <div class="category-value">€54.909,62</div>
+                    <div class="category-value" id="primary-value">€0</div>
                     <div class="category-progress">
                         <div class="progress-bar-category">
-                            <div class="progress-fill-category primary-fill" style="width: 61%"></div>
+                            <div class="progress-fill-category primary-fill" id="primary-progress" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
@@ -1300,12 +1325,12 @@
                 <div class="category-item secondary">
                     <div class="category-header">
                         <div class="category-name">Altri Prodotti</div>
-                        <div class="category-percentage">39%</div>
+                        <div class="category-percentage" id="secondary-perc">0%</div>
                     </div>
-                    <div class="category-value">€35.250,17</div>
+                    <div class="category-value" id="secondary-value">€0</div>
                     <div class="category-progress">
                         <div class="progress-bar-category">
-                            <div class="progress-fill-category secondary-fill" style="width: 39%"></div>
+                            <div class="progress-fill-category secondary-fill" id="secondary-progress" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
@@ -1313,11 +1338,11 @@
                 <div class="category-insights">
                     <div class="insight-item">
                         <i class="fas fa-chart-pie"></i>
-                        <span><strong>Pieni e Coppi</strong> è la categoria dominante</span>
+                        <span>Aggiornamento automatico dei dati dal CSV</span>
                     </div>
                     <div class="insight-item">
-                        <i class="fas fa-balance-scale"></i>
-                        <span>Buona diversificazione del portafoglio prodotti</span>
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Ultima sincronizzazione: <span id="last-update">Mai</span></span>
                     </div>
                 </div>
             </div>
@@ -1326,6 +1351,312 @@
 
     <script>
         let selectedProvince = 'all';
+        let csvData = [];
+        let productsChart = null;
+        
+        // Funzione per caricare dati dal CSV tramite API GitHub
+        async function loadDataFromCSV() {
+            try {
+                // URL dell'API GitHub per il file CSV
+                const apiUrl = 'https://api.github.com/repos/marketingcusimano/rete-commerciale-agenti/contents/63100238_CARABOT-NATALINO.csv';
+                
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Errore API GitHub: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Decodifica il contenuto base64
+                const csvContent = atob(data.content);
+                
+                console.log('CSV caricato tramite API GitHub');
+                console.log('Primi 500 caratteri:', csvContent.substring(0, 500));
+                
+                // Parsing del CSV
+                const righe = csvContent.split('\n');
+                const intestazioni = righe[0].split(',').map(h => h.trim().replace(/"/g, ''));
+                
+                console.log('Intestazioni trovate:', intestazioni);
+                
+                const datiProcessati = [];
+                for (let i = 1; i < righe.length; i++) {
+                    if (righe[i].trim()) {
+                        const valori = parseCSVLine(righe[i]);
+                        const riga = {};
+                        intestazioni.forEach((intestazione, index) => {
+                            riga[intestazione] = valori[index] || '';
+                        });
+                        datiProcessati.push(riga);
+                    }
+                }
+                
+                console.log('Dati processati:', datiProcessati.length, 'righe');
+                console.log('Esempio primi 3 record:', datiProcessati.slice(0, 3));
+                
+                // Salva i dati globalmente
+                csvData = datiProcessati;
+                
+                // Aggiorna la dashboard con i dati reali
+                aggiornaDashboardDaCSV(datiProcessati);
+                
+                // Aggiorna lo stato
+                document.getElementById('status-text').textContent = `Dati aggiornati: ${new Date().toLocaleTimeString()}`;
+                document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+                
+                return datiProcessati;
+                
+            } catch (error) {
+                console.error('Errore nel caricamento dei dati:', error);
+                document.getElementById('status-text').textContent = 'Errore nel caricamento dati - ' + error.message;
+                throw error;
+            }
+        }
+        
+        // Funzione per parsing CSV più robusto
+        function parseCSVLine(line) {
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    values.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            values.push(current.trim());
+            return values.map(v => v.replace(/"/g, ''));
+        }
+        
+        // Funzione per aggiornare la dashboard con i dati del CSV
+        function aggiornaDashboardDaCSV(dati) {
+            try {
+                let fatturatoTotale = 0;
+                let clientiUnici = new Set();
+                let statisticheProvince = {};
+                let prodottiStats = {};
+                
+                console.log('Elaborazione dati:', dati.length, 'righe');
+                
+                dati.forEach((riga, index) => {
+                    // Cerca le colonne che potrebbero contenere il fatturato
+                    let fatturato = 0;
+                    const possibiliColonneFatturato = ['Fatturato', 'Importo', 'Totale', 'Valore', 'Amount'];
+                    
+                    for (const col of possibiliColonneFatturato) {
+                        if (riga[col]) {
+                            const val = parseFloat(riga[col].toString().replace(/[€.,\s]/g, '')) || 0;
+                            if (val > 0) {
+                                fatturato = val;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Se non troviamo fatturato nelle colonne standard, proviamo con tutte le colonne numeriche
+                    if (fatturato === 0) {
+                        Object.keys(riga).forEach(key => {
+                            const val = parseFloat(riga[key].toString().replace(/[€.,\s]/g, ''));
+                            if (!isNaN(val) && val > 100) { // Assumiamo che valori > 100 siano fatturato
+                                fatturato = val;
+                            }
+                        });
+                    }
+                    
+                    // Cliente
+                    const cliente = riga['Cliente'] || riga['Ragione Sociale'] || riga['Nome'] || `Cliente_${index}`;
+                    
+                    // Provincia
+                    const provincia = riga['Provincia'] || riga['Prov'] || riga['PR'] || 'N/A';
+                    
+                    // Prodotto
+                    const prodotto = riga['Prodotto'] || riga['Categoria'] || riga['Descrizione'] || 'Non specificato';
+                    
+                    if (fatturato > 0) {
+                        fatturatoTotale += fatturato;
+                    }
+                    
+                    if (cliente) {
+                        clientiUnici.add(cliente);
+                    }
+                    
+                    if (provincia && provincia !== 'N/A') {
+                        if (!statisticheProvince[provincia]) {
+                            statisticheProvince[provincia] = { 
+                                fatturato: 0, 
+                                clienti: new Set() 
+                            };
+                        }
+                        statisticheProvince[provincia].fatturato += fatturato;
+                        if (cliente) {
+                            statisticheProvince[provincia].clienti.add(cliente);
+                        }
+                    }
+                    
+                    if (prodotto) {
+                        // Raggruppa prodotti simili
+                        let categoriaProdotto = 'Altri Prodotti';
+                        if (prodotto.toLowerCase().includes('pieni') || prodotto.toLowerCase().includes('coppi')) {
+                            categoriaProdotto = 'Pieni e Coppi';
+                        }
+                        
+                        if (!prodottiStats[categoriaProdotto]) {
+                            prodottiStats[categoriaProdotto] = 0;
+                        }
+                        prodottiStats[categoriaProdotto] += fatturato;
+                    }
+                });
+                
+                console.log('Statistiche calcolate:');
+                console.log('Fatturato totale:', fatturatoTotale);
+                console.log('Clienti unici:', clientiUnici.size);
+                console.log('Province:', statisticheProvince);
+                console.log('Prodotti:', prodottiStats);
+                
+                // Aggiorna i valori principali nella dashboard
+                const fatturatoK = Math.round(fatturatoTotale / 1000);
+                document.getElementById('fatturato-value').textContent = `€${fatturatoK}k`;
+                document.getElementById('clienti-value').textContent = clientiUnici.size;
+                
+                // Calcola progressione obiettivo
+                const obiettivo = 155000; // €155k
+                const progressione = Math.round((fatturatoTotale / obiettivo) * 100);
+                document.getElementById('fatturato-progress').style.width = `${Math.min(progressione, 100)}%`;
+                document.getElementById('obiettivo-progress').style.width = `${Math.min(progressione, 100)}%`;
+                
+                const mancante = Math.max(0, obiettivo - fatturatoTotale);
+                document.getElementById('fatturato-mancante').textContent = `€${Math.round(mancante/1000)}k`;
+                document.getElementById('da-raggiungere').textContent = `€${Math.round(mancante/1000)}k`;
+                document.getElementById('obiettivo-mancante').textContent = `€${Math.round(mancante/1000)}k`;
+                document.getElementById('progressione-perc').textContent = `${progressione}%`;
+                document.getElementById('obiettivo-percent').textContent = `${progressione}%`;
+                
+                // Calcolo crescita (mockup dato che non abbiamo dati 2024)
+                const crescitaVs2024 = 12.4; // Placeholder
+                document.getElementById('growth-rate').textContent = `+${crescitaVs2024}%`;
+                
+                // Clienti
+                const obiettivoClienti = 35;
+                const progressioneClienti = Math.round((clientiUnici.size / obiettivoClienti) * 100);
+                document.getElementById('clienti-progress').style.width = `${Math.min(progressioneClienti, 100)}%`;
+                document.getElementById('clienti-perc').textContent = `${progressioneClienti}%`;
+                document.getElementById('clienti-mancanti').textContent = Math.max(0, obiettivoClienti - clientiUnici.size);
+                
+                // Media mensile (assumiamo 8 mesi)
+                const mesiAttivi = 8;
+                const mediaMensile = Math.round((fatturatoTotale / mesiAttivi) / 1000);
+                document.getElementById('media-mensile').textContent = `€${mediaMensile}k`;
+                
+                // Efficienza
+                const mediaCliente = clientiUnici.size > 0 ? Math.round((fatturatoTotale / clientiUnici.size) / 1000) : 0;
+                document.getElementById('media-cliente').textContent = `€${mediaCliente}k`;
+                
+                const mediaGiorno = Math.round(fatturatoTotale / (30 * mesiAttivi));
+                document.getElementById('media-giorno').textContent = `€${mediaGiorno}`;
+                
+                const clientiMese = Math.round(clientiUnici.size / mesiAttivi * 10) / 10;
+                document.getElementById('clienti-mese').textContent = clientiMese;
+                
+                // Trova la provincia con più fatturato
+                let topProvincia = 'N/A';
+                let maxFatturato = 0;
+                for (const [prov, stats] of Object.entries(statisticheProvince)) {
+                    if (stats.fatturato > maxFatturato) {
+                        maxFatturato = stats.fatturato;
+                        topProvincia = prov;
+                    }
+                }
+                
+                if (topProvincia !== 'N/A') {
+                    document.getElementById('top-province').textContent = topProvincia;
+                    document.getElementById('top-province-name').textContent = `Provincia ${topProvincia}`;
+                    document.getElementById('top-fatturato').textContent = `€${Math.round(maxFatturato/1000)}k`;
+                    document.getElementById('top-clienti').textContent = statisticheProvince[topProvincia].clienti.size;
+                }
+                
+                // Aggiorna statistiche geografiche
+                aggiornaSezioneGeografica(statisticheProvince, fatturatoTotale);
+                
+                // Aggiorna grafico prodotti
+                aggiornaGraficoProdotti(prodottiStats);
+                
+                console.log('Dashboard aggiornata con successo!');
+                
+            } catch (error) {
+                console.error('Errore nell\'aggiornamento della dashboard:', error);
+            }
+        }
+        
+        function aggiornaSezioneGeografica(statisticheProvince, fatturatoTotale) {
+            // Province principali: LT e RM
+            const ltStats = statisticheProvince['LT'] || statisticheProvince['Latina'] || { fatturato: 0, clienti: new Set() };
+            const rmStats = statisticheProvince['RM'] || statisticheProvince['Roma'] || { fatturato: 0, clienti: new Set() };
+            
+            // Percentuali
+            const ltPerc = fatturatoTotale > 0 ? Math.round((ltStats.fatturato / fatturatoTotale) * 100) : 0;
+            const rmPerc = fatturatoTotale > 0 ? Math.round((rmStats.fatturato / fatturatoTotale) * 100) : 0;
+            
+            // Aggiorna LT
+            document.getElementById('lt-percentage').textContent = `${ltPerc}%`;
+            document.getElementById('lt-fatturato').textContent = `€${Math.round(ltStats.fatturato/1000)}k`;
+            document.getElementById('lt-clienti').textContent = ltStats.clienti.size;
+            document.getElementById('lt-media').textContent = `€${ltStats.clienti.size > 0 ? Math.round(ltStats.fatturato/ltStats.clienti.size/1000) : 0}k`;
+            document.getElementById('lt-stats').textContent = `€${Math.round(ltStats.fatturato/1000)}k • ${ltStats.clienti.size} clienti`;
+            
+            // Aggiorna RM
+            document.getElementById('rm-percentage').textContent = `${rmPerc}%`;
+            document.getElementById('rm-fatturato').textContent = `€${Math.round(rmStats.fatturato/1000)}k`;
+            document.getElementById('rm-clienti').textContent = rmStats.clienti.size;
+            document.getElementById('rm-media').textContent = `€${rmStats.clienti.size > 0 ? Math.round(rmStats.fatturato/rmStats.clienti.size/1000) : 0}k`;
+            document.getElementById('rm-stats').textContent = `€${Math.round(rmStats.fatturato/1000)}k • ${rmStats.clienti.size} clienti`;
+            
+            // Confronto
+            document.getElementById('lt-bar').style.width = `${ltPerc}%`;
+            document.getElementById('rm-bar').style.width = `${rmPerc}%`;
+            document.getElementById('lt-comparison-perc').textContent = `${ltPerc}%`;
+            document.getElementById('rm-comparison-perc').textContent = `${rmPerc}%`;
+            
+            const leadingProvince = ltStats.fatturato >= rmStats.fatturato ? 'Latina' : 'Roma';
+            document.getElementById('leading-province').textContent = `${leadingProvince} guida con il maggior fatturato`;
+        }
+        
+        function aggiornaGraficoProdotti(prodottiStats) {
+            const totale = Object.values(prodottiStats).reduce((sum, val) => sum + val, 0);
+            
+            const pieniCoppi = prodottiStats['Pieni e Coppi'] || 0;
+            const altriProdotti = prodottiStats['Altri Prodotti'] || 0;
+            
+            const pieniPerc = totale > 0 ? Math.round((pieniCoppi / totale) * 100) : 0;
+            const altriPerc = totale > 0 ? Math.round((altriProdotti / totale) * 100) : 0;
+            
+            // Aggiorna legenda
+            document.getElementById('primary-legend').textContent = `Pieni e Coppi (${pieniPerc}%)`;
+            document.getElementById('secondary-legend').textContent = `Altri Prodotti (${altriPerc}%)`;
+            
+            // Aggiorna dettagli categorie
+            document.getElementById('primary-perc').textContent = `${pieniPerc}%`;
+            document.getElementById('primary-value').textContent = `€${Math.round(pieniCoppi/1000)}k`;
+            document.getElementById('primary-progress').style.width = `${pieniPerc}%`;
+            
+            document.getElementById('secondary-perc').textContent = `${altriPerc}%`;
+            document.getElementById('secondary-value').textContent = `€${Math.round(altriProdotti/1000)}k`;
+            document.getElementById('secondary-progress').style.width = `${altriPerc}%`;
+            
+            // Aggiorna grafico
+            if (productsChart) {
+                productsChart.data.datasets[0].data = [pieniPerc, altriPerc];
+                productsChart.update();
+            }
+        }
         
         function toggleDropdown() {
             const dropdown = document.getElementById('province-dropdown');
@@ -1369,87 +1700,35 @@
         function updateDashboard(province) {
             selectedProvince = province;
             
-            const data = {
-                'all': {
-                    fatturato: '€90k',
-                    obiettivo: '€155k',
-                    progressione: 58,
-                    mancante: '€65k',
-                    clienti: 20,
-                    topProvince: 'LT',
-                    topFatturato: '€82k',
-                    topClienti: 18
-                },
-                'LT': {
-                    fatturato: '€82k',
-                    obiettivo: '€155k',
-                    progressione: 53,
-                    mancante: '€73k',
-                    clienti: 18,
-                    topProvince: 'LT',
-                    topFatturato: '€82k',
-                    topClienti: 18
-                },
-                'RM': {
-                    fatturato: '€8k',
-                    obiettivo: '€155k',
-                    progressione: 5,
-                    mancante: '€147k',
-                    clienti: 2,
-                    topProvince: 'RM',
-                    topFatturato: '€8k',
-                    topClienti: 2
-                }
-            };
-            
-            const current = data[province];
-            
-            // Aggiorna valori
-            document.getElementById('fatturato-value').textContent = current.fatturato;
-            document.getElementById('obiettivo-perc').textContent = current.obiettivo;
-            document.getElementById('fatturato-mancante').textContent = current.mancante;
-            document.getElementById('clienti-value').textContent = current.clienti;
-            document.getElementById('top-province').textContent = current.topProvince;
-            
-            // Aggiorna progress bar
-            document.getElementById('fatturato-progress').style.width = current.progressione + '%';
-            
-            // Aggiorna stats nella performance card
-            const statsGrid = document.querySelector('.performance-card .stats-grid');
-            statsGrid.innerHTML = `
-                <div class="stat-item">
-                    <div class="stat-value">${current.topFatturato}</div>
-                    <div class="stat-label">crescita totale</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${current.topClienti}</div>
-                    <div class="stat-label">clienti</div>
-                </div>
-            `;
-        }
-        
-        // Funzione per caricare dati dal CSV
-        async function loadDataFromCSV() {
-            try {
-                const response = await fetch('https://marketingcusimano.github.io/rete-commerciale-agenti/63100238_CARABOT-NATALINO.csv');
-                const csvText = await response.text();
-                
-                console.log('Dati caricati dal CSV');
-                // Qui implementeremo il parsing automatico
-                
-            } catch (error) {
-                console.error('Errore nel caricamento dei dati:', error);
+            if (!csvData || csvData.length === 0) {
+                console.log('Nessun dato CSV disponibile per il filtro');
+                return;
             }
+            
+            // Filtra i dati in base alla provincia selezionata
+            let datiFlitrati = csvData;
+            
+            if (province !== 'all') {
+                datiFlitrati = csvData.filter(riga => {
+                    const provinciaRiga = riga['Provincia'] || riga['Prov'] || riga['PR'] || '';
+                    return provinciaRiga.toUpperCase() === province.toUpperCase();
+                });
+            }
+            
+            console.log(`Filtro applicato per provincia ${province}:`, datiFlitrati.length, 'righe');
+            
+            // Riaggiorna la dashboard con i dati filtrati
+            aggiornaDashboardDaCSV(datiFlitrati);
         }
         
-        // Refresh manuale - SPOSTATO FUORI per accessibilità globale
+        // Refresh manuale
         async function manualRefresh() {
             const button = document.querySelector('.refresh-button');
             const statusText = document.getElementById('status-text');
             
             // Mostra stato loading
             button.classList.add('loading');
-            button.innerHTML = '<i class="fas fa-sync-alt"></i><span>Aggiornando...</span>';
+            button.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i><span>Aggiornando...</span>';
             statusText.textContent = 'Caricamento dati in corso...';
             
             try {
@@ -1459,6 +1738,7 @@
                 button.classList.remove('loading');
                 button.innerHTML = '<i class="fas fa-check"></i><span>Aggiornato!</span>';
                 button.style.background = '#48bb78';
+                statusText.textContent = `Dati aggiornati: ${new Date().toLocaleTimeString()}`;
                 
                 setTimeout(() => {
                     button.innerHTML = '<i class="fas fa-sync-alt"></i><span>Aggiorna</span>';
@@ -1470,34 +1750,46 @@
                 button.classList.remove('loading');
                 button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Errore</span>';
                 button.style.background = '#e53e3e';
-                statusText.textContent = 'Errore nel caricamento dati';
+                statusText.textContent = 'Errore nel caricamento dati: ' + error.message;
                 
                 setTimeout(() => {
                     button.innerHTML = '<i class="fas fa-sync-alt"></i><span>Aggiorna</span>';
                     button.style.background = '#48bb78';
-                }, 3000);
+                    statusText.textContent = 'Errore nel caricamento dati';
+                }, 5000);
             }
         }
         
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', function() {
-            loadDataFromCSV();
+            console.log('Inizializzazione dashboard...');
+            
+            // Carica i dati iniziali
+            loadDataFromCSV().then(() => {
+                console.log('Dati iniziali caricati');
+            }).catch(error => {
+                console.error('Errore nel caricamento iniziale:', error);
+            });
+            
+            // Inizializza il grafico
             initializeProductsChart();
             
-            // Auto-refresh ogni 10 minuti
+            // Auto-refresh ogni 10 minuti (600000 ms)
             setInterval(loadDataFromCSV, 600000);
+            
+            console.log('Dashboard inizializzata');
         });
         
         // Grafico Prodotti
         function initializeProductsChart() {
             const ctx = document.getElementById('productsChart').getContext('2d');
             
-            window.productsChart = new Chart(ctx, {
+            productsChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Pieni e Coppi', 'Altri Prodotti'],
                     datasets: [{
-                        data: [61, 39],
+                        data: [0, 0],
                         backgroundColor: ['#667eea', '#48bb78'],
                         borderWidth: 0,
                         cutout: '65%'
@@ -1526,6 +1818,22 @@
                 }
             });
         }
+        
+        // Funzione di debug per controllare la struttura del CSV
+        function debugCSVStructure() {
+            if (csvData && csvData.length > 0) {
+                console.log('=== DEBUG CSV STRUCTURE ===');
+                console.log('Numero totale righe:', csvData.length);
+                console.log('Colonne disponibili:', Object.keys(csvData[0]));
+                console.log('Prima riga esempio:', csvData[0]);
+                console.log('==========================');
+            } else {
+                console.log('Nessun dato CSV caricato');
+            }
+        }
+        
+        // Esponi la funzione debug globalmente
+        window.debugCSV = debugCSVStructure;
     </script>
 </body>
 </html>
