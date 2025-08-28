@@ -1213,23 +1213,28 @@ class DashboardManager {
     if (typeof input === 'number') return input;
     if (!input) return 0;
     
-    let cleaned = String(input).trim();
+    let str = String(input).trim();
     
-    // Rimuovi virgolette e simboli
-    cleaned = cleaned.replace(/"/g, '').replace(/€/g, '').replace(/\s+/g, '');
+    // Rimuovi virgolette, euro, spazi
+    str = str.replace(/"/g, '').replace(/€/g, '').replace(/\s+/g, '');
     
-    // CASO SPECIFICO: formato "80.238,72" o "90.159,79"
-    // Il punto è separatore migliaia, la virgola è decimale
-    if (cleaned.match(/^\d{1,3}\.\d{3},\d{2}$/)) {
-      // Es: "80.238,72" → rimuovi punto (migliaia) e converti virgola in punto (decimale)
-      cleaned = cleaned.replace('.', '').replace(',', '.');
-    } else if (cleaned.includes(',') && !cleaned.includes('.')) {
-      // Solo virgola = decimale
-      cleaned = cleaned.replace(',', '.');
+    console.log('DEBUG parseNumber input:', input, '-> cleaned:', str);
+    
+    // Caso specifico formato italiano: 80.238,72 (punto = migliaia, virgola = decimali)  
+    if (str.includes('.') && str.includes(',')) {
+      // Es: 80.238,72 -> 80238.72
+      str = str.replace(/\./g, '').replace(',', '.');
+      console.log('DEBUG formato italiano:', str);
+    } 
+    // Solo virgola (decimali): 1234,56
+    else if (str.includes(',') && !str.includes('.')) {
+      str = str.replace(',', '.');
     }
     
-    const n = parseFloat(cleaned);
-    return Number.isFinite(n) ? n : 0;
+    const result = parseFloat(str);
+    console.log('DEBUG risultato finale:', result);
+    
+    return Number.isFinite(result) ? result : 0;
   }
 
   updateLoadingState(state, errorMessage = null) {
