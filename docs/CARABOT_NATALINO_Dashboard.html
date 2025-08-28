@@ -14,9 +14,9 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
-            padding: 24px;
+            padding: 20px;
             color: #1a202c;
         }
 
@@ -26,13 +26,12 @@
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 40px;
-            margin-bottom: 32px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: white;
+            border-radius: 20px;
+            padding: 36px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.04);
         }
 
         .agent-info {
@@ -40,34 +39,34 @@
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: wrap;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .agent-name {
-            font-size: 2.8rem;
+            font-size: 2.4rem;
             font-weight: 800;
             color: #1a202c;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             letter-spacing: -0.02em;
         }
 
         .agent-subtitle {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #4a5568;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             font-weight: 500;
         }
 
         .status-info {
             text-align: right;
             background: rgba(72, 187, 120, 0.08);
-            padding: 16px 24px;
+            padding: 16px 20px;
             border-radius: 16px;
-            border: 1px solid rgba(72, 187, 120, 0.2);
+            border: 1px solid rgba(72, 187, 120, 0.15);
         }
 
         .last-update {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #4a5568;
             margin-bottom: 8px;
         }
@@ -75,75 +74,184 @@
         .data-source {
             display: inline-flex;
             align-items: center;
-            background: linear-gradient(135deg, #48bb78, #38a169);
+            background: #48bb78;
             color: white;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+            box-shadow: 0 2px 8px rgba(72, 187, 120, 0.2);
         }
 
         .data-source::before {
             content: "●";
-            margin-right: 8px;
+            margin-right: 6px;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.1); }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .data-status {
+            display: inline-flex;
+            align-items: center;
+            background: #48bb78;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .data-status::before {
+            content: "●";
+            margin-right: 6px;
         }
 
         .filters {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
             flex-wrap: wrap;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
         }
 
-        .filter-tag {
-            background: rgba(66, 153, 225, 0.1);
+        .filter-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .territory-filter {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(66, 153, 225, 0.08);
             color: #3182ce;
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.9rem;
             font-weight: 600;
-            border: 1px solid rgba(66, 153, 225, 0.2);
+            border: 1px solid rgba(66, 153, 225, 0.15);
+        }
+
+        .territory-filter::before {
+            content: "●";
+            margin-right: 8px;
+            color: #4299e1;
+        }
+
+        .province-selector {
+            position: relative;
+            display: inline-block;
         }
 
         .filter-button {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
+            background: #4299e1;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 24px;
-            font-size: 0.9rem;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .filter-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(66, 153, 225, 0.4);
+            background: #3182ce;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.35);
+        }
+
+        .filter-button::after {
+            content: "▼";
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+        }
+
+        .filter-button.active::after {
+            transform: rotate(180deg);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid #e2e8f0;
+            min-width: 200px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+
+        .dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f7fafc;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background: #f7fafc;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item.active {
+            background: rgba(66, 153, 225, 0.08);
+            color: #3182ce;
+            font-weight: 600;
         }
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 24px;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.04);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -155,79 +263,79 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 24px 24px 0 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4299e1, #3182ce);
+            border-radius: 20px 20px 0 0;
         }
 
         .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         .metric-header {
-            font-size: 1rem;
+            font-size: 0.85rem;
             color: #718096;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
         .metric-value {
-            font-size: 2.4rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: #1a202c;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             line-height: 1;
         }
 
         .metric-change {
             display: inline-flex;
             align-items: center;
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .positive {
-            background: rgba(72, 187, 120, 0.15);
+            background: rgba(72, 187, 120, 0.1);
             color: #2f855a;
-            border: 1px solid rgba(72, 187, 120, 0.3);
+            border: 1px solid rgba(72, 187, 120, 0.2);
         }
 
         .negative {
-            background: rgba(245, 101, 101, 0.15);
+            background: rgba(245, 101, 101, 0.1);
             color: #c53030;
-            border: 1px solid rgba(245, 101, 101, 0.3);
+            border: 1px solid rgba(245, 101, 101, 0.2);
         }
 
         .neutral {
-            background: rgba(160, 174, 192, 0.15);
+            background: rgba(160, 174, 192, 0.1);
             color: #4a5568;
-            border: 1px solid rgba(160, 174, 192, 0.3);
+            border: 1px solid rgba(160, 174, 192, 0.2);
         }
 
         .progress-section {
-            margin-top: 20px;
+            margin-top: 16px;
         }
 
         .progress-bar {
             width: 100%;
-            height: 12px;
-            background: rgba(226, 232, 240, 0.8);
-            border-radius: 12px;
+            height: 8px;
+            background: rgba(226, 232, 240, 0.6);
+            border-radius: 8px;
             overflow: hidden;
-            margin: 12px 0;
+            margin: 10px 0;
             position: relative;
         }
 
         .progress-fill {
             height: 100%;
-            border-radius: 12px;
-            transition: width 1.5s ease-in-out;
+            border-radius: 8px;
+            transition: width 1.2s ease-out;
             position: relative;
         }
 
@@ -238,8 +346,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 2s infinite;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 1.5s infinite;
         }
 
         @keyframes shimmer {
@@ -247,28 +355,17 @@
             100% { transform: translateX(100%); }
         }
 
-        .green-progress { 
-            background: linear-gradient(90deg, #48bb78, #38a169);
-        }
-        
-        .blue-progress { 
-            background: linear-gradient(90deg, #4299e1, #3182ce);
-        }
-        
-        .orange-progress { 
-            background: linear-gradient(90deg, #ed8936, #dd6b20);
-        }
-
-        .purple-progress {
-            background: linear-gradient(90deg, #805ad5, #6b46c1);
-        }
+        .green-progress { background: linear-gradient(90deg, #48bb78, #38a169); }
+        .blue-progress { background: linear-gradient(90deg, #4299e1, #3182ce); }
+        .orange-progress { background: linear-gradient(90deg, #ed8936, #dd6b20); }
+        .purple-progress { background: linear-gradient(90deg, #805ad5, #6b46c1); }
 
         .progress-details {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #4a5568;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .large-card {
@@ -277,41 +374,29 @@
         }
 
         .chart-container {
-            height: 320px;
-            margin-top: 20px;
+            height: 280px;
+            margin-top: 16px;
             position: relative;
         }
 
         .province-chart {
-            height: 280px;
+            height: 240px;
         }
 
         .province-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-top: 24px;
+            margin-top: 20px;
         }
 
         .province-item {
-            background: linear-gradient(135deg, rgba(247, 250, 252, 0.8), rgba(237, 242, 247, 0.8));
-            padding: 24px;
-            border-radius: 20px;
-            border-left: 6px solid;
+            background: linear-gradient(135deg, rgba(247, 250, 252, 0.9), rgba(237, 242, 247, 0.9));
+            padding: 20px;
+            border-radius: 16px;
+            border-left: 4px solid;
             position: relative;
             overflow: hidden;
-        }
-
-        .province-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
-            border-radius: 50%;
-            transform: translate(30px, -30px);
         }
 
         .province-item.latina { border-left-color: #805ad5; }
@@ -319,41 +404,29 @@
 
         .province-name {
             font-weight: 700;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             margin-bottom: 8px;
         }
 
         .province-stats {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #4a5568;
-            line-height: 1.6;
+            line-height: 1.4;
         }
 
         .products-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-top: 20px;
+            gap: 20px;
+            margin-top: 16px;
         }
 
         .product-item {
             background: linear-gradient(135deg, rgba(247, 250, 252, 0.9), rgba(237, 242, 247, 0.9));
-            padding: 28px;
-            border-radius: 20px;
-            border-left: 6px solid;
+            padding: 20px;
+            border-radius: 16px;
+            border-left: 4px solid;
             position: relative;
-            overflow: hidden;
-        }
-
-        .product-item::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
-            border-radius: 50%;
         }
 
         .product-item.main { border-left-color: #4299e1; }
@@ -361,44 +434,44 @@
 
         .product-title {
             font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 12px;
+            font-size: 1rem;
+            margin-bottom: 8px;
         }
 
         .product-percentage {
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .product-value {
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .product-details {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #4a5568;
-            line-height: 1.5;
+            line-height: 1.3;
         }
 
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 200px;
+            height: 160px;
             color: #4a5568;
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(66, 153, 225, 0.1);
-            border-top: 4px solid #4299e1;
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(66, 153, 225, 0.1);
+            border-top: 3px solid #4299e1;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-right: 16px;
+            margin-right: 12px;
         }
 
         @keyframes spin {
@@ -409,61 +482,64 @@
         .error {
             background: linear-gradient(135deg, #fed7d7, #feb2b2);
             color: #c53030;
-            padding: 20px;
-            border-radius: 16px;
-            margin: 20px 0;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
             border: 1px solid #fca5a5;
             font-weight: 600;
+            font-size: 0.9rem;
         }
 
         .success {
             background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
             color: #2f855a;
-            padding: 16px;
-            border-radius: 16px;
-            margin: 16px 0;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 12px 0;
             border: 1px solid #68d391;
             font-weight: 600;
+            font-size: 0.85rem;
         }
 
         .section-title {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #1a202c;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
         }
 
         .section-title::before {
             content: '';
-            width: 4px;
-            height: 24px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 4px;
-            margin-right: 12px;
+            width: 3px;
+            height: 20px;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            border-radius: 3px;
+            margin-right: 10px;
         }
 
         .client-list {
-            max-height: 300px;
+            max-height: 280px;
             overflow-y: auto;
-            margin-top: 16px;
+            margin-top: 12px;
         }
 
         .client-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
+            padding: 10px 14px;
             background: rgba(247, 250, 252, 0.6);
-            margin-bottom: 8px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            transition: background 0.2s ease;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
         }
 
         .client-item:hover {
             background: rgba(237, 242, 247, 0.8);
+            transform: translateX(4px);
         }
 
         .client-name {
@@ -494,7 +570,7 @@
             .agent-info {
                 text-align: center;
                 flex-direction: column;
-                gap: 20px;
+                gap: 16px;
             }
 
             .filters {
@@ -503,11 +579,11 @@
             }
 
             .agent-name {
-                font-size: 2.2rem;
+                font-size: 2rem;
             }
 
             .card {
-                padding: 24px;
+                padding: 20px;
             }
         }
     </style>
@@ -519,7 +595,6 @@
                 <div>
                     <h1 class="agent-name">CARABOT NATALINO</h1>
                     <p class="agent-subtitle">Dashboard Performance Vendite</p>
-                    <p class="agent-subtitle">ID: 631.00238</p>
                 </div>
                 <div class="status-info">
                     <div class="last-update">Ultimo aggiornamento: <span id="lastUpdate">Caricamento...</span></div>
@@ -527,10 +602,25 @@
                 </div>
             </div>
             
+            <div class="header-info">
+                <span class="info-item">ID: 631.00238</span>
+                <span class="info-item">Gen - Ago 2025 (8 mesi)</span>
+                <span class="data-status">Dati aggiornati dal file HTML</span>
+            </div>
+
             <div class="filters">
-                <span class="filter-tag">📅 Periodo: <span id="periode">01/01/2025 - 24/08/2025</span></span>
-                <span class="filter-tag">🌍 Province Servite: <span id="provinceCount">2</span></span>
-                <button class="filter-button" onclick="refreshData()">🔄 Aggiorna Dati</button>
+                <span class="filter-label">FILTRO TERRITORIO</span>
+                <span class="territory-filter" id="currentFilter">Tutte le Province</span>
+                <div class="province-selector">
+                    <button class="filter-button" id="provinceBtn" onclick="toggleDropdown()">
+                        Selezione Provincia
+                    </button>
+                    <div class="dropdown" id="provinceDropdown">
+                        <div class="dropdown-item active" onclick="selectProvince('all')">Tutte le Province</div>
+                        <div class="dropdown-item" onclick="selectProvince('LT')">Latina (LT)</div>
+                        <div class="dropdown-item" onclick="selectProvince('RM')">Roma (RM)</div>
+                    </div>
+                </div>
             </div>
             
             <div id="dataStatus"></div>
@@ -543,7 +633,7 @@
                 <div class="metric-value" id="fatturato">€0</div>
                 <div class="metric-change" id="fatturatoChange">Caricamento...</div>
                 <div class="progress-section">
-                    <small style="color: #718096;">vs 2024: €<span id="fatturatoPrec">0</span></small>
+                    <small style="color: #718096;">vs 2024: €<span id="fatturatoPrec">80.238</span></small>
                     <div class="progress-bar">
                         <div class="progress-fill green-progress" id="fatturatoProgress" style="width: 0%"></div>
                     </div>
@@ -551,7 +641,7 @@
                         <span>Obiettivo Fatturato</span>
                         <span>€<span id="obiettivoFatturato">155.000</span></span>
                     </div>
-                    <div style="font-size: 0.85rem; color: #4a5568; margin-top: 4px;">
+                    <div style="font-size: 0.75rem; color: #4a5568; margin-top: 4px;">
                         Mancano: €<span id="mancanteFatturato">0</span> | <span id="percentualeFatturato">0%</span>
                     </div>
                 </div>
@@ -563,7 +653,7 @@
                 <div class="metric-value" id="clientiAttivi">0</div>
                 <div class="metric-change" id="clientiChange">Caricamento...</div>
                 <div class="progress-section">
-                    <small style="color: #718096;">Anno prec.: <span id="clientiPrec">0</span> clienti</small>
+                    <small style="color: #718096;">Anno prec.: <span id="clientiPrec">23</span> clienti</small>
                     <div class="progress-bar">
                         <div class="progress-fill blue-progress" id="clientiProgress" style="width: 0%"></div>
                     </div>
@@ -571,7 +661,7 @@
                         <span>Obiettivo Clienti</span>
                         <span><span id="obiettivoClienti">35</span></span>
                     </div>
-                    <div style="font-size: 0.85rem; color: #4a5568; margin-top: 4px;">
+                    <div style="font-size: 0.75rem; color: #4a5568; margin-top: 4px;">
                         Mancano: <span id="mancanteClienti">0</span> clienti | <span id="percentualeClienti">0%</span>
                     </div>
                 </div>
@@ -580,7 +670,7 @@
             <!-- Performance LT -->
             <div class="card metric-card">
                 <div class="metric-header">Top Performance</div>
-                <div class="metric-value" style="font-size: 3rem;">LT</div>
+                <div class="metric-value" style="font-size: 2.8rem;">LT</div>
                 <div style="color: #805ad5; margin-bottom: 8px; font-weight: 600;">Provincia Latina</div>
                 <div class="metric-change positive" id="ltPerformance">Caricamento...</div>
                 <div class="progress-section">
@@ -597,7 +687,7 @@
             <!-- Province Roma -->
             <div class="card metric-card">
                 <div class="metric-header">Sviluppo Roma</div>
-                <div class="metric-value" style="font-size: 3rem;">RM</div>
+                <div class="metric-value" style="font-size: 2.8rem;">RM</div>
                 <div style="color: #38b2ac; margin-bottom: 8px; font-weight: 600;">Provincia Roma</div>
                 <div class="metric-change" id="rmPerformance">Caricamento...</div>
                 <div class="progress-section">
@@ -622,7 +712,7 @@
             <div class="province-details">
                 <div class="province-item latina">
                     <div class="province-name" style="color: #805ad5;">Latina (LT)</div>
-                    <div style="font-size: 1.8rem; font-weight: 800; color: #805ad5; margin: 8px 0;"><span id="percentualeLT">0%</span></div>
+                    <div style="font-size: 1.6rem; font-weight: 800; color: #805ad5; margin: 6px 0;"><span id="percentualeLT">0%</span></div>
                     <div class="province-stats">
                         Fatturato: €<span id="fatturatoLTDettaglio">0</span><br>
                         Clienti: <span id="clientiLT">0</span>
@@ -630,7 +720,7 @@
                 </div>
                 <div class="province-item roma">
                     <div class="province-name" style="color: #38b2ac;">Roma (RM)</div>
-                    <div style="font-size: 1.8rem; font-weight: 800; color: #38b2ac; margin: 8px 0;"><span id="percentualeRM">0%</span></div>
+                    <div style="font-size: 1.6rem; font-weight: 800; color: #38b2ac; margin: 6px 0;"><span id="percentualeRM">0%</span></div>
                     <div class="province-stats">
                         Fatturato: €<span id="fatturatoRMDettaglio">0</span><br>
                         Clienti: <span id="clientiRM">0</span>
@@ -683,24 +773,70 @@
     <script>
         let charts = {};
         let dashboardData = {};
+        let currentProvince = 'all';
         const CSV_URL = 'https://marketingcusimano.github.io/rete-commerciale-agenti/63100238_CARABOT-NATALINO.csv';
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('provinceDropdown');
+            const btn = document.getElementById('provinceBtn');
+            
+            dropdown.classList.toggle('show');
+            btn.classList.toggle('active');
+        }
+
+        function selectProvince(province) {
+            currentProvince = province;
+            const dropdown = document.getElementById('provinceDropdown');
+            const btn = document.getElementById('provinceBtn');
+            const currentFilter = document.getElementById('currentFilter');
+            
+            // Aggiorna UI
+            dropdown.classList.remove('show');
+            btn.classList.remove('active');
+            
+            // Aggiorna filtro attivo
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Aggiorna testo
+            const filterText = province === 'all' ? 'Tutte le Province' : 
+                              province === 'LT' ? 'Solo Latina (LT)' : 'Solo Roma (RM)';
+            currentFilter.textContent = filterText;
+            
+            // Ricarica dashboard con filtro
+            if (dashboardData && Object.keys(dashboardData).length > 0) {
+                updateDashboard(dashboardData);
+            }
+        }
+
+        // Chiudi dropdown cliccando fuori
+        document.addEventListener('click', function(event) {
+            const selector = document.querySelector('.province-selector');
+            if (!selector.contains(event.target)) {
+                document.getElementById('provinceDropdown').classList.remove('show');
+                document.getElementById('provinceBtn').classList.remove('active');
+            }
+        });
 
         function showStatus(message, type = 'info') {
             const statusDiv = document.getElementById('dataStatus');
             statusDiv.className = type;
-            statusDiv.innerHTML = `<strong>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</strong> ${message}`;
+            statusDiv.innerHTML = `<strong>${type === 'success' ? 'SUCCESSO' : type === 'error' ? 'ERRORE' : 'INFO'}</strong> ${message}`;
             
             if (type === 'success') {
                 setTimeout(() => {
                     statusDiv.innerHTML = '';
                     statusDiv.className = '';
-                }, 5000);
+                }, 4000);
             }
         }
 
         function parseCSVData(csvText) {
-            const lines = csvText.split('\n');
-            let currentSection = '';
+            console.log('Parsing CSV data...');
+            const lines = csvText.split('\n').map(line => line.trim()).filter(line => line);
+            
             const data = {
                 agente: {},
                 obiettivi: {},
@@ -710,90 +846,143 @@
                 totali: {}
             };
 
-            for (let line of lines) {
-                line = line.trim();
+            let currentSection = '';
+            let i = 0;
+
+            while (i < lines.length) {
+                const line = lines[i].trim();
                 
+                // Identifica sezioni
                 if (line.includes('INFORMAZIONI AGENTE')) {
                     currentSection = 'agente';
+                    i += 2; // Skip header
                     continue;
                 } else if (line.includes('VERIFICA OBIETTIVI')) {
                     currentSection = 'obiettivi';
+                    i += 2; // Skip header
                     continue;
                 } else if (line.includes('CLIENTI PER PROVINCIA')) {
                     currentSection = 'clientiProvince';
+                    i += 2; // Skip header
                     continue;
                 } else if (line.includes('DETTAGLIO VENDITE')) {
                     currentSection = 'venditeDettaglio';
+                    i += 2; // Skip header
                     continue;
                 } else if (line.includes('RIEPILOGO PER CATEGORIA')) {
                     currentSection = 'riepilogoCategorie';
+                    i += 2; // Skip header
                     continue;
                 } else if (line.includes('TOTALI')) {
                     currentSection = 'totali';
+                    i += 2; // Skip header
                     continue;
                 }
 
-                if (line.startsWith('===') || line === '') continue;
+                if (line.startsWith('===') || line === '') {
+                    i++;
+                    continue;
+                }
 
+                // Parse delle righe
                 const parts = line.split(',');
                 
                 switch (currentSection) {
                     case 'obiettivi':
-                        if (parts[0] && parts[0] !== 'Provincia') {
-                            const provincia = parts[0];
-                            const annoCorr = parseFloat(parts[2]?.replace(/[."]/g, '').replace(',', '.')) || 0;
-                            const obiettivo = parseFloat(parts[3]?.replace(/[."]/g, '').replace(',', '.')) || 0;
-                            const clientiCorr = parseInt(parts[6]) || 0;
-                            const clientiObiettivo = parseInt(parts[7]) || 0;
-                            
-                            data.obiettivi[provincia] = {
-                                fatturato: annoCorr,
-                                obiettivo: obiettivo,
-                                clienti: clientiCorr,
-                                clientiObiettivo: clientiObiettivo
-                            };
+                        if (parts.length >= 8 && parts[0] && parts[0] !== 'Provincia') {
+                            const provincia = parts[0].trim();
+                            if (provincia === 'LT' || provincia === 'Generale') {
+                                // Parsing più accurato dei numeri
+                                const parseNumber = (str) => {
+                                    if (!str) return 0;
+                                    return parseFloat(str.replace(/["'.]/g, '').replace(',', '.')) || 0;
+                                };
+
+                                const annoPrec = parseNumber(parts[1]);
+                                const annoCorr = parseNumber(parts[2]);
+                                const obiettivo = parseNumber(parts[3]);
+                                const clientiPrec = parseInt(parts[5]) || 0;
+                                const clientiCorr = parseInt(parts[6]) || 0;
+                                const clientiObiettivo = parseInt(parts[7]) || 0;
+                                
+                                data.obiettivi[provincia] = {
+                                    fatturatoPrec: annoPrec,
+                                    fatturato: annoCorr,
+                                    obiettivo: obiettivo,
+                                    clientiPrec: clientiPrec,
+                                    clienti: clientiCorr,
+                                    clientiObiettivo: clientiObiettivo
+                                };
+                            }
                         }
                         break;
                         
                     case 'clientiProvince':
-                        if (parts[0] && parts[0] !== 'Provincia') {
+                        if (parts.length >= 3 && parts[0] && parts[0] !== 'Provincia') {
+                            const parseNumber = (str) => {
+                                if (!str) return 0;
+                                return parseFloat(str.replace(/["'.]/g, '').replace(',', '.')) || 0;
+                            };
+
                             data.clientiProvince.push({
-                                provincia: parts[0],
+                                provincia: parts[0].trim(),
                                 clienti: parseInt(parts[1]) || 0,
-                                fatturato: parseFloat(parts[2]?.replace(/[."]/g, '').replace(',', '.')) || 0
+                                fatturato: parseNumber(parts[2])
                             });
                         }
                         break;
                         
                     case 'venditeDettaglio':
-                        if (parts[0] && parts[1] && parts[0] !== 'Provincia') {
+                        if (parts.length >= 4 && parts[0] && parts[1] && parts[0] !== 'Provincia') {
+                            const parseNumber = (str) => {
+                                if (!str) return 0;
+                                return parseFloat(str.replace(/["'.]/g, '').replace(',', '.')) || 0;
+                            };
+
                             data.venditeDettaglio.push({
-                                provincia: parts[0],
-                                cliente: parts[1],
-                                categoria: parts[2],
-                                fatturato: parseFloat(parts[3]?.replace(/[."]/g, '').replace(',', '.')) || 0
+                                provincia: parts[0].trim(),
+                                cliente: parts[1].trim(),
+                                categoria: parts[2].trim(),
+                                fatturato: parseNumber(parts[3])
                             });
                         }
                         break;
                         
                     case 'riepilogoCategorie':
-                        if (parts[0] && parts[1] && parts[0] !== 'Categoria') {
+                        if (parts.length >= 4 && parts[0] && parts[1] && parts[0] !== 'Categoria') {
+                            const parseNumber = (str) => {
+                                if (!str) return 0;
+                                return parseFloat(str.replace(/["'.]/g, '').replace(',', '.')) || 0;
+                            };
+
                             data.riepilogoCategorie.push({
-                                categoria: parts[0],
-                                importo: parseFloat(parts[1]?.replace(/[."]/g, '').replace(',', '.')) || 0,
+                                categoria: parts[0].trim(),
+                                importo: parseNumber(parts[1]),
                                 clientiLT: parseInt(parts[2]) || 0,
                                 clientiRM: parseInt(parts[3]) || 0
                             });
                         }
                         break;
                 }
+                
+                i++;
             }
 
+            console.log('Parsed data:', data);
             return data;
         }
 
         function updateDashboard(data) {
             dashboardData = data;
+            
+            // Filtra dati per provincia selezionata
+            let clientiProvinceFiltrati = data.clientiProvince;
+            let venditeDettaglioFiltrate = data.venditeDettaglio;
+            
+            if (currentProvince !== 'all') {
+                clientiProvinceFiltrati = data.clientiProvince.filter(p => p.provincia === currentProvince);
+                venditeDettaglioFiltrate = data.venditeDettaglio.filter(v => v.provincia === currentProvince);
+            }
             
             // Calcola totali
             let totFatturato = 0;
@@ -804,9 +993,6 @@
             let clientiRM = 0;
 
             data.clientiProvince.forEach(p => {
-                totFatturato += p.fatturato;
-                totClienti += p.clienti;
-                
                 if (p.provincia === 'LT') {
                     fatturatoLT = p.fatturato;
                     clientiLT = p.clienti;
@@ -816,10 +1002,30 @@
                 }
             });
 
+            // Se filtro attivo, usa solo i dati della provincia
+            if (currentProvince === 'LT') {
+                totFatturato = fatturatoLT;
+                totClienti = clientiLT;
+            } else if (currentProvince === 'RM') {
+                totFatturato = fatturatoRM;
+                totClienti = clientiRM;
+            } else {
+                totFatturato = fatturatoLT + fatturatoRM;
+                totClienti = clientiLT + clientiRM;
+            }
+
+            // Dati obiettivi da LT (principale)
             const obiettivoFatturato = data.obiettivi.LT?.obiettivo || 155000;
             const obiettivoClienti = data.obiettivi.LT?.clientiObiettivo || 35;
+            const fatturatoPrec = data.obiettivi.LT?.fatturatoPrec || 80238;
+            const clientiPrec = data.obiettivi.LT?.clientiPrec || 23;
+
             const percentualeFatturato = Math.round((totFatturato / obiettivoFatturato) * 100);
             const percentualeClienti = Math.round((totClienti / obiettivoClienti) * 100);
+
+            // Calcola crescita
+            const crescitaFatturato = fatturatoPrec > 0 ? ((totFatturato - fatturatoPrec) / fatturatoPrec * 100) : 0;
+            const crescitaClienti = clientiPrec > 0 ? ((totClienti - clientiPrec) / clientiPrec * 100) : 0;
 
             // Aggiorna metriche principali
             document.getElementById('fatturato').textContent = `€${Math.round(totFatturato).toLocaleString()}`;
@@ -828,16 +1034,18 @@
             document.getElementById('percentualeClienti').textContent = `${percentualeClienti}%`;
             document.getElementById('mancanteFatturato').textContent = Math.max(0, obiettivoFatturato - totFatturato).toLocaleString();
             document.getElementById('mancanteClienti').textContent = Math.max(0, obiettivoClienti - totClienti);
+            document.getElementById('fatturatoPrec').textContent = fatturatoPrec.toLocaleString();
+            document.getElementById('clientiPrec').textContent = clientiPrec;
 
             // Progress bars
             setTimeout(() => {
                 document.getElementById('fatturatoProgress').style.width = `${Math.min(percentualeFatturato, 100)}%`;
                 document.getElementById('clientiProgress').style.width = `${Math.min(percentualeClienti, 100)}%`;
-            }, 500);
+            }, 300);
 
             // Province
-            const percentualeLT = totFatturato > 0 ? Math.round((fatturatoLT / totFatturato) * 100) : 0;
-            const percentualeRM = totFatturato > 0 ? Math.round((fatturatoRM / totFatturato) * 100) : 0;
+            const percentualeLT = (fatturatoLT + fatturatoRM) > 0 ? Math.round((fatturatoLT / (fatturatoLT + fatturatoRM)) * 100) : 0;
+            const percentualeRM = 100 - percentualeLT;
             
             document.getElementById('fatturatoLT').textContent = Math.round(fatturatoLT).toLocaleString();
             document.getElementById('fatturatoRM').textContent = Math.round(fatturatoRM).toLocaleString();
@@ -850,8 +1058,9 @@
 
             // Mix prodotti
             const mattone = data.riepilogoCategorie.find(c => c.categoria === 'MATTONE PIENO') || { importo: 0, clientiLT: 0, clientiRM: 0 };
-            const altriProdotti = totFatturato - mattone.importo;
-            const percentualeMattone = totFatturato > 0 ? Math.round((mattone.importo / totFatturato) * 100) : 0;
+            const totaleRiepilogo = data.riepilogoCategorie.reduce((sum, cat) => sum + cat.importo, 0);
+            const altriProdotti = totaleRiepilogo - mattone.importo;
+            const percentualeMattone = totaleRiepilogo > 0 ? Math.round((mattone.importo / totaleRiepilogo) * 100) : 0;
             const percentualeAltri = 100 - percentualeMattone;
 
             document.getElementById('percentualeMattone').textContent = `${percentualeMattone}%`;
@@ -861,11 +1070,11 @@
             document.getElementById('clientiMattone').textContent = mattone.clientiLT + mattone.clientiRM;
 
             // Cambiamenti
-            document.getElementById('fatturatoChange').textContent = `${percentualeFatturato}% completato`;
-            document.getElementById('fatturatoChange').className = `metric-change ${percentualeFatturato >= 50 ? 'positive' : 'neutral'}`;
+            document.getElementById('fatturatoChange').textContent = `${crescitaFatturato >= 0 ? '+' : ''}${crescitaFatturato.toFixed(1)}% vs 2024`;
+            document.getElementById('fatturatoChange').className = `metric-change ${crescitaFatturato >= 0 ? 'positive' : 'negative'}`;
             
-            document.getElementById('clientiChange').textContent = `${percentualeClienti}% completato`;
-            document.getElementById('clientiChange').className = `metric-change ${percentualeClienti >= 50 ? 'positive' : 'neutral'}`;
+            document.getElementById('clientiChange').textContent = `${crescitaClienti >= 0 ? '+' : ''}${crescitaClienti.toFixed(1)}% vs anno prec.`;
+            document.getElementById('clientiChange').className = `metric-change ${crescitaClienti >= 0 ? 'positive' : 'negative'}`;
 
             document.getElementById('ltPerformance').textContent = `${percentualeLT}% del totale`;
             document.getElementById('ltPerformance').className = 'metric-change positive';
@@ -875,17 +1084,17 @@
 
             // Progress bars province
             setTimeout(() => {
-                document.getElementById('ltProgress').style.width = `${Math.min(percentualeLT, 100)}%`;
-                document.getElementById('rmProgress').style.width = `${Math.min(percentualeRM, 100)}%`;
-            }, 800);
+                document.getElementById('ltProgress').style.width = `${percentualeLT}%`;
+                document.getElementById('rmProgress').style.width = `${percentualeRM}%`;
+            }, 600);
 
-            // Top clienti
-            updateTopClients(data.venditeDettaglio);
+            // Top clienti (filtrati)
+            updateTopClients(venditeDettaglioFiltrate);
             
             // Crea grafici
             createCharts();
             
-            showStatus('Dati aggiornati con successo! Dashboard sincronizzata con il CSV.', 'success');
+            showStatus(`Dati aggiornati con successo! ${currentProvince === 'all' ? 'Tutte le province' : 'Provincia ' + currentProvince}`, 'success');
         }
 
         function updateTopClients(vendite) {
@@ -903,10 +1112,16 @@
                 .slice(0, 10);
 
             const clientList = document.getElementById('clientList');
+            
+            if (topClienti.length === 0) {
+                clientList.innerHTML = '<div style="text-align: center; padding: 20px; color: #718096;">Nessun cliente trovato per il filtro selezionato</div>';
+                return;
+            }
+
             clientList.innerHTML = topClienti.map(([nome, fatturato], index) => `
                 <div class="client-item">
                     <div>
-                        <span style="color: #718096; margin-right: 12px;">${index + 1}.</span>
+                        <span style="color: #718096; margin-right: 10px; font-weight: bold;">${index + 1}.</span>
                         <span class="client-name">${nome}</span>
                     </div>
                     <div class="client-revenue">€${Math.round(fatturato).toLocaleString()}</div>
@@ -915,7 +1130,7 @@
         }
 
         function createCharts() {
-            // Distruzione chart esistenti
+            // Distruggi chart esistenti
             Object.values(charts).forEach(chart => {
                 if (chart && typeof chart.destroy === 'function') {
                     chart.destroy();
@@ -940,22 +1155,25 @@
                         data: [fatturatoLT, fatturatoRM],
                         backgroundColor: ['#805ad5', '#38b2ac'],
                         borderWidth: 0,
-                        hoverOffset: 10
+                        hoverOffset: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '65%',
+                    cutout: '70%',
                     plugins: {
                         legend: { 
                             display: false 
                         },
                         tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
                             callbacks: {
                                 label: function(context) {
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
                                     return `${context.label}: €${context.parsed.toLocaleString()} (${percentage}%)`;
                                 }
                             }
@@ -979,22 +1197,25 @@
                         data: [mattone, altri],
                         backgroundColor: ['#4299e1', '#718096'],
                         borderWidth: 0,
-                        hoverOffset: 10
+                        hoverOffset: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '65%',
+                    cutout: '70%',
                     plugins: {
                         legend: { 
                             display: false 
                         },
                         tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
                             callbacks: {
                                 label: function(context) {
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
                                     return `${context.label}: €${context.parsed.toLocaleString()} (${percentage}%)`;
                                 }
                             }
@@ -1021,16 +1242,16 @@
                 }
                 
                 const csvText = await response.text();
-                console.log('✅ CSV caricato:', csvText.length, 'caratteri');
+                console.log('CSV caricato:', csvText.length, 'caratteri');
                 
                 const data = parseCSVData(csvText);
-                console.log('✅ Dati elaborati:', data);
+                console.log('Dati elaborati:', data);
                 
                 updateDashboard(data);
                 updateLastUpdateTime();
                 
             } catch (error) {
-                console.error('❌ Errore caricamento:', error);
+                console.error('Errore caricamento:', error);
                 showStatus(`Errore nel caricamento dei dati: ${error.message}`, 'error');
             }
         }
@@ -1054,13 +1275,13 @@
 
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Inizializzazione dashboard CARABOT NATALINO');
+            console.log('Inizializzazione dashboard CARABOT NATALINO');
             
             // Carica i dati immediatamente
             loadData();
             
-            // Aggiorna automaticamente ogni 3 minuti
-            setInterval(loadData, 3 * 60 * 1000);
+            // Aggiorna automaticamente ogni 5 minuti
+            setInterval(loadData, 5 * 60 * 1000);
             
             // Aggiorna l'orario ogni minuto
             setInterval(updateLastUpdateTime, 60 * 1000);
@@ -1071,10 +1292,11 @@
             loadData,
             refreshData,
             csvUrl: CSV_URL,
-            currentData: () => dashboardData
+            currentData: () => dashboardData,
+            setProvince: selectProvince
         };
 
-        console.log('🎯 Dashboard CARABOT NATALINO caricata. Comandi disponibili: window.debugDashboard');
+        console.log('Dashboard CARABOT NATALINO caricata. Comandi disponibili: window.debugDashboard');
     </script>
 </body>
 </html>
