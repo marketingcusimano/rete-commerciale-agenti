@@ -1098,33 +1098,69 @@ class DashboardManager {
     }
   }
 
+  // Funzione di parsing numeri TESTATA
+  parseItalianNumber(str) {
+    if (!str) return 0;
+    // "80.238,72" -> 80238.72
+    return parseFloat(str.replace(/"/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+  }
+
   parseCSV(csvText) {
     try {
-      console.log('USANDO VALORI HARDCODED PER TEST');
+      console.log('Inizio parsing CSV automatico...');
       
-      // HARDCODED - valori dal tuo CSV
+      const obiettiviMatch = csvText.match(/=== VERIFICA OBIETTIVI ===([\s\S]*?)(?==== |$)/);
+      if (!obiettiviMatch) throw new Error('Sezione "VERIFICA OBIETTIVI" non trovata');
+      
+      const obiettiviText = obiettiviMatch[1];
+      const lines = obiettiviText.split('\n').filter(line => line.trim());
+      
+      // Parse GENERALE
+      const generaleLine = lines.find(line => line.startsWith('Generale,'));
+      if (!generaleLine) throw new Error('Riga Generale non trovata');
+      
+      const generaleParts = generaleLine.split(',');
       const generale = {
-        annoPrecedente: 80238.72,
-        annoCorrente: 90159.79,
-        clienti: 20
+        annoPrecedente: this.parseItalianNumber(generaleParts[1]),
+        annoCorrente: this.parseItalianNumber(generaleParts[2]),
+        clienti: parseInt(generaleParts[6]) || 0
       };
+      console.log('Dati Generale:', generale);
 
+      // Parse LATINA  
+      const ltLine = lines.find(line => line.startsWith('LT,'));
+      if (!ltLine) throw new Error('Riga LT non trovata');
+      
+      const ltParts = ltLine.split(',');
       const latina = {
-        annoPrecedente: 79029.16,
-        annoCorrente: 82389.23,
-        obiettivo: 145000,
-        percentualeObiettivo: 57,
-        clientiPrecedenti: 23,
-        clientiCorrente: 18,
-        obiettivoClienti: 35
+        annoPrecedente: this.parseItalianNumber(ltParts[1]),
+        annoCorrente: this.parseItalianNumber(ltParts[2]),
+        obiettivo: this.parseItalianNumber(ltParts[3]) * 1000, // CSV in migliaia
+        percentualeObiettivo: parseInt(ltParts[4].replace(/[^0-9]/g, '')) || 0,
+        clientiPrecedenti: parseInt(ltParts[5]) || 0,
+        clientiCorrente: parseInt(ltParts[6]) || 0,
+        obiettivoClienti: parseInt(ltParts[7]) || 0
       };
+      console.log('Dati Latina:', latina);
 
-      const roma = {
-        annoCorrente: 7770.56,
-        clienti: 2
-      };
+      // Parse Roma
+      const clientiMatch = csvText.match(/=== CLIENTI PER PROVINCIA ===([\s\S]*?)(?==== |$)/);
+      let roma = { annoCorrente: 0, clienti: 0 };
+      if (clientiMatch) {
+        const clientiText = clientiMatch[1];
+        const clientiLines = clientiText.split('\n').filter(line => line.trim() && !line.includes('Provincia,'));
+        const rmLine = clientiLines.find(line => line.startsWith('RM,'));
+        if (rmLine) {
+          const rmParts = rmLine.split(',');
+          roma = {
+            annoCorrente: this.parseItalianNumber(rmParts[2]),
+            clienti: parseInt(rmParts[1]) || 0
+          };
+        }
+      }
+      console.log('Dati Roma:', roma);
 
-      // Parse vendite (questo funziona già)
+      // Parse vendite
       const dettaglioMatch = csvText.match(/=== DETTAGLIO VENDITE PER CLIENTE ===([\s\S]*?)(?==== |$)/);
       let vendite = [];
       if (dettaglioMatch) {
@@ -1140,12 +1176,7 @@ class DashboardManager {
         dettaglioLines.forEach(line => {
           const parts = line.split(',');
           if (parts.length >= 4) {
-            let fatturato = 0;
-            if (parts[3]) {
-              let str = parts[3].replace(/"/g, '').replace('.', '').replace(',', '.');
-              fatturato = parseFloat(str) || 0;
-            }
-            
+            const fatturato = this.parseItalianNumber(parts[3]);
             if (!isNaN(fatturato) && fatturato > 0) {
               const cliente = parts[1].trim().replace(/"/g, '');
               const key = cliente;
@@ -1176,7 +1207,7 @@ class DashboardManager {
         timestamp: new Date() 
       };
       
-      console.log('RISULTATO CON VALORI HARDCODED:', result);
+      console.log('Parsing automatico completato');
       return result;
 
     } catch (e) {
