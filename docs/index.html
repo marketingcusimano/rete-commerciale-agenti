@@ -1897,6 +1897,89 @@ COPERTURE;3;1;0;;;;;
                 document.getElementById('riepilogo-rm-medio').textContent = this.formatEuroK(rmMedio);
             }
 
+            updateDistribuzioneProvince() {
+                const ltFatturato = this.csvData.latina.annoCorrente;
+                const rmFatturato = this.csvData.roma.annoCorrente;
+                const total = ltFatturato + rmFatturato;
+
+                if (total > 0) {
+                    const ltPercentage = ((ltFatturato / total) * 100).toFixed(1);
+                    const rmPercentage = ((rmFatturato / total) * 100).toFixed(1);
+
+                    document.getElementById('dist-lt-percentage').textContent = `${ltPercentage}%`;
+                    document.getElementById('dist-rm-percentage').textContent = `${rmPercentage}%`;
+                    document.getElementById('dist-lt-amount').textContent = this.formatEuro(ltFatturato);
+                    document.getElementById('dist-rm-amount').textContent = this.formatEuro(rmFatturato);
+                }
+            }
+
+            calculateMixProdotti() {
+                if (!this.csvData.categorie || this.csvData.categorie.length === 0) {
+                    return {
+                        core: { importo: 45000, mattone: 30000, pavimentazione: 15000 },
+                        others: { importo: 15000, refrattari: 10000, altri: 5000 }
+                    };
+                }
+
+                const categorie = this.csvData.categorie;
+                let mattone = 0, pavimentazione = 0, refrattari = 0, altri = 0;
+
+                categorie.forEach(cat => {
+                    const nome = cat.nome.toLowerCase();
+                    if (nome.includes('mattone') || nome.includes('laterizio')) {
+                        mattone += cat.importo;
+                    } else if (nome.includes('paviment') || nome.includes('cotto') || nome.includes('polis')) {
+                        pavimentazione += cat.importo;
+                    } else if (nome.includes('refratt')) {
+                        refrattari += cat.importo;
+                    } else {
+                        altri += cat.importo;
+                    }
+                });
+
+                const coreImporto = mattone + pavimentazione;
+                const othersImporto = refrattari + altri;
+
+                return {
+                    core: { importo: coreImporto, mattone, pavimentazione },
+                    others: { importo: othersImporto, refrattari, altri },
+                    total: coreImporto + othersImporto
+                };
+            }
+
+            updateMixProdottiData() {
+                const mixData = this.calculateMixProdotti();
+                const total = mixData.total;
+
+                if (total > 0) {
+                    // Calculate percentages
+                    const corePercentage = ((mixData.core.importo / total) * 100).toFixed(1);
+                    const othersPercentage = ((mixData.others.importo / total) * 100).toFixed(1);
+
+                    // Update percentages
+                    document.getElementById('core-percentage').textContent = `${corePercentage}%`;
+                    document.getElementById('other-percentage').textContent = `${othersPercentage}%`;
+
+                    // Update amounts
+                    document.getElementById('core-amount').textContent = this.formatEuro(mixData.core.importo);
+                    document.getElementById('other-amount').textContent = this.formatEuro(mixData.others.importo);
+
+                    // Update breakdown
+                    document.getElementById('mattone-amount').textContent = this.formatEuroK(mixData.core.mattone);
+                    document.getElementById('pavimentazione-amount').textContent = this.formatEuroK(mixData.core.pavimentazione);
+                    document.getElementById('refrattari-amount').textContent = this.formatEuroK(mixData.others.refrattari);
+                    document.getElementById('altri-amount').textContent = this.formatEuroK(mixData.others.altri);
+
+                    // Update performance metrics
+                    document.getElementById('core-perf').textContent = `${corePercentage}%`;
+                    document.getElementById('categories-count').textContent = this.csvData.categorie.length;
+                    
+                    // Calculate involved clients (estimate based on categories)
+                    const involvedClients = Math.min(this.csvData.generale.clienti, this.csvData.categorie.length * 3);
+                    document.getElementById('involved-clients').textContent = involvedClients;
+                }
+            }
+
             formatEuro(value) {
                 const ctx = document.getElementById('mixProdottiChart');
                 if (!ctx) return;
