@@ -1451,7 +1451,7 @@
         function initializeProductsChart() {
             const ctx = document.getElementById('productsChart').getContext('2d');
             
-            new Chart(ctx, {
+            window.productsChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Pieni e Coppi', 'Altri Prodotti'],
