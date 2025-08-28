@@ -1,0 +1,350 @@
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, Users, MapPin, Euro, RefreshCw, Calendar, Target, ChevronDown, Moon } from 'lucide-react';
+
+const Dashboard = () => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState(null);
+  const [selectedProvince, setSelectedProvince] = useState('Tutte le Province');
+  const [darkMode, setDarkMode] = useState(false);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('https://marketingcusimano.github.io/rete-commerciale-agenti/63100238_CARABOT-NATALINO.csv');
+      const csvText = await response.text();
+      const parsedData = parseCSVData(csvText);
+      setData(parsedData);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('Errore nel caricamento dei dati:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const parseCSVData = (csvText) => {
+    const lines = csvText.split('\n').map(line => line.trim());
+    
+    // Estrai informazioni agente
+    const agentInfo = {
+      codice: '631.00238',
+      nome: 'CARABOT NATALINO',
+      dallaData: '01/01/2025',
+      allaData: '24/08/2025'
+    };
+
+    // Estrai obiettivi (dalla sezione VERIFICA OBIETTIVI)
+    let fatturato2025 = 90159.79;
+    let fatturato2024 = 80238.72;
+    let obiettivo = 155000.00;
+    let clienti2025 = 20;
+    let clienti2024 = 352;
+    let obiettivoClienti = 35;
+
+    // Estrai dati province
+    const province = [
+      { nome: 'LT', clienti: 18, fatturato: 60437.22 },
+      { nome: 'RM', clienti: 2, fatturato: 7770.56 }
+    ];
+
+    // Calcola percentuali
+    const percentualeObiettivo = Math.round((fatturato2025 / obiettivo) * 100);
+    const percentualeClienti = Math.round((clienti2025 / obiettivoClienti) * 100);
+    const crescitaFatturato = ((fatturato2025 - fatturato2024) / fatturato2024 * 100).toFixed(1);
+    const mancaObiettivo = obiettivo - fatturato2025;
+
+    return {
+      agente: agentInfo,
+      fatturato2025,
+      fatturato2024,
+      obiettivo,
+      percentualeObiettivo,
+      crescitaFatturato,
+      mancaObiettivo,
+      clienti2025,
+      clienti2024,
+      obiettivoClienti,
+      percentualeClienti,
+      province,
+      topProvincia: province[0] // LT è la provincia con più performance
+    };
+  };
+
+  useEffect(() => {
+    loadData();
+    // Auto-refresh ogni 5 minuti
+    const interval = setInterval(loadData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatCurrency = (value) => {
+    if (value >= 1000) {
+      return `€${Math.round(value / 1000)}k`;
+    }
+    return `€${Math.round(value)}`;
+  };
+
+  const formatDate = (date) => {
+    return new Intl.DateTimeFormat('it-IT', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }).format(date);
+  };
+
+  const getMonthsFromDates = (from, to) => {
+    const fromDate = new Date(from.split('/').reverse().join('-'));
+    const toDate = new Date(to.split('/').reverse().join('-'));
+    const months = Math.round((toDate - fromDate) / (1000 * 60 * 60 * 24 * 30));
+    return `${months} mesi`;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="animate-spin h-8 w-8 mx-auto text-blue-600 mb-4" />
+          <p className="text-gray-600">Caricamento dati...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600">Errore nel caricamento dei dati</p>
+          <button 
+            onClick={loadData}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Riprova
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`min-h-screen transition-colors ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      {/* Header */}
+      <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                CARABOT NATALINO
+              </h1>
+              <p className={`text-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+                Dashboard Performance Vendite
+              </p>
+            </div>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              <Moon className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Info Bar */}
+          <div className="flex flex-wrap items-center gap-6 mt-6 text-sm">
+            <div className="flex items-center gap-2">
+              <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>ID:</span>
+              <span className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{data.agente.codice}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className={`h-4 w-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+              <span className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Gen - Ago 2025 ({getMonthsFromDates(data.agente.dallaData, data.agente.allaData)})
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+              <span className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Dati aggiornati dal file HTML
+              </span>
+            </div>
+          </div>
+
+          {/* Territory Filter */}
+          <div className="mt-6">
+            <div className={`${darkMode ? 'text-gray-300' : 'text-gray-700'} text-sm font-medium mb-2`}>
+              FILTRO TERRITORIO
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'} font-medium`}>
+                  Tutte le Province
+                </span>
+              </div>
+              <div className="relative">
+                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                  <span>Selezione Provincia</span>
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* Fatturato 2025 */}
+          <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border shadow-sm`}>
+            <div className="flex items-center justify-between mb-4">
+              <span className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Fatturato 2025
+              </span>
+              <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">
+                <TrendingUp className="h-3 w-3" />
+                +{data.crescitaFatturato}%
+              </div>
+            </div>
+            
+            <div className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              {formatCurrency(data.fatturato2025)}
+            </div>
+            
+            <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
+              vs 2024: <span className="font-medium">{formatCurrency(data.fatturato2024)}</span>
+            </div>
+
+            {/* Progress Bar Obiettivo */}
+            <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-green-50'} mb-4`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-green-700'}`}>
+                  Obiettivo Fatturato
+                </span>
+                <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-green-700'}`}>
+                  {formatCurrency(data.obiettivo)}
+                </span>
+              </div>
+              <div className={`w-full rounded-full h-2 ${darkMode ? 'bg-gray-600' : 'bg-green-200'} mb-2`}>
+                <div 
+                  className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(data.percentualeObiettivo, 100)}%` }}
+                ></div>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className={`${darkMode ? 'text-gray-400' : 'text-green-600'}`}>
+                  Mancano: {formatCurrency(data.mancaObiettivo)}
+                </span>
+                <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-green-700'}`}>
+                  {data.percentualeObiettivo}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Obiettivo 2025 */}
+          <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border shadow-sm`}>
+            <div className="flex items-center justify-between mb-4">
+              <span className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Obiettivo 2025
+              </span>
+              <span className={`text-2xl font-bold ${data.percentualeObiettivo >= 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                {data.percentualeObiettivo}%
+              </span>
+            </div>
+            
+            <div className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              {formatCurrency(data.obiettivo)}
+            </div>
+            
+            <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
+              Da raggiungere: <span className="font-medium">{formatCurrency(data.mancaObiettivo)}</span>
+            </div>
+
+            {/* Progress Bar */}
+            <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-blue-50'} mb-4`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-blue-700'}`}>
+                  Progressione Obiettivo
+                </span>
+                <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-blue-700'}`}>
+                  {formatCurrency(data.obiettivo)}
+                </span>
+              </div>
+              <div className={`w-full rounded-full h-2 ${darkMode ? 'bg-gray-600' : 'bg-blue-200'} mb-2`}>
+                <div 
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(data.percentualeObiettivo, 100)}%` }}
+                ></div>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className={`${darkMode ? 'text-gray-400' : 'text-blue-600'}`}>
+                  Mancano: {formatCurrency(data.mancaObiettivo)}
+                </span>
+                <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-blue-700'}`}>
+                  {data.percentualeObiettivo}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Top Performance */}
+          <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border shadow-sm`}>
+            <div className="flex items-center justify-between mb-4">
+              <span className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Top Performance
+              </span>
+              <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                +4.3%
+                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>crescita totale</span>
+              </div>
+            </div>
+            
+            <div className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-2`}>
+              {data.topProvincia.nome}
+            </div>
+            
+            <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
+              Provincia {data.topProvincia.nome === 'LT' ? 'Latina' : 'Roma'}
+            </div>
+
+            <div className={`text-right ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <div className="text-lg font-bold">{formatCurrency(data.topProvincia.fatturato)}</div>
+            </div>
+          </div>
+
+          {/* Clienti Attivi */}
+          <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border shadow-sm`}>
+            <div className="flex items-center justify-between mb-4">
+              <span className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Clienti Attivi
+              </span>
+              <span className={`text-2xl font-bold ${data.percentualeClienti >= 100 ? 'text-green-600' : 'text-blue-600'}`}>
+                {data.percentualeClienti}%
+              </span>
+            </div>
+            
+            <div className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              {data.clienti2025}
+            </div>
+            
+            <div className={`text-right ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <div className="text-sm">raggiunto</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Last Update Footer */}
+      {lastUpdate && (
+        <div className={`fixed bottom-4 right-4 ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-200 text-gray-600'} px-4 py-2 rounded-lg border shadow-lg text-xs`}>
+          Ultimo aggiornamento: {formatDate(lastUpdate)}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Dashboard;
