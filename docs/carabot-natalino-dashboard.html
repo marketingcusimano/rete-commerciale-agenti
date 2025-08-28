@@ -1354,76 +1354,113 @@
         let csvData = [];
         let productsChart = null;
         
-        // Funzione per caricare dati dal CSV tramite API GitHub (con debug)
+        // Funzione per caricare dati dal CSV (stesso dominio GitHub Pages)
         async function loadDataFromCSV() {
             try {
-                // Prima controlliamo se il repository e il file esistono
-                console.log('1. Verifica struttura repository...');
+                // URL diretto del file CSV (stesso dominio, niente CORS)
+                const csvUrl = 'https://marketingcusimano.github.io/rete-commerciale-agenti/63100238_CARABOT-NATALINO.csv';
                 
-                // URL per listare i contenuti del repository
-                const repoUrl = 'https://api.github.com/repos/marketingcusimano/rete-commerciale-agenti/contents';
+                console.log('Caricamento CSV da:', csvUrl);
                 
-                let repoResponse = await fetch(repoUrl);
-                if (!repoResponse.ok) {
-                    throw new Error(`Repository non accessibile: ${repoResponse.status}`);
+                const response = await fetch(csvUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                const contents = await repoResponse.json();
-                console.log('File nel repository:', contents.map(item => item.name));
+                const csvContent = await response.text();
                 
-                // Cerca il file CSV
-                const csvFile = contents.find(file => 
-                    file.name.includes('CARABOT') && file.name.includes('NATALINO') && file.name.endsWith('.csv')
-                );
+                console.log('CSV caricato con successo');
+                console.log('Dimensione file:', csvContent.length, 'caratteri');
+                console.log('Prime 300 caratteri:', csvContent.substring(0, 300));
                 
-                if (!csvFile) {
-                    console.log('File CSV non trovato. File disponibili:', contents.map(f => f.name));
-                    throw new Error('File CSV CARABOT-NATALINO non trovato nel repository');
-                }
-                
-                console.log('2. File trovato:', csvFile.name);
-                
-                // Scarica il file tramite API
-                const fileResponse = await fetch(csvFile.download_url || csvFile.url);
-                
-                if (!fileResponse.ok) {
-                    throw new Error(`Errore scaricamento file: ${fileResponse.status}`);
-                }
-                
-                let csvContent;
-                
-                // Se è un URL API, decodifica da base64
-                if (csvFile.url && !csvFile.download_url) {
-                    const fileData = await fileResponse.json();
-                    csvContent = atob(fileData.content);
-                } else {
-                    // Se è download_url, è già testo
-                    csvContent = await fileResponse.text();
-                }
-                
-                console.log('3. CSV caricato, dimensione:', csvContent.length, 'caratteri');
-                console.log('4. Primi 300 caratteri:', csvContent.substring(0, 300));
-                
-                // Parsing del CSV
+                // Parsing del CSV con separatore corretto (;)
                 const righe = csvContent.split('\n');
-                const intestazioni = righe[0].split(',').map(h => h.trim().replace(/"/g, ''));
                 
-                console.log('Intestazioni trovate:', intestazioni);
+                console.log('Prime 10 righe del CSV:');
+                righe.slice(0, 10).forEach((riga, index) => {
+                    console.log(`${index}: ${riga}`);
+                });
+                
+                // Trova la riga con le intestazioni dei dati (non le sezioni)
+                let indiceFatturatoInizio = -1;
+                let intestazioni = [];
+                
+                for (let i = 0; i < righe.length; i++) {
+                    const riga = righe[i].trim();
+                    
+                    // Cerca una riga che assomiglia a intestazioni di dati di vendita
+                    if (riga.includes('Cliente') || riga.includes('Fatturato') || riga.includes('Data') || 
+                        (riga.includes(';') && riga.split(';').length > 3 && !riga.includes('==='))) {
+                        
+                        intestazioni = riga.split(';').map(h => h.trim().replace(/"/g, ''));
+                        indiceFatturatoInizio = i;
+                        console.log(`Intestazioni trovate alla riga ${i}:`, intestazioni);
+                        break;
+                    }
+                }
+                
+                // Se non trova intestazioni standard, cerca pattern di dati
+                if (indiceFatturatoInizio === -1) {
+                    console.log('Nessuna intestazione standard trovata, cerco pattern di dati...');
+                    
+                    for (let i = 0; i < righe.length; i++) {
+                        const riga = righe[i].trim();
+                        
+                        if (riga && !riga.includes('===') && !riga.includes('====') && riga.includes(';')) {
+                            const parti = riga.split(';');
+                            
+                            // Se ha più di 3 parti e contiene dati che sembrano reali
+                            if (parti.length > 3 && parti.some(p => p.length > 0 && !p.match(/^;*$/))) {
+                                console.log(`Possibile riga di dati alla riga ${i}:`, parti);
+                                
+                                // Usa la riga precedente come intestazioni se esiste
+                                if (i > 0 && righe[i-1].includes(';')) {
+                                    intestazioni = righe[i-1].split(';').map(h => h.trim().replace(/"/g, ''));
+                                    indiceFatturatoInizio = i-1;
+                                } else {
+                                    // Crea intestazioni generiche
+                                    intestazioni = parti.map((_, index) => `Colonna${index + 1}`);
+                                    indiceFatturatoInizio = i;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                console.log('Intestazioni finali:', intestazioni);
+                console.log('Inizio dati alla riga:', indiceFatturatoInizio);
                 
                 const datiProcessati = [];
-                for (let i = 1; i < righe.length; i++) {
-                    if (righe[i].trim()) {
-                        const valori = parseCSVLine(righe[i]);
-                        const riga = {};
-                        intestazioni.forEach((intestazione, index) => {
-                            riga[intestazione] = valori[index] || '';
-                        });
-                        datiProcessati.push(riga);
+                
+                if (indiceFatturatoInizio >= 0 && intestazioni.length > 0) {
+                    for (let i = indiceFatturatoInizio + 1; i < righe.length; i++) {
+                        const riga = righe[i].trim();
+                        
+                        // Salta righe vuote o di separazione
+                        if (!riga || riga.includes('===') || riga.match(/^;*$/)) {
+                            continue;
+                        }
+                        
+                        const valori = riga.split(';').map(v => v.trim().replace(/"/g, ''));
+                        
+                        // Solo righe con dati significativi
+                        if (valori.length >= intestazioni.length && valori.some(v => v.length > 0)) {
+                            const rigaObj = {};
+                            intestazioni.forEach((intestazione, index) => {
+                                rigaObj[intestazione] = valori[index] || '';
+                            });
+                            datiProcessati.push(rigaObj);
+                        }
                     }
                 }
                 
                 console.log('Dati processati:', datiProcessati.length, 'righe');
-                console.log('Esempio primi 3 record:', datiProcessati.slice(0, 3));
+                if (datiProcessati.length > 0) {
+                    console.log('Esempio prime 3 righe:', datiProcessati.slice(0, 3));
+                    console.log('Colonne disponibili:', Object.keys(datiProcessati[0]));
+                }
                 
                 // Salva i dati globalmente
                 csvData = datiProcessati;
