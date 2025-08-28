@@ -801,8 +801,10 @@
                 this.selectedProvince = 'all';
                 this.isLoading = false;
                 this.csvFileNames = [
+                    '63100238_CARABOT-NATALINO.csv',
                     '631.00238_CARABOT-NATALINO.csv',
                     '631.00238_CARABOT NATALINO.csv',
+                    '63100238_CARABOT NATALINO.csv',
                     'CARABOT-NATALINO.csv',
                     'carabot.csv'
                 ];
@@ -1024,15 +1026,6 @@ FACCIAVISTA;2;0;4500
             }
 
             buildCandidateUrls() {
-                // Primary URLs - GitHub Raw (most reliable)
-                const githubRawUrls = [
-                    'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/631.00238_CARABOT-NATALINO.csv',
-                    'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/631.00238_CARABOT NATALINO.csv',
-                    'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/631.00238_CARABOT-NATALINO.csv',
-                    'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/631.00238_CARABOT NATALINO.csv'
-                ];
-
-                // Fallback URLs - GitHub Pages
                 const { pathname, origin } = window.location;
                 const segs = pathname.split('/').filter(Boolean);
                 const repoSlug = segs.length ? segs[0] : '';
@@ -1048,19 +1041,16 @@ FACCIAVISTA;2;0;4500
                     repoSlug ? `/${repoSlug}/` : '/'
                 ];
 
-                const fallbackUrls = [];
+                const urls = [];
                 for (const base of bases) {
                     for (const name of this.csvFileNames) {
                         try {
-                            fallbackUrls.push(new URL(base + name, origin).href);
+                            urls.push(new URL(base + name, origin).href);
                         } catch (e) {}
                     }
                 }
-
-                // Combine: GitHub Raw first (most reliable), then fallbacks
-                const allUrls = [...githubRawUrls, ...fallbackUrls];
-                console.log('Candidate URLs (GitHub Raw first):', [...new Set(allUrls)]);
-                return [...new Set(allUrls)];
+                console.log('Candidate URLs:', [...new Set(urls)]);
+                return [...new Set(urls)];
             }
 
             parseCSV(csvText) {
