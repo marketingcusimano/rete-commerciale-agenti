@@ -1504,133 +1504,106 @@
             return values.map(v => v.replace(/"/g, ''));
         }
         
-        // Funzione per aggiornare la dashboard con i dati del CSV
+        // Funzione per aggiornare la dashboard con i dati del CSV CARABOT
         function aggiornaDashboardDaCSV(dati) {
             try {
-                let fatturatoTotale = 0;
+                console.log('Aggiornamento dashboard con dati CARABOT:', dati);
+                
+                // Usa i dati delle sezioni parsate
+                const fatturatoTotale = dati.totali?.fatturatoTotale || 0;
+                const clientiTotali = dati.totali?.clientiTotali || 0;
+                
+                // Calcola fatturato dalle vendite dettagliate per maggiore precisione
+                let fatturatoCalcolato = 0;
                 let clientiUnici = new Set();
                 let statisticheProvince = {};
                 let prodottiStats = {};
                 
-                console.log('Elaborazione dati:', dati.length, 'righe');
-                
-                dati.forEach((riga, index) => {
-                    // Cerca le colonne che potrebbero contenere il fatturato
-                    let fatturato = 0;
-                    const possibiliColonneFatturato = ['Fatturato', 'Importo', 'Totale', 'Valore', 'Amount'];
+                // Usa i dati del dettaglio vendite
+                dati.dettaglioVendite.forEach(vendita => {
+                    fatturatoCalcolato += vendita.fatturato;
+                    clientiUnici.add(vendita.cliente);
                     
-                    for (const col of possibiliColonneFatturato) {
-                        if (riga[col]) {
-                            const val = parseFloat(riga[col].toString().replace(/[€.,\s]/g, '')) || 0;
-                            if (val > 0) {
-                                fatturato = val;
-                                break;
-                            }
-                        }
+                    if (!statisticheProvince[vendita.provincia]) {
+                        statisticheProvince[vendita.provincia] = { 
+                            fatturato: 0, 
+                            clienti: new Set() 
+                        };
+                    }
+                    statisticheProvince[vendita.provincia].fatturato += vendita.fatturato;
+                    statisticheProvince[vendita.provincia].clienti.add(vendita.cliente);
+                    
+                    // Raggruppa prodotti
+                    let categoria = 'Altri Prodotti';
+                    if (vendita.categoria.toLowerCase().includes('mattone') || 
+                        vendita.categoria.toLowerCase().includes('pieno') ||
+                        vendita.categoria.toLowerCase().includes('coppi')) {
+                        categoria = 'Pieni e Coppi';
                     }
                     
-                    // Se non troviamo fatturato nelle colonne standard, proviamo con tutte le colonne numeriche
-                    if (fatturato === 0) {
-                        Object.keys(riga).forEach(key => {
-                            const val = parseFloat(riga[key].toString().replace(/[€.,\s]/g, ''));
-                            if (!isNaN(val) && val > 100) { // Assumiamo che valori > 100 siano fatturato
-                                fatturato = val;
-                            }
-                        });
+                    if (!prodottiStats[categoria]) {
+                        prodottiStats[categoria] = 0;
                     }
-                    
-                    // Cliente
-                    const cliente = riga['Cliente'] || riga['Ragione Sociale'] || riga['Nome'] || `Cliente_${index}`;
-                    
-                    // Provincia
-                    const provincia = riga['Provincia'] || riga['Prov'] || riga['PR'] || 'N/A';
-                    
-                    // Prodotto
-                    const prodotto = riga['Prodotto'] || riga['Categoria'] || riga['Descrizione'] || 'Non specificato';
-                    
-                    if (fatturato > 0) {
-                        fatturatoTotale += fatturato;
-                    }
-                    
-                    if (cliente) {
-                        clientiUnici.add(cliente);
-                    }
-                    
-                    if (provincia && provincia !== 'N/A') {
-                        if (!statisticheProvince[provincia]) {
-                            statisticheProvince[provincia] = { 
-                                fatturato: 0, 
-                                clienti: new Set() 
-                            };
-                        }
-                        statisticheProvince[provincia].fatturato += fatturato;
-                        if (cliente) {
-                            statisticheProvince[provincia].clienti.add(cliente);
-                        }
-                    }
-                    
-                    if (prodotto) {
-                        // Raggruppa prodotti simili
-                        let categoriaProdotto = 'Altri Prodotti';
-                        if (prodotto.toLowerCase().includes('pieni') || prodotto.toLowerCase().includes('coppi')) {
-                            categoriaProdotto = 'Pieni e Coppi';
-                        }
-                        
-                        if (!prodottiStats[categoriaProdotto]) {
-                            prodottiStats[categoriaProdotto] = 0;
-                        }
-                        prodottiStats[categoriaProdotto] += fatturato;
-                    }
+                    prodottiStats[categoria] += vendita.fatturato;
                 });
                 
-                console.log('Statistiche calcolate:');
-                console.log('Fatturato totale:', fatturatoTotale);
-                console.log('Clienti unici:', clientiUnici.size);
+                // Usa i dati dai totali del CSV se disponibili, altrimenti quelli calcolati
+                const fatturato = fatturatoTotale > 0 ? fatturatoTotale : fatturatoCalcolato;
+                const clienti = clientiTotali > 0 ? clientiTotali : clientiUnici.size;
+                
+                console.log('Fatturato finale:', fatturato);
+                console.log('Clienti finali:', clienti);
                 console.log('Province:', statisticheProvince);
                 console.log('Prodotti:', prodottiStats);
                 
                 // Aggiorna i valori principali nella dashboard
-                const fatturatoK = Math.round(fatturatoTotale / 1000);
+                const fatturatoK = Math.round(fatturato / 1000);
                 document.getElementById('fatturato-value').textContent = `€${fatturatoK}k`;
-                document.getElementById('clienti-value').textContent = clientiUnici.size;
+                document.getElementById('clienti-value').textContent = clienti;
                 
                 // Calcola progressione obiettivo
                 const obiettivo = 155000; // €155k
-                const progressione = Math.round((fatturatoTotale / obiettivo) * 100);
+                const progressione = Math.round((fatturato / obiettivo) * 100);
                 document.getElementById('fatturato-progress').style.width = `${Math.min(progressione, 100)}%`;
                 document.getElementById('obiettivo-progress').style.width = `${Math.min(progressione, 100)}%`;
                 
-                const mancante = Math.max(0, obiettivo - fatturatoTotale);
+                const mancante = Math.max(0, obiettivo - fatturato);
                 document.getElementById('fatturato-mancante').textContent = `€${Math.round(mancante/1000)}k`;
                 document.getElementById('da-raggiungere').textContent = `€${Math.round(mancante/1000)}k`;
                 document.getElementById('obiettivo-mancante').textContent = `€${Math.round(mancante/1000)}k`;
                 document.getElementById('progressione-perc').textContent = `${progressione}%`;
                 document.getElementById('obiettivo-percent').textContent = `${progressione}%`;
                 
-                // Calcolo crescita (mockup dato che non abbiamo dati 2024)
-                const crescitaVs2024 = 12.4; // Placeholder
-                document.getElementById('growth-rate').textContent = `+${crescitaVs2024}%`;
+                // Calcolo crescita vs 2024 (usa i dati obiettivi se disponibili)
+                const annoPrec = dati.obiettivi?.Generale?.annoPrec || 80000;
+                const crescitaVs2024 = Math.round(((fatturato - annoPrec) / annoPrec) * 100);
+                document.getElementById('growth-rate').textContent = `${crescitaVs2024 > 0 ? '+' : ''}${crescitaVs2024}%`;
                 
                 // Clienti
                 const obiettivoClienti = 35;
-                const progressioneClienti = Math.round((clientiUnici.size / obiettivoClienti) * 100);
+                const progressioneClienti = Math.round((clienti / obiettivoClienti) * 100);
                 document.getElementById('clienti-progress').style.width = `${Math.min(progressioneClienti, 100)}%`;
                 document.getElementById('clienti-perc').textContent = `${progressioneClienti}%`;
-                document.getElementById('clienti-mancanti').textContent = Math.max(0, obiettivoClienti - clientiUnici.size);
+                document.getElementById('clienti-mancanti').textContent = Math.max(0, obiettivoClienti - clienti);
                 
-                // Media mensile (assumiamo 8 mesi)
+                // Media mensile (8 mesi da gennaio ad agosto)
                 const mesiAttivi = 8;
-                const mediaMensile = Math.round((fatturatoTotale / mesiAttivi) / 1000);
+                const mediaMensile = Math.round((fatturato / mesiAttivi) / 1000);
                 document.getElementById('media-mensile').textContent = `€${mediaMensile}k`;
                 
+                // VS 2024 mensile
+                const media2024 = Math.round((annoPrec / 12) / 1000);
+                const crescitaMensile = Math.round(((mediaMensile - media2024) / media2024) * 100);
+                document.getElementById('vs-2024').textContent = `${crescitaMensile > 0 ? '+' : ''}${crescitaMensile}%`;
+                
                 // Efficienza
-                const mediaCliente = clientiUnici.size > 0 ? Math.round((fatturatoTotale / clientiUnici.size) / 1000) : 0;
+                const mediaCliente = clienti > 0 ? Math.round((fatturato / clienti) / 1000) : 0;
                 document.getElementById('media-cliente').textContent = `€${mediaCliente}k`;
                 
-                const mediaGiorno = Math.round(fatturatoTotale / (30 * mesiAttivi));
+                const mediaGiorno = Math.round(fatturato / (30 * mesiAttivi));
                 document.getElementById('media-giorno').textContent = `€${mediaGiorno}`;
                 
-                const clientiMese = Math.round(clientiUnici.size / mesiAttivi * 10) / 10;
+                const clientiMese = Math.round((clienti / mesiAttivi) * 10) / 10;
                 document.getElementById('clienti-mese').textContent = clientiMese;
                 
                 // Trova la provincia con più fatturato
@@ -1651,7 +1624,7 @@
                 }
                 
                 // Aggiorna statistiche geografiche
-                aggiornaSezioneGeografica(statisticheProvince, fatturatoTotale);
+                aggiornaSezioneGeografica(statisticheProvince, fatturato);
                 
                 // Aggiorna grafico prodotti
                 aggiornaGraficoProdotti(prodottiStats);
