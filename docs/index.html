@@ -1353,6 +1353,87 @@ class DashboardManager {
     if (provinciaLabel2) provinciaLabel2.textContent = this.selectedProvince === 'all' ? 'TOT' : this.selectedProvince;
   }
 
+  renderChart() {
+    const canvas = document.getElementById('performanceChart');
+    if (!canvas || !this.csvData) return;
+
+    // Distruggi il grafico precedente se esiste
+    if (window.performanceChart) {
+      window.performanceChart.destroy();
+    }
+
+    const data = this.getDisplayData();
+    
+    // Dati per il grafico a barre
+    const chartData = {
+      labels: ['Anno Precedente', 'Anno Corrente', 'Obiettivo'],
+      datasets: [{
+        label: 'Fatturato (€k)',
+        data: [
+          Math.round(data.annoPrecedente / 1000), 
+          Math.round(data.fatturato / 1000),
+          data.obiettivo ? Math.round(data.obiettivo / 1000) : 0
+        ],
+        backgroundColor: [
+          'rgba(107, 114, 128, 0.8)',
+          'rgba(59, 130, 246, 0.8)',
+          data.obiettivo ? 'rgba(16, 185, 129, 0.8)' : 'transparent'
+        ],
+        borderColor: [
+          'rgba(107, 114, 128, 1)',
+          'rgba(59, 130, 246, 1)',
+          data.obiettivo ? 'rgba(16, 185, 129, 1)' : 'transparent'
+        ],
+        borderWidth: 2
+      }]
+    };
+
+    window.performanceChart = new Chart(canvas, {
+      type: 'bar',
+      data: chartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: true,
+            text: `Performance ${this.selectedProvince === 'all' ? 'Generale' : this.selectedProvince}`,
+            font: {
+              size: 16,
+              weight: 'bold'
+            },
+            color: getComputedStyle(document.body).getPropertyValue('--text-primary')
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return '€' + value + 'k';
+              },
+              color: getComputedStyle(document.body).getPropertyValue('--text-secondary')
+            },
+            grid: {
+              color: 'rgba(107, 114, 128, 0.1)'
+            }
+          },
+          x: {
+            ticks: {
+              color: getComputedStyle(document.body).getPropertyValue('--text-secondary')
+            },
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
   renderVenditeTable() {
     if (!this.csvData.vendite || this.csvData.vendite.length === 0) return;
 
