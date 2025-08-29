@@ -586,6 +586,34 @@
                 <!-- Le card verranno generate dinamicamente -->
             </div>
 
+            <!-- SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE -->
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2>DETTAGLIO VENDITE PER CLIENTE</h2>
+                    <div class="status-indicator">
+                        <span>●</span>
+                        <span>Top 10 automatico</span>
+                    </div>
+                </div>
+                
+                <!-- Podio Top 3 -->
+                <div class="podium-section">
+                    <div class="podium-container" id="podiumContainer">
+                        <!-- Podio generato dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Tabella Top 10 -->
+                <div class="top-clients-section">
+                    <h3>Classifica Completa Top 10</h3>
+                    <div class="clients-table-container">
+                        <div class="clients-table" id="clientsTable">
+                            <!-- Tabella generata dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- SEZIONE 2: CLIENTI SERVITI PER PROVINCIA -->
             <div class="chart-section">
                 <div class="section-header">
@@ -1008,6 +1036,119 @@
             });
         }
 
+        function createTopClientsSection(allData) {
+            // Cerca i dati delle vendite per cliente dal CSV
+            const venditeData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+            console.log('Dati vendite clienti trovati:', venditeData);
+            
+            if (venditeData.length === 0) {
+                document.getElementById('podiumContainer').innerHTML = 
+                    '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato vendite disponibile</div>';
+                return;
+            }
+
+            // Raggruppa per cliente e somma il fatturato
+            const clientiMap = new Map();
+            venditeData.forEach(vendita => {
+                const clienteKey = vendita.Ragione_Sociale_Cliente;
+                const provincia = vendita.Provincia;
+                const fatturato = parseFloat(vendita.Fatturato) || 0;
+                
+                if (clientiMap.has(clienteKey)) {
+                    clientiMap.get(clienteKey).fatturato += fatturato;
+                } else {
+                    clientiMap.set(clienteKey, {
+                        nome: clienteKey,
+                        provincia: provincia,
+                        fatturato: fatturato
+                    });
+                }
+            });
+
+            // Converti in array e ordina per fatturato decrescente
+            const clientiOrdinati = Array.from(clientiMap.values())
+                .sort((a, b) => b.fatturato - a.fatturato)
+                .slice(0, 10); // Top 10
+
+            console.log('Top 10 clienti:', clientiOrdinati);
+
+            // Crea il podio (top 3)
+            createPodium(clientiOrdinati.slice(0, 3));
+            
+            // Crea la tabella completa top 10
+            createClientsTable(clientiOrdinati);
+        }
+
+        function createPodium(top3) {
+            const container = document.getElementById('podiumContainer');
+            
+            if (top3.length < 3) {
+                container.innerHTML = '<div style="text-align: center; color: #64748b;">Dati insufficienti per il podio</div>';
+                return;
+            }
+
+            const positions = [
+                { data: top3[1], rank: '2', class: 'podium-second' }, // Secondo a sinistra
+                { data: top3[0], rank: '1', class: 'podium-first' },  // Primo al centro
+                { data: top3[2], rank: '3', class: 'podium-third' }   // Terzo a destra
+            ];
+
+            let html = '';
+            positions.forEach(pos => {
+                const shortName = pos.data.nome.length > 30 ? 
+                    pos.data.nome.substring(0, 30) + '...' : 
+                    pos.data.nome;
+
+                html += `
+                    <div class="podium-position">
+                        <div class="podium-card ${pos.class}">
+                            <div class="podium-rank">${pos.rank}</div>
+                            <div class="podium-client-name">${shortName}</div>
+                            <div class="podium-amount">${formatCurrency(pos.data.fatturato)}</div>
+                            <div class="podium-province">${pos.data.provincia}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function createClientsTable(clienti) {
+            const container = document.getElementById('clientsTable');
+            
+            let html = `
+                <div class="table-header">
+                    <div>Pos.</div>
+                    <div>Cliente</div>
+                    <div>Fatturato</div>
+                    <div class="province-cell">Prov.</div>
+                </div>
+            `;
+
+            clienti.forEach((cliente, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank-1' : 
+                                 rank === 2 ? 'rank-2' : 
+                                 rank === 3 ? 'rank-3' : 'rank-other';
+                
+                const shortName = cliente.nome.length > 50 ? 
+                    cliente.nome.substring(0, 50) + '...' : 
+                    cliente.nome;
+
+                html += `
+                    <div class="table-row">
+                        <div class="rank-cell ${rankClass}">${rank}</div>
+                        <div class="client-name-cell">${shortName}</div>
+                        <div class="amount-cell">${formatCurrency(cliente.fatturato)}</div>
+                        <div class="province-cell">${cliente.provincia}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
         function createProvinceCards(allData) {
             // Cerca i dati delle province dal CSV
             const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
@@ -1215,6 +1356,9 @@
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
                 updateDashboard();
+                
+                // Crea la sezione top clienti con podio
+                createTopClientsSection(allData);
                 
                 // Crea le sezioni province e grafico
                 const chartData = createProvinceCards(allData);
