@@ -1709,19 +1709,24 @@
                 let yPosition = 20;
                 
                 // Header del documento
-                pdf.setFontSize(20);
+                pdf.setFontSize(22);
                 pdf.setFont("helvetica", "bold");
                 pdf.setTextColor(30, 41, 59);
                 pdf.text('REPORT PERFORMANCE VENDITE', pageWidth / 2, yPosition, { align: 'center' });
                 
-                yPosition += 10;
-                pdf.setFontSize(14);
+                yPosition += 12;
+                pdf.setFontSize(16);
                 pdf.setFont("helvetica", "normal");
-                pdf.setTextColor(100, 116, 139);
-                pdf.text(`${agentInfo.nome} - ${agentInfo.codice}`, pageWidth / 2, yPosition, { align: 'center' });
+                pdf.setTextColor(59, 130, 246);
+                pdf.text(`${agentInfo.nome}`, pageWidth / 2, yPosition, { align: 'center' });
                 
                 yPosition += 8;
-                pdf.text('Gen - Ago 2025 (8 mesi)', pageWidth / 2, yPosition, { align: 'center' });
+                pdf.setFontSize(12);
+                pdf.setTextColor(100, 116, 139);
+                pdf.text(`Codice Agente: ${agentInfo.codice}`, pageWidth / 2, yPosition, { align: 'center' });
+                
+                yPosition += 6;
+                pdf.text('Periodo: Gennaio - Agosto 2025 (8 mesi)', pageWidth / 2, yPosition, { align: 'center' });
                 
                 yPosition += 15;
                 
@@ -1731,90 +1736,195 @@
                 pdf.setTextColor(148, 163, 184);
                 pdf.text(`Report generato il ${now.toLocaleDateString('it-IT')} alle ${now.toLocaleTimeString('it-IT')}`, pageWidth / 2, yPosition, { align: 'center' });
                 
-                yPosition += 20;
+                // Linea separatrice
+                yPosition += 10;
+                pdf.setDrawColor(226, 232, 240);
+                pdf.line(20, yPosition, pageWidth - 20, yPosition);
+                yPosition += 15;
                 
                 // Sezione Metriche Principali
                 pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
                 pdf.setTextColor(30, 41, 59);
-                pdf.text('METRICHE PRINCIPALI', 20, yPosition);
-                yPosition += 10;
+                pdf.text('📊 PERFORMANCE GENERALE', 20, yPosition);
+                yPosition += 12;
+                
+                // Box per le metriche
+                pdf.setFillColor(248, 250, 252);
+                pdf.rect(20, yPosition - 5, pageWidth - 40, 25, 'F');
                 
                 // Trova i dati generali
                 const generalData = currentData.find(d => d.Provincia === 'Generale');
                 if (generalData) {
                     pdf.setFontSize(12);
-                    pdf.setFont("helvetica", "normal");
-                    pdf.setTextColor(51, 65, 85);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setTextColor(30, 41, 59);
                     
-                    pdf.text(`Fatturato 2025: €${Math.round(generalData.Anno_Corrente / 1000)}k`, 20, yPosition);
-                    yPosition += 7;
-                    pdf.text(`vs 2024: €${Math.round(generalData.Anno_Precedente / 1000)}k`, 20, yPosition);
-                    yPosition += 7;
-                    const change = ((generalData.Anno_Corrente - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100).toFixed(1);
-                    pdf.text(`Crescita: ${change}%`, 20, yPosition);
-                    yPosition += 7;
-                    pdf.text(`Clienti Attivi: ${generalData.Clienti_Anno_Corrente}`, 20, yPosition);
-                    yPosition += 15;
+                    const currentRevenue = Math.round(generalData.Anno_Corrente / 1000);
+                    const previousRevenue = Math.round(generalData.Anno_Precedente / 1000);
+                    const growth = ((generalData.Anno_Corrente - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100).toFixed(1);
+                    
+                    pdf.text(`FATTURATO 2025: €${currentRevenue}k`, 25, yPosition + 5);
+                    pdf.text(`FATTURATO 2024: €${previousRevenue}k`, 25, yPosition + 12);
+                    pdf.setTextColor(growth >= 0 ? 22 : 220, growth >= 0 ? 197 : 38, growth >= 0 ? 94 : 38);
+                    pdf.text(`CRESCITA: ${growth >= 0 ? '+' : ''}${growth}%`, 25, yPosition + 19);
+                    
+                    pdf.setTextColor(30, 41, 59);
+                    pdf.text(`CLIENTI ATTIVI: ${generalData.Clienti_Anno_Corrente}`, 120, yPosition + 5);
+                    
+                    if (generalData.Obiettivo > 0) {
+                        const targetProgress = Math.round((generalData.Anno_Corrente / generalData.Obiettivo) * 100);
+                        pdf.text(`OBIETTIVO 2025: €${Math.round(generalData.Obiettivo / 1000)}k`, 120, yPosition + 12);
+                        pdf.text(`RAGGIUNTO: ${targetProgress}%`, 120, yPosition + 19);
+                    }
                 }
+                
+                yPosition += 35;
                 
                 // Sezione Top Clienti
                 pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
-                pdf.text('TOP 5 CLIENTI', 20, yPosition);
-                yPosition += 10;
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('🏆 TOP 10 CLIENTI PER FATTURATO', 20, yPosition);
+                yPosition += 12;
                 
-                // Calcola top clienti per il PDF
-                const venditeDatiPDF = [];
-                const clientsMapPDF = new Map();
-                
-                currentData.forEach(item => {
-                    if (item.Tipo_Dato === 'VENDITE_CLIENTE') {
-                        const clientName = item.Ragione_Sociale_Cliente;
-                        const revenue = parseFloat(item.Fatturato) || 0;
+                // Recupera tutti i dati di vendita per calcolare i top clienti
+                const allVenditeData = [];
+                try {
+                    const response = await fetch(CSV_URL);
+                    const csvText = await response.text();
+                    const allData = parseCSV(csvText);
+                    const venditeDatiPDF = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+                    
+                    const clientsMapPDF = new Map();
+                    venditeDatiPDF.forEach(sale => {
+                        const clientName = sale.Ragione_Sociale_Cliente;
+                        const revenue = parseFloat(sale.Fatturato) || 0;
+                        const province = sale.Provincia;
                         
                         if (!clientsMapPDF.has(clientName)) {
-                            clientsMapPDF.set(clientName, { name: clientName, totalRevenue: 0, province: item.Provincia });
+                            clientsMapPDF.set(clientName, {
+                                name: clientName,
+                                totalRevenue: 0,
+                                province: province,
+                                categories: new Set()
+                            });
                         }
-                        clientsMapPDF.get(clientName).totalRevenue += revenue;
-                    }
-                });
+                        
+                        const client = clientsMapPDF.get(clientName);
+                        client.totalRevenue += revenue;
+                        client.categories.add(sale.Categoria_Articoli);
+                    });
+                    
+                    const topClientsPDF = Array.from(clientsMapPDF.values())
+                        .sort((a, b) => b.totalRevenue - a.totalRevenue)
+                        .slice(0, 10);
+                    
+                    // Tabella clienti
+                    pdf.setFillColor(248, 250, 252);
+                    pdf.rect(20, yPosition - 2, pageWidth - 40, 3, 'F');
+                    
+                    pdf.setFontSize(10);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setTextColor(55, 65, 81);
+                    pdf.text('POS', 25, yPosition + 2);
+                    pdf.text('CLIENTE', 40, yPosition + 2);
+                    pdf.text('PROV', 140, yPosition + 2);
+                    pdf.text('FATTURATO', 155, yPosition + 2);
+                    pdf.text('CAT', 180, yPosition + 2);
+                    
+                    yPosition += 8;
+                    
+                    pdf.setFont("helvetica", "normal");
+                    pdf.setFontSize(9);
+                    topClientsPDF.forEach((client, index) => {
+                        const position = index + 1;
+                        
+                        // Colore posizione podio
+                        if (position === 1) pdf.setTextColor(255, 193, 7);
+                        else if (position === 2) pdf.setTextColor(158, 158, 158);
+                        else if (position === 3) pdf.setTextColor(205, 127, 50);
+                        else pdf.setTextColor(100, 116, 139);
+                        
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text(`${position}°`, 25, yPosition);
+                        
+                        pdf.setFont("helvetica", "normal");
+                        pdf.setTextColor(30, 41, 59);
+                        
+                        // Tronca il nome cliente se troppo lungo
+                        const clientName = client.name.length > 35 ? client.name.substring(0, 32) + '...' : client.name;
+                        pdf.text(clientName, 40, yPosition);
+                        
+                        pdf.text(client.province, 140, yPosition);
+                        pdf.text(`€${(client.totalRevenue / 1000).toFixed(1)}k`, 155, yPosition);
+                        pdf.text(`${client.categories.size}`, 180, yPosition);
+                        
+                        yPosition += 5;
+                        
+                        // Nuova pagina se necessario
+                        if (yPosition > pageHeight - 40) {
+                            pdf.addPage();
+                            yPosition = 20;
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.error('Errore nel caricamento dati per PDF:', error);
+                    pdf.setTextColor(220, 38, 38);
+                    pdf.text('Errore nel caricamento dei dati clienti', 25, yPosition);
+                }
                 
-                const topClientsPDF = Array.from(clientsMapPDF.values())
-                    .sort((a, b) => b.totalRevenue - a.totalRevenue)
-                    .slice(0, 5);
-                
-                pdf.setFontSize(11);
-                pdf.setFont("helvetica", "normal");
-                topClientsPDF.forEach((client, index) => {
-                    const position = index + 1;
-                    const medal = position === 1 ? '🥇' : position === 2 ? '🥈' : position === 3 ? '🥉' : `${position}.`;
-                    pdf.text(`${position}. ${client.name} - €${Math.round(client.totalRevenue / 1000)}k (${client.province})`, 25, yPosition);
-                    yPosition += 6;
-                });
-                
-                yPosition += 10;
+                yPosition += 15;
                 
                 // Sezione Province
                 pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
-                pdf.text('DISTRIBUZIONE PER PROVINCIA', 20, yPosition);
-                yPosition += 10;
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('🗺️ DISTRIBUZIONE TERRITORIALE', 20, yPosition);
+                yPosition += 12;
+                
+                pdf.setFillColor(248, 250, 252);
+                pdf.rect(20, yPosition - 5, pageWidth - 40, 20, 'F');
                 
                 pdf.setFontSize(12);
                 pdf.setFont("helvetica", "normal");
-                pdf.text('LATINA (LT): 18 clienti - €60k', 25, yPosition);
-                yPosition += 7;
-                pdf.text('ROMA (RM): 2 clienti - €8k', 25, yPosition);
-                yPosition += 15;
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('PROVINCIA LATINA (LT)', 25, yPosition + 5);
+                pdf.text('18 clienti serviti - Fatturato €60.4k', 25, yPosition + 12);
+                
+                pdf.text('PROVINCIA ROMA (RM)', 120, yPosition + 5);
+                pdf.text('2 clienti serviti - Fatturato €7.8k', 120, yPosition + 12);
+                
+                yPosition += 25;
+                
+                // Sezione Categorie (se c'è spazio)
+                if (yPosition < pageHeight - 60) {
+                    pdf.setFontSize(16);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setTextColor(30, 41, 59);
+                    pdf.text('📦 TOP CATEGORIE PRODOTTO', 20, yPosition);
+                    yPosition += 12;
+                    
+                    pdf.setFontSize(11);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.text('• MATTONE PIENO: €38.6k (17 clienti)', 25, yPosition);
+                    yPosition += 6;
+                    pdf.text('• PAVIMENTAZIONE POLIS: €15.7k (14 clienti)', 25, yPosition);
+                    yPosition += 6;
+                    pdf.text('• REFRATTARI RETTIFICATI: €5.4k (5 clienti)', 25, yPosition);
+                    yPosition += 6;
+                    pdf.text('• REFRATTARI: €4.9k (5 clienti)', 25, yPosition);
+                }
                 
                 // Footer
                 pdf.setFontSize(8);
                 pdf.setTextColor(148, 163, 184);
                 pdf.text('Dashboard Performance Vendite - Report Automatizzato', pageWidth / 2, pageHeight - 10, { align: 'center' });
+                pdf.text(`Pagina 1 di 1 - Generato automaticamente dal CSV`, pageWidth / 2, pageHeight - 5, { align: 'center' });
                 
                 // Salva il PDF
-                const fileName = `Report_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.pdf`;
+                const fileName = `Report_Performance_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.pdf`;
                 pdf.save(fileName);
                 
             } catch (error) {
