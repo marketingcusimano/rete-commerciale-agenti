@@ -1525,7 +1525,9 @@
                 updateDashboard();
                 
                 // Crea la sezione TOP clienti con filtri avanzati
-                createTopClientsSection(allData);
+                setTimeout(() => {
+                    createTopClientsSection(allData);
+                }, 100);
                 
                 // Crea le sezioni province e grafico
                 const chartData = createProvinceCards(allData);
