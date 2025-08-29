@@ -22,188 +22,186 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 40px 24px;
+            padding: 32px;
         }
 
-        /* Header Section */
         .header {
-            margin-bottom: 40px;
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
-        .agent-name {
-            font-size: 2.5rem;
+        .header h1 {
+            font-size: 2rem;
             font-weight: 700;
-            color: #0f172a;
+            color: #1e293b;
             margin-bottom: 8px;
-            letter-spacing: -0.025em;
         }
 
-        .dashboard-title {
+        .header .subtitle {
             color: #64748b;
-            font-size: 1.125rem;
-            font-weight: 500;
-            margin-bottom: 24px;
+            font-size: 1rem;
+            margin-bottom: 16px;
         }
 
-        .agent-info {
+        .agent-details {
             display: flex;
+            gap: 32px;
             align-items: center;
-            gap: 24px;
             flex-wrap: wrap;
         }
 
-        .info-item {
+        .detail-item {
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.9rem;
             color: #475569;
-            font-size: 0.875rem;
+        }
+
+        .detail-item .label {
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #dcfce7;
+            color: #166534;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 500;
         }
 
-        .info-dot {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-        }
-
-        /* Controls */
         .controls {
-            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
         }
 
-        .filter-section {
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .filter-controls {
             display: flex;
-            align-items: center;
             gap: 16px;
+            align-items: center;
         }
 
         .filter-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #374151;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #64748b;
         }
 
         .province-selector {
             position: relative;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
         }
 
         .province-selector select {
             font-family: 'Montserrat', sans-serif;
-            background: #3b82f6;
-            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 12px 40px 12px 16px;
             border: none;
-            border-radius: 8px;
-            padding: 10px 40px 10px 16px;
-            font-size: 0.875rem;
-            font-weight: 600;
+            background: transparent;
+            color: #1e293b;
             cursor: pointer;
-            outline: none;
-            appearance: none;
             min-width: 180px;
+            outline: none;
         }
 
-        .province-selector::after {
-            content: '▼';
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: white;
-            font-size: 0.75rem;
-            pointer-events: none;
-        }
-
-        /* Cards Grid */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-        
-        @media (max-width: 1024px) {
-            .cards-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 640px) {
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
         }
 
         .metric-card {
             background: white;
             border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            border: 1px solid #f1f5f9;
+            border: 1px solid #e2e8f0;
             transition: all 0.2s ease;
+            position: relative;
         }
 
         .metric-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
         }
 
-        /* Card Headers */
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .card-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #6b7280;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #64748b;
+            line-height: 1.4;
         }
 
-        .trend-indicator {
+        .trend-badge {
             display: flex;
             align-items: center;
             gap: 4px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
         }
 
         .trend-positive {
-            background: #ecfdf5;
-            color: #10b981;
+            background: #dcfce7;
+            color: #166534;
         }
 
         .trend-negative {
             background: #fef2f2;
-            color: #ef4444;
+            color: #dc2626;
         }
 
-        /* Main Value */
         .main-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #0f172a;
+            color: #1e293b;
             margin-bottom: 8px;
-            line-height: 1;
         }
 
-        .vs-previous {
-            color: #6b7280;
-            font-size: 0.875rem;
+        .comparison {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 20px;
+            font-size: 0.85rem;
         }
 
-        /* Progress Sections */
+        .prev-value {
+            color: #64748b;
+        }
+
+        .change-value {
+            font-weight: 600;
+        }
+
         .progress-section {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 16px;
             margin-top: 16px;
         }
 
@@ -211,162 +209,127 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
-        .progress-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #374151;
+        .progress-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #475569;
         }
 
         .progress-percentage {
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             font-weight: 700;
         }
 
         .progress-bar {
-            background: #e5e7eb;
+            background: #f1f5f9;
+            border-radius: 8px;
             height: 8px;
-            border-radius: 4px;
             overflow: hidden;
-            margin-bottom: 12px;
+            position: relative;
         }
 
         .progress-fill {
             height: 100%;
-            border-radius: 4px;
-            transition: width 0.8s ease;
+            border-radius: 8px;
+            transition: width 0.6s ease;
         }
 
-        .progress-fill.green {
-            background: #10b981;
+        .progress-green {
+            background: #22c55e;
         }
 
-        .progress-fill.blue {
+        .progress-blue {
             background: #3b82f6;
         }
 
         .progress-details {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .progress-label {
-            font-size: 0.75rem;
-            color: #6b7280;
-        }
-
-        .progress-value {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #374151;
-        }
-
-        /* Special card styles */
-        .performance-card .main-value {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-
-        .province-label {
-            font-size: 1rem;
-            color: #6b7280;
-        }
-
-        .clients-card .main-value {
-            color: #0f172a;
-        }
-
-        .achievement-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: #f0f9ff;
-            color: #0369a1;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #64748b;
         }
 
         .loading {
-            text-align: center;
-            color: #3b82f6;
-            font-size: 1.2rem;
-            font-weight: 600;
-            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #64748b;
+            font-size: 1rem;
         }
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 24px 16px;
+                padding: 16px;
             }
             
-            .agent-name {
-                font-size: 2rem;
+            .header {
+                padding: 20px;
             }
             
-            .agent-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
+            .agent-details {
+                gap: 16px;
             }
             
             .cards-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
             }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Header -->
         <div class="header">
-            <h1 class="agent-name" id="agentName">CARABOT NATALINO</h1>
-            <p class="dashboard-title">Dashboard Performance Vendite</p>
-            <div class="agent-info">
-                <div class="info-item">
-                    <span>ID:</span>
+            <h1 id="agentName">CARABOT NATALINO</h1>
+            <div class="subtitle">Dashboard Performance Vendite</div>
+            <div class="agent-details">
+                <div class="detail-item">
+                    <span class="label">ID:</span>
                     <span id="agentCode">631.00238</span>
                 </div>
-                <div class="info-item">
-                    <span>📅</span>
+                <div class="detail-item">
+                    <span class="label">📅</span>
                     <span id="period">Gen - Ago 2025 (8 mesi)</span>
                 </div>
-                <div class="info-item">
-                    <div class="info-dot"></div>
+                <div class="status-indicator">
+                    <span>●</span>
                     <span>Dati aggiornati dal file HTML</span>
                 </div>
             </div>
         </div>
 
-        <!-- Controls -->
         <div class="controls">
-            <div class="filter-section">
-                <span class="filter-label">FILTRO TERRITORIO</span>
+            <div class="section-title">FILTRO TERRITORIO</div>
+            <div class="filter-controls">
+                <div class="filter-label">Selezione Provincia</div>
                 <div class="province-selector">
                     <select id="provinceSelect">
-                        <option value="all">Tutte le Province</option>
-                        <option value="generale">Riepilogo Generale</option>
-                        <option value="LT">Provincia Latina</option>
-                        <option value="RM">Provincia Roma</option>
+                        <option value="all">● Tutte le Province</option>
+                        <option value="generale">Generale</option>
+                        <option value="LT">LT</option>
+                        <option value="RM">RM</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <!-- Loading -->
         <div id="loadingMessage" class="loading">
             Caricamento dati in corso...
         </div>
 
-        <!-- Dashboard Content -->
         <div id="dashboardContent" style="display: none;">
             <div class="cards-grid" id="metricsCards">
-                <!-- Cards generate dinamically -->
+                <!-- Le card verranno generate dinamicamente -->
             </div>
         </div>
     </div>
@@ -382,374 +345,22 @@
         function formatNumber(num) {
             return new Intl.NumberFormat('it-IT', {
                 style: 'decimal',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(num);
-        }
-
-        function formatCurrency(num) {
-            return new Intl.NumberFormat('it-IT', {
-                style: 'currency',
-                currency: 'EUR',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             }).format(num);
         }
 
-        function formatCompactCurrency(num) {
+        function formatCurrency(num) {
             if (num >= 1000) {
                 return '€' + Math.round(num / 1000) + 'k';
             }
-            return formatCurrency(num);
+            return '€' + formatNumber(num);
         }
 
         function calculateChange(current, previous) {
             const change = current - previous;
-            const percentage = ((change / previous) * 100);
+            const percentage = previous > 0 ? ((change / previous) * 100) : 0;
             return { change, percentage };
-        }
-
-        function createFatturatoCard(data) {
-            const current = data.Anno_Corrente;
-            const previous = data.Anno_Precedente;
-            const { change, percentage } = calculateChange(current, previous);
-            const isPositive = change >= 0;
-
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Fatturato 2025</div>
-                        <div class="trend-indicator ${isPositive ? 'trend-positive' : 'trend-negative'}">
-                            <span>${isPositive ? '↗' : '↘'}</span>
-                            ${isPositive ? '+' : ''}${percentage.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCompactCurrency(current)}</div>
-                    <div class="vs-previous">vs 2024: ${formatCompactCurrency(previous)}</div>
-                    
-                    ${data.Obiettivo && data.Obiettivo > 0 ? `
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <div class="progress-title">Obiettivo Fatturato</div>
-                                <div class="progress-percentage" style="color: #10b981;">${formatCompactCurrency(data.Obiettivo)}</div>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill green" style="width: ${Math.min((current / data.Obiettivo) * 100, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span class="progress-label">Mancano: ${formatCompactCurrency(Math.max(0, data.Obiettivo - current))}</span>
-                                <span class="progress-value">${((current / data.Obiettivo) * 100).toFixed(0)}%</span>
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        function createObiettivoCard(data) {
-            if (!data.Obiettivo || data.Obiettivo <= 0) return '';
-            
-            const current = data.Anno_Corrente;
-            const target = data.Obiettivo;
-            const percentage = (current / target) * 100;
-            const remaining = Math.max(0, target - current);
-
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Obiettivo 2025</div>
-                        <div class="achievement-badge">
-                            <span>${percentage.toFixed(0)}%</span>
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCompactCurrency(target)}</div>
-                    <div class="vs-previous">Da raggiungere: ${formatCompactCurrency(remaining)}</div>
-                    
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <div class="progress-title">Progressione Obiettivo</div>
-                            <div class="progress-percentage" style="color: #3b82f6;">${formatCompactCurrency(target)}</div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill blue" style="width: ${Math.min(percentage, 100)}%"></div>
-                        </div>
-                        <div class="progress-details">
-                            <span class="progress-label">Mancano: ${formatCompactCurrency(remaining)}</span>
-                            <span class="progress-value">${percentage.toFixed(0)}%</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function createPerformanceCard(data) {
-            const current = data.Anno_Corrente;
-            const previous = data.Anno_Precedente;
-            const { change, percentage } = calculateChange(current, previous);
-            const isPositive = change >= 0;
-
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Top Performance</div>
-                        <div class="trend-indicator ${isPositive ? 'trend-positive' : 'trend-negative'}">
-                            ${isPositive ? '+' : ''}${percentage.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="main-value">
-                        ${data.Provincia}
-                        <span class="province-label">Provincia ${data.Provincia === 'LT' ? 'Latina' : data.Provincia === 'RM' ? 'Roma' : data.Provincia}</span>
-                    </div>
-                    <div class="vs-previous">crescita totale ${formatCompactCurrency(current)}</div>
-                </div>
-            `;
-        }
-
-        function createClientsCard(data) {
-            const clientsCurrent = data.Clienti_Anno_Corrente || 0;
-            const clientsPrevious = data.Clienti_Anno_Precedente || 0;
-            const clientsChange = clientsCurrent - clientsPrevious;
-            const clientsPercentage = clientsPrevious > 0 ? ((clientsChange / clientsPrevious) * 100) : 0;
-
-            return `
-                <div class="metric-card clients-card">
-                    <div class="card-header">
-                        <div class="card-title">Clienti Attivi</div>
-                        <div class="achievement-badge">
-                            ${clientsPercentage > 0 ? Math.round(clientsPercentage) + '% raggiunto' : 'stabile'}
-                        </div>
-                    </div>
-                    <div class="main-value">${clientsCurrent}</div>
-                    <div class="vs-previous">vs anno precedente: ${clientsPrevious}</div>
-                </div>
-            `;
-        }
-
-        function createRitmoVenditeCard(data) {
-            const current = data.Anno_Corrente;
-            const mesiTrascorsi = 8; // Gen-Ago
-            const ritmoMensile = current / mesiTrascorsi;
-            const proiezioneAnnuale = ritmoMensile * 12;
-            const obiettivo = data.Obiettivo || current * 1.2;
-            const raggiungeraObiettivo = proiezioneAnnuale >= obiettivo;
-
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Ritmo di Vendita</div>
-                        <div class="achievement-badge">
-                            <span>${formatCompactCurrency(ritmoMensile)}/mese</span>
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCompactCurrency(proiezioneAnnuale)}</div>
-                    <div class="vs-previous">proiezione fine anno</div>
-                    
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <div class="progress-title">Trend Obiettivo</div>
-                            <div class="progress-percentage" style="color: ${raggiungeraObiettivo ? '#10b981' : '#ef4444'};">
-                                ${raggiungeraObiettivo ? '✓' : '⚠'} ${((proiezioneAnnuale / obiettivo) * 100).toFixed(0)}%
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill ${raggiungeraObiettivo ? 'green' : 'blue'}" style="width: ${Math.min((proiezioneAnnuale / obiettivo) * 100, 100)}%"></div>
-                        </div>
-                        <div class="progress-details">
-                            <span class="progress-label">vs obiettivo annuale</span>
-                            <span class="progress-value">${formatCompactCurrency(obiettivo)}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function createCrescitaCard(data) {
-            const current = data.Anno_Corrente;
-            const previous = data.Anno_Precedente;
-            const { change, percentage } = calculateChange(current, previous);
-            const isPositive = change >= 0;
-            
-            // Calcola crescita media mensile
-            const crescitaMensile = change / 8; // 8 mesi
-            const tendenza = percentage > 15 ? 'Eccellente' : percentage > 5 ? 'Buona' : percentage > 0 ? 'Moderata' : 'Negativa';
-
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Crescita vs 2024</div>
-                        <div class="trend-indicator ${isPositive ? 'trend-positive' : 'trend-negative'}">
-                            ${isPositive ? '↗' : '↘'} ${tendenza}
-                        </div>
-                    </div>
-                    <div class="main-value">${isPositive ? '+' : ''}${formatCompactCurrency(change)}</div>
-                    <div class="vs-previous">${isPositive ? '+' : ''}${percentage.toFixed(1)}% in 8 mesi</div>
-                    
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <div class="progress-title">Crescita Mensile Media</div>
-                            <div class="progress-percentage" style="color: #3b82f6;">
-                                ${formatCompactCurrency(crescitaMensile)}/mese
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function createEfficienzaCard(data) {
-            const fatturato = data.Anno_Corrente;
-            const clienti = data.Clienti_Anno_Corrente || 1;
-            const fatturatoMedioCliente = fatturato / clienti;
-            const clientiPrecedenti = data.Clienti_Anno_Precedente || clienti;
-            const variazioneFatturatoCliente = clienti > 0 ? ((fatturatoMedioCliente - (data.Anno_Precedente / clientiPrecedenti)) / (data.Anno_Precedente / clientiPrecedenti)) * 100 : 0;
-
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Efficienza Vendite</div>
-                        <div class="trend-indicator ${variazioneFatturatoCliente >= 0 ? 'trend-positive' : 'trend-negative'}">
-                            ${variazioneFatturatoCliente >= 0 ? '+' : ''}${variazioneFatturatoCliente.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCompactCurrency(fatturatoMedioCliente)}</div>
-                    <div class="vs-previous">fatturato medio per cliente</div>
-                    
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <div class="progress-title">Performance Cliente</div>
-                            <div class="progress-percentage" style="color: #10b981;">
-                                ${clienti} clienti attivi
-                            </div>
-                        </div>
-                        <div class="progress-details">
-                            <span class="progress-label">vs anno precedente</span>
-                            <span class="progress-value">${clientiPrecedenti} clienti</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function createPrestazioniCard(data) {
-            const current = data.Anno_Corrente;
-            const obiettivo = data.Obiettivo;
-            const percentualeObiettivo = obiettivo > 0 ? (current / obiettivo) * 100 : 0;
-            
-            let valutazione = 'In corso';
-            let colore = '#3b82f6';
-            
-            if (percentualeObiettivo >= 80) {
-                valutazione = 'Eccellente';
-                colore = '#10b981';
-            } else if (percentualeObiettivo >= 60) {
-                valutazione = 'Buona';
-                colore = '#f59e0b';
-            } else if (percentualeObiettivo >= 40) {
-                valutazione = 'Sufficiente';
-                colore = '#ef4444';
-            }
-
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Prestazioni 2025</div>
-                        <div class="achievement-badge" style="background: ${colore}20; color: ${colore};">
-                            ${valutazione}
-                        </div>
-                    </div>
-                    <div class="main-value">${percentualeObiettivo.toFixed(0)}%</div>
-                    <div class="vs-previous">completamento obiettivo</div>
-                    
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <div class="progress-title">Target Annuale</div>
-                            <div class="progress-percentage" style="color: ${colore};">
-                                ${obiettivo > 0 ? formatCompactCurrency(obiettivo) : 'Non definito'}
-                            </div>
-                        </div>
-                        ${obiettivo > 0 ? `
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="background: ${colore}; width: ${Math.min(percentualeObiettivo, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span class="progress-label">Raggiunti: ${formatCompactCurrency(current)}</span>
-                                <span class="progress-value">Mancano: ${formatCompactCurrency(Math.max(0, obiettivo - current))}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-        }
-
-        function createTendenzaCard(data) {
-            const current = data.Anno_Corrente;
-            const previous = data.Anno_Precedente;
-            const { change, percentage } = calculateChange(current, previous);
-            
-            // Calcola la tendenza futura basata sui dati attuali
-            const mesiRimanenti = 4; // Set-Dic
-            const mesiTrascorsi = 8; // Gen-Ago
-            const crescitaMensile = change / mesiTrascorsi;
-            const crescitaPrevista = crescitaMensile * mesiRimanenti;
-            const previsione = current + crescitaPrevista;
-            
-            const tendenzaPositiva = crescitaPrevista > 0;
-
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Tendenza Fine Anno</div>
-                        <div class="trend-indicator ${tendenzaPositiva ? 'trend-positive' : 'trend-negative'}">
-                            ${tendenzaPositiva ? '📈' : '📉'} Previsione
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCompactCurrency(previsione)}</div>
-                    <div class="vs-previous">stima dicembre 2025</div>
-                    
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <div class="progress-title">Crescita Attesa</div>
-                            <div class="progress-percentage" style="color: ${tendenzaPositiva ? '#10b981' : '#ef4444'};">
-                                ${tendenzaPositiva ? '+' : ''}${formatCompactCurrency(crescitaPrevista)}
-                            </div>
-                        </div>
-                        <div class="progress-details">
-                            <span class="progress-label">Ultimi 4 mesi</span>
-                            <span class="progress-value">Set-Dic 2025</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function updateDashboard() {
-            const filteredData = filterData(selectedProvince);
-            const container = document.getElementById('metricsCards');
-            
-            let cardsHtml = '';
-            
-            filteredData.forEach(data => {
-                // 6 Card uniche con metriche diverse
-                cardsHtml += createFatturatoCard(data);          // 1. Fatturato principale
-                cardsHtml += createObiettivoCard(data);          // 2. Obiettivo con progress
-                cardsHtml += createRitmoVenditeCard(data);       // 3. Ritmo vendite e proiezioni
-                cardsHtml += createCrescitaCard(data);           // 4. Crescita vs anno precedente
-                cardsHtml += createEfficienzaCard(data);         // 5. Efficienza per cliente
-                cardsHtml += createPrestazioniCard(data);        // 6. Valutazione prestazioni
-                // cardsHtml += createTendenzaCard(data);           // Extra: Tendenza futura
-            });
-            
-            container.innerHTML = cardsHtml;
-        }
-
-        function filterData(province) {
-            if (province === 'all') {
-                return currentData;
-            } else if (province === 'generale') {
-                return currentData.filter(item => item.Provincia === 'Generale');
-            } else {
-                return currentData.filter(item => item.Provincia === province);
-            }
         }
 
         // Funzione per parsificare il CSV personalizzato
@@ -795,6 +406,195 @@
             }
             
             return data;
+        }
+
+        function createFatturatoCard(data) {
+            const current = data.Anno_Corrente;
+            const previous = data.Anno_Precedente;
+            const { change, percentage } = calculateChange(current, previous);
+            const isPositive = change >= 0;
+            
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Fatturato 2025</div>
+                        <div class="trend-badge ${isPositive ? 'trend-positive' : 'trend-negative'}">
+                            ${isPositive ? '↗' : '↘'} ${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="main-value">${formatCurrency(current)}</div>
+                    <div class="comparison">
+                        <span class="prev-value">vs 2024: ${formatCurrency(previous)}</span>
+                    </div>
+                    ${data.Obiettivo > 0 ? `
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span class="progress-label">● Obiettivo Fatturato</span>
+                                <span class="progress-percentage">${formatCurrency(data.Obiettivo)}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-green" style="width: ${Math.min((current/data.Obiettivo)*100, 100)}%"></div>
+                            </div>
+                            <div class="progress-details">
+                                <span>Mancano: ${formatCurrency(Math.max(0, data.Obiettivo - current))}</span>
+                                <span>${Math.round((current/data.Obiettivo)*100)}%</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function createObiettivoCard(data) {
+            const current = data.Anno_Corrente;
+            const target = data.Obiettivo;
+            const progressPerc = target > 0 ? (current / target) * 100 : 0;
+            const remaining = Math.max(0, target - current);
+            
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Obiettivo 2025</div>
+                        <div class="trend-badge trend-positive">
+                            ${Math.round(progressPerc)}%
+                        </div>
+                    </div>
+                    <div class="main-value">${formatCurrency(target)}</div>
+                    <div class="comparison">
+                        <span class="prev-value">Da raggiungere: ${formatCurrency(remaining)}</span>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span class="progress-label">● Progressione Obiettivo</span>
+                            <span class="progress-percentage">${formatCurrency(target)}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-blue" style="width: ${Math.min(progressPerc, 100)}%"></div>
+                        </div>
+                        <div class="progress-details">
+                            <span>Mancano: ${formatCurrency(remaining)}</span>
+                            <span>${Math.round(progressPerc)}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createTopPerformanceCard(data) {
+            // Trova la provincia con performance migliore
+            const allProvData = currentData.filter(d => d.Provincia !== 'Generale');
+            let topProv = allProvData[0];
+            let bestGrowth = 0;
+            
+            allProvData.forEach(prov => {
+                const growth = ((prov.Anno_Corrente - prov.Anno_Precedente) / prov.Anno_Precedente) * 100;
+                if (growth > bestGrowth) {
+                    bestGrowth = growth;
+                    topProv = prov;
+                }
+            });
+            
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Top Performance</div>
+                        <div class="trend-badge trend-positive">
+                            +${bestGrowth.toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="main-value">${topProv?.Provincia || 'LT'}</div>
+                    <div class="comparison">
+                        <span class="prev-value">Provincia ${topProv?.Provincia === 'LT' ? 'Latina' : 'Roma'}</span>
+                        <span class="change-value" style="color: #22c55e;">crescita totale</span>
+                    </div>
+                    <div class="progress-details">
+                        <span style="color: #64748b; font-size: 0.85rem;">${formatCurrency(topProv?.Anno_Corrente || 0)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createClientiAttiviCard(data) {
+            const currentClients = data.Clienti_Anno_Corrente || 0;
+            const prevClients = data.Clienti_Anno_Precedente || 0;
+            const targetClients = data.Obiettivo_Clienti || 0;
+            const clientProgress = targetClients > 0 ? (currentClients / targetClients) * 100 : 0;
+            
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Clienti Attivi</div>
+                        <div class="trend-badge ${clientProgress >= 50 ? 'trend-positive' : 'trend-negative'}">
+                            ${Math.round(clientProgress)}%
+                        </div>
+                    </div>
+                    <div class="main-value">${currentClients}</div>
+                    <div class="comparison">
+                        <span class="prev-value">vs 2024: ${prevClients}</span>
+                        <span class="change-value" style="color: #64748b;">raggiunto</span>
+                    </div>
+                    ${targetClients > 0 ? `
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span class="progress-label">● Obiettivo Clienti</span>
+                                <span class="progress-percentage">${targetClients}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-blue" style="width: ${Math.min(clientProgress, 100)}%"></div>
+                            </div>
+                            <div class="progress-details">
+                                <span>Mancano: ${Math.max(0, targetClients - currentClients)}</span>
+                                <span>${Math.round(clientProgress)}%</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function filterData(province) {
+            if (province === 'all') {
+                return currentData;
+            } else if (province === 'generale') {
+                return currentData.filter(item => item.Provincia === 'Generale');
+            } else {
+                return currentData.filter(item => item.Provincia === province);
+            }
+        }
+
+        function updateDashboard() {
+            const filteredData = filterData(selectedProvince);
+            const container = document.getElementById('metricsCards');
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato disponibile per la selezione corrente</div>';
+                return;
+            }
+
+            let html = '';
+            
+            filteredData.forEach(data => {
+                // Card Fatturato
+                html += createFatturatoCard(data);
+                
+                // Card Obiettivo (solo se presente)
+                if (data.Obiettivo > 0) {
+                    html += createObiettivoCard(data);
+                }
+                
+                // Card Clienti Attivi
+                html += createClientiAttiviCard(data);
+            });
+            
+            // Aggiungi Top Performance solo per vista "all"
+            if (selectedProvince === 'all') {
+                const generalData = currentData.find(d => d.Provincia === 'Generale');
+                if (generalData) {
+                    html += createTopPerformanceCard(generalData);
+                }
+            }
+            
+            container.innerHTML = html;
         }
 
         // Carica dati dal CSV GitHub
@@ -843,7 +643,7 @@
                 // Aggiorna header
                 document.getElementById('agentCode').textContent = agentInfo.codice;
                 document.getElementById('agentName').textContent = agentInfo.nome;
-                document.getElementById('period').textContent = `Gen - Ago 2025 (8 mesi)`;
+                document.getElementById('period').textContent = 'Gen - Ago 2025 (8 mesi)';
                 
                 // Filtra solo i record OBIETTIVI per la sezione 1
                 currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
@@ -856,7 +656,7 @@
             } catch (error) {
                 console.error('Errore nel caricamento dei dati:', error);
                 document.getElementById('loadingMessage').innerHTML = `
-                    <div style="color: #ef4444;">
+                    <div style="color: #dc2626; text-align: center;">
                         ❌ Errore nel caricamento dei dati<br>
                         <small>${error.message}</small>
                     </div>
