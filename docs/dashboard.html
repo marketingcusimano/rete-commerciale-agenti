@@ -135,25 +135,261 @@
             color: #64748b;
         }
 
-        .province-selector {
+        .province-selector-custom {
             position: relative;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
         }
 
-        .province-selector select {
+        .province-selector-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 12px 40px 12px 16px;
-            border: none;
-            background: transparent;
-            color: #1e293b;
             cursor: pointer;
-            min-width: 180px;
-            outline: none;
+            min-width: 200px;
+            transition: all 0.2s ease;
+            gap: 12px;
+        }
+
+        .selector-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex: 1;
+        }
+
+        .selector-content span:first-child {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+
+        .selector-content span:last-child {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #64748b;
+            line-height: 1.2;
+        }
+
+        .province-selector-btn:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .province-selector-btn.active {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .chevron-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .chevron-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        /* Modal Overlay */
+        .province-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .province-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Modal Content */
+        .province-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 450px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .province-modal-overlay.show .province-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+            color: #374151;
+        }
+
+        .province-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .province-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border: 2px solid #f1f5f9;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fafbfc;
+        }
+
+        .province-option:hover {
+            border-color: #e2e8f0;
+            background: white;
+        }
+
+        .province-option.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .province-option-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .province-option-icon.all {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .province-option-icon.lt {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .province-option-icon.rm {
+            background: linear-gradient(135deg, #06d6a0, #059669);
+            color: white;
+        }
+
+        .province-option-content {
+            flex: 1;
+        }
+
+        .province-option-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .province-option-subtitle {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .province-option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            position: relative;
+            margin-left: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .province-option.selected .province-option-radio {
+            border-color: #3b82f6;
+        }
+
+        .province-option-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.2s ease;
+        }
+
+        .province-option.selected .province-option-radio::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-cancel {
+            width: 100%;
+            padding: 12px 24px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-cancel:hover {
+            background: #f1f5f9;
+            color: #374151;
         }
 
         .cards-grid {
@@ -781,14 +1017,76 @@
             <div class="section-title">FILTRO TERRITORIO</div>
             <div class="filter-controls">
                 <div class="filter-label">Selezione Provincia</div>
-                <div class="province-selector">
-                    <select id="provinceSelect">
-                        <option value="all">Tutte le Province</option>
-                        <option value="generale">Generale</option>
-                        <option value="LT">LT</option>
-                        <option value="RM">RM</option>
-                    </select>
+                <div class="province-selector-custom">
+                    <button class="province-selector-btn" id="provinceSelectorBtn">
+                        <div class="selector-content">
+                            <span id="selectedProvinceText">Tutte le Province</span>
+                            <span id="selectedProvinceSubtext">Panoramica completa</span>
+                        </div>
+                        <svg class="chevron-icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal Popup Province -->
+        <div class="province-modal-overlay" id="provinceModal">
+            <div class="province-modal">
+                <button class="modal-close" id="modalClose">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                    </svg>
+                </button>
+                
+                <div class="modal-header">
+                    <h2 class="modal-title">Seleziona Provincia</h2>
+                    <p class="modal-subtitle">Scegli il territorio da visualizzare</p>
+                </div>
+                
+                <div class="province-options">
+                    <div class="province-option selected" data-value="all">
+                        <div class="province-option-icon all">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                            </svg>
+                        </div>
+                        <div class="province-option-content">
+                            <div class="province-option-title">Tutte le Province</div>
+                            <div class="province-option-subtitle">Panoramica completa</div>
+                        </div>
+                        <div class="province-option-radio"></div>
+                    </div>
+                    
+                    <div class="province-option" data-value="LT">
+                        <div class="province-option-icon lt">
+                            <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                            </svg>
+                        </div>
+                        <div class="province-option-content">
+                            <div class="province-option-title">Latina</div>
+                            <div class="province-option-subtitle">60k • 18 clienti</div>
+                        </div>
+                        <div class="province-option-radio"></div>
+                    </div>
+                    
+                    <div class="province-option" data-value="RM">
+                        <div class="province-option-icon rm">
+                            <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                            </svg>
+                        </div>
+                        <div class="province-option-content">
+                            <div class="province-option-title">Roma</div>
+                            <div class="province-option-subtitle">8k • 2 clienti</div>
+                        </div>
+                        <div class="province-option-radio"></div>
+                    </div>
+                </div>
+                
+                <button class="modal-cancel" id="modalCancel">Annulla</button>
             </div>
         </div>
 
@@ -1669,19 +1967,92 @@
         }
 
         // Event listeners
-        document.getElementById('provinceSelect').addEventListener('change', (e) => {
-            selectedProvince = e.target.value;
-            updateDashboard();
-            // Il grafico della ripartizione fatturato rimane sempre uguale indipendentemente dalla provincia
-        });
-
-        // Inizializzazione
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
+            
+            // Event listeners per il popup province
+            const provinceSelectorBtn = document.getElementById('provinceSelectorBtn');
+            const provinceModal = document.getElementById('provinceModal');
+            const modalClose = document.getElementById('modalClose');
+            const modalCancel = document.getElementById('modalCancel');
+            const chevronIcon = document.querySelector('.chevron-icon');
+            
+            // Apri popup
+            provinceSelectorBtn.addEventListener('click', () => {
+                provinceModal.classList.add('show');
+                provinceSelectorBtn.classList.add('active');
+                chevronIcon.classList.add('rotated');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Chiudi popup
+            function closeModal() {
+                provinceModal.classList.remove('show');
+                provinceSelectorBtn.classList.remove('active');
+                chevronIcon.classList.remove('rotated');
+                document.body.style.overflow = '';
+            }
+            
+            modalClose.addEventListener('click', closeModal);
+            modalCancel.addEventListener('click', closeModal);
+            
+            // Chiudi cliccando fuori
+            provinceModal.addEventListener('click', (e) => {
+                if (e.target === provinceModal) {
+                    closeModal();
+                }
+            });
+            
+            // Gestione selezione province
+            const provinceOptions = document.querySelectorAll('.province-option');
+            
+            provinceOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Rimuovi selezione precedente
+                    provinceOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Aggiungi selezione corrente
+                    option.classList.add('selected');
+                    
+                    // Aggiorna provincia selezionata
+                    const value = option.dataset.value;
+                    selectedProvince = value;
+                    
+                    // Aggiorna testo del pulsante
+                    const selectedText = document.getElementById('selectedProvinceText');
+                    const selectedSubtext = document.getElementById('selectedProvinceSubtext');
+                    
+                    if (value === 'all') {
+                        selectedText.textContent = 'Tutte le Province';
+                        selectedSubtext.textContent = 'Panoramica completa';
+                    } else if (value === 'LT') {
+                        selectedText.textContent = 'Latina';
+                        selectedSubtext.textContent = '60k • 18 clienti';
+                    } else if (value === 'RM') {
+                        selectedText.textContent = 'Roma';
+                        selectedSubtext.textContent = '8k • 2 clienti';
+                    }
+                    
+                    // Aggiorna dashboard
+                    updateDashboard();
+                    
+                    // Chiudi modal
+                    setTimeout(() => {
+                        closeModal();
+                    }, 200);
+                });
+            });
             
             // Event listener per il download PDF
             document.getElementById('downloadPDF').addEventListener('click', async () => {
                 await generatePDF();
+            });
+            
+            // Chiudi modal con ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && provinceModal.classList.contains('show')) {
+                    closeModal();
+                }
             });
         });
 
