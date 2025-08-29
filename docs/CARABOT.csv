@@ -6,7 +6,7 @@
 ## SEZIONE 1: VERIFICA OBIETTIVI
 Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
 OBIETTIVI,Generale,80238.72,90159.79,,,352,20,,
-OBIETTIVI,LT,79029.116,22389.23,155000.00,38,43,48,35,51
+OBIETTIVI,LT,79029.116,122389.23,155000.00,38,43,48,35,51
 
 ## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
 Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
