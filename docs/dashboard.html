@@ -137,58 +137,7 @@
             }
         }
 
-        .chart-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-top: 24px;
-        }
-
-        .stat-card {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-        }
-
-        .stat-icon {
-            width: 32px;
-            height: 32px;
-            margin: 0 auto 8px;
-            background: #3b82f6;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .stat-icon.growth { background: #10b981; }
-        .stat-icon.target { background: #f59e0b; }
-        .stat-icon.trend { background: #8b5cf6; }
-
-        .stat-value {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        @media (max-width: 768px) {
-            .chart-stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-        }
+        @media (max-width: 640px) {
             .cards-grid {
                 grid-template-columns: 1fr;
             }
@@ -338,28 +287,78 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f1f5f9;
         }
 
         .section-header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
         }
 
         .chart-container {
             display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 32px;
-            align-items: center;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            align-items: start;
         }
 
         .chart-wrapper {
             position: relative;
-            height: 300px;
+            height: 400px;
             display: flex;
             justify-content: center;
             align-items: center;
+            background: #fafbfc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .chart-info {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .info-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-description {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 16px;
         }
 
         .chart-legend {
@@ -372,43 +371,51 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px;
-            background: #f8fafc;
+            padding: 20px;
+            background: white;
             border-radius: 12px;
-            border-left: 4px solid;
+            border: 2px solid #f1f5f9;
+            transition: all 0.2s ease;
+        }
+
+        .legend-item:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .legend-item.pieni-coppi {
-            border-left-color: #3b82f6;
+            border-left: 4px solid #3b82f6;
         }
 
         .legend-item.altro {
-            border-left-color: #f59e0b;
+            border-left: 4px solid #f59e0b;
         }
 
         .legend-content {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
         }
 
         .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .legend-color.pieni-coppi {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         }
 
         .legend-color.altro {
-            background: #f59e0b;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
         }
 
         .legend-label {
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 600;
             color: #374151;
         }
 
@@ -419,24 +426,78 @@
         }
 
         .legend-amount {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.2rem;
+            font-weight: 700;
             color: #1e293b;
         }
 
         .legend-percentage {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #64748b;
+            font-weight: 500;
         }
 
-        @media (max-width: 768px) {
+        .chart-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        @media (max-width: 1024px) {
             .chart-container {
                 grid-template-columns: 1fr;
-                gap: 24px;
+                gap: 32px;
             }
             
             .chart-section {
-                padding: 20px;
+                padding: 24px;
+            }
+            
+            .chart-wrapper {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                gap: 24px;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .chart-wrapper {
+                height: 300px;
+                padding: 16px;
+            }
+            
+            .chart-stats {
+                grid-template-columns: 1fr;
             }
         }
             .dashboard-container {
@@ -511,7 +572,10 @@
             <!-- SEZIONE 5: RIPARTIZIONE FATTURATO -->
             <div class="chart-section">
                 <div class="section-header">
-                    <h2>RIPARTIZIONE FATTURATO</h2>
+                    <h2>
+                        <div class="section-icon">📊</div>
+                        RIPARTIZIONE FATTURATO
+                    </h2>
                     <div class="status-indicator">
                         <span>●</span>
                         <span>Aggiornato automaticamente</span>
@@ -521,14 +585,27 @@
                     <div class="chart-wrapper">
                         <canvas id="fatturato-chart"></canvas>
                     </div>
-                    <div class="chart-legend" id="chartLegend">
-                        <!-- Legend sarà generata dinamicamente -->
+                    <div class="chart-info">
+                        <div class="info-card">
+                            <div class="info-title">
+                                <span>ℹ️</span>
+                                Analisi Distribuzione
+                            </div>
+                            <div class="info-description">
+                                La ripartizione del fatturato mostra la distribuzione tra i prodotti principali 
+                                (Pieni e Coppi) e le altre categorie merceologiche. Questo indicatore è fondamentale 
+                                per comprendere il focus commerciale e le opportunità di diversificazione.
+                            </div>
+                        </div>
+                        
+                        <div class="chart-legend" id="chartLegend">
+                            <!-- Legend sarà generata dinamicamente -->
+                        </div>
+                        
+                        <div class="chart-stats" id="chartStats">
+                            <!-- Stats saranno generate dinamicamente -->
+                        </div>
                     </div>
-                </div>
-
-                <!-- Statistiche aggiuntive automatiche -->
-                <div class="chart-stats" id="chartStats">
-                    <!-- Stats saranno generate dinamicamente -->
                 </div>
             </div>
         </div>
@@ -853,15 +930,28 @@
                 </div>
             `;
 
-            // Crea statistiche aggiuntive automatiche
-            createChartStats(allData, total, pieniCoppiValue, altroValue);
+            // Aggiorna statistiche
+            const statsContainer = document.getElementById('chartStats');
+            const avgTicket = total > 0 ? total / 2 : 0; // Media tra le due categorie
+            const dominantCategory = pieniCoppiValue > altroValue ? 'Pieni e Coppi' : 'Altro';
+            
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">FATTURATO TOTALE</div>
+                    <div class="stat-value">${formatCurrency(total)}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">CATEGORIA DOMINANTE</div>
+                    <div class="stat-value">${dominantCategory}</div>
+                </div>
+            `;
 
             // Distruggi chart esistente se presente
             if (fatturato_chart) {
                 fatturato_chart.destroy();
             }
 
-            // Crea nuovo chart con dati dinamici
+            // Crea nuovo chart con dati dinamici e design migliorato
             const ctx = document.getElementById('fatturato-chart').getContext('2d');
             fatturato_chart = new Chart(ctx, {
                 type: 'doughnut',
@@ -869,100 +959,103 @@
                     labels: ['Pieni e Coppi', 'Altro'],
                     datasets: [{
                         data: [pieniCoppiValue, altroValue],
-                        backgroundColor: ['#3b82f6', '#f59e0b'],
-                        borderColor: '#ffffff',
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(245, 158, 11, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(245, 158, 11, 1)'
+                        ],
                         borderWidth: 3,
-                        hoverBorderWidth: 5,
-                        hoverOffset: 8
+                        hoverBackgroundColor: [
+                            'rgba(59, 130, 246, 0.9)',
+                            'rgba(245, 158, 11, 0.9)'
+                        ],
+                        hoverBorderWidth: 4,
+                        hoverOffset: 10
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '70%',
+                    cutout: '65%',
                     plugins: {
                         legend: {
                             display: false
                         },
                         tooltip: {
-                            backgroundColor: '#1e293b',
+                            backgroundColor: 'rgba(30, 41, 59, 0.95)',
                             titleColor: '#ffffff',
                             bodyColor: '#ffffff',
                             borderColor: '#64748b',
                             borderWidth: 1,
-                            cornerRadius: 8,
+                            cornerRadius: 12,
                             displayColors: true,
+                            titleFont: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                size: 13,
+                                weight: '500'
+                            },
                             callbacks: {
                                 label: function(context) {
                                     const value = context.parsed;
                                     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                                     return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                },
+                                afterLabel: function(context) {
+                                    const value = context.parsed;
+                                    const isMain = context.label === 'Pieni e Coppi';
+                                    return isMain ? 'Categoria principale' : 'Prodotti complementari';
                                 }
                             }
                         }
                     },
                     interaction: {
                         intersect: false,
-                        mode: 'index'
+                        mode: 'point'
                     },
                     animation: {
                         animateScale: true,
                         animateRotate: true,
-                        duration: 1000,
+                        duration: 1200,
                         easing: 'easeInOutQuart'
+                    },
+                    elements: {
+                        arc: {
+                            borderWidth: 3,
+                            borderJoinStyle: 'round'
+                        }
                     }
-                }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    beforeDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
+                        const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
+                        
+                        ctx.save();
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        
+                        // Totale
+                        ctx.font = 'bold 28px Montserrat';
+                        ctx.fillStyle = '#1e293b';
+                        ctx.fillText(formatCurrency(total), centerX, centerY - 10);
+                        
+                        // Label
+                        ctx.font = '500 14px Montserrat';
+                        ctx.fillStyle = '#64748b';
+                        ctx.fillText('FATTURATO TOTALE', centerX, centerY + 15);
+                        
+                        ctx.restore();
+                    }
+                }]
             });
-        }
-
-        function createChartStats(allData, totalFatturato, pieniCoppi, altro) {
-            // Calcola statistiche automatiche dai dati
-            const obiettiviData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
-            const generaleData = obiettiviData.find(item => item.Provincia === 'Generale');
-            
-            // Calcola crescita media
-            let crescitaMedia = 0;
-            if (generaleData && generaleData.Anno_Precedente > 0) {
-                crescitaMedia = ((generaleData.Anno_Corrente - generaleData.Anno_Precedente) / generaleData.Anno_Precedente * 100);
-            }
-            
-            // Calcola quota principale (categoria dominante)
-            const quotaPrincipale = Math.max(pieniCoppi, altro);
-            const quotaPercentuale = totalFatturato > 0 ? (quotaPrincipale / totalFatturato * 100) : 0;
-            
-            // Calcola trend (differenza tra categorie)
-            const trend = Math.abs(pieniCoppi - altro);
-            const trendPercentuale = totalFatturato > 0 ? (trend / totalFatturato * 100) : 0;
-            
-            // Calcola obiettivo raggiunto
-            let obiettivoRaggiunto = 0;
-            if (generaleData && generaleData.Obiettivo > 0) {
-                obiettivoRaggiunto = (generaleData.Anno_Corrente / generaleData.Obiettivo * 100);
-            }
-            
-            const statsContainer = document.getElementById('chartStats');
-            statsContainer.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-icon">€</div>
-                    <div class="stat-value">${formatCurrency(totalFatturato)}</div>
-                    <div class="stat-label">Fatturato Totale</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon growth">%</div>
-                    <div class="stat-value">${crescitaMedia >= 0 ? '+' : ''}${crescitaMedia.toFixed(1)}%</div>
-                    <div class="stat-label">Crescita Annuale</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon target">◉</div>
-                    <div class="stat-value">${quotaPercentuale.toFixed(1)}%</div>
-                    <div class="stat-label">Quota Principale</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon trend">⚡</div>
-                    <div class="stat-value">${obiettivoRaggiunto > 0 ? obiettivoRaggiunto.toFixed(0) + '%' : 'N/A'}</div>
-                    <div class="stat-label">Obiettivo Raggiunto</div>
-                </div>
-            `;
         }
 
         // Carica dati dal CSV GitHub
