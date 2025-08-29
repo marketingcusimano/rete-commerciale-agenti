@@ -262,136 +262,27 @@
             font-size: 1rem;
         }
 
-        .ripartizione-container {
-            margin-top: 20px;
-        }
-
-        .ripartizione-card {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            border: 1px solid #e2e8f0;
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .chart-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .chart-center-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            pointer-events: none;
-        }
-
-        .chart-center-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e293b;
-            line-height: 1;
-        }
-
-        .chart-center-label {
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        .ripartizione-details {
-            flex: 1;
-        }
-
-        .ripartizione-header {
-            margin-bottom: 24px;
-        }
-
-        .ripartizione-header h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 8px;
-        }
-
-        .total-amount {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .categories-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .category-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 12px;
-            border-left: 4px solid;
-        }
-
-        .category-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .category-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .category-name {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #1e293b;
-        }
-
-        .category-stats {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            text-align: right;
-        }
-
-        .category-amount {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .category-percentage {
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 8px;
-            background: white;
-            color: #64748b;
-        }
-
         @media (max-width: 768px) {
-            .ripartizione-card {
-                grid-template-columns: 1fr;
-                gap: 24px;
-                text-align: center;
+            .dashboard-container {
+                padding: 16px;
             }
             
-            .chart-container {
-                justify-content: center;
+            .header {
+                padding: 20px;
+            }
+            
+            .agent-details {
+                gap: 16px;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
             }
         }
     </style>
@@ -440,31 +331,9 @@
             <div class="cards-grid" id="metricsCards">
                 <!-- Le card verranno generate dinamicamente -->
             </div>
-            
-            <!-- SEZIONE 5: RIPARTIZIONE FATTURATO -->
-            <div class="section-divider">
-                <div class="section-title" style="margin: 40px 0 24px 0;">RIPARTIZIONE FATTURATO</div>
-                <div class="ripartizione-container">
-                    <div class="ripartizione-card">
-                        <div class="chart-container">
-                            <canvas id="donutChart" width="300" height="300"></canvas>
-                        </div>
-                        <div class="ripartizione-details">
-                            <div class="ripartizione-header">
-                                <h3>Analisi Categorie Prodotto</h3>
-                                <div class="total-amount" id="totalFatturato">€90k</div>
-                            </div>
-                            <div class="categories-list" id="categoriesList">
-                                <!-- Lista categorie generata dinamicamente -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
         // URL del CSV su GitHub
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
@@ -472,8 +341,6 @@
         let currentData = [];
         let agentInfo = {};
         let selectedProvince = 'all';
-        let donutChart = null;
-        let ripartizioneData = [];
 
         function formatNumber(num) {
             return new Intl.NumberFormat('it-IT', {
@@ -647,153 +514,42 @@
             `;
         }
 
-        function createDonutChart() {
-            const ctx = document.getElementById('donutChart').getContext('2d');
+        function createClientiAttiviCard(data) {
+            const currentClients = data.Clienti_Anno_Corrente || 0;
+            const prevClients = data.Clienti_Anno_Precedente || 0;
+            const targetClients = data.Obiettivo_Clienti || 0;
+            const clientProgress = targetClients > 0 ? (currentClients / targetClients) * 100 : 0;
             
-            if (donutChart) {
-                donutChart.destroy();
-            }
-
-            // Usa i dati della ripartizione fatturato dal CSV
-            const chartData = ripartizioneData.length > 0 ? ripartizioneData : [
-                { categoria: 'Pieni e Coppi', importo: 54909.62, percentuale: 60.8 },
-                { categoria: 'Altro', importo: 35250.17, percentuale: 39.2 }
-            ];
-
-            const colors = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
-
-            donutChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: chartData.map(item => item.categoria),
-                    datasets: [{
-                        data: chartData.map(item => item.percentuale),
-                        backgroundColor: colors.slice(0, chartData.length),
-                        borderWidth: 0,
-                        cutout: '70%'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const item = chartData[context.dataIndex];
-                                    return `${item.categoria}: ${formatCurrency(item.importo)} (${item.percentuale.toFixed(1)}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Aggiorna la lista delle categorie
-            updateCategoriesList(chartData, colors);
-            
-            // Aggiorna il totale
-            const total = chartData.reduce((sum, item) => sum + item.importo, 0);
-            document.getElementById('totalFatturato').textContent = formatCurrency(total);
-        }
-
-        function updateCategoriesList(data, colors) {
-            const container = document.getElementById('categoriesList');
-            
-            const html = data.map((item, index) => `
-                <div class="category-item" style="border-left-color: ${colors[index]}">
-                    <div class="category-info">
-                        <div class="category-color" style="background-color: ${colors[index]}"></div>
-                        <div class="category-name">${item.categoria}</div>
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Clienti Attivi</div>
+                        <div class="trend-badge ${clientProgress >= 50 ? 'trend-positive' : 'trend-negative'}">
+                            ${Math.round(clientProgress)}%
+                        </div>
                     </div>
-                    <div class="category-stats">
-                        <div class="category-amount">${formatCurrency(item.importo)}</div>
-                        <div class="category-percentage">${item.percentuale.toFixed(1)}%</div>
+                    <div class="main-value">${currentClients}</div>
+                    <div class="comparison">
+                        <span class="prev-value">vs 2024: ${prevClients}</span>
+                        <span class="change-value" style="color: #64748b;">raggiunto</span>
                     </div>
+                    ${targetClients > 0 ? `
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span class="progress-label">● Obiettivo Clienti</span>
+                                <span class="progress-percentage">${targetClients}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-blue" style="width: ${Math.min(clientProgress, 100)}%"></div>
+                            </div>
+                            <div class="progress-details">
+                                <span>Mancano: ${Math.max(0, targetClients - currentClients)}</span>
+                                <span>${Math.round(clientProgress)}%</span>
+                            </div>
+                        </div>
+                    ` : ''}
                 </div>
-            `).join('');
-            
-            container.innerHTML = html;
-            
-            // Crea il grafico donut dopo aver aggiornato le card
-            setTimeout(() => {
-                createDonutChart();
-            }, 100);
-        }
-
-        function createDonutChart() {
-            const ctx = document.getElementById('donutChart').getContext('2d');
-            
-            if (donutChart) {
-                donutChart.destroy();
-            }
-
-            // Usa i dati della ripartizione fatturato dal CSV
-            const chartData = ripartizioneData.length > 0 ? ripartizioneData : [
-                { categoria: 'Pieni e Coppi', importo: 54909.62, percentuale: 60.8 },
-                { categoria: 'Altro', importo: 35250.17, percentuale: 39.2 }
-            ];
-
-            const colors = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
-
-            donutChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: chartData.map(item => item.categoria),
-                    datasets: [{
-                        data: chartData.map(item => item.percentuale),
-                        backgroundColor: colors.slice(0, chartData.length),
-                        borderWidth: 0,
-                        cutout: '70%'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const item = chartData[context.dataIndex];
-                                    return `${item.categoria}: ${formatCurrency(item.importo)} (${item.percentuale.toFixed(1)}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Aggiorna la lista delle categorie
-            updateCategoriesList(chartData, colors);
-            
-            // Aggiorna il totale
-            const total = chartData.reduce((sum, item) => sum + item.importo, 0);
-            document.getElementById('totalFatturato').textContent = formatCurrency(total);
-        }
-
-        function updateCategoriesList(data, colors) {
-            const container = document.getElementById('categoriesList');
-            
-            const html = data.map((item, index) => `
-                <div class="category-item" style="border-left-color: ${colors[index]}">
-                    <div class="category-info">
-                        <div class="category-color" style="background-color: ${colors[index]}"></div>
-                        <div class="category-name">${item.categoria}</div>
-                    </div>
-                    <div class="category-stats">
-                        <div class="category-amount">${formatCurrency(item.importo)}</div>
-                        <div class="category-percentage">${item.percentuale.toFixed(1)}%</div>
-                    </div>
-                </div>
-            `).join('');
-            
-            container.innerHTML = html;
+            `;
         }
 
         function filterData(province) {
@@ -892,18 +648,6 @@
                 // Filtra solo i record OBIETTIVI per la sezione 1
                 currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
                 console.log('Dati obiettivi filtrati:', currentData);
-                
-                // Filtra i dati ripartizione fatturato per la sezione 5
-                ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
-                console.log('Dati ripartizione filtrati:', ripartizioneData);
-                
-                // Se non ci sono dati ripartizione nel CSV, usa i valori dall'HTML originale
-                if (ripartizioneData.length === 0) {
-                    ripartizioneData = [
-                        { categoria: 'Pieni e Coppi', importo: 54909.62, percentuale: 60.8 },
-                        { categoria: 'Altro', importo: 35250.17, percentuale: 39.2 }
-                    ];
-                }
                 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
