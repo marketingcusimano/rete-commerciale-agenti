@@ -600,11 +600,24 @@
             padding: 20px;
             border: 1px solid #e2e8f0;
             transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--category-color);
         }
 
         .category-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border-color: #cbd5e1;
+            border-color: var(--category-color);
+            transform: translateY(-2px);
         }
 
         .category-name {
@@ -1142,18 +1155,22 @@
             // Ordina per importo decrescente
             activeCategories.sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale));
             
+            // Colori del grafico (stesso array utilizzato nel chart)
+            const colors = ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
+            
             // Crea cards
             const gridContainer = document.getElementById('categoriesGrid');
             let cardsHtml = '';
             
-            activeCategories.forEach(cat => {
+            activeCategories.forEach((cat, index) => {
                 const importo = parseFloat(cat.Importo_Totale);
                 const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
                 const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
                 const totalClienti = clientiLT + clientiRM;
+                const categoryColor = colors[index] || '#64748b';
                 
                 cardsHtml += `
-                    <div class="category-card">
+                    <div class="category-card" style="--category-color: ${categoryColor}">
                         <div class="category-name">${cat.Categoria}</div>
                         <div class="category-value">${formatCurrency(importo)}</div>
                         <div class="category-clients">${totalClienti} clienti (LT: ${clientiLT}, RM: ${clientiRM})</div>
@@ -1163,28 +1180,26 @@
             
             gridContainer.innerHTML = cardsHtml;
             
-            // Crea grafico
-            createCategoriesChart(activeCategories);
+            // Crea grafico con gli stessi colori
+            createCategoriesChart(activeCategories, colors);
         }
 
-        function createCategoriesChart(categoriesData) {
+        function createCategoriesChart(categoriesData, colors) {
             if (categories_chart) {
                 categories_chart.destroy();
             }
             
-            // Prendi le top 6 categorie
-            const topCategories = categoriesData.slice(0, 6);
+            // Prendi le top categorie (massimo quante ne abbiamo)
+            const topCategories = categoriesData.slice(0, Math.min(categoriesData.length, colors.length));
             
             const ctx = document.getElementById('categories-chart').getContext('2d');
             categories_chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: topCategories.map(cat => cat.Categoria.replace('_', ' ')),
+                    labels: topCategories.map(cat => cat.Categoria.replace(/_/g, ' ')),
                     datasets: [{
                         data: topCategories.map(cat => parseFloat(cat.Importo_Totale)),
-                        backgroundColor: [
-                            '#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0'
-                        ],
+                        backgroundColor: colors.slice(0, topCategories.length),
                         borderColor: '#ffffff',
                         borderWidth: 3,
                         hoverOffset: 4
