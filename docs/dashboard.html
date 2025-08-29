@@ -127,8 +127,20 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .metric-card {
@@ -366,15 +378,52 @@
             color: #64748b;
         }
 
-        @media (max-width: 768px) {
-            .chart-container {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-            
-            .chart-section {
-                padding: 20px;
-            }
+        .chart-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .growth-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .growth-positive {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .growth-neutral {
+            background: #f1f5f9;
+            color: #64748b;
         }
             .dashboard-container {
                 padding: 16px;
@@ -785,9 +834,57 @@
                 </div>
             `;
 
+            // Aggiungi statistiche aggiuntive automatiche
+            const totalFatturato = pieniCoppiValue + altroValue;
+            const mediaGiornaliera = totalFatturato / 235; // Circa 235 giorni lavorativi all'anno
+            const proiezioneAnnuale = totalFatturato * (365 / 235);
+            const percentualePieniSuTotale = total > 0 ? (pieniCoppiValue / total * 100) : 0;
+            
+            // Crea le card statistiche aggiuntive
+            const chartStatsContainer = document.createElement('div');
+            chartStatsContainer.className = 'chart-stats';
+            chartStatsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${formatCurrency(totalFatturato)}</div>
+                    <div class="stat-label">Totale Fatturato</div>
+                    <div class="growth-indicator growth-positive">
+                        ↗ Anno corrente
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${formatCurrency(mediaGiornaliera)}</div>
+                    <div class="stat-label">Media Giornaliera</div>
+                    <div class="growth-indicator growth-neutral">
+                        📊 Stima
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${formatCurrency(proiezioneAnnuale)}</div>
+                    <div class="stat-label">Proiezione Anno</div>
+                    <div class="growth-indicator growth-positive">
+                        📈 Trend
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${percentualePieniSuTotale.toFixed(0)}%</div>
+                    <div class="stat-label">Prodotti Core</div>
+                    <div class="growth-indicator growth-positive">
+                        🎯 Focus
+                    </div>
+                </div>
+            `;
+
+            // Aggiungi le statistiche dopo la legend
+            legendContainer.parentNode.appendChild(chartStatsContainer);
+
             // Distruggi chart esistente se presente
             if (fatturato_chart) {
                 fatturato_chart.destroy();
+                // Rimuovi anche le statistiche precedenti
+                const existingStats = document.querySelector('.chart-stats');
+                if (existingStats) {
+                    existingStats.remove();
+                }
             }
 
             // Crea nuovo chart con dati dinamici
