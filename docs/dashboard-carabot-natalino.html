@@ -1016,13 +1016,45 @@
         let lastUpdateTime = null;
         
         // Funzioni di utilità per il parsing e formattazione
-        function parseFloatSafe(str) {
-            if (!str || str === '') return 0;
-            // Rimuovi caratteri non numerici eccetto punto e virgola
-            const cleaned = str.toString().replace(/[^\d.,-]/g, '');
-            // Sostituisci virgola con punto per decimali
-            const normalized = cleaned.replace(',', '.');
-            return parseFloat(normalized) || 0;
+        function parseMoneyIT(str) {
+            if (str === null || str === undefined) return 0;
+            let s = String(str).trim();
+            if (!s) return 0;
+
+            s = s.replace(/\s|\u00A0|€|EUR/gi, '');
+            let negative = false;
+            if (/^\(.*\)$/.test(s)) { negative = true; s = s.slice(1, -1); }
+            if (s.startsWith('-')) { negative = true; s = s.slice(1); }
+
+            const hasComma = s.includes(',');
+            const hasDot   = s.includes('.');
+            let decimalSep = null;
+
+            if (hasComma && hasDot) {
+                decimalSep = s.lastIndexOf(',') > s.lastIndexOf('.') ? ',' : '.';
+            } else if (hasComma) {
+                decimalSep = ',';
+            } else if (hasDot) {
+                decimalSep = '.';
+            }
+
+            if (decimalSep) s = s.replace(decimalSep, '|');
+            s = s.replace(/[.,]/g, '');
+            if (decimalSep) s = s.replace('|', '.');
+
+            const num = parseFloat(s);
+            return Number.isNaN(num) ? 0 : (negative ? -num : num);
+        }
+        
+        function getField(row, candidates) {
+            const keys = Object.keys(row);
+            for (const wanted of candidates) {
+                const k = keys.find(key =>
+                    key.replace(/\s+/g,'').toLowerCase() === wanted.replace(/\s+/g,'').toLowerCase()
+                );
+                if (k) return row[k];
+            }
+            return '';
         }
         
         function formatCurrency(amount) {
@@ -1175,10 +1207,10 @@
             };
             
             rows.forEach(r => {
-                const provincia = r['Provincia'] || '';
-                const cliente = r['Ragione Sociale Cliente'] || '';
-                const prodotto = r['Categoria ARTICOLI'] || '';
-                const fatturato = parseFloatSafe(r['Fatturato'] || '0');
+                const provincia = getField(r, ['Provincia']);
+                const cliente   = getField(r, ['Ragione Sociale Cliente', 'Cliente']);
+                const prodotto  = getField(r, ['Categoria ARTICOLI', 'Categoria', 'Prodotto']);
+                const fatturato = parseMoneyIT(getField(r, ['Fatturato', 'Importo', 'Valore']));
 
                 processed.totalFatturato += fatturato;
 
@@ -1210,6 +1242,7 @@
             processed.totalClienti = Object.keys(processed.clients).length;
             
             console.log('Dati processati:', processed);
+            console.log('Totale fatturato calcolato:', processed.totalFatturato);
             return processed;
         }
         
