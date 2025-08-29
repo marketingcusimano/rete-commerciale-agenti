@@ -137,7 +137,58 @@
             }
         }
 
+        .chart-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            margin: 0 auto 8px;
+            background: #3b82f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .stat-icon.growth { background: #10b981; }
+        .stat-icon.target { background: #f59e0b; }
+        .stat-icon.trend { background: #8b5cf6; }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
         @media (max-width: 768px) {
+            .chart-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
             .cards-grid {
                 grid-template-columns: 1fr;
             }
@@ -378,52 +429,15 @@
             color: #64748b;
         }
 
-        .chart-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-top: 24px;
-        }
-
-        .stat-card {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .growth-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 4px;
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 12px;
-        }
-
-        .growth-positive {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .growth-neutral {
-            background: #f1f5f9;
-            color: #64748b;
+        @media (max-width: 768px) {
+            .chart-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .chart-section {
+                padding: 20px;
+            }
         }
             .dashboard-container {
                 padding: 16px;
@@ -510,6 +524,11 @@
                     <div class="chart-legend" id="chartLegend">
                         <!-- Legend sarà generata dinamicamente -->
                     </div>
+                </div>
+
+                <!-- Statistiche aggiuntive automatiche -->
+                <div class="chart-stats" id="chartStats">
+                    <!-- Stats saranno generate dinamicamente -->
                 </div>
             </div>
         </div>
@@ -834,57 +853,12 @@
                 </div>
             `;
 
-            // Aggiungi statistiche aggiuntive automatiche
-            const totalFatturato = pieniCoppiValue + altroValue;
-            const mediaGiornaliera = totalFatturato / 235; // Circa 235 giorni lavorativi all'anno
-            const proiezioneAnnuale = totalFatturato * (365 / 235);
-            const percentualePieniSuTotale = total > 0 ? (pieniCoppiValue / total * 100) : 0;
-            
-            // Crea le card statistiche aggiuntive
-            const chartStatsContainer = document.createElement('div');
-            chartStatsContainer.className = 'chart-stats';
-            chartStatsContainer.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-value">${formatCurrency(totalFatturato)}</div>
-                    <div class="stat-label">Totale Fatturato</div>
-                    <div class="growth-indicator growth-positive">
-                        ↗ Anno corrente
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${formatCurrency(mediaGiornaliera)}</div>
-                    <div class="stat-label">Media Giornaliera</div>
-                    <div class="growth-indicator growth-neutral">
-                        📊 Stima
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${formatCurrency(proiezioneAnnuale)}</div>
-                    <div class="stat-label">Proiezione Anno</div>
-                    <div class="growth-indicator growth-positive">
-                        📈 Trend
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${percentualePieniSuTotale.toFixed(0)}%</div>
-                    <div class="stat-label">Prodotti Core</div>
-                    <div class="growth-indicator growth-positive">
-                        🎯 Focus
-                    </div>
-                </div>
-            `;
-
-            // Aggiungi le statistiche dopo la legend
-            legendContainer.parentNode.appendChild(chartStatsContainer);
+            // Crea statistiche aggiuntive automatiche
+            createChartStats(allData, total, pieniCoppiValue, altroValue);
 
             // Distruggi chart esistente se presente
             if (fatturato_chart) {
                 fatturato_chart.destroy();
-                // Rimuovi anche le statistiche precedenti
-                const existingStats = document.querySelector('.chart-stats');
-                if (existingStats) {
-                    existingStats.remove();
-                }
             }
 
             // Crea nuovo chart con dati dinamici
@@ -939,6 +913,56 @@
                     }
                 }
             });
+        }
+
+        function createChartStats(allData, totalFatturato, pieniCoppi, altro) {
+            // Calcola statistiche automatiche dai dati
+            const obiettiviData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
+            const generaleData = obiettiviData.find(item => item.Provincia === 'Generale');
+            
+            // Calcola crescita media
+            let crescitaMedia = 0;
+            if (generaleData && generaleData.Anno_Precedente > 0) {
+                crescitaMedia = ((generaleData.Anno_Corrente - generaleData.Anno_Precedente) / generaleData.Anno_Precedente * 100);
+            }
+            
+            // Calcola quota principale (categoria dominante)
+            const quotaPrincipale = Math.max(pieniCoppi, altro);
+            const quotaPercentuale = totalFatturato > 0 ? (quotaPrincipale / totalFatturato * 100) : 0;
+            
+            // Calcola trend (differenza tra categorie)
+            const trend = Math.abs(pieniCoppi - altro);
+            const trendPercentuale = totalFatturato > 0 ? (trend / totalFatturato * 100) : 0;
+            
+            // Calcola obiettivo raggiunto
+            let obiettivoRaggiunto = 0;
+            if (generaleData && generaleData.Obiettivo > 0) {
+                obiettivoRaggiunto = (generaleData.Anno_Corrente / generaleData.Obiettivo * 100);
+            }
+            
+            const statsContainer = document.getElementById('chartStats');
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon">€</div>
+                    <div class="stat-value">${formatCurrency(totalFatturato)}</div>
+                    <div class="stat-label">Fatturato Totale</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon growth">%</div>
+                    <div class="stat-value">${crescitaMedia >= 0 ? '+' : ''}${crescitaMedia.toFixed(1)}%</div>
+                    <div class="stat-label">Crescita Annuale</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon target">◉</div>
+                    <div class="stat-value">${quotaPercentuale.toFixed(1)}%</div>
+                    <div class="stat-label">Quota Principale</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon trend">⚡</div>
+                    <div class="stat-value">${obiettivoRaggiunto > 0 ? obiettivoRaggiunto.toFixed(0) + '%' : 'N/A'}</div>
+                    <div class="stat-label">Obiettivo Raggiunto</div>
+                </div>
+            `;
         }
 
         // Carica dati dal CSV GitHub
