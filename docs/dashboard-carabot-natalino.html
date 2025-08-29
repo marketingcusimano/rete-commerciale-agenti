@@ -1148,6 +1148,14 @@
         
         // Funzione per processare e aggregare i dati
         function processData(data) {
+            console.log('=== DEBUG PROCESSAMENTO DATI ===');
+            console.log('Numero di righe da processare:', data.length);
+            
+            if (data.length > 0) {
+                console.log('Prima riga di esempio:', data[0]);
+                console.log('Colonne disponibili:', Object.keys(data[0]));
+            }
+            
             const processed = {
                 totalFatturato: 0,
                 totalClienti: 0,
@@ -1157,18 +1165,62 @@
                 clients: {}
             };
             
-            data.forEach(row => {
-                // Trova le colonne dei dati (assumendo struttura standard)
-                const provincia = row['Provincia'] || row['PROVINCIA'] || row['provincia'] || '';
-                const fatturato = parseFloatSafe(row['Fatturato'] || row['FATTURATO'] || row['fatturato'] || '0');
-                const cliente = row['Cliente'] || row['CLIENTE'] || row['cliente'] || '';
-                const prodotto = row['Prodotto'] || row['PRODOTTO'] || row['prodotto'] || '';
+            data.forEach((row, index) => {
+                if (index < 3) {
+                    console.log(`Riga ${index}:`, row);
+                }
+                
+                // Prova a identificare le colonne automaticamente
+                const columns = Object.keys(row);
+                let provincia = '';
+                let fatturato = 0;
+                let cliente = '';
+                let prodotto = '';
+                
+                // Cerca la colonna provincia
+                const provinciaCol = columns.find(col => 
+                    col.toLowerCase().includes('provincia') || 
+                    col.toLowerCase().includes('prov') ||
+                    col.toLowerCase().includes('region')
+                );
+                if (provinciaCol) provincia = row[provinciaCol];
+                
+                // Cerca la colonna fatturato
+                const fatturatoCol = columns.find(col => 
+                    col.toLowerCase().includes('fatturato') || 
+                    col.toLowerCase().includes('importo') ||
+                    col.toLowerCase().includes('valore') ||
+                    col.toLowerCase().includes('euro') ||
+                    col.toLowerCase().includes('€')
+                );
+                if (fatturatoCol) fatturato = parseFloatSafe(row[fatturatoCol]);
+                
+                // Cerca la colonna cliente
+                const clienteCol = columns.find(col => 
+                    col.toLowerCase().includes('cliente') || 
+                    col.toLowerCase().includes('ragione') ||
+                    col.toLowerCase().includes('ditta') ||
+                    col.toLowerCase().includes('nome')
+                );
+                if (clienteCol) cliente = row[clienteCol];
+                
+                // Cerca la colonna prodotto
+                const prodottoCol = columns.find(col => 
+                    col.toLowerCase().includes('prodotto') || 
+                    col.toLowerCase().includes('articolo') ||
+                    col.toLowerCase().includes('descrizione')
+                );
+                if (prodottoCol) prodotto = row[prodottoCol];
+                
+                if (index < 3) {
+                    console.log(`Riga ${index} - Provincia: ${provincia}, Fatturato: ${fatturato}, Cliente: ${cliente}, Prodotto: ${prodotto}`);
+                }
                 
                 // Totali generali
                 processed.totalFatturato += fatturato;
                 
                 // Aggregazione per provincia
-                if (provincia) {
+                if (provincia && provincia.trim() !== '') {
                     if (!processed.provinces[provincia]) {
                         processed.provinces[provincia] = {
                             fatturato: 0,
@@ -1177,11 +1229,13 @@
                         };
                     }
                     processed.provinces[provincia].fatturato += fatturato;
-                    if (cliente) processed.provinces[provincia].clienti.add(cliente);
+                    if (cliente && cliente.trim() !== '') {
+                        processed.provinces[provincia].clienti.add(cliente.trim());
+                    }
                 }
                 
                 // Aggregazione per prodotti
-                if (prodotto) {
+                if (prodotto && prodotto.trim() !== '') {
                     if (!processed.products[prodotto]) {
                         processed.products[prodotto] = 0;
                     }
@@ -1189,7 +1243,7 @@
                 }
                 
                 // Aggregazione per clienti
-                if (cliente) {
+                if (cliente && cliente.trim() !== '') {
                     if (!processed.clients[cliente]) {
                         processed.clients[cliente] = {
                             fatturato: 0,
@@ -1207,7 +1261,13 @@
             
             processed.totalClienti = Object.keys(processed.clients).length;
             
-            console.log('Dati processati:', processed);
+            console.log('=== RISULTATO PROCESSAMENTO ===');
+            console.log('Fatturato totale:', processed.totalFatturato);
+            console.log('Clienti totali:', processed.totalClienti);
+            console.log('Province:', processed.provinces);
+            console.log('Prodotti:', processed.products);
+            console.log('================================');
+            
             return processed;
         }
         
