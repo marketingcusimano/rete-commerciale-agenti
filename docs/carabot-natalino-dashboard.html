@@ -1460,6 +1460,16 @@
                 if (datiProcessati.length > 0) {
                     console.log('Esempio prime 3 righe:', datiProcessati.slice(0, 3));
                     console.log('Colonne disponibili:', Object.keys(datiProcessati[0]));
+                    
+                    // DEBUG DETTAGLIATO per ogni colonna
+                    const primaRiga = datiProcessati[0];
+                    console.log('=== ANALISI COLONNE ===');
+                    Object.keys(primaRiga).forEach(colonna => {
+                        const valore = primaRiga[colonna];
+                        const isNumeric = !isNaN(parseFloat(valore.toString().replace(/[€.,\s]/g, '')));
+                        console.log(`${colonna}: "${valore}" (numeric: ${isNumeric})`);
+                    });
+                    console.log('=====================');
                 }
                 
                 // Salva i dati globalmente
