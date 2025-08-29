@@ -1009,7 +1009,11 @@
 
     <script>
         // Variabili globali per i dati
-        const CSV_URL = "https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/63100238_CARABOT-NATALINO.csv";
+        const CSV_BASE = "https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/63100238_CARABOT-NATALINO.csv";
+        function csvUrl() {
+            return `${CSV_BASE}?v=${Date.now()}`; // query sempre diversa
+        }
+        
         let rawData = [];
         let processedData = {};
         let selectedProvince = 'all';
@@ -1096,10 +1100,10 @@
             
             try {
                 console.log('Caricamento dati dal CSV...');
-                const response = await fetch(`${CSV_URL}?_=${Date.now()}`);
+                const response = await fetch(csvUrl(), { cache: 'no-store' });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
                 const csvText = await response.text();
