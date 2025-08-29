@@ -6,7 +6,6 @@
     <title>Dashboard Agente CARABOT NATALINO</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -128,8 +127,20 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .metric-card {
@@ -270,102 +281,50 @@
             padding: 32px;
             margin: 32px 0;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid #f1f5f9;
-        }
-
-        .section-title-with-icon {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .section-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
+            margin-bottom: 24px;
         }
 
         .section-header h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.25rem;
+            font-weight: 600;
             color: #1e293b;
-            margin: 0;
         }
 
         .chart-container {
             display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 48px;
+            grid-template-columns: 1fr 300px;
+            gap: 32px;
             align-items: center;
         }
 
         .chart-wrapper {
             position: relative;
-            height: 350px;
+            height: 300px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .chart-center-info {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            pointer-events: none;
-        }
-
-        .chart-center-title {
-            font-size: 0.9rem;
-            color: #64748b;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .chart-center-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
         .chart-legend {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            min-width: 280px;
+            gap: 16px;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 16px;
-            border-left: 5px solid;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .legend-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid;
         }
 
         .legend-item.pieni-coppi {
@@ -379,94 +338,54 @@
         .legend-content {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
-        .legend-icon-wrapper {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: white;
-            font-weight: 600;
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
         }
 
-        .legend-icon-wrapper.pieni-coppi {
-            background: linear-gradient(135deg, #3b82f6, #1e40af);
+        .legend-color.pieni-coppi {
+            background: #3b82f6;
         }
 
-        .legend-icon-wrapper.altro {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-
-        .legend-text {
-            flex: 1;
+        .legend-color.altro {
+            background: #f59e0b;
         }
 
         .legend-label {
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 0.95rem;
+            font-weight: 500;
             color: #374151;
-            margin-bottom: 4px;
-        }
-
-        .legend-description {
-            font-size: 0.85rem;
-            color: #6b7280;
         }
 
         .legend-value {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 4px;
         }
 
         .legend-amount {
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 600;
             color: #1e293b;
         }
 
         .legend-percentage {
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 20px;
-            color: white;
-        }
-
-        .legend-percentage.pieni-coppi {
-            background: #3b82f6;
-        }
-
-        .legend-percentage.altro {
-            background: #f59e0b;
+            font-size: 0.85rem;
+            color: #64748b;
         }
 
         @media (max-width: 768px) {
             .chart-container {
                 grid-template-columns: 1fr;
-                gap: 32px;
+                gap: 24px;
             }
             
             .chart-section {
-                padding: 24px;
-            }
-
-            .chart-wrapper {
-                height: 280px;
-            }
-
-            .legend-item {
-                padding: 16px;
-            }
-
-            .section-header h2 {
-                font-size: 1.25rem;
+                padding: 20px;
             }
         }
             .dashboard-container {
@@ -541,24 +460,15 @@
             <!-- SEZIONE 5: RIPARTIZIONE FATTURATO -->
             <div class="chart-section">
                 <div class="section-header">
-                    <div class="section-title-with-icon">
-                        <div class="section-icon">
-                            <i class="fas fa-chart-pie"></i>
-                        </div>
-                        <h2>RIPARTIZIONE FATTURATO</h2>
-                    </div>
+                    <h2>RIPARTIZIONE FATTURATO</h2>
                     <div class="status-indicator">
-                        <span><i class="fas fa-sync-alt"></i></span>
-                        <span>Aggiornamento automatico</span>
+                        <span>●</span>
+                        <span>Aggiornato automaticamente</span>
                     </div>
                 </div>
                 <div class="chart-container">
                     <div class="chart-wrapper">
                         <canvas id="fatturato-chart"></canvas>
-                        <div class="chart-center-info" id="chartCenterInfo">
-                            <div class="chart-center-title">Totale</div>
-                            <div class="chart-center-value" id="chartCenterValue">€90k</div>
-                        </div>
                     </div>
                     <div class="chart-legend" id="chartLegend">
                         <!-- Legend sarà generata dinamicamente -->
@@ -862,40 +772,27 @@
 
             console.log(`Ripartizione automatica: Pieni e Coppi €${pieniCoppiValue} (${pieniCoppiPerc}%), Altro €${altroValue} (${altroPerc}%)`);
 
-            // Aggiorna il valore centrale
-            document.getElementById('chartCenterValue').textContent = formatCurrency(total);
-
-            // Aggiorna legend dinamicamente con icone
+            // Aggiorna legend dinamicamente
             const legendContainer = document.getElementById('chartLegend');
             legendContainer.innerHTML = `
                 <div class="legend-item pieni-coppi">
                     <div class="legend-content">
-                        <div class="legend-icon-wrapper pieni-coppi">
-                            <i class="fas fa-th-large"></i>
-                        </div>
-                        <div class="legend-text">
-                            <div class="legend-label">Pieni e Coppi</div>
-                            <div class="legend-description">Prodotti principali</div>
-                        </div>
+                        <div class="legend-color pieni-coppi"></div>
+                        <div class="legend-label">Pieni e Coppi</div>
                     </div>
                     <div class="legend-value">
                         <div class="legend-amount">${formatCurrency(pieniCoppiValue)}</div>
-                        <div class="legend-percentage pieni-coppi">${pieniCoppiPerc}%</div>
+                        <div class="legend-percentage">${pieniCoppiPerc}%</div>
                     </div>
                 </div>
                 <div class="legend-item altro">
                     <div class="legend-content">
-                        <div class="legend-icon-wrapper altro">
-                            <i class="fas fa-boxes"></i>
-                        </div>
-                        <div class="legend-text">
-                            <div class="legend-label">Altri Prodotti</div>
-                            <div class="legend-description">Articoli vari</div>
-                        </div>
+                        <div class="legend-color altro"></div>
+                        <div class="legend-label">Altro</div>
                     </div>
                     <div class="legend-value">
                         <div class="legend-amount">${formatCurrency(altroValue)}</div>
-                        <div class="legend-percentage altro">${altroPerc}%</div>
+                        <div class="legend-percentage">${altroPerc}%</div>
                     </div>
                 </div>
             `;
@@ -905,58 +802,37 @@
                 fatturato_chart.destroy();
             }
 
-            // Crea nuovo chart con dati dinamici e design moderno
+            // Crea nuovo chart con dati dinamici
             const ctx = document.getElementById('fatturato-chart').getContext('2d');
             fatturato_chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Pieni e Coppi', 'Altri Prodotti'],
+                    labels: ['Pieni e Coppi', 'Altro'],
                     datasets: [{
                         data: [pieniCoppiValue, altroValue],
-                        backgroundColor: [
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(245, 158, 11, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(59, 130, 246, 1)',
-                            'rgba(245, 158, 11, 1)'
-                        ],
+                        backgroundColor: ['#3b82f6', '#6366f1'],
+                        borderColor: '#ffffff',
                         borderWidth: 3,
                         hoverBorderWidth: 5,
-                        hoverOffset: 12,
-                        hoverBackgroundColor: [
-                            'rgba(59, 130, 246, 0.9)',
-                            'rgba(245, 158, 11, 0.9)'
-                        ]
+                        hoverOffset: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '75%',
+                    cutout: '70%',
                     plugins: {
                         legend: {
                             display: false
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                            backgroundColor: '#1e293b',
                             titleColor: '#ffffff',
                             bodyColor: '#ffffff',
                             borderColor: '#64748b',
                             borderWidth: 1,
-                            cornerRadius: 12,
+                            cornerRadius: 8,
                             displayColors: true,
-                            titleFont: {
-                                family: 'Montserrat',
-                                size: 14,
-                                weight: '600'
-                            },
-                            bodyFont: {
-                                family: 'Montserrat',
-                                size: 13,
-                                weight: '500'
-                            },
-                            padding: 12,
                             callbacks: {
                                 label: function(context) {
                                     const value = context.parsed;
@@ -973,13 +849,8 @@
                     animation: {
                         animateScale: true,
                         animateRotate: true,
-                        duration: 1200,
-                        easing: 'easeInOutCubic'
-                    },
-                    elements: {
-                        arc: {
-                            borderJoinStyle: 'round'
-                        }
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
                     }
                 }
             });
