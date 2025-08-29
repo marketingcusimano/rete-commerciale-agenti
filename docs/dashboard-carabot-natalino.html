@@ -1009,6 +1009,7 @@
 
     <script>
         // Variabili globali per i dati
+        const CSV_URL = "https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/63100238_CARABOT-NATALINO.csv";
         let rawData = [];
         let processedData = {};
         let selectedProvince = 'all';
@@ -1063,7 +1064,7 @@
             
             try {
                 console.log('Caricamento dati dal CSV...');
-                const response = await fetch('https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/63100238_CARABOT-NATALINO.csv');
+                const response = await fetch(`${CSV_URL}?_=${Date.now()}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1072,22 +1073,22 @@
                 const csvText = await response.text();
                 console.log('CSV caricato, lunghezza:', csvText.length);
                 
-                // Parse del CSV
-                const parsedData = parseCSV(csvText);
-                console.log('Dati parsati:', parsedData.length, 'righe');
+                // Parse del CSV con sezioni
+                const { detailRows, period } = parseCSVSections(csvText);
+                console.log('Dati parsati:', detailRows.length, 'righe');
                 
-                if (parsedData.length === 0) {
-                    throw new Error('Nessun dato trovato nel CSV');
+                if (detailRows.length === 0) {
+                    throw new Error('Nessun dettaglio vendite trovato nel CSV');
                 }
                 
-                rawData = parsedData;
-                processedData = processData(parsedData);
+                rawData = detailRows;
+                processedData = processData(detailRows);
                 
                 // Aggiorna la dashboard
                 updateDashboard();
                 updateProvinceSelector();
                 updateGeographicSection();
-                updateInfoBar();
+                updateInfoBar(period);
                 
                 lastUpdateTime = new Date();
                 console.log('Dashboard aggiornata con successo');
@@ -1100,27 +1101,44 @@
             }
         }
         
-        // Funzione per parsare il CSV
-        function parseCSV(csvText) {
-            const lines = csvText.split('\n').filter(line => line.trim());
-            if (lines.length < 2) return [];
-            
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-            console.log('Headers trovati:', headers);
-            
-            const data = [];
-            for (let i = 1; i < lines.length; i++) {
+        // Funzione per parsare il CSV con sezioni
+        function parseCSVSections(csvText) {
+            const lines = csvText.split('\n').map(l => l.trim()).filter(Boolean);
+
+            // Trova la sezione DETTAGLIO VENDITE
+            const startIdx = lines.findIndex(l => l.toUpperCase().includes('=== DETTAGLIO VENDITE PER CLIENTE ==='));
+            if (startIdx === -1) return { detailRows: [], period: null };
+
+            // Header subito sotto
+            const headerLine = lines[startIdx + 1];
+            const headers = headerLine.split(',').map(h => h.replace(/"/g,'').trim());
+
+            // Raccogli righe fino alla prossima sezione
+            let i = startIdx + 2;
+            const detailRows = [];
+            while (i < lines.length && !lines[i].startsWith('===')) {
                 const values = parseCSVLine(lines[i]);
                 if (values.length >= headers.length) {
                     const row = {};
-                    headers.forEach((header, index) => {
-                        row[header] = values[index] ? values[index].trim().replace(/"/g, '') : '';
-                    });
-                    data.push(row);
+                    headers.forEach((h, idx) => { row[h] = (values[idx] || '').replace(/"/g,'').trim(); });
+                    detailRows.push(row);
+                }
+                i++;
+            }
+
+            // Prova a leggere il periodo dalla sezione TOTALI
+            const totalsIdx = lines.findIndex(l => l.toUpperCase().includes('=== TOTALI ==='));
+            let period = null;
+            if (totalsIdx !== -1) {
+                for (let j = totalsIdx + 1; j < Math.min(lines.length, totalsIdx + 10); j++) {
+                    if (lines[j].startsWith('Periodo,')) {
+                        const parts = lines[j].split(',');
+                        period = parts.slice(1).join(',').trim(); // es. "01/01/2025 - 24/08/2025"
+                        break;
+                    }
                 }
             }
-            
-            return data;
+            return { detailRows, period };
         }
         
         // Funzione per parsare una riga CSV (gestisce virgole all'interno delle virgolette)
@@ -1147,127 +1165,51 @@
         }
         
         // Funzione per processare e aggregare i dati
-        function processData(data) {
-            console.log('=== DEBUG PROCESSAMENTO DATI ===');
-            console.log('Numero di righe da processare:', data.length);
-            
-            if (data.length > 0) {
-                console.log('Prima riga di esempio:', data[0]);
-                console.log('Colonne disponibili:', Object.keys(data[0]));
-            }
-            
+        function processData(rows) {
             const processed = {
                 totalFatturato: 0,
                 totalClienti: 0,
                 provinces: {},
                 products: {},
-                months: {},
                 clients: {}
             };
             
-            data.forEach((row, index) => {
-                if (index < 3) {
-                    console.log(`Riga ${index}:`, row);
-                }
-                
-                // Prova a identificare le colonne automaticamente
-                const columns = Object.keys(row);
-                let provincia = '';
-                let fatturato = 0;
-                let cliente = '';
-                let prodotto = '';
-                
-                // Cerca la colonna provincia
-                const provinciaCol = columns.find(col => 
-                    col.toLowerCase().includes('provincia') || 
-                    col.toLowerCase().includes('prov') ||
-                    col.toLowerCase().includes('region')
-                );
-                if (provinciaCol) provincia = row[provinciaCol];
-                
-                // Cerca la colonna fatturato
-                const fatturatoCol = columns.find(col => 
-                    col.toLowerCase().includes('fatturato') || 
-                    col.toLowerCase().includes('importo') ||
-                    col.toLowerCase().includes('valore') ||
-                    col.toLowerCase().includes('euro') ||
-                    col.toLowerCase().includes('€')
-                );
-                if (fatturatoCol) fatturato = parseFloatSafe(row[fatturatoCol]);
-                
-                // Cerca la colonna cliente
-                const clienteCol = columns.find(col => 
-                    col.toLowerCase().includes('cliente') || 
-                    col.toLowerCase().includes('ragione') ||
-                    col.toLowerCase().includes('ditta') ||
-                    col.toLowerCase().includes('nome')
-                );
-                if (clienteCol) cliente = row[clienteCol];
-                
-                // Cerca la colonna prodotto
-                const prodottoCol = columns.find(col => 
-                    col.toLowerCase().includes('prodotto') || 
-                    col.toLowerCase().includes('articolo') ||
-                    col.toLowerCase().includes('descrizione')
-                );
-                if (prodottoCol) prodotto = row[prodottoCol];
-                
-                if (index < 3) {
-                    console.log(`Riga ${index} - Provincia: ${provincia}, Fatturato: ${fatturato}, Cliente: ${cliente}, Prodotto: ${prodotto}`);
-                }
-                
-                // Totali generali
+            rows.forEach(r => {
+                const provincia = r['Provincia'] || '';
+                const cliente = r['Ragione Sociale Cliente'] || '';
+                const prodotto = r['Categoria ARTICOLI'] || '';
+                const fatturato = parseFloatSafe(r['Fatturato'] || '0');
+
                 processed.totalFatturato += fatturato;
-                
-                // Aggregazione per provincia
-                if (provincia && provincia.trim() !== '') {
+
+                if (provincia) {
                     if (!processed.provinces[provincia]) {
-                        processed.provinces[provincia] = {
-                            fatturato: 0,
-                            clienti: new Set(),
-                            prodotti: {}
-                        };
+                        processed.provinces[provincia] = { fatturato: 0, clienti: new Set(), prodotti: {} };
                     }
                     processed.provinces[provincia].fatturato += fatturato;
-                    if (cliente && cliente.trim() !== '') {
-                        processed.provinces[provincia].clienti.add(cliente.trim());
-                    }
+                    if (cliente) processed.provinces[provincia].clienti.add(cliente);
                 }
                 
-                // Aggregazione per prodotti
-                if (prodotto && prodotto.trim() !== '') {
-                    if (!processed.products[prodotto]) {
-                        processed.products[prodotto] = 0;
-                    }
-                    processed.products[prodotto] += fatturato;
+                if (prodotto) {
+                    processed.products[prodotto] = (processed.products[prodotto] || 0) + fatturato;
                 }
-                
-                // Aggregazione per clienti
-                if (cliente && cliente.trim() !== '') {
+
+                if (cliente) {
                     if (!processed.clients[cliente]) {
-                        processed.clients[cliente] = {
-                            fatturato: 0,
-                            provincia: provincia
-                        };
+                        processed.clients[cliente] = { fatturato: 0, provincia };
                     }
                     processed.clients[cliente].fatturato += fatturato;
                 }
             });
             
             // Converti Set in numeri per le province
-            Object.keys(processed.provinces).forEach(prov => {
-                processed.provinces[prov].clienti = processed.provinces[prov].clienti.size;
+            Object.keys(processed.provinces).forEach(p => {
+                processed.provinces[p].clienti = processed.provinces[p].clienti.size;
             });
             
             processed.totalClienti = Object.keys(processed.clients).length;
             
-            console.log('=== RISULTATO PROCESSAMENTO ===');
-            console.log('Fatturato totale:', processed.totalFatturato);
-            console.log('Clienti totali:', processed.totalClienti);
-            console.log('Province:', processed.provinces);
-            console.log('Prodotti:', processed.products);
-            console.log('================================');
-            
+            console.log('Dati processati:', processed);
             return processed;
         }
         
@@ -1473,9 +1415,10 @@
         }
         
         // Funzione per aggiornare la info bar
-        function updateInfoBar() {
-            // Periodo (assumiamo Gen-Ago 2025)
-            document.getElementById('period-info').textContent = 'Gen - Ago 2025 (8 mesi)';
+        function updateInfoBar(periodStr) {
+            // Periodo dal CSV o default
+            document.getElementById('period-info').textContent = 
+                periodStr ? `${periodStr}` : 'Gen - Ago 2025 (8 mesi)';
             
             // Status
             document.getElementById('update-status').textContent = 'Dati caricati dal CSV';
