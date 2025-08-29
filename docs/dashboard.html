@@ -607,21 +607,56 @@
                 </div>
             </div>
 
-            <!-- SEZIONE 5: RIPARTIZIONE FATTURATO -->
+            <!-- SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE - TOP 10 -->
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2>TOP 10 CLIENTI PER FATTURATO</h2>
+                    <div class="top-clients-controls">
+                        <select id="clientSortSelect" class="sort-select">
+                            <option value="fatturato">Ordina per Fatturato</option>
+                            <option value="alfabetico">Ordina Alfabetico</option>
+                            <option value="provincia">Ordina per Provincia</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="top-clients-container">
+                    <div class="clients-ranking-grid" id="topClientsGrid">
+                        <!-- TOP 10 clienti generati dinamicamente -->
+                    </div>
+                    <div class="clients-summary-panel">
+                        <div class="summary-stats" id="clientsSummary">
+                            <!-- Statistiche riassuntive -->
+                        </div>
+                        <div class="clients-chart-wrapper">
+                            <canvas id="clients-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEZIONE 5: RIPARTIZIONE FATTURATO MIGLIORATA -->
             <div class="chart-section">
                 <div class="section-header">
                     <h2>RIPARTIZIONE FATTURATO</h2>
-                    <div class="status-indicator">
-                        <span>●</span>
-                        <span>Aggiornato automaticamente</span>
+                    <div class="fatturato-controls">
+                        <div class="total-indicator">
+                            <span class="total-label">Totale</span>
+                            <span class="total-value" id="fatturatoTotale">€90k</span>
+                        </div>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <div class="chart-wrapper">
-                        <canvas id="fatturato-chart"></canvas>
+                <div class="fatturato-enhanced-container">
+                    <div class="fatturato-breakdown-cards" id="fatturatoBreakdown">
+                        <!-- Card breakdown generate dinamicamente -->
                     </div>
-                    <div class="chart-legend" id="chartLegend">
-                        <!-- Legend sarà generata dinamicamente -->
+                    <div class="fatturato-chart-section">
+                        <div class="chart-wrapper enhanced-chart">
+                            <canvas id="fatturato-chart"></canvas>
+                            <div class="chart-center-text" id="chartCenterText">
+                                <div class="center-total">€90k</div>
+                                <div class="center-label">Totale</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -637,6 +672,8 @@
         let selectedProvince = 'all';
         let fatturato_chart = null;
         let province_chart = null;
+        let clients_chart = null;
+        let currentClientSort = 'fatturato';
 
         function formatNumber(num) {
             return new Intl.NumberFormat('it-IT', {
@@ -1008,6 +1045,267 @@
             });
         }
 
+        function createTopClientsSection(allData) {
+            // Estrai dati vendite per cliente
+            const venditeData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+            console.log('Dati vendite clienti:', venditeData);
+            
+            if (venditeData.length === 0) {
+                document.getElementById('topClientsGrid').innerHTML = 
+                    '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato vendite disponibile</div>';
+                return;
+            }
+
+            // Aggrega per cliente
+            const clientiMap = new Map();
+            
+            venditeData.forEach(vendita => {
+                const clienteKey = vendita.Ragione_Sociale_Cliente;
+                if (!clientiMap.has(clienteKey)) {
+                    clientiMap.set(clienteKey, {
+                        nome: clienteKey,
+                        provincia: vendita.Provincia,
+                        fatturato: 0,
+                        categorie: new Set()
+                    });
+                }
+                
+                const cliente = clientiMap.get(clienteKey);
+                cliente.fatturato += parseFloat(vendita.Fatturato) || 0;
+                cliente.categorie.add(vendita.Categoria_Articoli);
+            });
+
+            // Converti in array e ordina
+            let clientiArray = Array.from(clientiMap.values());
+            sortClients(clientiArray);
+
+            // Prendi TOP 10
+            const top10 = clientiArray.slice(0, 10);
+            
+            renderTopClients(top10, clientiArray);
+            createClientsSummary(top10, clientiArray);
+            createClientsChart(top10);
+        }
+
+        function sortClients(clienti) {
+            switch(currentClientSort) {
+                case 'alfabetico':
+                    clienti.sort((a, b) => a.nome.localeCompare(b.nome));
+                    break;
+                case 'provincia':
+                    clienti.sort((a, b) => a.provincia.localeCompare(b.provincia) || b.fatturato - a.fatturato);
+                    break;
+                default: // fatturato
+                    clienti.sort((a, b) => b.fatturato - a.fatturato);
+            }
+        }
+
+        function renderTopClients(top10, tuttiClienti) {
+            const container = document.getElementById('topClientsGrid');
+            
+            let html = '';
+            top10.forEach((cliente, index) => {
+                const rankClass = index === 0 ? 'rank-1' : 
+                                index === 1 ? 'rank-2' : 
+                                index === 2 ? 'rank-3' : 'rank-other';
+                
+                const provinceName = cliente.provincia === 'LT' ? 'Latina' : 
+                                   cliente.provincia === 'RM' ? 'Roma' : cliente.provincia;
+
+                html += `
+                    <div class="client-ranking-item">
+                        <div class="ranking-position ${rankClass}">${index + 1}</div>
+                        <div class="client-info">
+                            <div class="client-name" title="${cliente.nome}">
+                                ${cliente.nome.length > 40 ? cliente.nome.substring(0, 37) + '...' : cliente.nome}
+                            </div>
+                            <div class="client-location">${provinceName} • ${cliente.categorie.size} categorie</div>
+                        </div>
+                        <div class="client-revenue">${formatCurrency(cliente.fatturato)}</div>
+                        <div class="client-details">
+                            ${((cliente.fatturato / tuttiClienti.reduce((sum, c) => sum + c.fatturato, 0)) * 100).toFixed(1)}%
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function createClientsSummary(top10, tuttiClienti) {
+            const totalFatturato = tuttiClienti.reduce((sum, c) => sum + c.fatturato, 0);
+            const top10Fatturato = top10.reduce((sum, c) => sum + c.fatturato, 0);
+            const avgTop10 = top10Fatturato / Math.min(10, top10.length);
+            const percentualeTop10 = (top10Fatturato / totalFatturato * 100).toFixed(1);
+
+            document.getElementById('clientsSummary').innerHTML = `
+                <div class="summary-title">Statistiche TOP 10</div>
+                <div class="summary-item">
+                    <span class="summary-label">Fatturato TOP 10</span>
+                    <span class="summary-value">${formatCurrency(top10Fatturato)}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">% sul totale</span>
+                    <span class="summary-value">${percentualeTop10}%</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Media TOP 10</span>
+                    <span class="summary-value">${formatCurrency(avgTop10)}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Clienti totali</span>
+                    <span class="summary-value">${tuttiClienti.length}</span>
+                </div>
+            `;
+        }
+
+        function createClientsChart(top10) {
+            if (clients_chart) {
+                clients_chart.destroy();
+            }
+
+            const ctx = document.getElementById('clients-chart').getContext('2d');
+            const top5 = top10.slice(0, 5);
+
+            clients_chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: top5.map(c => c.nome.length > 20 ? c.nome.substring(0, 17) + '...' : c.nome),
+                    datasets: [{
+                        data: top5.map(c => c.fatturato),
+                        backgroundColor: ['#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#c084fc'],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Montserrat',
+                                    size: 11
+                                },
+                                padding: 8,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${formatCurrency(context.parsed)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createEnhancedFatturatoChart(allData) {
+            // Cerca i dati di ripartizione
+            const ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
+            
+            let pieniCoppiValue = 54909.62; // fallback
+            let altroValue = 35250.17; // fallback
+            
+            ripartizioneData.forEach(item => {
+                if (item.Categoria_Prodotto === 'Pieni_e_Coppi') {
+                    pieniCoppiValue = parseFloat(item.Importo) || pieniCoppiValue;
+                } else if (item.Categoria_Prodotto === 'Altro') {
+                    altroValue = parseFloat(item.Importo) || altroValue;
+                }
+            });
+            
+            const total = pieniCoppiValue + altroValue;
+            const pieniCoppiPerc = (pieniCoppiValue / total * 100).toFixed(1);
+            const altroPerc = (altroValue / total * 100).toFixed(1);
+
+            // Aggiorna indicatore totale
+            document.getElementById('fatturatoTotale').textContent = formatCurrency(total);
+            document.getElementById('chartCenterText').innerHTML = `
+                <div class="center-total">${formatCurrency(total)}</div>
+                <div class="center-label">Totale</div>
+            `;
+
+            // Crea breakdown cards
+            document.getElementById('fatturatoBreakdown').innerHTML = `
+                <div class="breakdown-card pieni-coppi">
+                    <div class="breakdown-header">
+                        <div class="breakdown-title">Pieni e Coppi</div>
+                        <div class="breakdown-percentage">${pieniCoppiPerc}%</div>
+                    </div>
+                    <div class="breakdown-amount">${formatCurrency(pieniCoppiValue)}</div>
+                    <div class="breakdown-details">Categoria principale di vendita</div>
+                </div>
+                <div class="breakdown-card altro">
+                    <div class="breakdown-header">
+                        <div class="breakdown-title">Altri Prodotti</div>
+                        <div class="breakdown-percentage" style="color: #6366f1">${altroPerc}%</div>
+                    </div>
+                    <div class="breakdown-amount">${formatCurrency(altroValue)}</div>
+                    <div class="breakdown-details">Prodotti diversificati</div>
+                </div>
+            `;
+
+            // Distruggi e ricrea chart
+            if (fatturato_chart) {
+                fatturato_chart.destroy();
+            }
+
+            const ctx = document.getElementById('fatturato-chart').getContext('2d');
+            fatturato_chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pieni e Coppi', 'Altri Prodotti'],
+                    datasets: [{
+                        data: [pieniCoppiValue, altroValue],
+                        backgroundColor: ['#3b82f6', '#6366f1'],
+                        hoverBackgroundColor: ['#2563eb', '#4f46e5'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverBorderWidth: 5,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#64748b',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 1200,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
         function createProvinceCards(allData) {
             // Cerca i dati delle province dal CSV
             const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
@@ -1212,16 +1510,22 @@
                 currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
                 console.log('Dati obiettivi filtrati:', currentData);
                 
+                // Cache per evitare re-fetch
+                window.allDataCache = allData;
+                
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
                 updateDashboard();
                 
-                // Crea le sezioni province e grafico
+                // Crea tutte le sezioni
                 const chartData = createProvinceCards(allData);
                 createProvinceChart(chartData);
                 
-                // Crea il grafico della ripartizione fatturato con tutti i dati
-                createFatturatoChart(allData);
+                // Crea TOP 10 clienti
+                createTopClientsSection(allData);
+                
+                // Crea il grafico della ripartizione fatturato migliorato
+                createEnhancedFatturatoChart(allData);
                 
             } catch (error) {
                 console.error('Errore nel caricamento dei dati:', error);
@@ -1239,6 +1543,15 @@
             selectedProvince = e.target.value;
             updateDashboard();
             // Il grafico della ripartizione fatturato rimane sempre uguale indipendentemente dalla provincia
+        });
+
+        document.getElementById('clientSortSelect').addEventListener('change', (e) => {
+            currentClientSort = e.target.value;
+            // Ricarica la sezione clienti con nuovo ordinamento
+            const allDataCached = window.allDataCache; // Salviamo i dati per evitare re-fetch
+            if (allDataCached) {
+                createTopClientsSection(allDataCached);
+            }
         });
 
         // Inizializzazione
