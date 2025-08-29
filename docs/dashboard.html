@@ -1088,34 +1088,40 @@
                 return [];
             }
 
-            let html = '';
+            let html = `
+                <div class="leaderboard">
+                    <div class="leaderboard-header">
+                        <div class="leaderboard-title">Classifica Clienti</div>
+                        <div class="leaderboard-count">${top10.length} clienti</div>
+                    </div>
+            `;
             
             top10.forEach((client, index) => {
                 const rank = index + 1;
-                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
                 const rankClass = rank <= 3 ? `rank-${rank}` : '';
-                const displayValue = sortBy === 'revenue' ? formatCurrency(client.totalRevenue) : `${client.orders} ordini`;
+                const positionClass = rank <= 3 ? 'top3' : '';
+                const displayValue = sortBy === 'revenue' ? formatCurrency(client.totalRevenue) : client.orders;
+                const secondaryValue = sortBy === 'revenue' ? `${client.orders} ordini` : formatCurrency(client.totalRevenue);
                 
                 html += `
                     <div class="client-rank-card ${rankClass}">
-                        <div class="rank-header">
-                            <div class="rank-position">
-                                <span class="rank-medal">${medal}</span>
-                                <span class="rank-number">${rank}</span>
+                        <div class="rank-position ${positionClass}">${rank}</div>
+                        <div class="client-info">
+                            <div class="client-name">${client.name}</div>
+                            <div class="client-meta">
+                                <span>${client.province === 'LT' ? 'Latina' : client.province === 'RM' ? 'Roma' : client.province}</span>
+                                <span>${client.categories.size} categorie</span>
                             </div>
                         </div>
-                        <div class="client-name">${client.name}</div>
-                        <div class="client-stats">
+                        <div class="client-value">
                             <div class="client-revenue">${displayValue}</div>
-                            <div class="client-details">
-                                <div class="client-province">${client.province === 'LT' ? 'Latina' : client.province === 'RM' ? 'Roma' : client.province}</div>
-                                <div class="client-orders">${client.orders} ordini • ${client.categories.size} categorie</div>
-                            </div>
+                            <div class="client-secondary">${secondaryValue}</div>
                         </div>
                     </div>
                 `;
             });
 
+            html += '</div>';
             container.innerHTML = html;
             return top10;
         }
@@ -1130,74 +1136,52 @@
 
             const ctx = document.getElementById('clients-chart').getContext('2d');
             const chartData = sortBy === 'revenue' ? 
-                clientsData.map(c => c.totalRevenue) : 
-                clientsData.map(c => c.orders);
+                clientsData.slice(0, 5).map(c => c.totalRevenue) : 
+                clientsData.slice(0, 5).map(c => c.orders);
             
-            const maxValue = Math.max(...chartData);
-            const colors = clientsData.map((_, index) => {
-                if (index === 0) return '#f59e0b'; // Oro per il primo
-                if (index === 1) return '#9ca3af'; // Argento per il secondo  
-                if (index === 2) return '#f87171'; // Bronzo per il terzo
-                return '#3b82f6'; // Blu per gli altri
-            });
+            const topColors = ['#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#c084fc'];
 
             clients_chart = new Chart(ctx, {
-                type: 'horizontalBar',
+                type: 'doughnut',
                 data: {
-                    labels: clientsData.map(c => c.name.length > 20 ? c.name.substring(0, 20) + '...' : c.name),
+                    labels: clientsData.slice(0, 5).map(c => c.name.length > 15 ? c.name.substring(0, 15) + '...' : c.name),
                     datasets: [{
-                        label: sortBy === 'revenue' ? 'Fatturato' : 'Ordini',
                         data: chartData,
-                        backgroundColor: colors,
-                        borderColor: colors,
+                        backgroundColor: topColors,
+                        borderColor: '#ffffff',
                         borderWidth: 2,
-                        borderRadius: 6,
+                        hoverOffset: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            max: maxValue * 1.1,
-                            ticks: {
-                                color: '#64748b',
-                                font: { family: 'Montserrat', size: 11 },
-                                callback: function(value) {
-                                    return sortBy === 'revenue' ? formatCurrency(value) : value;
-                                }
-                            },
-                            grid: { color: '#f1f5f9' }
-                        },
-                        y: {
-                            ticks: {
-                                color: '#64748b',
-                                font: { family: 'Montserrat', size: 10, weight: '500' }
-                            },
-                            grid: { display: false }
-                        }
-                    },
+                    cutout: '60%',
                     plugins: {
-                        legend: { display: false },
+                        legend: {
+                            display: false
+                        },
                         tooltip: {
                             backgroundColor: '#1e293b',
                             titleColor: '#ffffff',
                             bodyColor: '#ffffff',
+                            borderColor: '#64748b',
+                            borderWidth: 1,
+                            cornerRadius: 8,
                             callbacks: {
                                 label: function(context) {
                                     const client = clientsData[context.dataIndex];
+                                    const percentage = ((context.parsed / chartData.reduce((a,b) => a+b, 0)) * 100).toFixed(1);
                                     return [
-                                        `Fatturato: ${formatCurrency(client.totalRevenue)}`,
-                                        `Ordini: ${client.orders}`,
-                                        `Categorie: ${client.categories.size}`
+                                        `${client.name}`,
+                                        `${sortBy === 'revenue' ? formatCurrency(client.totalRevenue) : client.orders + ' ordini'}`,
+                                        `${percentage}% del totale`
                                     ];
                                 }
                             }
                         }
                     },
-                    animation: { duration: 1000, easing: 'easeInOutQuart' }
+                    animation: { duration: 800, easing: 'easeInOutQuart' }
                 }
             });
 
@@ -1212,21 +1196,29 @@
             
             const summaryContainer = document.getElementById('clientSummary');
             summaryContainer.innerHTML = `
-                <div class="summary-card">
-                    <div class="summary-value">${formatCurrency(totalRevenue)}</div>
-                    <div class="summary-label">Fatturato Top 10</div>
+                <div class="chart-header">
+                    <div class="chart-title">Top 5 Overview</div>
+                    <div class="chart-subtitle">${sortBy === 'revenue' ? 'Per fatturato' : 'Per volume ordini'}</div>
                 </div>
-                <div class="summary-card">
-                    <div class="summary-value">${totalOrders}</div>
-                    <div class="summary-label">Ordini Totali</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-value">${formatCurrency(avgOrderValue)}</div>
-                    <div class="summary-label">Valore Medio Ordine</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-value">${clientsData.length}</div>
-                    <div class="summary-label">Clienti in Classifica</div>
+                <div class="chart-summary">
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-value">${formatCurrency(totalRevenue)}</div>
+                            <div class="summary-label">Fatturato Totale</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">${totalOrders}</div>
+                            <div class="summary-label">Ordini Totali</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">${formatCurrency(avgOrderValue)}</div>
+                            <div class="summary-label">Valore Medio</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">${clientsData.length}</div>
+                            <div class="summary-label">Clienti Attivi</div>
+                        </div>
+                    </div>
                 </div>
             `;
         }
