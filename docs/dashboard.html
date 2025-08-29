@@ -120,8 +120,20 @@
         /* Cards Grid */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
+        }
+        
+        @media (max-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .metric-card {
@@ -513,6 +525,203 @@
             `;
         }
 
+        function createRitmoVenditeCard(data) {
+            const current = data.Anno_Corrente;
+            const mesiTrascorsi = 8; // Gen-Ago
+            const ritmoMensile = current / mesiTrascorsi;
+            const proiezioneAnnuale = ritmoMensile * 12;
+            const obiettivo = data.Obiettivo || current * 1.2;
+            const raggiungeraObiettivo = proiezioneAnnuale >= obiettivo;
+
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Ritmo di Vendita</div>
+                        <div class="achievement-badge">
+                            <span>${formatCompactCurrency(ritmoMensile)}/mese</span>
+                        </div>
+                    </div>
+                    <div class="main-value">${formatCompactCurrency(proiezioneAnnuale)}</div>
+                    <div class="vs-previous">proiezione fine anno</div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <div class="progress-title">Trend Obiettivo</div>
+                            <div class="progress-percentage" style="color: ${raggiungeraObiettivo ? '#10b981' : '#ef4444'};">
+                                ${raggiungeraObiettivo ? '✓' : '⚠'} ${((proiezioneAnnuale / obiettivo) * 100).toFixed(0)}%
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${raggiungeraObiettivo ? 'green' : 'blue'}" style="width: ${Math.min((proiezioneAnnuale / obiettivo) * 100, 100)}%"></div>
+                        </div>
+                        <div class="progress-details">
+                            <span class="progress-label">vs obiettivo annuale</span>
+                            <span class="progress-value">${formatCompactCurrency(obiettivo)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createCrescitaCard(data) {
+            const current = data.Anno_Corrente;
+            const previous = data.Anno_Precedente;
+            const { change, percentage } = calculateChange(current, previous);
+            const isPositive = change >= 0;
+            
+            // Calcola crescita media mensile
+            const crescitaMensile = change / 8; // 8 mesi
+            const tendenza = percentage > 15 ? 'Eccellente' : percentage > 5 ? 'Buona' : percentage > 0 ? 'Moderata' : 'Negativa';
+
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Crescita vs 2024</div>
+                        <div class="trend-indicator ${isPositive ? 'trend-positive' : 'trend-negative'}">
+                            ${isPositive ? '↗' : '↘'} ${tendenza}
+                        </div>
+                    </div>
+                    <div class="main-value">${isPositive ? '+' : ''}${formatCompactCurrency(change)}</div>
+                    <div class="vs-previous">${isPositive ? '+' : ''}${percentage.toFixed(1)}% in 8 mesi</div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <div class="progress-title">Crescita Mensile Media</div>
+                            <div class="progress-percentage" style="color: #3b82f6;">
+                                ${formatCompactCurrency(crescitaMensile)}/mese
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createEfficienzaCard(data) {
+            const fatturato = data.Anno_Corrente;
+            const clienti = data.Clienti_Anno_Corrente || 1;
+            const fatturatoMedioCliente = fatturato / clienti;
+            const clientiPrecedenti = data.Clienti_Anno_Precedente || clienti;
+            const variazioneFatturatoCliente = clienti > 0 ? ((fatturatoMedioCliente - (data.Anno_Precedente / clientiPrecedenti)) / (data.Anno_Precedente / clientiPrecedenti)) * 100 : 0;
+
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Efficienza Vendite</div>
+                        <div class="trend-indicator ${variazioneFatturatoCliente >= 0 ? 'trend-positive' : 'trend-negative'}">
+                            ${variazioneFatturatoCliente >= 0 ? '+' : ''}${variazioneFatturatoCliente.toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="main-value">${formatCompactCurrency(fatturatoMedioCliente)}</div>
+                    <div class="vs-previous">fatturato medio per cliente</div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <div class="progress-title">Performance Cliente</div>
+                            <div class="progress-percentage" style="color: #10b981;">
+                                ${clienti} clienti attivi
+                            </div>
+                        </div>
+                        <div class="progress-details">
+                            <span class="progress-label">vs anno precedente</span>
+                            <span class="progress-value">${clientiPrecedenti} clienti</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createPrestazioniCard(data) {
+            const current = data.Anno_Corrente;
+            const obiettivo = data.Obiettivo;
+            const percentualeObiettivo = obiettivo > 0 ? (current / obiettivo) * 100 : 0;
+            
+            let valutazione = 'In corso';
+            let colore = '#3b82f6';
+            
+            if (percentualeObiettivo >= 80) {
+                valutazione = 'Eccellente';
+                colore = '#10b981';
+            } else if (percentualeObiettivo >= 60) {
+                valutazione = 'Buona';
+                colore = '#f59e0b';
+            } else if (percentualeObiettivo >= 40) {
+                valutazione = 'Sufficiente';
+                colore = '#ef4444';
+            }
+
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Prestazioni 2025</div>
+                        <div class="achievement-badge" style="background: ${colore}20; color: ${colore};">
+                            ${valutazione}
+                        </div>
+                    </div>
+                    <div class="main-value">${percentualeObiettivo.toFixed(0)}%</div>
+                    <div class="vs-previous">completamento obiettivo</div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <div class="progress-title">Target Annuale</div>
+                            <div class="progress-percentage" style="color: ${colore};">
+                                ${obiettivo > 0 ? formatCompactCurrency(obiettivo) : 'Non definito'}
+                            </div>
+                        </div>
+                        ${obiettivo > 0 ? `
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="background: ${colore}; width: ${Math.min(percentualeObiettivo, 100)}%"></div>
+                            </div>
+                            <div class="progress-details">
+                                <span class="progress-label">Raggiunti: ${formatCompactCurrency(current)}</span>
+                                <span class="progress-value">Mancano: ${formatCompactCurrency(Math.max(0, obiettivo - current))}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function createTendenzaCard(data) {
+            const current = data.Anno_Corrente;
+            const previous = data.Anno_Precedente;
+            const { change, percentage } = calculateChange(current, previous);
+            
+            // Calcola la tendenza futura basata sui dati attuali
+            const mesiRimanenti = 4; // Set-Dic
+            const mesiTrascorsi = 8; // Gen-Ago
+            const crescitaMensile = change / mesiTrascorsi;
+            const crescitaPrevista = crescitaMensile * mesiRimanenti;
+            const previsione = current + crescitaPrevista;
+            
+            const tendenzaPositiva = crescitaPrevista > 0;
+
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Tendenza Fine Anno</div>
+                        <div class="trend-indicator ${tendenzaPositiva ? 'trend-positive' : 'trend-negative'}">
+                            ${tendenzaPositiva ? '📈' : '📉'} Previsione
+                        </div>
+                    </div>
+                    <div class="main-value">${formatCompactCurrency(previsione)}</div>
+                    <div class="vs-previous">stima dicembre 2025</div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <div class="progress-title">Crescita Attesa</div>
+                            <div class="progress-percentage" style="color: ${tendenzaPositiva ? '#10b981' : '#ef4444'};">
+                                ${tendenzaPositiva ? '+' : ''}${formatCompactCurrency(crescitaPrevista)}
+                            </div>
+                        </div>
+                        <div class="progress-details">
+                            <span class="progress-label">Ultimi 4 mesi</span>
+                            <span class="progress-value">Set-Dic 2025</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function updateDashboard() {
             const filteredData = filterData(selectedProvince);
             const container = document.getElementById('metricsCards');
@@ -520,19 +729,14 @@
             let cardsHtml = '';
             
             filteredData.forEach(data => {
-                // Card Fatturato
-                cardsHtml += createFatturatoCard(data);
-                
-                // Card Obiettivo (solo se esiste)
-                cardsHtml += createObiettivoCard(data);
-                
-                // Card Performance (solo per province specifiche, non generale)
-                if (data.Provincia !== 'Generale') {
-                    cardsHtml += createPerformanceCard(data);
-                }
-                
-                // Card Clienti
-                cardsHtml += createClientsCard(data);
+                // 6 Card uniche con metriche diverse
+                cardsHtml += createFatturatoCard(data);          // 1. Fatturato principale
+                cardsHtml += createObiettivoCard(data);          // 2. Obiettivo con progress
+                cardsHtml += createRitmoVenditeCard(data);       // 3. Ritmo vendite e proiezioni
+                cardsHtml += createCrescitaCard(data);           // 4. Crescita vs anno precedente
+                cardsHtml += createEfficienzaCard(data);         // 5. Efficienza per cliente
+                cardsHtml += createPrestazioniCard(data);        // 6. Valutazione prestazioni
+                // cardsHtml += createTendenzaCard(data);           // Extra: Tendenza futura
             });
             
             container.innerHTML = cardsHtml;
