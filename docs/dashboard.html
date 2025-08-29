@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Agente CARABOT NATALINO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,226 +14,275 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f8fafc;
             min-height: 100vh;
-            padding: 20px;
+            color: #1e293b;
         }
 
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+            padding: 40px 24px;
         }
 
+        /* Header Section */
         .header {
-            text-align: center;
             margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e0e6ed;
         }
 
-        .header h1 {
-            color: #2c3e50;
+        .agent-name {
             font-size: 2.5rem;
             font-weight: 700;
-            margin-bottom: 10px;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
         }
 
-        .header .agent-info {
-            color: #7f8c8d;
-            font-size: 1.1rem;
-            font-weight: 400;
+        .dashboard-title {
+            color: #64748b;
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin-bottom: 24px;
         }
 
-        .controls {
+        .agent-info {
             display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #475569;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .info-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        /* Controls */
+        .controls {
+            margin-bottom: 32px;
+        }
+
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .province-selector {
             position: relative;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
-            overflow: hidden;
         }
 
         .province-selector select {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 15px 50px 15px 20px;
+            background: #3b82f6;
+            color: white;
             border: none;
-            background: transparent;
-            color: #2c3e50;
+            border-radius: 8px;
+            padding: 10px 40px 10px 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
             cursor: pointer;
-            min-width: 200px;
             outline: none;
+            appearance: none;
+            min-width: 180px;
         }
 
-        .cards-container {
+        .province-selector::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 0.75rem;
+            pointer-events: none;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
         }
 
         .metric-card {
             background: white;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
         }
 
         .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
         }
 
+        /* Card Headers */
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 20px;
         }
 
         .card-title {
-            font-size: 1.1rem;
+            font-size: 0.875rem;
             font-weight: 600;
-            color: #34495e;
+            color: #6b7280;
         }
 
         .trend-indicator {
             display: flex;
             align-items: center;
-            font-size: 0.9rem;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
             font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 20px;
         }
 
         .trend-positive {
-            background: rgba(46, 204, 113, 0.1);
-            color: #27ae60;
+            background: #ecfdf5;
+            color: #10b981;
         }
 
         .trend-negative {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
+            background: #fef2f2;
+            color: #ef4444;
         }
 
+        /* Main Value */
         .main-value {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: #2c3e50;
+            color: #0f172a;
             margin-bottom: 8px;
+            line-height: 1;
         }
 
-        .comparison {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .vs-previous {
+            color: #6b7280;
+            font-size: 0.875rem;
             margin-bottom: 20px;
         }
 
-        .prev-year {
-            color: #7f8c8d;
-            font-size: 1rem;
-        }
-
-        .change-value {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .objective-section {
-            background: #f8f9fa;
+        /* Progress Sections */
+        .progress-section {
+            background: #f8fafc;
             border-radius: 12px;
-            padding: 20px;
-            margin-top: 15px;
+            padding: 16px;
+            margin-top: 16px;
         }
 
-        .objective-header {
+        .progress-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
-        .objective-title {
-            font-size: 1rem;
+        .progress-title {
+            font-size: 0.875rem;
             font-weight: 600;
-            color: #495057;
+            color: #374151;
         }
 
-        .objective-percentage {
-            font-size: 1.2rem;
+        .progress-percentage {
+            font-size: 0.875rem;
             font-weight: 700;
-            color: #667eea;
         }
 
         .progress-bar {
-            background: #e9ecef;
-            border-radius: 25px;
-            height: 12px;
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 4px;
             overflow: hidden;
-            position: relative;
+            margin-bottom: 12px;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 25px;
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
+            border-radius: 4px;
+            transition: width 0.8s ease;
         }
 
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
+        .progress-fill.green {
+            background: #10b981;
         }
 
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .progress-fill.blue {
+            background: #3b82f6;
         }
 
-        .objective-details {
+        .progress-details {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #6c757d;
+            align-items: center;
+        }
+
+        .progress-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .progress-value {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* Special card styles */
+        .performance-card .main-value {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .province-label {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .clients-card .main-value {
+            color: #0f172a;
+        }
+
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
         .loading {
             text-align: center;
-            color: #667eea;
+            color: #3b82f6;
             font-size: 1.2rem;
             font-weight: 600;
             padding: 40px;
@@ -241,15 +290,20 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 20px;
-                margin: 10px;
+                padding: 24px 16px;
             }
             
-            .header h1 {
+            .agent-name {
                 font-size: 2rem;
             }
             
-            .cards-container {
+            .agent-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .cards-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -257,42 +311,60 @@
 </head>
 <body>
     <div class="dashboard-container">
+        <!-- Header -->
         <div class="header">
-            <h1>Dashboard Performance</h1>
+            <h1 class="agent-name" id="agentName">CARABOT NATALINO</h1>
+            <p class="dashboard-title">Dashboard Performance Vendite</p>
             <div class="agent-info">
-                <span id="agentCode">631.00238</span> - <span id="agentName">CARABOT NATALINO</span><br>
-                Periodo: <span id="period">01/01/2025 - 24/08/2025</span>
+                <div class="info-item">
+                    <span>ID:</span>
+                    <span id="agentCode">631.00238</span>
+                </div>
+                <div class="info-item">
+                    <span>📅</span>
+                    <span id="period">Gen - Ago 2025 (8 mesi)</span>
+                </div>
+                <div class="info-item">
+                    <div class="info-dot"></div>
+                    <span>Dati aggiornati dal file HTML</span>
+                </div>
             </div>
         </div>
 
+        <!-- Controls -->
         <div class="controls">
-            <div class="province-selector">
-                <select id="provinceSelect">
-                    <option value="all">🌍 Tutte le Province</option>
-                    <option value="generale">📊 Riepilogo Generale</option>
-                    <option value="LT">🏛️ Latina (LT)</option>
-                    <option value="RM">🏛️ Roma (RM)</option>
-                </select>
+            <div class="filter-section">
+                <span class="filter-label">FILTRO TERRITORIO</span>
+                <div class="province-selector">
+                    <select id="provinceSelect">
+                        <option value="all">Tutte le Province</option>
+                        <option value="generale">Riepilogo Generale</option>
+                        <option value="LT">Provincia Latina</option>
+                        <option value="RM">Provincia Roma</option>
+                    </select>
+                </div>
             </div>
         </div>
 
+        <!-- Loading -->
         <div id="loadingMessage" class="loading">
             Caricamento dati in corso...
         </div>
 
+        <!-- Dashboard Content -->
         <div id="dashboardContent" style="display: none;">
-            <div class="cards-container" id="metricsCards">
-                <!-- Le card verranno generate dinamicamente -->
+            <div class="cards-grid" id="metricsCards">
+                <!-- Cards generate dinamically -->
             </div>
         </div>
     </div>
 
     <script>
-        // URL del CSV su GitHub (corretto)
+        // URL del CSV su GitHub
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
         
         let currentData = [];
-        let agentInfo = {}
+        let agentInfo = {};
         let selectedProvince = 'all';
 
         function formatNumber(num) {
@@ -306,8 +378,17 @@
         function formatCurrency(num) {
             return new Intl.NumberFormat('it-IT', {
                 style: 'currency',
-                currency: 'EUR'
+                currency: 'EUR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
             }).format(num);
+        }
+
+        function formatCompactCurrency(num) {
+            if (num >= 1000) {
+                return '€' + Math.round(num / 1000) + 'k';
+            }
+            return formatCurrency(num);
         }
 
         function calculateChange(current, previous) {
@@ -316,72 +397,145 @@
             return { change, percentage };
         }
 
-        function createMetricCard(data) {
+        function createFatturatoCard(data) {
             const current = data.Anno_Corrente;
             const previous = data.Anno_Precedente;
             const { change, percentage } = calculateChange(current, previous);
             const isPositive = change >= 0;
-            const trendClass = isPositive ? 'trend-positive' : 'trend-negative';
-            const trendIcon = isPositive ? '📈' : '📉';
-            
-            const hasObjective = data.Obiettivo && data.Obiettivo > 0;
-            const progressWidth = hasObjective ? Math.min((current / data.Obiettivo) * 100, 100) : 0;
-            const remaining = hasObjective ? data.Obiettivo - current : 0;
-            const objectivePercentage = hasObjective ? (current / data.Obiettivo) * 100 : 0;
 
             return `
                 <div class="metric-card">
                     <div class="card-header">
-                        <div class="card-title">
-                            ${data.Provincia === 'Generale' ? '🌍 Totale Generale' : 
-                              data.Provincia === 'LT' ? '🏛️ Provincia di Latina' : 
-                              data.Provincia === 'RM' ? '🏛️ Provincia di Roma' : 
-                              `📍 ${data.Provincia}`}
-                        </div>
-                        <div class="trend-indicator ${trendClass}">
-                            ${trendIcon} ${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%
+                        <div class="card-title">Fatturato 2025</div>
+                        <div class="trend-indicator ${isPositive ? 'trend-positive' : 'trend-negative'}">
+                            <span>${isPositive ? '↗' : '↘'}</span>
+                            ${isPositive ? '+' : ''}${percentage.toFixed(1)}%
                         </div>
                     </div>
-
-                    <div class="main-value">${formatCurrency(current)}</div>
+                    <div class="main-value">${formatCompactCurrency(current)}</div>
+                    <div class="vs-previous">vs 2024: ${formatCompactCurrency(previous)}</div>
                     
-                    <div class="comparison">
-                        <div class="prev-year">
-                            Anno precedente: ${formatCurrency(previous)}
-                        </div>
-                        <div class="change-value ${isPositive ? 'trend-positive' : 'trend-negative'}">
-                            ${isPositive ? '+' : ''}${formatCurrency(change)}
-                        </div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; color: #6c757d; font-size: 0.95rem; margin-bottom: 15px;">
-                        <span>👥 Clienti: ${data.Clienti_Anno_Corrente || 0}</span>
-                        <span>📅 Anno corrente</span>
-                    </div>
-
-                    ${hasObjective ? `
-                        <div class="objective-section">
-                            <div class="objective-header">
-                                <div class="objective-title">🎯 Obiettivo ${new Date().getFullYear()}</div>
-                                <div class="objective-percentage">${objectivePercentage.toFixed(1)}%</div>
+                    ${data.Obiettivo && data.Obiettivo > 0 ? `
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <div class="progress-title">Obiettivo Fatturato</div>
+                                <div class="progress-percentage" style="color: #10b981;">${formatCompactCurrency(data.Obiettivo)}</div>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progressWidth}%"></div>
+                                <div class="progress-fill green" style="width: ${Math.min((current / data.Obiettivo) * 100, 100)}%"></div>
                             </div>
-                            <div class="objective-details">
-                                <span>Target: ${formatCurrency(data.Obiettivo)}</span>
-                                <span style="color: ${remaining > 0 ? '#e74c3c' : '#27ae60'};">
-                                    ${remaining > 0 ? 'Mancano: ' + formatCurrency(remaining) : 'Obiettivo raggiunto! 🎉'}
-                                </span>
+                            <div class="progress-details">
+                                <span class="progress-label">Mancano: ${formatCompactCurrency(Math.max(0, data.Obiettivo - current))}</span>
+                                <span class="progress-value">${((current / data.Obiettivo) * 100).toFixed(0)}%</span>
                             </div>
                         </div>
-                    ` : `
-                        <div class="objective-section">
-                            <div class="objective-title">ℹ️ Nessun obiettivo definito</div>
-                        </div>
-                    `}
+                    ` : ''}
                 </div>
             `;
+        }
+
+        function createObiettivoCard(data) {
+            if (!data.Obiettivo || data.Obiettivo <= 0) return '';
+            
+            const current = data.Anno_Corrente;
+            const target = data.Obiettivo;
+            const percentage = (current / target) * 100;
+            const remaining = Math.max(0, target - current);
+
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Obiettivo 2025</div>
+                        <div class="achievement-badge">
+                            <span>${percentage.toFixed(0)}%</span>
+                        </div>
+                    </div>
+                    <div class="main-value">${formatCompactCurrency(target)}</div>
+                    <div class="vs-previous">Da raggiungere: ${formatCompactCurrency(remaining)}</div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <div class="progress-title">Progressione Obiettivo</div>
+                            <div class="progress-percentage" style="color: #3b82f6;">${formatCompactCurrency(target)}</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill blue" style="width: ${Math.min(percentage, 100)}%"></div>
+                        </div>
+                        <div class="progress-details">
+                            <span class="progress-label">Mancano: ${formatCompactCurrency(remaining)}</span>
+                            <span class="progress-value">${percentage.toFixed(0)}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createPerformanceCard(data) {
+            const current = data.Anno_Corrente;
+            const previous = data.Anno_Precedente;
+            const { change, percentage } = calculateChange(current, previous);
+            const isPositive = change >= 0;
+
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Top Performance</div>
+                        <div class="trend-indicator ${isPositive ? 'trend-positive' : 'trend-negative'}">
+                            ${isPositive ? '+' : ''}${percentage.toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="main-value">
+                        ${data.Provincia}
+                        <span class="province-label">Provincia ${data.Provincia === 'LT' ? 'Latina' : data.Provincia === 'RM' ? 'Roma' : data.Provincia}</span>
+                    </div>
+                    <div class="vs-previous">crescita totale ${formatCompactCurrency(current)}</div>
+                </div>
+            `;
+        }
+
+        function createClientsCard(data) {
+            const clientsCurrent = data.Clienti_Anno_Corrente || 0;
+            const clientsPrevious = data.Clienti_Anno_Precedente || 0;
+            const clientsChange = clientsCurrent - clientsPrevious;
+            const clientsPercentage = clientsPrevious > 0 ? ((clientsChange / clientsPrevious) * 100) : 0;
+
+            return `
+                <div class="metric-card clients-card">
+                    <div class="card-header">
+                        <div class="card-title">Clienti Attivi</div>
+                        <div class="achievement-badge">
+                            ${clientsPercentage > 0 ? Math.round(clientsPercentage) + '% raggiunto' : 'stabile'}
+                        </div>
+                    </div>
+                    <div class="main-value">${clientsCurrent}</div>
+                    <div class="vs-previous">vs anno precedente: ${clientsPrevious}</div>
+                </div>
+            `;
+        }
+
+        function updateDashboard() {
+            const filteredData = filterData(selectedProvince);
+            const container = document.getElementById('metricsCards');
+            
+            let cardsHtml = '';
+            
+            filteredData.forEach(data => {
+                // Card Fatturato
+                cardsHtml += createFatturatoCard(data);
+                
+                // Card Obiettivo (solo se esiste)
+                cardsHtml += createObiettivoCard(data);
+                
+                // Card Performance (solo per province specifiche, non generale)
+                if (data.Provincia !== 'Generale') {
+                    cardsHtml += createPerformanceCard(data);
+                }
+                
+                // Card Clienti
+                cardsHtml += createClientsCard(data);
+            });
+            
+            container.innerHTML = cardsHtml;
         }
 
         function filterData(province) {
@@ -392,13 +546,6 @@
             } else {
                 return currentData.filter(item => item.Provincia === province);
             }
-        }
-
-        function updateDashboard() {
-            const filteredData = filterData(selectedProvince);
-            const container = document.getElementById('metricsCards');
-            
-            container.innerHTML = filteredData.map(data => createMetricCard(data)).join('');
         }
 
         // Funzione per parsificare il CSV personalizzato
@@ -457,7 +604,7 @@
                 }
                 
                 const csvText = await response.text();
-                console.log('CSV caricato, prime 300 caratteri:', csvText.substring(0, 300));
+                console.log('CSV caricato');
                 
                 const allData = parseCSV(csvText);
                 console.log('Dati parsificati:', allData);
@@ -492,7 +639,7 @@
                 // Aggiorna header
                 document.getElementById('agentCode').textContent = agentInfo.codice;
                 document.getElementById('agentName').textContent = agentInfo.nome;
-                document.getElementById('period').textContent = `${agentInfo.periodo_da} - ${agentInfo.periodo_a}`;
+                document.getElementById('period').textContent = `Gen - Ago 2025 (8 mesi)`;
                 
                 // Filtra solo i record OBIETTIVI per la sezione 1
                 currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
@@ -505,10 +652,9 @@
             } catch (error) {
                 console.error('Errore nel caricamento dei dati:', error);
                 document.getElementById('loadingMessage').innerHTML = `
-                    <div style="color: #e74c3c;">
+                    <div style="color: #ef4444;">
                         ❌ Errore nel caricamento dei dati<br>
-                        <small>${error.message}</small><br>
-                        <small>URL: ${CSV_URL}</small>
+                        <small>${error.message}</small>
                     </div>
                 `;
             }
