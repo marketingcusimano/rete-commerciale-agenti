@@ -595,24 +595,28 @@
         }
 
         .category-card {
+            background: white;
             border-radius: 12px;
             padding: 20px;
             border: 1px solid var(--category-color);
-            background: color-mix(in srgb, var(--category-color) 50%, transparent);
             transition: all 0.2s ease;
             position: relative;
+            overflow: hidden;
         }
 
         .category-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-width: 2px;
             transform: translateY(-2px);
         }
 
         .category-name {
             font-size: 0.9rem;
-            font-weight: 500;
-            color: #64748b;
+            font-weight: 600;
+            color: var(--category-color);
             margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .category-value {
