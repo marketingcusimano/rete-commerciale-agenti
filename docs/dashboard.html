@@ -544,6 +544,42 @@
             color: #4338ca;
         }
 
+        /* Stili per podio clienti */
+        .podium-position {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .podium-1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #8B4513;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+        }
+
+        .podium-2 {
+            background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+            color: #4A4A4A;
+            box-shadow: 0 2px 8px rgba(192, 192, 192, 0.4);
+        }
+
+        .podium-3 {
+            background: linear-gradient(135deg, #CD7F32, #B8860B);
+            color: #FFFFFF;
+            box-shadow: 0 2px 8px rgba(205, 127, 50, 0.4);
+        }
+
+        .podium-other {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+
         /* Stili per categorie prodotto */
         .categories-container {
             display: grid;
@@ -679,11 +715,13 @@
                     <span id="agentCode">631.00238</span>
                 </div>
                 <div class="detail-item">
-                    <span class="label">📅</span>
+                    <span class="label"><svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg></span>
                     <span id="period">Gen - Ago 2025 (8 mesi)</span>
                 </div>
                 <div class="status-indicator">
-                    <span>●</span>
+                    <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
+                        <circle cx="8" cy="8" r="8"/>
+                    </svg>
                     <span>Dati aggiornati dal file HTML</span>
                 </div>
             </div>
@@ -695,7 +733,7 @@
                 <div class="filter-label">Selezione Provincia</div>
                 <div class="province-selector">
                     <select id="provinceSelect">
-                        <option value="all">● Tutte le Province</option>
+                        <option value="all">Tutte le Province</option>
                         <option value="generale">Generale</option>
                         <option value="LT">LT</option>
                         <option value="RM">RM</option>
@@ -719,7 +757,9 @@
                 <div class="section-header">
                     <h2>CLIENTI SERVITI PER PROVINCIA</h2>
                     <div class="status-indicator">
-                        <span>●</span>
+                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
+                            <circle cx="8" cy="8" r="8"/>
+                        </svg>
                         <span>Dati live dal CSV</span>
                     </div>
                 </div>
@@ -740,7 +780,9 @@
                 <div class="section-header">
                     <h2>TOP CLIENTI PER FATTURATO</h2>
                     <div class="status-indicator">
-                        <span>●</span>
+                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
+                            <circle cx="8" cy="8" r="8"/>
+                        </svg>
                         <span>Aggiornato dal CSV</span>
                     </div>
                 </div>
@@ -754,7 +796,9 @@
                 <div class="section-header">
                     <h2>PERFORMANCE PER CATEGORIA PRODOTTO</h2>
                     <div class="status-indicator">
-                        <span>●</span>
+                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
+                            <circle cx="8" cy="8" r="8"/>
+                        </svg>
                         <span>Dati live dal CSV</span>
                     </div>
                 </div>
@@ -773,7 +817,9 @@
                 <div class="section-header">
                     <h2>RIPARTIZIONE FATTURATO</h2>
                     <div class="status-indicator">
-                        <span>●</span>
+                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
+                            <circle cx="8" cy="8" r="8"/>
+                        </svg>
                         <span>Aggiornato automaticamente</span>
                     </div>
                 </div>
@@ -888,7 +934,7 @@
                     ${data.Obiettivo > 0 ? `
                         <div class="progress-section">
                             <div class="progress-header">
-                                <span class="progress-label">● Obiettivo Fatturato</span>
+                                <span class="progress-label">Obiettivo Fatturato</span>
                                 <span class="progress-percentage">${formatCurrency(data.Obiettivo)}</span>
                             </div>
                             <div class="progress-bar">
@@ -924,7 +970,7 @@
                     </div>
                     <div class="progress-section">
                         <div class="progress-header">
-                            <span class="progress-label">● Progressione Obiettivo</span>
+                            <span class="progress-label">Progressione Obiettivo</span>
                             <span class="progress-percentage">${formatCurrency(target)}</span>
                         </div>
                         <div class="progress-bar">
@@ -995,7 +1041,7 @@
                     ${targetClients > 0 ? `
                         <div class="progress-section">
                             <div class="progress-header">
-                                <span class="progress-label">● Obiettivo Clienti</span>
+                                <span class="progress-label">Obiettivo Clienti</span>
                                 <span class="progress-percentage">${targetClients}</span>
                             </div>
                             <div class="progress-bar">
@@ -1042,6 +1088,13 @@
             
             const container = document.getElementById('clientsTable');
             
+            function getPodiumClass(index) {
+                if (index === 0) return 'podium-1';
+                if (index === 1) return 'podium-2';
+                if (index === 2) return 'podium-3';
+                return 'podium-other';
+            }
+            
             let html = `
                 <table class="clients-table">
                     <thead>
@@ -1059,7 +1112,11 @@
             clientsArray.slice(0, 10).forEach((client, index) => {
                 html += `
                     <tr>
-                        <td><strong>${index + 1}</strong></td>
+                        <td>
+                            <div class="podium-position ${getPodiumClass(index)}">
+                                ${index + 1}
+                            </div>
+                        </td>
                         <td class="client-name">${client.name}</td>
                         <td><span class="client-province ${client.province}">${client.province}</span></td>
                         <td class="client-revenue">${formatCurrency(client.totalRevenue)}</td>
