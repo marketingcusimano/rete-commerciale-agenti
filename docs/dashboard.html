@@ -326,15 +326,21 @@
             padding: 16px;
             background: #f8fafc;
             border-radius: 12px;
-            border-left: 4px solid;
+            border: 1px solid var(--legend-color);
+            transition: all 0.2s ease;
+        }
+
+        .legend-item:hover {
+            border-width: 2px;
+            transform: translateY(-1px);
         }
 
         .legend-item.pieni-coppi {
-            border-left-color: #3b82f6;
+            --legend-color: #3b82f6;
         }
 
         .legend-item.altro {
-            border-left-color: #f59e0b;
+            --legend-color: #8b5cf6;
         }
 
         .legend-content {
@@ -354,13 +360,15 @@
         }
 
         .legend-color.altro {
-            background: #f59e0b;
+            background: #8b5cf6;
         }
 
         .legend-label {
             font-size: 0.95rem;
-            font-weight: 500;
-            color: #374151;
+            font-weight: 600;
+            color: var(--legend-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .legend-value {
@@ -1344,8 +1352,8 @@
                     labels: ['Pieni e Coppi', 'Altro'],
                     datasets: [{
                         data: [pieniCoppiValue, altroValue],
-                        backgroundColor: ['#3b82f6', '#6366f1'],
-                        hoverBackgroundColor: ['#2563eb', '#4f46e5'],
+                        backgroundColor: ['#3b82f6', '#8b5cf6'],
+                        hoverBackgroundColor: ['#2563eb', '#7c3aed'],
                         borderColor: '#ffffff',
                         borderWidth: 3,
                         hoverBorderWidth: 5,
