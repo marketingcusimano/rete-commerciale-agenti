@@ -639,6 +639,217 @@
             color: #64748b;
         }
 
+        /* Stili per sezione analisi avanzate */
+        .analysis-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .pdf-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pdf-button:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .alerts-section {
+            margin-bottom: 32px;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .alert-critical {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+            color: #d97706;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border-left-color: #22c55e;
+            color: #16a34a;
+        }
+
+        .alert-icon {
+            flex-shrink: 0;
+        }
+
+        .province-comparison-container h3,
+        .scoring-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .comparison-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .comparison-card.winner {
+            border-color: #22c55e;
+            background: linear-gradient(135deg, #f0fdf4, #ffffff);
+        }
+
+        .comparison-card.winner::before {
+            content: '👑';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 1.2rem;
+        }
+
+        .province-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .metric-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .score-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .score-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .score-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .score-excellent {
+            color: #22c55e;
+        }
+
+        .score-good {
+            color: #3b82f6;
+        }
+
+        .score-warning {
+            color: #f59e0b;
+        }
+
+        .score-critical {
+            color: #ef4444;
+        }
+
+        .score-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .score-description {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        @media (max-width: 1024px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .score-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .analysis-controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+        }
+
         @media (max-width: 1024px) {
             .province-stats-container {
                 grid-template-columns: 1fr;
@@ -821,6 +1032,48 @@
                     </div>
                     <div class="categories-grid" id="categoriesGrid">
                         <!-- Cards categorie generate dinamicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEZIONE 6: ANALISI AVANZATE E ALERT -->
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2>ANALISI AVANZATE E ALERT</h2>
+                    <div class="analysis-controls">
+                        <button id="generatePdfBtn" class="pdf-button">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                            </svg>
+                            Genera Report PDF
+                        </button>
+                        <div class="status-indicator">
+                            <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
+                                <circle cx="8" cy="8" r="8"/>
+                            </svg>
+                            <span>Aggiornato in tempo reale</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alert System -->
+                <div class="alerts-section" id="alertsSection">
+                    <!-- Alert generati dinamicamente -->
+                </div>
+                
+                <!-- Province Comparison -->
+                <div class="province-comparison-container">
+                    <h3>Confronto Performance Province</h3>
+                    <div class="comparison-grid" id="comparisonGrid">
+                        <!-- Confronto generato dinamicamente -->
+                    </div>
+                </div>
+                
+                <!-- Scoring System -->
+                <div class="scoring-section">
+                    <h3>Sistema di Scoring</h3>
+                    <div class="score-cards" id="scoreCards">
+                        <!-- Score generati dinamicamente -->
                     </div>
                 </div>
             </div>
@@ -1284,7 +1537,240 @@
             container.innerHTML = html;
         }
 
-        function createFatturatoChart(allData) {
+        // Funzioni per analisi avanzate
+        function createAlertsSystem(allData) {
+            const alertsContainer = document.getElementById('alertsSection');
+            const alerts = [];
+            
+            // Analizza i dati per generare alert
+            const obiettiviData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
+            
+            obiettiviData.forEach(obj => {
+                const provincia = obj.Provincia;
+                const fatturato = obj.Anno_Corrente;
+                const obiettivo = obj.Obiettivo;
+                const clienti = obj.Clienti_Anno_Corrente;
+                const obiettivoClienti = obj.Obiettivo_Clienti;
+                
+                // Alert fatturato
+                if (obiettivo > 0) {
+                    const percentuale = (fatturato / obiettivo) * 100;
+                    
+                    if (percentuale < 30) {
+                        alerts.push({
+                            type: 'critical',
+                            icon: '⚠',
+                            message: `${provincia}: Fatturato critico al ${percentuale.toFixed(1)}% dell'obiettivo (${formatCurrency(fatturato)} vs ${formatCurrency(obiettivo)})`
+                        });
+                    } else if (percentuale < 60) {
+                        alerts.push({
+                            type: 'warning',
+                            icon: '⚡',
+                            message: `${provincia}: Attenzione! Fatturato al ${percentuale.toFixed(1)}% dell'obiettivo - serve accelerazione`
+                        });
+                    } else if (percentuale > 80) {
+                        alerts.push({
+                            type: 'success',
+                            icon: '✅',
+                            message: `${provincia}: Eccellente! Obiettivo fatturato quasi raggiunto (${percentuale.toFixed(1)}%)`
+                        });
+                    }
+                }
+                
+                // Alert clienti
+                if (obiettivoClienti > 0) {
+                    const percentualeClienti = (clienti / obiettivoClienti) * 100;
+                    
+                    if (percentualeClienti > 100) {
+                        alerts.push({
+                            type: 'success',
+                            icon: '🎯',
+                            message: `${provincia}: Obiettivo clienti superato! ${clienti} clienti (target: ${obiettivoClienti})`
+                        });
+                    } else if (percentualeClienti < 50) {
+                        alerts.push({
+                            type: 'warning',
+                            icon: '👥',
+                            message: `${provincia}: Solo ${percentualeClienti.toFixed(1)}% dell'obiettivo clienti raggiunto`
+                        });
+                    }
+                }
+            });
+            
+            // Se non ci sono alert, mostra messaggio positivo
+            if (alerts.length === 0) {
+                alerts.push({
+                    type: 'success',
+                    icon: '💪',
+                    message: 'Tutte le metriche sono nella norma - performance stabile!'
+                });
+            }
+            
+            const alertsHtml = alerts.map(alert => `
+                <div class="alert-item alert-${alert.type}">
+                    <div class="alert-icon">${alert.icon}</div>
+                    <div>${alert.message}</div>
+                </div>
+            `).join('');
+            
+            alertsContainer.innerHTML = `<h3>Alert e Notifiche</h3>${alertsHtml}`;
+        }
+
+        function createProvinceComparison(allData) {
+            const obiettiviData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
+            const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
+            
+            const ltData = obiettiviData.find(d => d.Provincia === 'LT') || {};
+            const rmData = obiettiviData.find(d => d.Provincia === 'RM') || {};
+            
+            const ltClients = provinceData.find(d => d.Provincia === 'LT') || {};
+            const rmClients = provinceData.find(d => d.Provincia === 'RM') || {};
+            
+            // Calcola metriche
+            const ltMetrics = {
+                fatturato: ltData.Anno_Corrente || 0,
+                clienti: ltClients.Clienti_Serviti || 0,
+                mediaPerCliente: (ltData.Anno_Corrente || 0) / (ltClients.Clienti_Serviti || 1),
+                crescita: ltData.Anno_Precedente > 0 ? ((ltData.Anno_Corrente - ltData.Anno_Precedente) / ltData.Anno_Precedente * 100) : 0,
+                obiettivoRaggiunto: ltData.Obiettivo > 0 ? (ltData.Anno_Corrente / ltData.Obiettivo * 100) : 0
+            };
+            
+            const rmMetrics = {
+                fatturato: rmData.Anno_Corrente || 0,
+                clienti: rmClients.Clienti_Serviti || 0,
+                mediaPerCliente: (rmData.Anno_Corrente || 0) / (rmClients.Clienti_Serviti || 1),
+                crescita: rmData.Anno_Precedente > 0 ? ((rmData.Anno_Corrente - rmData.Anno_Precedente) / rmData.Anno_Precedente * 100) : 0,
+                obiettivoRaggiunto: rmData.Obiettivo > 0 ? (rmData.Anno_Corrente / rmData.Obiettivo * 100) : 0
+            };
+            
+            // Determina il vincitore
+            const ltScore = ltMetrics.fatturato + ltMetrics.crescita + ltMetrics.obiettivoRaggiunto;
+            const rmScore = rmMetrics.fatturato + rmMetrics.crescita + rmMetrics.obiettivoRaggiunto;
+            const ltWins = ltScore > rmScore;
+            
+            const comparisonHtml = `
+                <div class="comparison-card ${ltWins ? 'winner' : ''}">
+                    <div class="province-title">
+                        <span style="color: #3b82f6;">●</span>
+                        Latina (LT)
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Fatturato</span>
+                        <span class="metric-value">${formatCurrency(ltMetrics.fatturato)}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Clienti</span>
+                        <span class="metric-value">${ltMetrics.clienti}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Media per cliente</span>
+                        <span class="metric-value">${formatCurrency(ltMetrics.mediaPerCliente)}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Crescita vs 2024</span>
+                        <span class="metric-value" style="color: ${ltMetrics.crescita >= 0 ? '#22c55e' : '#ef4444'}">${ltMetrics.crescita >= 0 ? '+' : ''}${ltMetrics.crescita.toFixed(1)}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Obiettivo raggiunto</span>
+                        <span class="metric-value">${ltMetrics.obiettivoRaggiunto.toFixed(1)}%</span>
+                    </div>
+                </div>
+                
+                <div class="comparison-card ${!ltWins ? 'winner' : ''}">
+                    <div class="province-title">
+                        <span style="color: #8b5cf6;">●</span>
+                        Roma (RM)
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Fatturato</span>
+                        <span class="metric-value">${formatCurrency(rmMetrics.fatturato)}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Clienti</span>
+                        <span class="metric-value">${rmMetrics.clienti}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Media per cliente</span>
+                        <span class="metric-value">${formatCurrency(rmMetrics.mediaPerCliente)}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Crescita vs 2024</span>
+                        <span class="metric-value" style="color: ${rmMetrics.crescita >= 0 ? '#22c55e' : '#ef4444'}">${rmMetrics.crescita >= 0 ? '+' : ''}${rmMetrics.crescita.toFixed(1)}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Obiettivo raggiunto</span>
+                        <span class="metric-value">${rmMetrics.obiettivoRaggiunto.toFixed(1)}%</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('comparisonGrid').innerHTML = comparisonHtml;
+        }
+
+        function createScoringSystem(allData) {
+            const generalData = allData.find(item => item.Tipo_Dato === 'OBIETTIVI' && item.Provincia === 'Generale') || {};
+            
+            // Calcola score
+            const fatturatoScore = generalData.Anno_Corrente > generalData.Anno_Precedente ? 
+                Math.min(100, ((generalData.Anno_Corrente / generalData.Anno_Precedente - 1) * 100) + 70) : 50;
+            
+            const obiettivoScore = generalData.Obiettivo > 0 ? 
+                Math.min(100, (generalData.Anno_Corrente / generalData.Obiettivo) * 100) : 0;
+            
+            const clientiScore = generalData.Clienti_Anno_Corrente > generalData.Clienti_Anno_Precedente ? 85 : 
+                generalData.Clienti_Anno_Corrente === generalData.Clienti_Anno_Precedente ? 70 : 50;
+            
+            const diversificazioneData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
+            const categorie_attive = diversificazioneData.filter(cat => parseFloat(cat.Importo_Totale) > 0).length;
+            const diversificazioneScore = Math.min(100, (categorie_attive / 10) * 100);
+            
+            function getScoreClass(score) {
+                if (score >= 80) return 'excellent';
+                if (score >= 65) return 'good';
+                if (score >= 45) return 'warning';
+                return 'critical';
+            }
+            
+            function getScoreLabel(score) {
+                if (score >= 80) return 'Eccellente';
+                if (score >= 65) return 'Buono';
+                if (score >= 45) return 'Attenzione';
+                return 'Critico';
+            }
+            
+            const scoreHtml = `
+                <div class="score-card">
+                    <div class="score-value score-${getScoreClass(fatturatoScore)}">${Math.round(fatturatoScore)}</div>
+                    <div class="score-title">Performance Fatturato</div>
+                    <div class="score-description">${getScoreLabel(fatturatoScore)}</div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="score-value score-${getScoreClass(obiettivoScore)}">${Math.round(obiettivoScore)}</div>
+                    <div class="score-title">Raggiungimento Obiettivi</div>
+                    <div class="score-description">${getScoreLabel(obiettivoScore)}</div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="score-value score-${getScoreClass(clientiScore)}">${Math.round(clientiScore)}</div>
+                    <div class="score-title">Gestione Clienti</div>
+                    <div class="score-description">${getScoreLabel(clientiScore)}</div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="score-value score-${getScoreClass(diversificazioneScore)}">${Math.round(diversificazioneScore)}</div>
+                    <div class="score-title">Diversificazione</div>
+                    <div class="score-description">${categorie_attive} categorie attive</div>
+                </div>
+            `;
+            
+            document.getElementById('scoreCards').innerHTML = scoreHtml;
+        }
+
+        function generatePDFReport() {
+            // Placeholder per generazione PDF
+            alert('Funzione PDF in sviluppo! Sarà disponibile nella prossima versione per esportare tutti i dati e grafici in formato PDF professionale.');
+        }
             // Cerca i dati di ripartizione dal CSV
             const ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
             console.log('Dati ripartizione trovati:', ripartizioneData);
@@ -1617,6 +2103,11 @@
                 // Crea l'analisi delle categorie prodotto
                 createCategoriesSection(allData);
                 
+                // Crea le nuove sezioni avanzate
+                createAlertsSystem(allData);
+                createProvinceComparison(allData);
+                createScoringSystem(allData);
+                
                 // Crea il grafico della ripartizione fatturato con tutti i dati
                 createFatturatoChart(allData);
                 
@@ -1636,6 +2127,13 @@
             selectedProvince = e.target.value;
             updateDashboard();
             // Il grafico della ripartizione fatturato rimane sempre uguale indipendentemente dalla provincia
+        });
+
+        // Event listener per il pulsante PDF
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#generatePdfBtn')) {
+                generatePDFReport();
+            }
         });
 
         // Inizializzazione
