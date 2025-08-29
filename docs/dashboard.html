@@ -93,56 +93,12 @@
             color: #1e293b;
         }
 
-        .filter-controls {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .filter-label {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        .province-selector {
-            position: relative;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-        }
-
-        .province-selector select {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 12px 40px 12px 16px;
-            border: none;
-            background: transparent;
-            color: #1e293b;
-            cursor: pointer;
-            min-width: 180px;
-            outline: none;
-        }
-
         .cards-grid {
-            display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 20px !important;
-            width: 100% !important;
-        }
-
-        @media screen and (max-width: 1200px) {
-            .cards-grid {
-                grid-template-columns: repeat(2, 1fr) !important;
-            }
-        }
-
-        @media screen and (max-width: 768px) {
-            .cards-grid {
-                grid-template-columns: 1fr !important;
-            }
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 32px;
         }
 
         .metric-card {
@@ -151,7 +107,6 @@
             padding: 24px;
             border: 1px solid #e2e8f0;
             transition: all 0.2s ease;
-            position: relative;
         }
 
         .metric-card:hover {
@@ -159,38 +114,11 @@
             border-color: #cbd5e1;
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-
         .card-title {
             font-size: 0.9rem;
             font-weight: 500;
             color: #64748b;
-            line-height: 1.4;
-        }
-
-        .trend-badge {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 12px;
-        }
-
-        .trend-positive {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .trend-negative {
-            background: #fef2f2;
-            color: #dc2626;
+            margin-bottom: 16px;
         }
 
         .main-value {
@@ -201,80 +129,9 @@
         }
 
         .comparison {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #64748b;
             margin-bottom: 20px;
-            font-size: 0.85rem;
-        }
-
-        .prev-value {
-            color: #64748b;
-        }
-
-        .change-value {
-            font-weight: 600;
-        }
-
-        .progress-section {
-            margin-top: 16px;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .progress-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #475569;
-        }
-
-        .progress-percentage {
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        .progress-bar {
-            background: #f1f5f9;
-            border-radius: 8px;
-            height: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 8px;
-            transition: width 0.6s ease;
-        }
-
-        .progress-green {
-            background: #22c55e;
-        }
-
-        .progress-blue {
-            background: #3b82f6;
-        }
-
-        .progress-details {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-            color: #64748b;
-            font-size: 1rem;
         }
 
         .chart-section {
@@ -298,206 +155,13 @@
             color: #1e293b;
         }
 
-        .chart-container {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 32px;
-            align-items: center;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            height: 300px;
+        .loading {
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        .chart-legend {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 12px;
-            border: 1px solid var(--legend-color);
-            transition: all 0.2s ease;
-        }
-
-        .legend-item:hover {
-            border-width: 2px;
-            transform: translateY(-1px);
-        }
-
-        .legend-item.pieni-coppi {
-            --legend-color: #3b82f6;
-        }
-
-        .legend-item.altro {
-            --legend-color: #8b5cf6;
-        }
-
-        .legend-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-        }
-
-        .legend-color.pieni-coppi {
-            background: #3b82f6;
-        }
-
-        .legend-color.altro {
-            background: #8b5cf6;
-        }
-
-        .legend-label {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--legend-color);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .legend-value {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .legend-amount {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .legend-percentage {
-            font-size: 0.85rem;
+            height: 200px;
             color: #64748b;
-        }
-
-        .province-stats-container {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 32px;
-            align-items: start;
-        }
-
-        .province-cards-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .province-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .province-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-color: #cbd5e1;
-        }
-
-        .province-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .province-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .province-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #6366f1);
-        }
-
-        .province-clients {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #3b82f6;
-        }
-
-        .province-revenue {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-top: 8px;
-        }
-
-        .province-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #f1f5f9;
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-
-        .client-avg {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .avg-label {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-
-        .avg-value {
-            font-weight: 600;
-            color: #475569;
-        }
-
-        .province-chart-section {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .province-chart-section h3 {
             font-size: 1rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        /* Stili per sezione clienti */
-        .clients-table-container {
-            background: #f8fafc;
-            border-radius: 12px;
-            overflow: hidden;
         }
 
         .clients-table {
@@ -519,40 +183,6 @@
             font-size: 0.9rem;
         }
 
-        .clients-table td {
-            font-size: 0.9rem;
-            color: #1e293b;
-        }
-
-        .client-name {
-            font-weight: 500;
-            max-width: 200px;
-        }
-
-        .client-revenue {
-            font-weight: 600;
-            color: #3b82f6;
-        }
-
-        .client-province {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .client-province.LT {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .client-province.RM {
-            background: #e0e7ff;
-            color: #4338ca;
-        }
-
-        /* Stili per podio clienti */
         .podium-position {
             display: flex;
             align-items: center;
@@ -588,342 +218,38 @@
             border: 2px solid #e2e8f0;
         }
 
-        /* Stili per categorie prodotto */
-        .categories-container {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 32px;
-            align-items: start;
-        }
-
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .category-card {
-            background: white;
+        .client-province {
+            display: inline-block;
+            padding: 4px 8px;
             border-radius: 12px;
-            padding: 20px;
-            border: 1px solid var(--category-color);
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .category-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border-width: 2px;
-            transform: translateY(-2px);
-        }
-
-        .category-name {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--category-color);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .category-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 4px;
-        }
-
-        .category-clients {
             font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        /* Stili per sezione analisi avanzate */
-        .analysis-controls {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .pdf-button {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 16px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .pdf-button:hover {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-
-        .alerts-section {
-            margin-bottom: 32px;
-        }
-
-        .alert-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            border-left: 4px solid;
-            font-size: 0.9rem;
             font-weight: 500;
         }
 
-        .alert-critical {
-            background: #fef2f2;
-            border-left-color: #ef4444;
-            color: #dc2626;
+        .client-province.LT {
+            background: #dbeafe;
+            color: #1d4ed8;
         }
 
-        .alert-warning {
-            background: #fffbeb;
-            border-left-color: #f59e0b;
-            color: #d97706;
+        .client-province.RM {
+            background: #e0e7ff;
+            color: #4338ca;
         }
 
-        .alert-success {
-            background: #f0fdf4;
-            border-left-color: #22c55e;
-            color: #16a34a;
-        }
-
-        .alert-icon {
-            flex-shrink: 0;
-        }
-
-        .province-comparison-container h3,
-        .scoring-section h3 {
-            font-size: 1.1rem;
+        .client-revenue {
             font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 20px;
-        }
-
-        .comparison-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .comparison-card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            border: 1px solid #e2e8f0;
-            position: relative;
-        }
-
-        .comparison-card.winner {
-            border-color: #22c55e;
-            background: linear-gradient(135deg, #f0fdf4, #ffffff);
-        }
-
-        .comparison-card.winner::before {
-            content: '👑';
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            font-size: 1.2rem;
-        }
-
-        .province-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .metric-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .metric-row:last-child {
-            border-bottom: none;
-        }
-
-        .metric-label {
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-
-        .metric-value {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .score-cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .score-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s ease;
-        }
-
-        .score-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .score-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .score-excellent {
-            color: #22c55e;
-        }
-
-        .score-good {
             color: #3b82f6;
         }
 
-        .score-warning {
-            color: #f59e0b;
-        }
-
-        .score-critical {
-            color: #ef4444;
-        }
-
-        .score-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 4px;
-        }
-
-        .score-description {
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        @media (max-width: 1024px) {
-            .comparison-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .score-cards {
+        @media (max-width: 1200px) {
+            .cards-grid {
                 grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 640px) {
-            .score-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .analysis-controls {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .province-stats-container {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-            
-            .province-cards-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
-            }
-
-            .categories-container {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-            
-            .categories-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .chart-container {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-            
-            .chart-section {
-                padding: 20px;
             }
         }
 
         @media (max-width: 768px) {
-            .categories-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 640px) {
-            .province-cards-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .province-card {
-                padding: 16px;
-            }
-
-            .categories-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .clients-table-container {
-                overflow-x: auto;
-            }
-
-            .dashboard-container {
-                padding: 16px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-            
-            .agent-details {
-                gap: 16px;
-            }
-            
             .cards-grid {
                 grid-template-columns: 1fr;
-            }
-            
-            .controls {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
             }
         }
     </style>
@@ -939,29 +265,11 @@
                     <span id="agentCode">631.00238</span>
                 </div>
                 <div class="detail-item">
-                    <span class="label"><svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg></span>
+                    <span class="label">Periodo:</span>
                     <span id="period">Gen - Ago 2025 (8 mesi)</span>
                 </div>
                 <div class="status-indicator">
-                    <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
-                        <circle cx="8" cy="8" r="8"/>
-                    </svg>
-                    <span>Dati aggiornati dal file HTML</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="controls">
-            <div class="section-title">FILTRO TERRITORIO</div>
-            <div class="filter-controls">
-                <div class="filter-label">Selezione Provincia</div>
-                <div class="province-selector">
-                    <select id="provinceSelect">
-                        <option value="all">Tutte le Province</option>
-                        <option value="generale">Generale</option>
-                        <option value="LT">LT</option>
-                        <option value="RM">RM</option>
-                    </select>
+                    <span>Dati aggiornati</span>
                 </div>
             </div>
         </div>
@@ -971,169 +279,37 @@
         </div>
 
         <div id="dashboardContent" style="display: none;">
-            <!-- SEZIONE 1: METRICHE PRINCIPALI -->
             <div class="cards-grid" id="metricsCards">
                 <!-- Le card verranno generate dinamicamente -->
             </div>
 
-            <!-- SEZIONE 2: CLIENTI SERVITI PER PROVINCIA -->
-            <div class="chart-section">
-                <div class="section-header">
-                    <h2>CLIENTI SERVITI PER PROVINCIA</h2>
-                    <div class="status-indicator">
-                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
-                            <circle cx="8" cy="8" r="8"/>
-                        </svg>
-                        <span>Dati live dal CSV</span>
-                    </div>
-                </div>
-                <div class="province-stats-container">
-                    <div class="province-cards-grid" id="provinceCards">
-                        <!-- Le card province verranno generate dinamicamente -->
-                    </div>
-                    <div class="province-chart-section">
-                        <div class="chart-wrapper">
-                            <canvas id="province-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SEZIONE 3: TOP CLIENTI PER FATTURATO -->
             <div class="chart-section">
                 <div class="section-header">
                     <h2>TOP CLIENTI PER FATTURATO</h2>
                     <div class="status-indicator">
-                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
-                            <circle cx="8" cy="8" r="8"/>
-                        </svg>
                         <span>Aggiornato dal CSV</span>
                     </div>
                 </div>
-                <div class="clients-table-container" id="clientsTable">
+                <div id="clientsTable">
                     <!-- Tabella clienti generata dinamicamente -->
-                </div>
-            </div>
-
-            <!-- SEZIONE 4: PERFORMANCE PER CATEGORIA PRODOTTO -->
-            <div class="chart-section">
-                <div class="section-header">
-                    <h2>PERFORMANCE PER CATEGORIA PRODOTTO</h2>
-                    <div class="status-indicator">
-                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
-                            <circle cx="8" cy="8" r="8"/>
-                        </svg>
-                        <span>Dati live dal CSV</span>
-                    </div>
-                </div>
-                <div class="categories-container">
-                    <div class="chart-wrapper">
-                        <canvas id="categories-chart"></canvas>
-                    </div>
-                    <div class="categories-grid" id="categoriesGrid">
-                        <!-- Cards categorie generate dinamicamente -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- SEZIONE 6: ANALISI AVANZATE E ALERT -->
-            <div class="chart-section">
-                <div class="section-header">
-                    <h2>ANALISI AVANZATE E ALERT</h2>
-                    <div class="analysis-controls">
-                        <button id="generatePdfBtn" class="pdf-button">
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-                            </svg>
-                            Genera Report PDF
-                        </button>
-                        <div class="status-indicator">
-                            <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
-                                <circle cx="8" cy="8" r="8"/>
-                            </svg>
-                            <span>Aggiornato in tempo reale</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Alert System -->
-                <div class="alerts-section" id="alertsSection">
-                    <!-- Alert generati dinamicamente -->
-                </div>
-                
-                <!-- Province Comparison -->
-                <div class="province-comparison-container">
-                    <h3>Confronto Performance Province</h3>
-                    <div class="comparison-grid" id="comparisonGrid">
-                        <!-- Confronto generato dinamicamente -->
-                    </div>
-                </div>
-                
-                <!-- Scoring System -->
-                <div class="scoring-section">
-                    <h3>Sistema di Scoring</h3>
-                    <div class="score-cards" id="scoreCards">
-                        <!-- Score generati dinamicamente -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- SEZIONE 5: RIPARTIZIONE FATTURATO -->
-            <div class="chart-section">
-                <div class="section-header">
-                    <h2>RIPARTIZIONE FATTURATO</h2>
-                    <div class="status-indicator">
-                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
-                            <circle cx="8" cy="8" r="8"/>
-                        </svg>
-                        <span>Aggiornato automaticamente</span>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <div class="chart-wrapper">
-                        <canvas id="fatturato-chart"></canvas>
-                    </div>
-                    <div class="chart-legend" id="chartLegend">
-                        <!-- Legend sarà generata dinamicamente -->
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // URL del CSV su GitHub
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
         
         let currentData = [];
         let agentInfo = {};
-        let selectedProvince = 'all';
-        let fatturato_chart = null;
-        let province_chart = null;
-        let categories_chart = null;
-
-        function formatNumber(num) {
-            return new Intl.NumberFormat('it-IT', {
-                style: 'decimal',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(num);
-        }
 
         function formatCurrency(num) {
             if (num >= 1000) {
                 return '€' + Math.round(num / 1000) + 'k';
             }
-            return '€' + formatNumber(num);
+            return '€' + new Intl.NumberFormat('it-IT').format(Math.round(num));
         }
 
-        function calculateChange(current, previous) {
-            const change = current - previous;
-            const percentage = previous > 0 ? ((change / previous) * 100) : 0;
-            return { change, percentage };
-        }
-
-        // Funzione per parsificare il CSV personalizzato
         function parseCSV(csvText) {
             const lines = csvText.trim().split('\n');
             const data = [];
@@ -1142,16 +318,13 @@
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 
-                // Salta righe vuote e commenti
                 if (!line || line.startsWith('#')) continue;
                 
-                // Se la riga contiene "Tipo_Dato" è un header
                 if (line.includes('Tipo_Dato')) {
                     currentHeaders = line.split(',').map(h => h.trim());
                     continue;
                 }
                 
-                // Processa i dati se abbiamo headers
                 if (currentHeaders && line) {
                     const values = line.split(',').map(v => v.trim());
                     if (values.length >= currentHeaders.length) {
@@ -1160,11 +333,7 @@
                         currentHeaders.forEach((header, index) => {
                             let value = values[index] || '';
                             
-                            // Converti numeri
-                            if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Percentuale_Obiettivo', 
-                                'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Obiettivo_Clienti', 
-                                'Percentuale_Obiettivo_Clienti', 'Fatturato', 'Clienti_Serviti', 'Importo_Totale',
-                                'Clienti_Prov_1', 'Clienti_Prov_2', 'Importo', 'Valore'].includes(header)) {
+                            if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 'Clienti_Anno_Corrente'].includes(header)) {
                                 value = parseFloat(value) || 0;
                             }
                             
@@ -1182,143 +351,36 @@
         function createFatturatoCard(data) {
             const current = data.Anno_Corrente;
             const previous = data.Anno_Precedente;
-            const { change, percentage } = calculateChange(current, previous);
-            const isPositive = change >= 0;
+            const change = current - previous;
+            const percentage = previous > 0 ? ((change / previous) * 100) : 0;
             
             return `
                 <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Fatturato 2025</div>
-                        <div class="trend-badge ${isPositive ? 'trend-positive' : 'trend-negative'}">
-                            ${isPositive ? '↗' : '↘'} ${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%
-                        </div>
-                    </div>
+                    <div class="card-title">Fatturato 2025</div>
                     <div class="main-value">${formatCurrency(current)}</div>
-                    <div class="comparison">
-                        <span class="prev-value">vs 2024: ${formatCurrency(previous)}</span>
-                    </div>
-                    ${data.Obiettivo > 0 ? `
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <span class="progress-label">Obiettivo Fatturato</span>
-                                <span class="progress-percentage">${formatCurrency(data.Obiettivo)}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill progress-green" style="width: ${Math.min((current/data.Obiettivo)*100, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span>Mancano: ${formatCurrency(Math.max(0, data.Obiettivo - current))}</span>
-                                <span>${Math.round((current/data.Obiettivo)*100)}%</span>
-                            </div>
-                        </div>
-                    ` : ''}
+                    <div class="comparison">vs 2024: ${formatCurrency(previous)}</div>
                 </div>
             `;
         }
 
-        function createObiettivoCard(data) {
-            const current = data.Anno_Corrente;
-            const target = data.Obiettivo;
-            const progressPerc = target > 0 ? (current / target) * 100 : 0;
-            const remaining = Math.max(0, target - current);
+        function createClientiCard(data) {
+            const clients = data.Clienti_Anno_Corrente || 0;
             
             return `
                 <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Obiettivo 2025</div>
-                        <div class="trend-badge trend-positive">
-                            ${Math.round(progressPerc)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCurrency(target)}</div>
-                    <div class="comparison">
-                        <span class="prev-value">Da raggiungere: ${formatCurrency(remaining)}</span>
-                    </div>
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <span class="progress-label">Progressione Obiettivo</span>
-                            <span class="progress-percentage">${formatCurrency(target)}</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill progress-blue" style="width: ${Math.min(progressPerc, 100)}%"></div>
-                        </div>
-                        <div class="progress-details">
-                            <span>Mancano: ${formatCurrency(remaining)}</span>
-                            <span>${Math.round(progressPerc)}%</span>
-                        </div>
-                    </div>
+                    <div class="card-title">Clienti Attivi</div>
+                    <div class="main-value">${clients}</div>
+                    <div class="comparison">Clienti serviti</div>
                 </div>
             `;
         }
 
-        function createTopPerformanceCard(data) {
-            // Trova la provincia con performance migliore
-            const allProvData = currentData.filter(d => d.Provincia !== 'Generale');
-            let topProv = allProvData[0];
-            let bestGrowth = 0;
-            
-            allProvData.forEach(prov => {
-                const growth = ((prov.Anno_Corrente - prov.Anno_Precedente) / prov.Anno_Precedente) * 100;
-                if (growth > bestGrowth) {
-                    bestGrowth = growth;
-                    topProv = prov;
-                }
-            });
-            
+        function createTopPerformanceCard() {
             return `
                 <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Top Performance</div>
-                        <div class="trend-badge trend-positive">
-                            +${bestGrowth.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${topProv?.Provincia || 'LT'}</div>
-                    <div class="comparison">
-                        <span class="prev-value">Provincia ${topProv?.Provincia === 'LT' ? 'Latina' : 'Roma'}</span>
-                        <span class="change-value" style="color: #22c55e;">crescita totale</span>
-                    </div>
-                    <div class="progress-details">
-                        <span style="color: #64748b; font-size: 0.85rem;">${formatCurrency(topProv?.Anno_Corrente || 0)}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        function createClientiAttiviCard(data) {
-            const currentClients = data.Clienti_Anno_Corrente || 0;
-            const prevClients = data.Clienti_Anno_Precedente || 0;
-            const targetClients = data.Obiettivo_Clienti || 0;
-            const clientProgress = targetClients > 0 ? (currentClients / targetClients) * 100 : 0;
-            
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Clienti Attivi</div>
-                        <div class="trend-badge ${clientProgress >= 50 ? 'trend-positive' : 'trend-negative'}">
-                            ${Math.round(clientProgress)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${currentClients}</div>
-                    <div class="comparison">
-                        <span class="prev-value">vs 2024: ${prevClients}</span>
-                        <span class="change-value" style="color: #64748b;">raggiunto</span>
-                    </div>
-                    ${targetClients > 0 ? `
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <span class="progress-label">Obiettivo Clienti</span>
-                                <span class="progress-percentage">${targetClients}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill progress-blue" style="width: ${Math.min(clientProgress, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span>Mancano: ${Math.max(0, targetClients - currentClients)}</span>
-                                <span>${Math.round(clientProgress)}%</span>
-                            </div>
-                        </div>
-                    ` : ''}
+                    <div class="card-title">Top Performance</div>
+                    <div class="main-value">LT</div>
+                    <div class="comparison">Provincia Latina</div>
                 </div>
             `;
         }
@@ -1326,7 +388,6 @@
         function createClientsTable(allData) {
             const venditeLData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
             
-            // Raggruppa per cliente
             const clientsMap = new Map();
             
             venditeLData.forEach(sale => {
@@ -1348,11 +409,8 @@
                 client.categories.add(sale.Categoria_Articoli);
             });
             
-            // Converti in array e ordina per fatturato
             const clientsArray = Array.from(clientsMap.values())
                 .sort((a, b) => b.totalRevenue - a.totalRevenue);
-            
-            const container = document.getElementById('clientsTable');
             
             function getPodiumClass(index) {
                 if (index === 0) return 'podium-1';
@@ -1383,7 +441,7 @@
                                 ${index + 1}
                             </div>
                         </td>
-                        <td class="client-name">${client.name}</td>
+                        <td>${client.name}</td>
                         <td><span class="client-province ${client.province}">${client.province}</span></td>
                         <td class="client-revenue">${formatCurrency(client.totalRevenue)}</td>
                         <td>${client.categories.size} categorie</td>
@@ -1396,651 +454,23 @@
                 </table>
             `;
             
-            container.innerHTML = html;
-        }
-
-        function createCategoriesSection(allData) {
-            const categoriesData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-            
-            // Filtra solo categorie con importo > 0
-            const activeCategories = categoriesData.filter(cat => parseFloat(cat.Importo_Totale) > 0);
-            
-            // Ordina per importo decrescente
-            activeCategories.sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale));
-            
-            // Colori del grafico (stesso array utilizzato nel chart)
-            const colors = ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
-            
-            // Crea cards
-            const gridContainer = document.getElementById('categoriesGrid');
-            let cardsHtml = '';
-            
-            activeCategories.forEach((cat, index) => {
-                const importo = parseFloat(cat.Importo_Totale);
-                const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
-                const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
-                const totalClienti = clientiLT + clientiRM;
-                const categoryColor = colors[index] || '#64748b';
-                
-                cardsHtml += `
-                    <div class="category-card" style="--category-color: ${categoryColor}">
-                        <div class="category-name">${cat.Categoria}</div>
-                        <div class="category-value">${formatCurrency(importo)}</div>
-                        <div class="category-clients">${totalClienti} clienti (LT: ${clientiLT}, RM: ${clientiRM})</div>
-                    </div>
-                `;
-            });
-            
-            gridContainer.innerHTML = cardsHtml;
-            
-            // Crea grafico con gli stessi colori
-            createCategoriesChart(activeCategories, colors);
-        }
-
-        function createCategoriesChart(categoriesData, colors) {
-            if (categories_chart) {
-                categories_chart.destroy();
-            }
-            
-            // Prendi le top categorie (massimo quante ne abbiamo)
-            const topCategories = categoriesData.slice(0, Math.min(categoriesData.length, colors.length));
-            
-            const ctx = document.getElementById('categories-chart').getContext('2d');
-            categories_chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: topCategories.map(cat => cat.Categoria.replace(/_/g, ' ')),
-                    datasets: [{
-                        data: topCategories.map(cat => parseFloat(cat.Importo_Totale)),
-                        backgroundColor: colors.slice(0, topCategories.length),
-                        borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((value / total) * 100).toFixed(1);
-                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true,
-                        duration: 1000
-                    }
-                }
-            });
-        }
-
-        function filterData(province) {
-            if (province === 'all') {
-                return currentData;
-            } else if (province === 'generale') {
-                return currentData.filter(item => item.Provincia === 'Generale');
-            } else {
-                return currentData.filter(item => item.Provincia === province);
-            }
+            document.getElementById('clientsTable').innerHTML = html;
         }
 
         function updateDashboard() {
-            const filteredData = filterData(selectedProvince);
+            const generalData = currentData.find(item => item.Provincia === 'Generale') || {};
             const container = document.getElementById('metricsCards');
             
-            if (filteredData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato disponibile per la selezione corrente</div>';
-                return;
-            }
-
             let html = '';
-            
-            filteredData.forEach(data => {
-                // Card Fatturato
-                html += createFatturatoCard(data);
-                
-                // Card Obiettivo (solo se presente)
-                if (data.Obiettivo > 0) {
-                    html += createObiettivoCard(data);
-                }
-                
-                // Card Clienti Attivi
-                html += createClientiAttiviCard(data);
-            });
-            
-            // Aggiungi Top Performance solo per vista "all"
-            if (selectedProvince === 'all') {
-                const generalData = currentData.find(d => d.Provincia === 'Generale');
-                if (generalData) {
-                    html += createTopPerformanceCard(generalData);
-                }
-            }
+            html += createFatturatoCard(generalData);
+            html += createClientiCard(generalData);
+            html += createTopPerformanceCard();
             
             container.innerHTML = html;
         }
 
-        // Funzioni per analisi avanzate
-        function createAlertsSystem(allData) {
-            const alertsContainer = document.getElementById('alertsSection');
-            const alerts = [];
-            
-            // Analizza i dati per generare alert
-            const obiettiviData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
-            
-            obiettiviData.forEach(obj => {
-                const provincia = obj.Provincia;
-                const fatturato = obj.Anno_Corrente;
-                const obiettivo = obj.Obiettivo;
-                const clienti = obj.Clienti_Anno_Corrente;
-                const obiettivoClienti = obj.Obiettivo_Clienti;
-                
-                // Alert fatturato
-                if (obiettivo > 0) {
-                    const percentuale = (fatturato / obiettivo) * 100;
-                    
-                    if (percentuale < 30) {
-                        alerts.push({
-                            type: 'critical',
-                            icon: '⚠',
-                            message: `${provincia}: Fatturato critico al ${percentuale.toFixed(1)}% dell'obiettivo (${formatCurrency(fatturato)} vs ${formatCurrency(obiettivo)})`
-                        });
-                    } else if (percentuale < 60) {
-                        alerts.push({
-                            type: 'warning',
-                            icon: '⚡',
-                            message: `${provincia}: Attenzione! Fatturato al ${percentuale.toFixed(1)}% dell'obiettivo - serve accelerazione`
-                        });
-                    } else if (percentuale > 80) {
-                        alerts.push({
-                            type: 'success',
-                            icon: '✅',
-                            message: `${provincia}: Eccellente! Obiettivo fatturato quasi raggiunto (${percentuale.toFixed(1)}%)`
-                        });
-                    }
-                }
-                
-                // Alert clienti
-                if (obiettivoClienti > 0) {
-                    const percentualeClienti = (clienti / obiettivoClienti) * 100;
-                    
-                    if (percentualeClienti > 100) {
-                        alerts.push({
-                            type: 'success',
-                            icon: '🎯',
-                            message: `${provincia}: Obiettivo clienti superato! ${clienti} clienti (target: ${obiettivoClienti})`
-                        });
-                    } else if (percentualeClienti < 50) {
-                        alerts.push({
-                            type: 'warning',
-                            icon: '👥',
-                            message: `${provincia}: Solo ${percentualeClienti.toFixed(1)}% dell'obiettivo clienti raggiunto`
-                        });
-                    }
-                }
-            });
-            
-            // Se non ci sono alert, mostra messaggio positivo
-            if (alerts.length === 0) {
-                alerts.push({
-                    type: 'success',
-                    icon: '💪',
-                    message: 'Tutte le metriche sono nella norma - performance stabile!'
-                });
-            }
-            
-            const alertsHtml = alerts.map(alert => `
-                <div class="alert-item alert-${alert.type}">
-                    <div class="alert-icon">${alert.icon}</div>
-                    <div>${alert.message}</div>
-                </div>
-            `).join('');
-            
-            alertsContainer.innerHTML = `<h3>Alert e Notifiche</h3>${alertsHtml}`;
-        }
-
-        function createProvinceComparison(allData) {
-            const obiettiviData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
-            const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
-            
-            const ltData = obiettiviData.find(d => d.Provincia === 'LT') || {};
-            const rmData = obiettiviData.find(d => d.Provincia === 'RM') || {};
-            
-            const ltClients = provinceData.find(d => d.Provincia === 'LT') || {};
-            const rmClients = provinceData.find(d => d.Provincia === 'RM') || {};
-            
-            // Calcola metriche
-            const ltMetrics = {
-                fatturato: ltData.Anno_Corrente || 0,
-                clienti: ltClients.Clienti_Serviti || 0,
-                mediaPerCliente: (ltData.Anno_Corrente || 0) / (ltClients.Clienti_Serviti || 1),
-                crescita: ltData.Anno_Precedente > 0 ? ((ltData.Anno_Corrente - ltData.Anno_Precedente) / ltData.Anno_Precedente * 100) : 0,
-                obiettivoRaggiunto: ltData.Obiettivo > 0 ? (ltData.Anno_Corrente / ltData.Obiettivo * 100) : 0
-            };
-            
-            const rmMetrics = {
-                fatturato: rmData.Anno_Corrente || 0,
-                clienti: rmClients.Clienti_Serviti || 0,
-                mediaPerCliente: (rmData.Anno_Corrente || 0) / (rmClients.Clienti_Serviti || 1),
-                crescita: rmData.Anno_Precedente > 0 ? ((rmData.Anno_Corrente - rmData.Anno_Precedente) / rmData.Anno_Precedente * 100) : 0,
-                obiettivoRaggiunto: rmData.Obiettivo > 0 ? (rmData.Anno_Corrente / rmData.Obiettivo * 100) : 0
-            };
-            
-            // Determina il vincitore
-            const ltScore = ltMetrics.fatturato + ltMetrics.crescita + ltMetrics.obiettivoRaggiunto;
-            const rmScore = rmMetrics.fatturato + rmMetrics.crescita + rmMetrics.obiettivoRaggiunto;
-            const ltWins = ltScore > rmScore;
-            
-            const comparisonHtml = `
-                <div class="comparison-card ${ltWins ? 'winner' : ''}">
-                    <div class="province-title">
-                        <span style="color: #3b82f6;">●</span>
-                        Latina (LT)
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Fatturato</span>
-                        <span class="metric-value">${formatCurrency(ltMetrics.fatturato)}</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Clienti</span>
-                        <span class="metric-value">${ltMetrics.clienti}</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Media per cliente</span>
-                        <span class="metric-value">${formatCurrency(ltMetrics.mediaPerCliente)}</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Crescita vs 2024</span>
-                        <span class="metric-value" style="color: ${ltMetrics.crescita >= 0 ? '#22c55e' : '#ef4444'}">${ltMetrics.crescita >= 0 ? '+' : ''}${ltMetrics.crescita.toFixed(1)}%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Obiettivo raggiunto</span>
-                        <span class="metric-value">${ltMetrics.obiettivoRaggiunto.toFixed(1)}%</span>
-                    </div>
-                </div>
-                
-                <div class="comparison-card ${!ltWins ? 'winner' : ''}">
-                    <div class="province-title">
-                        <span style="color: #8b5cf6;">●</span>
-                        Roma (RM)
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Fatturato</span>
-                        <span class="metric-value">${formatCurrency(rmMetrics.fatturato)}</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Clienti</span>
-                        <span class="metric-value">${rmMetrics.clienti}</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Media per cliente</span>
-                        <span class="metric-value">${formatCurrency(rmMetrics.mediaPerCliente)}</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Crescita vs 2024</span>
-                        <span class="metric-value" style="color: ${rmMetrics.crescita >= 0 ? '#22c55e' : '#ef4444'}">${rmMetrics.crescita >= 0 ? '+' : ''}${rmMetrics.crescita.toFixed(1)}%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Obiettivo raggiunto</span>
-                        <span class="metric-value">${rmMetrics.obiettivoRaggiunto.toFixed(1)}%</span>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('comparisonGrid').innerHTML = comparisonHtml;
-        }
-
-        function createScoringSystem(allData) {
-            const generalData = allData.find(item => item.Tipo_Dato === 'OBIETTIVI' && item.Provincia === 'Generale') || {};
-            
-            // Calcola score
-            const fatturatoScore = generalData.Anno_Corrente > generalData.Anno_Precedente ? 
-                Math.min(100, ((generalData.Anno_Corrente / generalData.Anno_Precedente - 1) * 100) + 70) : 50;
-            
-            const obiettivoScore = generalData.Obiettivo > 0 ? 
-                Math.min(100, (generalData.Anno_Corrente / generalData.Obiettivo) * 100) : 0;
-            
-            const clientiScore = generalData.Clienti_Anno_Corrente > generalData.Clienti_Anno_Precedente ? 85 : 
-                generalData.Clienti_Anno_Corrente === generalData.Clienti_Anno_Precedente ? 70 : 50;
-            
-            const diversificazioneData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-            const categorie_attive = diversificazioneData.filter(cat => parseFloat(cat.Importo_Totale) > 0).length;
-            const diversificazioneScore = Math.min(100, (categorie_attive / 10) * 100);
-            
-            function getScoreClass(score) {
-                if (score >= 80) return 'excellent';
-                if (score >= 65) return 'good';
-                if (score >= 45) return 'warning';
-                return 'critical';
-            }
-            
-            function getScoreLabel(score) {
-                if (score >= 80) return 'Eccellente';
-                if (score >= 65) return 'Buono';
-                if (score >= 45) return 'Attenzione';
-                return 'Critico';
-            }
-            
-            const scoreHtml = `
-                <div class="score-card">
-                    <div class="score-value score-${getScoreClass(fatturatoScore)}">${Math.round(fatturatoScore)}</div>
-                    <div class="score-title">Performance Fatturato</div>
-                    <div class="score-description">${getScoreLabel(fatturatoScore)}</div>
-                </div>
-                
-                <div class="score-card">
-                    <div class="score-value score-${getScoreClass(obiettivoScore)}">${Math.round(obiettivoScore)}</div>
-                    <div class="score-title">Raggiungimento Obiettivi</div>
-                    <div class="score-description">${getScoreLabel(obiettivoScore)}</div>
-                </div>
-                
-                <div class="score-card">
-                    <div class="score-value score-${getScoreClass(clientiScore)}">${Math.round(clientiScore)}</div>
-                    <div class="score-title">Gestione Clienti</div>
-                    <div class="score-description">${getScoreLabel(clientiScore)}</div>
-                </div>
-                
-                <div class="score-card">
-                    <div class="score-value score-${getScoreClass(diversificazioneScore)}">${Math.round(diversificazioneScore)}</div>
-                    <div class="score-title">Diversificazione</div>
-                    <div class="score-description">${categorie_attive} categorie attive</div>
-                </div>
-            `;
-            
-            document.getElementById('scoreCards').innerHTML = scoreHtml;
-        }
-
-        function generatePDFReport() {
-            // Placeholder per generazione PDF
-            alert('Funzione PDF in sviluppo! Sarà disponibile nella prossima versione per esportare tutti i dati e grafici in formato PDF professionale.');
-        }
-            // Cerca i dati di ripartizione dal CSV
-            const ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
-            console.log('Dati ripartizione trovati:', ripartizioneData);
-            
-            let pieniCoppiValue = 0;
-            let altroValue = 0;
-            
-            // Estrai valori dalla sezione RIPARTIZIONE del CSV
-            ripartizioneData.forEach(item => {
-                if (item.Categoria_Prodotto === 'Pieni_e_Coppi') {
-                    pieniCoppiValue = parseFloat(item.Importo) || 0;
-                } else if (item.Categoria_Prodotto === 'Altro') {
-                    altroValue = parseFloat(item.Importo) || 0;
-                }
-            });
-            
-            // Fallback ai valori originali se non trovati nel CSV
-            if (pieniCoppiValue === 0 && altroValue === 0) {
-                console.warn('Dati ripartizione non trovati nel CSV, uso valori fallback');
-                pieniCoppiValue = 54909.62;
-                altroValue = 35250.17;
-            }
-            
-            const total = pieniCoppiValue + altroValue;
-            const pieniCoppiPerc = total > 0 ? (pieniCoppiValue / total * 100).toFixed(1) : 0;
-            const altroPerc = total > 0 ? (altroValue / total * 100).toFixed(1) : 0;
-
-            console.log(`Ripartizione automatica: Pieni e Coppi €${pieniCoppiValue} (${pieniCoppiPerc}%), Altro €${altroValue} (${altroPerc}%)`);
-
-            // Aggiorna legend dinamicamente
-            const legendContainer = document.getElementById('chartLegend');
-            legendContainer.innerHTML = `
-                <div class="legend-item pieni-coppi">
-                    <div class="legend-content">
-                        <div class="legend-color pieni-coppi"></div>
-                        <div class="legend-label">Pieni e Coppi</div>
-                    </div>
-                    <div class="legend-value">
-                        <div class="legend-amount">${formatCurrency(pieniCoppiValue)}</div>
-                        <div class="legend-percentage">${pieniCoppiPerc}%</div>
-                    </div>
-                </div>
-                <div class="legend-item altro">
-                    <div class="legend-content">
-                        <div class="legend-color altro"></div>
-                        <div class="legend-label">Altro</div>
-                    </div>
-                    <div class="legend-value">
-                        <div class="legend-amount">${formatCurrency(altroValue)}</div>
-                        <div class="legend-percentage">${altroPerc}%</div>
-                    </div>
-                </div>
-            `;
-
-            // Distruggi chart esistente se presente
-            if (fatturato_chart) {
-                fatturato_chart.destroy();
-            }
-
-            // Crea nuovo chart con dati dinamici
-            const ctx = document.getElementById('fatturato-chart').getContext('2d');
-            fatturato_chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Pieni e Coppi', 'Altro'],
-                    datasets: [{
-                        data: [pieniCoppiValue, altroValue],
-                        backgroundColor: ['#3b82f6', '#8b5cf6'],
-                        hoverBackgroundColor: ['#2563eb', '#7c3aed'],
-                        borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverBorderWidth: 5,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            displayColors: true,
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed;
-                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true,
-                        duration: 1000,
-                        easing: 'easeInOutQuart'
-                    }
-                }
-            });
-        }
-
-        function createProvinceCards(allData) {
-            // Cerca i dati delle province dal CSV
-            const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
-            console.log('Dati province trovati:', provinceData);
-            
-            const container = document.getElementById('provinceCards');
-            
-            if (provinceData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px;">Nessun dato provincia disponibile</div>';
-                return [];
-            }
-
-            let html = '';
-            const chartData = [];
-
-            provinceData.forEach(prov => {
-                const clients = parseInt(prov.Clienti_Serviti) || 0;
-                const revenue = parseFloat(prov.Fatturato) || 0;
-                const avgPerClient = clients > 0 ? revenue / clients : 0;
-                
-                const provinceName = prov.Provincia === 'LT' ? 'Latina' : 
-                                   prov.Provincia === 'RM' ? 'Roma' : 
-                                   prov.Provincia;
-
-                html += `
-                    <div class="province-card">
-                        <div class="province-card-header">
-                            <div class="province-name">
-                                <div class="province-indicator"></div>
-                                ${provinceName} (${prov.Provincia})
-                            </div>
-                        </div>
-                        <div class="province-clients">${clients}</div>
-                        <div class="province-revenue">${formatCurrency(revenue)}</div>
-                        <div class="province-details">
-                            <span>Clienti serviti</span>
-                            <div class="client-avg">
-                                <div class="avg-label">Media per cliente</div>
-                                <div class="avg-value">${formatCurrency(avgPerClient)}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                chartData.push({
-                    label: provinceName,
-                    clients: clients,
-                    revenue: revenue,
-                    color: prov.Provincia === 'LT' ? '#3b82f6' : '#6366f1'
-                });
-            });
-
-            container.innerHTML = html;
-            return chartData;
-        }
-
-        function createProvinceChart(chartData) {
-            if (chartData.length === 0) return;
-
-            // Distruggi chart esistente
-            if (province_chart) {
-                province_chart.destroy();
-            }
-
-            const ctx = document.getElementById('province-chart').getContext('2d');
-            province_chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartData.map(d => d.label),
-                    datasets: [{
-                        label: 'Clienti',
-                        data: chartData.map(d => d.clients),
-                        backgroundColor: chartData.map(d => d.color),
-                        borderColor: chartData.map(d => d.color),
-                        borderWidth: 2,
-                        borderRadius: 6,
-                        borderSkipped: false,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1,
-                                color: '#64748b',
-                                font: {
-                                    family: 'Montserrat',
-                                    size: 12
-                                }
-                            },
-                            grid: {
-                                color: '#f1f5f9',
-                                borderColor: '#e2e8f0'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#64748b',
-                                font: {
-                                    family: 'Montserrat',
-                                    size: 12,
-                                    weight: '500'
-                                }
-                            },
-                            grid: {
-                                display: false
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            titleFont: {
-                                family: 'Montserrat',
-                                size: 14,
-                                weight: '600'
-                            },
-                            bodyFont: {
-                                family: 'Montserrat',
-                                size: 13
-                            },
-                            callbacks: {
-                                label: function(context) {
-                                    const dataPoint = chartData[context.dataIndex];
-                                    return [
-                                        `Clienti: ${context.parsed.y}`,
-                                        `Fatturato: ${formatCurrency(dataPoint.revenue)}`,
-                                        `Media: ${formatCurrency(dataPoint.revenue / dataPoint.clients)}`
-                                    ];
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        duration: 800,
-                        easing: 'easeInOutQuart'
-                    }
-                }
-            });
-        }
-
-        // Carica dati dal CSV GitHub
         async function loadData() {
             try {
-                console.log('Caricamento dati da:', CSV_URL);
                 const response = await fetch(CSV_URL);
                 
                 if (!response.ok) {
@@ -2048,95 +478,27 @@
                 }
                 
                 const csvText = await response.text();
-                console.log('CSV caricato');
-                
                 const allData = parseCSV(csvText);
-                console.log('Dati parsificati:', allData);
                 
-                // Estrai info agente dai commenti
-                const lines = csvText.split('\n');
-                agentInfo = {
-                    codice: '631.00238',
-                    nome: 'CARABOT NATALINO', 
-                    periodo_da: '01/01/2025',
-                    periodo_a: '24/08/2025'
-                };
-                
-                // Cerca info nei commenti
-                lines.forEach(line => {
-                    if (line.includes('Codice Agente:')) {
-                        agentInfo.codice = line.split(':')[1]?.trim() || agentInfo.codice;
-                    }
-                    if (line.includes('Ragione Sociale:')) {
-                        agentInfo.nome = line.split(':')[1]?.trim() || agentInfo.nome;
-                    }
-                    if (line.includes('Periodo:')) {
-                        const periodo = line.split(':')[1]?.trim() || '';
-                        const dates = periodo.split(' - ');
-                        if (dates.length === 2) {
-                            agentInfo.periodo_da = dates[0].trim();
-                            agentInfo.periodo_a = dates[1].trim();
-                        }
-                    }
-                });
-                
-                // Aggiorna header
-                document.getElementById('agentCode').textContent = agentInfo.codice;
-                document.getElementById('agentName').textContent = agentInfo.nome;
-                document.getElementById('period').textContent = 'Gen - Ago 2025 (8 mesi)';
-                
-                // Filtra solo i record OBIETTIVI per la sezione 1
                 currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
-                console.log('Dati obiettivi filtrati:', currentData);
                 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
+                
                 updateDashboard();
-                
-                // Crea le sezioni province e grafico
-                const chartData = createProvinceCards(allData);
-                createProvinceChart(chartData);
-                
-                // Crea la tabella dei top clienti
                 createClientsTable(allData);
-                
-                // Crea l'analisi delle categorie prodotto
-                createCategoriesSection(allData);
-                
-                // Crea le nuove sezioni avanzate
-                createAlertsSystem(allData);
-                createProvinceComparison(allData);
-                createScoringSystem(allData);
-                
-                // Crea il grafico della ripartizione fatturato con tutti i dati
-                createFatturatoChart(allData);
                 
             } catch (error) {
                 console.error('Errore nel caricamento dei dati:', error);
                 document.getElementById('loadingMessage').innerHTML = `
                     <div style="color: #dc2626; text-align: center;">
-                        ❌ Errore nel caricamento dei dati<br>
+                        Errore nel caricamento dei dati<br>
                         <small>${error.message}</small>
                     </div>
                 `;
             }
         }
 
-        // Event listeners
-        document.getElementById('provinceSelect').addEventListener('change', (e) => {
-            selectedProvince = e.target.value;
-            updateDashboard();
-            // Il grafico della ripartizione fatturato rimane sempre uguale indipendentemente dalla provincia
-        });
-
-        // Event listener per il pulsante PDF
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('#generatePdfBtn')) {
-                generatePDFReport();
-            }
-        });
-
-        // Inizializzazione
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
         });
