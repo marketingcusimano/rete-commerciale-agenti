@@ -288,77 +288,11 @@
     </div>
 
     <script>
-        // CSV Data dinamici
-        const csvData = `codice_agente,ragione_sociale,periodo_da,periodo_a,provincia,cliente,categoria_articolo,fatturato,clienti_serviti,anno_precedente,anno_corrente,obiettivo,percentuale_obiettivo,tipo_record
-631.00238,CARABOT NATALINO,01/01/2025,24/08/2025,Generale,,TOTALE,90159.79,20,80238.72,90159.79,,OBIETTIVO
-631.00238,CARABOT NATALINO,01/01/2025,24/08/2025,LT,,TOTALE,82389.23,18,79029.16,82389.23,155000.00,38,OBIETTIVO
-631.00238,CARABOT NATALINO,01/01/2025,24/08/2025,LT,,CLIENTI_SERVITI,60437.22,18,,,,PROVINCIA_RIEPILOGO
-631.00238,CARABOT NATALINO,01/01/2025,24/08/2025,RM,,CLIENTI_SERVITI,7770.56,2,,,,PROVINCIA_RIEPILOGO`;
-
+        // URL del CSV su GitHub (corretto)
+        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
+        
         let currentData = [];
-
-        // Funzione per parsificare CSV
-        function parseCSV(csvText) {
-            const lines = csvText.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
-            const data = [];
-
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim());
-                const row = {};
-                
-                headers.forEach((header, index) => {
-                    let value = values[index] || '';
-                    
-                    // Converti numeri
-                    if (header === 'fatturato' || header === 'anno_precedente' || 
-                        header === 'anno_corrente' || header === 'obiettivo') {
-                        value = value === '' ? 0 : parseFloat(value) || 0;
-                    } else if (header === 'clienti_serviti' || header === 'percentuale_obiettivo') {
-                        value = value === '' ? 0 : parseInt(value) || 0;
-                    }
-                    
-                    row[header] = value;
-                });
-                
-                data.push(row);
-            }
-            
-            return data;
-        }
-
-        // Funzione per aggregare dati per dashboard
-        function processDataForDashboard(rawData) {
-            const processed = [];
-            
-            // Filtra solo i record obiettivi e riepilogo
-            const objectiveData = rawData.filter(row => row.tipo_record === 'OBIETTIVO');
-            const provinciaData = rawData.filter(row => row.tipo_record === 'PROVINCIA_RIEPILOGO');
-            
-            objectiveData.forEach(row => {
-                processed.push({
-                    ...row,
-                    // Calcola percentuale obiettivo se non presente
-                    percentuale_obiettivo: row.obiettivo > 0 ? 
-                        (row.anno_corrente / row.obiettivo * 100) : 0
-                });
-            });
-
-            // Aggiungi dati RM se non presenti negli obiettivi
-            const rmProvinciaData = provinciaData.find(row => row.provincia === 'RM');
-            if (rmProvinciaData && !processed.find(row => row.provincia === 'RM')) {
-                processed.push({
-                    ...rmProvinciaData,
-                    anno_precedente: rmProvinciaData.fatturato * 0.15, // Stima
-                    anno_corrente: rmProvinciaData.fatturato,
-                    obiettivo: 15000, // Obiettivo stimato
-                    percentuale_obiettivo: (rmProvinciaData.fatturato / 15000 * 100),
-                    tipo_record: 'OBIETTIVO'
-                });
-            }
-
-            return processed;
-        }
+        let agentInfo = {}
         let selectedProvince = 'all';
 
         function formatNumber(num) {
@@ -383,34 +317,37 @@
         }
 
         function createMetricCard(data) {
-            const { change, percentage } = calculateChange(data.anno_corrente, data.anno_precedente);
+            const current = data.Anno_Corrente;
+            const previous = data.Anno_Precedente;
+            const { change, percentage } = calculateChange(current, previous);
             const isPositive = change >= 0;
             const trendClass = isPositive ? 'trend-positive' : 'trend-negative';
             const trendIcon = isPositive ? '📈' : '📉';
             
-            const hasObjective = data.obiettivo && data.obiettivo !== '';
-            const progressWidth = hasObjective ? Math.min(data.percentuale_obiettivo, 100) : 0;
-            const remaining = hasObjective ? data.obiettivo - data.anno_corrente : 0;
+            const hasObjective = data.Obiettivo && data.Obiettivo > 0;
+            const progressWidth = hasObjective ? Math.min((current / data.Obiettivo) * 100, 100) : 0;
+            const remaining = hasObjective ? data.Obiettivo - current : 0;
+            const objectivePercentage = hasObjective ? (current / data.Obiettivo) * 100 : 0;
 
             return `
                 <div class="metric-card">
                     <div class="card-header">
                         <div class="card-title">
-                            ${data.provincia === 'Generale' ? '🌍 Totale Generale' : 
-                              data.provincia === 'LT' ? '🏛️ Provincia di Latina' : 
-                              data.provincia === 'RM' ? '🏛️ Provincia di Roma' : 
-                              `📍 ${data.provincia}`}
+                            ${data.Provincia === 'Generale' ? '🌍 Totale Generale' : 
+                              data.Provincia === 'LT' ? '🏛️ Provincia di Latina' : 
+                              data.Provincia === 'RM' ? '🏛️ Provincia di Roma' : 
+                              `📍 ${data.Provincia}`}
                         </div>
                         <div class="trend-indicator ${trendClass}">
                             ${trendIcon} ${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%
                         </div>
                     </div>
 
-                    <div class="main-value">${formatCurrency(data.anno_corrente)}</div>
+                    <div class="main-value">${formatCurrency(current)}</div>
                     
                     <div class="comparison">
                         <div class="prev-year">
-                            Anno precedente: ${formatCurrency(data.anno_precedente)}
+                            Anno precedente: ${formatCurrency(previous)}
                         </div>
                         <div class="change-value ${isPositive ? 'trend-positive' : 'trend-negative'}">
                             ${isPositive ? '+' : ''}${formatCurrency(change)}
@@ -418,7 +355,7 @@
                     </div>
 
                     <div style="display: flex; justify-content: space-between; color: #6c757d; font-size: 0.95rem; margin-bottom: 15px;">
-                        <span>👥 Clienti: ${data.clienti_serviti}</span>
+                        <span>👥 Clienti: ${data.Clienti_Anno_Corrente || 0}</span>
                         <span>📅 Anno corrente</span>
                     </div>
 
@@ -426,13 +363,13 @@
                         <div class="objective-section">
                             <div class="objective-header">
                                 <div class="objective-title">🎯 Obiettivo ${new Date().getFullYear()}</div>
-                                <div class="objective-percentage">${data.percentuale_obiettivo.toFixed(1)}%</div>
+                                <div class="objective-percentage">${objectivePercentage.toFixed(1)}%</div>
                             </div>
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: ${progressWidth}%"></div>
                             </div>
                             <div class="objective-details">
-                                <span>Target: ${formatCurrency(data.obiettivo)}</span>
+                                <span>Target: ${formatCurrency(data.Obiettivo)}</span>
                                 <span style="color: ${remaining > 0 ? '#e74c3c' : '#27ae60'};">
                                     ${remaining > 0 ? 'Mancano: ' + formatCurrency(remaining) : 'Obiettivo raggiunto! 🎉'}
                                 </span>
@@ -451,9 +388,9 @@
             if (province === 'all') {
                 return currentData;
             } else if (province === 'generale') {
-                return currentData.filter(item => item.provincia === 'Generale');
+                return currentData.filter(item => item.Provincia === 'Generale');
             } else {
-                return currentData.filter(item => item.provincia === province);
+                return currentData.filter(item => item.Provincia === province);
             }
         }
 
@@ -464,49 +401,116 @@
             container.innerHTML = filteredData.map(data => createMetricCard(data)).join('');
         }
 
-        function loadData() {
-            loadDataFromGitHub(GITHUB_CSV_URL);
+        // Funzione per parsificare il CSV personalizzato
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const data = [];
+            let currentHeaders = null;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                // Salta righe vuote e commenti
+                if (!line || line.startsWith('#')) continue;
+                
+                // Se la riga contiene "Tipo_Dato" è un header
+                if (line.includes('Tipo_Dato')) {
+                    currentHeaders = line.split(',').map(h => h.trim());
+                    continue;
+                }
+                
+                // Processa i dati se abbiamo headers
+                if (currentHeaders && line) {
+                    const values = line.split(',').map(v => v.trim());
+                    if (values.length >= currentHeaders.length) {
+                        const row = {};
+                        
+                        currentHeaders.forEach((header, index) => {
+                            let value = values[index] || '';
+                            
+                            // Converti numeri
+                            if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Percentuale_Obiettivo', 
+                                'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Obiettivo_Clienti', 
+                                'Percentuale_Obiettivo_Clienti', 'Fatturato', 'Clienti_Serviti'].includes(header)) {
+                                value = parseFloat(value) || 0;
+                            }
+                            
+                            row[header] = value;
+                        });
+                        
+                        data.push(row);
+                    }
+                }
+            }
+            
+            return data;
         }
 
-        // Funzione per caricare dati da GitHub
-        async function loadDataFromGitHub(githubRawUrl) {
+        // Carica dati dal CSV GitHub
+        async function loadData() {
             try {
-                document.getElementById('loadingMessage').innerHTML = 'Caricamento dati da GitHub...';
-                document.getElementById('loadingMessage').style.display = 'block';
-                document.getElementById('dashboardContent').style.display = 'none';
-                
-                const response = await fetch(githubRawUrl, {
-                    method: 'GET',
-                    cache: 'no-cache',
-                    headers: {
-                        'Cache-Control': 'no-cache'
-                    }
-                });
+                console.log('Caricamento dati da:', CSV_URL);
+                const response = await fetch(CSV_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const csvText = await response.text();
-                const rawData = parseCSV(csvText);
-                currentData = processDataForDashboard(rawData);
+                console.log('CSV caricato, prime 300 caratteri:', csvText.substring(0, 300));
                 
-                // Aggiorna header dinamicamente
-                if (currentData.length > 0) {
-                    const firstRow = currentData[0];
-                    document.getElementById('agentCode').textContent = firstRow.codice_agente;
-                    document.getElementById('agentName').textContent = firstRow.ragione_sociale;
-                    document.getElementById('period').textContent = `${firstRow.periodo_da} - ${firstRow.periodo_a}`;
-                }
+                const allData = parseCSV(csvText);
+                console.log('Dati parsificati:', allData);
+                
+                // Estrai info agente dai commenti
+                const lines = csvText.split('\n');
+                agentInfo = {
+                    codice: '631.00238',
+                    nome: 'CARABOT NATALINO', 
+                    periodo_da: '01/01/2025',
+                    periodo_a: '24/08/2025'
+                };
+                
+                // Cerca info nei commenti
+                lines.forEach(line => {
+                    if (line.includes('Codice Agente:')) {
+                        agentInfo.codice = line.split(':')[1]?.trim() || agentInfo.codice;
+                    }
+                    if (line.includes('Ragione Sociale:')) {
+                        agentInfo.nome = line.split(':')[1]?.trim() || agentInfo.nome;
+                    }
+                    if (line.includes('Periodo:')) {
+                        const periodo = line.split(':')[1]?.trim() || '';
+                        const dates = periodo.split(' - ');
+                        if (dates.length === 2) {
+                            agentInfo.periodo_da = dates[0].trim();
+                            agentInfo.periodo_a = dates[1].trim();
+                        }
+                    }
+                });
+                
+                // Aggiorna header
+                document.getElementById('agentCode').textContent = agentInfo.codice;
+                document.getElementById('agentName').textContent = agentInfo.nome;
+                document.getElementById('period').textContent = `${agentInfo.periodo_da} - ${agentInfo.periodo_a}`;
+                
+                // Filtra solo i record OBIETTIVI per la sezione 1
+                currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
+                console.log('Dati obiettivi filtrati:', currentData);
                 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
                 updateDashboard();
                 
             } catch (error) {
-                document.getElementById('loadingMessage').innerHTML = 
-                    `<span style="color: #e74c3c;">❌ Errore connessione GitHub: ${error.message}</span>
-                     <br><button onclick="loadDataFromGitHub('${GITHUB_CSV_URL}')" style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">🔄 Riprova</button>`;
+                console.error('Errore nel caricamento dei dati:', error);
+                document.getElementById('loadingMessage').innerHTML = `
+                    <div style="color: #e74c3c;">
+                        ❌ Errore nel caricamento dei dati<br>
+                        <small>${error.message}</small><br>
+                        <small>URL: ${CSV_URL}</small>
+                    </div>
+                `;
             }
         }
 
@@ -520,11 +524,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
         });
-
-        // Auto-refresh ogni 5 minuti per dati sempre aggiornati
-        setInterval(() => {
-            loadDataFromGitHub(GITHUB_CSV_URL);
-        }, 300000); // 5 minuti
     </script>
 </body>
 </html>
