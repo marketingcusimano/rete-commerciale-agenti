@@ -589,28 +589,57 @@
             <!-- SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE - TOP 10 -->
             <div class="chart-section">
                 <div class="section-header">
-                    <h2>TOP 10 CLIENTI - DETTAGLIO VENDITE</h2>
+                    <h2>TOP CLIENTI - DETTAGLIO VENDITE</h2>
                     <div class="section-controls">
-                        <div class="view-toggle">
-                            <button class="toggle-btn active" id="toggleRevenue" data-view="revenue">💰 Per Fatturato</button>
-                            <button class="toggle-btn" id="toggleVolume" data-view="volume">📦 Per Volume</button>
+                        <div class="filter-group">
+                            <select id="sortBySelect" class="filter-select">
+                                <option value="revenue">Ordina per Fatturato</option>
+                                <option value="orders">Ordina per N° Ordini</option>
+                                <option value="categories">Ordina per Categorie</option>
+                            </select>
+                            <select id="provinceFilterSelect" class="filter-select">
+                                <option value="all">Tutte le Province</option>
+                                <option value="LT">Solo Latina</option>
+                                <option value="RM">Solo Roma</option>
+                            </select>
+                            <select id="limitSelect" class="filter-select">
+                                <option value="10">Top 10</option>
+                                <option value="15">Top 15</option>
+                                <option value="20">Top 20</option>
+                            </select>
                         </div>
                         <div class="status-indicator">
                             <span>●</span>
-                            <span>Classifica live</span>
+                            <span id="clientsStatus">Classifica live</span>
                         </div>
                     </div>
                 </div>
-                <div class="top-clients-container">
-                    <div class="leaderboard" id="clientLeaderboard">
-                        <!-- La classifica verrà generata dinamicamente -->
-                    </div>
-                    <div class="client-chart-section">
-                        <div class="chart-wrapper">
-                            <canvas id="clients-chart"></canvas>
+                
+                <div class="clients-dashboard">
+                    <div class="clients-main">
+                        <div class="clients-summary-bar" id="clientsSummaryBar">
+                            <!-- Summary dinamico -->
                         </div>
-                        <div class="chart-summary" id="clientSummary">
-                            <!-- Riepilogo automatico -->
+                        <div class="clients-list" id="clientsList">
+                            <!-- Lista clienti dinamica -->
+                        </div>
+                    </div>
+                    
+                    <div class="clients-sidebar">
+                        <div class="chart-card">
+                            <div class="chart-card-header">
+                                <h3 id="chartTitle">Distribuzione Top 5</h3>
+                                <div class="chart-card-subtitle" id="chartSubtitle">Per fatturato</div>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="clients-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <div class="stats-grid" id="clientsStatsGrid">
+                                <!-- Stats dinamiche -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1039,188 +1068,252 @@
             });
         }
 
-        function createTopClientsLeaderboard(allData, sortBy = 'revenue') {
-            // Cerca i dati delle vendite per cliente dal CSV
-            const salesData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
-            console.log('Dati vendite clienti trovati:', salesData.length);
-            
-            // Aggrega i dati per cliente
-            const clientTotals = {};
-            
-            salesData.forEach(sale => {
-                const clientName = sale.Ragione_Sociale_Cliente || sale.cliente || 'Cliente N/D';
-                const province = sale.Provincia || 'N/D';
-                const revenue = parseFloat(sale.Fatturato) || 0;
+        function createTopClientsSection(allData) {
+            let currentFilters = {
+                sortBy: 'revenue',
+                province: 'all',
+                limit: 10
+            };
+
+            function processClientData(salesData, filters) {
+                const clientTotals = {};
                 
-                if (!clientTotals[clientName]) {
-                    clientTotals[clientName] = {
-                        name: clientName,
-                        province: province,
-                        totalRevenue: 0,
-                        orders: 0,
-                        categories: new Set()
-                    };
+                // Filtra per provincia se necessario
+                const filteredSales = filters.province === 'all' ? 
+                    salesData : 
+                    salesData.filter(sale => sale.Provincia === filters.province);
+                
+                filteredSales.forEach(sale => {
+                    const clientName = sale.Ragione_Sociale_Cliente || sale.cliente || 'Cliente N/D';
+                    const province = sale.Provincia || 'N/D';
+                    const revenue = parseFloat(sale.Fatturato) || 0;
+                    
+                    if (!clientTotals[clientName]) {
+                        clientTotals[clientName] = {
+                            name: clientName,
+                            province: province,
+                            totalRevenue: 0,
+                            orders: 0,
+                            categories: new Set()
+                        };
+                    }
+                    
+                    clientTotals[clientName].totalRevenue += revenue;
+                    clientTotals[clientName].orders += 1;
+                    if (sale.Categoria_Articoli) {
+                        clientTotals[clientName].categories.add(sale.Categoria_Articoli);
+                    }
+                });
+
+                // Converti in array
+                const clientsArray = Object.values(clientTotals);
+                
+                // Ordina in base al filtro
+                if (filters.sortBy === 'revenue') {
+                    clientsArray.sort((a, b) => b.totalRevenue - a.totalRevenue);
+                } else if (filters.sortBy === 'orders') {
+                    clientsArray.sort((a, b) => b.orders - a.orders);
+                } else if (filters.sortBy === 'categories') {
+                    clientsArray.sort((a, b) => b.categories.size - a.categories.size);
                 }
                 
-                clientTotals[clientName].totalRevenue += revenue;
-                clientTotals[clientName].orders += 1;
-                if (sale.Categoria_Articoli) {
-                    clientTotals[clientName].categories.add(sale.Categoria_Articoli);
-                }
-            });
-
-            // Converti in array e ordina
-            const clientsArray = Object.values(clientTotals);
-            
-            if (sortBy === 'revenue') {
-                clientsArray.sort((a, b) => b.totalRevenue - a.totalRevenue);
-            } else {
-                clientsArray.sort((a, b) => b.orders - a.orders);
-            }
-            
-            // Prendi i top 10
-            const top10 = clientsArray.slice(0, 10);
-            
-            const container = document.getElementById('clientLeaderboard');
-            
-            if (top10.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato cliente disponibile</div>';
-                return [];
+                return clientsArray.slice(0, filters.limit);
             }
 
-            let html = `
-                <div class="leaderboard">
-                    <div class="leaderboard-header">
-                        <div class="leaderboard-title">Classifica Clienti</div>
-                        <div class="leaderboard-count">${top10.length} clienti</div>
+            function updateClientsDisplay(salesData, filters) {
+                const topClients = processClientData(salesData, filters);
+                
+                // Aggiorna summary bar
+                const totalRevenue = topClients.reduce((sum, c) => sum + c.totalRevenue, 0);
+                const totalOrders = topClients.reduce((sum, c) => sum + c.orders, 0);
+                const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+                const maxCategories = Math.max(...topClients.map(c => c.categories.size));
+                
+                document.getElementById('clientsSummaryBar').innerHTML = `
+                    <div class="summary-item">
+                        <div class="summary-value">${formatCurrency(totalRevenue)}</div>
+                        <div class="summary-label">Fatturato Totale</div>
                     </div>
-            `;
-            
-            top10.forEach((client, index) => {
-                const rank = index + 1;
-                const rankClass = rank <= 3 ? `rank-${rank}` : '';
-                const positionClass = rank <= 3 ? 'top3' : '';
-                const displayValue = sortBy === 'revenue' ? formatCurrency(client.totalRevenue) : client.orders;
-                const secondaryValue = sortBy === 'revenue' ? `${client.orders} ordini` : formatCurrency(client.totalRevenue);
-                
-                html += `
-                    <div class="client-rank-card ${rankClass}">
-                        <div class="rank-position ${positionClass}">${rank}</div>
-                        <div class="client-info">
-                            <div class="client-name">${client.name}</div>
-                            <div class="client-meta">
-                                <span>${client.province === 'LT' ? 'Latina' : client.province === 'RM' ? 'Roma' : client.province}</span>
-                                <span>${client.categories.size} categorie</span>
-                            </div>
-                        </div>
-                        <div class="client-value">
-                            <div class="client-revenue">${displayValue}</div>
-                            <div class="client-secondary">${secondaryValue}</div>
-                        </div>
+                    <div class="summary-item">
+                        <div class="summary-value">${totalOrders}</div>
+                        <div class="summary-label">Ordini Totali</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">${formatCurrency(avgOrderValue)}</div>
+                        <div class="summary-label">Valore Medio</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">${topClients.length}</div>
+                        <div class="summary-label">Clienti Top</div>
                     </div>
                 `;
-            });
 
-            html += '</div>';
-            container.innerHTML = html;
-            return top10;
-        }
-
-        function createClientsChart(clientsData, sortBy) {
-            if (clientsData.length === 0) return;
-
-            // Distruggi chart esistente
-            if (clients_chart) {
-                clients_chart.destroy();
+                // Aggiorna lista clienti
+                let clientsHtml = '';
+                topClients.forEach((client, index) => {
+                    const rank = index + 1;
+                    const isTop3 = rank <= 3;
+                    
+                    let primaryValue, secondaryValue;
+                    if (filters.sortBy === 'revenue') {
+                        primaryValue = formatCurrency(client.totalRevenue);
+                        secondaryValue = `${client.orders} ordini`;
+                    } else if (filters.sortBy === 'orders') {
+                        primaryValue = `${client.orders} ordini`;
+                        secondaryValue = formatCurrency(client.totalRevenue);
+                    } else {
+                        primaryValue = `${client.categories.size} categorie`;
+                        secondaryValue = formatCurrency(client.totalRevenue);
+                    }
+                    
+                    clientsHtml += `
+                        <div class="client-item">
+                            <div class="client-rank ${isTop3 ? 'top-3' : ''}">${rank}</div>
+                            <div class="client-info">
+                                <div class="client-name">${client.name}</div>
+                                <div class="client-meta">
+                                    <span>${client.province === 'LT' ? 'Latina' : client.province === 'RM' ? 'Roma' : client.province}</span>
+                                    <span>${client.categories.size} categorie</span>
+                                </div>
+                            </div>
+                            <div class="client-values">
+                                <div class="primary-value">${primaryValue}</div>
+                                <div class="secondary-value">${secondaryValue}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('clientsList').innerHTML = clientsHtml;
+                
+                // Aggiorna grafico
+                updateClientsChart(topClients.slice(0, 5), filters.sortBy);
+                
+                // Aggiorna stats sidebar
+                updateClientsSidebar(topClients, filters);
+                
+                // Aggiorna status
+                const provinceText = filters.province === 'all' ? 'tutte le province' : 
+                                   filters.province === 'LT' ? 'Latina' : 'Roma';
+                const sortText = filters.sortBy === 'revenue' ? 'fatturato' :
+                                filters.sortBy === 'orders' ? 'numero ordini' : 'categorie';
+                
+                document.getElementById('clientsStatus').textContent = 
+                    `Top ${filters.limit} per ${sortText} - ${provinceText}`;
             }
 
-            const ctx = document.getElementById('clients-chart').getContext('2d');
-            const chartData = sortBy === 'revenue' ? 
-                clientsData.slice(0, 5).map(c => c.totalRevenue) : 
-                clientsData.slice(0, 5).map(c => c.orders);
-            
-            const topColors = ['#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#c084fc'];
+            function updateClientsChart(topClients, sortBy) {
+                if (clients_chart) {
+                    clients_chart.destroy();
+                }
 
-            clients_chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: clientsData.slice(0, 5).map(c => c.name.length > 15 ? c.name.substring(0, 15) + '...' : c.name),
-                    datasets: [{
-                        data: chartData,
-                        backgroundColor: topColors,
-                        borderColor: '#ffffff',
-                        borderWidth: 2,
-                        hoverOffset: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function(context) {
-                                    const client = clientsData[context.dataIndex];
-                                    const percentage = ((context.parsed / chartData.reduce((a,b) => a+b, 0)) * 100).toFixed(1);
-                                    return [
-                                        `${client.name}`,
-                                        `${sortBy === 'revenue' ? formatCurrency(client.totalRevenue) : client.orders + ' ordini'}`,
-                                        `${percentage}% del totale`
-                                    ];
+                if (topClients.length === 0) return;
+
+                const ctx = document.getElementById('clients-chart').getContext('2d');
+                const chartData = sortBy === 'revenue' ? 
+                    topClients.map(c => c.totalRevenue) : 
+                    sortBy === 'orders' ?
+                    topClients.map(c => c.orders) :
+                    topClients.map(c => c.categories.size);
+                
+                const colors = ['#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#c084fc'];
+                
+                clients_chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: topClients.map(c => c.name.length > 12 ? c.name.substring(0, 12) + '...' : c.name),
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: colors,
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1e293b',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#64748b',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        const client = topClients[context.dataIndex];
+                                        const total = chartData.reduce((a,b) => a+b, 0);
+                                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                        return [
+                                            client.name,
+                                            `Fatturato: ${formatCurrency(client.totalRevenue)}`,
+                                            `Ordini: ${client.orders}`,
+                                            `${percentage}% del totale`
+                                        ];
+                                    }
                                 }
                             }
-                        }
-                    },
-                    animation: { duration: 800, easing: 'easeInOutQuart' }
-                }
+                        },
+                        animation: { duration: 600 }
+                    }
+                });
+
+                // Aggiorna titoli grafico
+                document.getElementById('chartTitle').textContent = `Top ${topClients.length} Overview`;
+                const subtitleText = sortBy === 'revenue' ? 'Per fatturato' : 
+                                   sortBy === 'orders' ? 'Per ordini' : 'Per categorie';
+                document.getElementById('chartSubtitle').textContent = subtitleText;
+            }
+
+            function updateClientsSidebar(topClients, filters) {
+                const totalRevenue = topClients.reduce((sum, c) => sum + c.totalRevenue, 0);
+                const totalOrders = topClients.reduce((sum, c) => sum + c.orders, 0);
+                const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+                const totalCategories = new Set(topClients.flatMap(c => Array.from(c.categories))).size;
+                
+                document.getElementById('clientsStatsGrid').innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-value">${formatCurrency(totalRevenue)}</div>
+                        <div class="stat-label">Fatturato</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${totalOrders}</div>
+                        <div class="stat-label">Ordini</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${formatCurrency(avgOrderValue)}</div>
+                        <div class="stat-label">Media Ordine</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${totalCategories}</div>
+                        <div class="stat-label">Categorie</div>
+                    </div>
+                `;
+            }
+
+            // Event listeners per filtri
+            document.getElementById('sortBySelect').addEventListener('change', (e) => {
+                currentFilters.sortBy = e.target.value;
+                updateClientsDisplay(salesData, currentFilters);
             });
 
-            // Aggiorna summary
-            updateClientSummary(clientsData, sortBy);
-        }
+            document.getElementById('provinceFilterSelect').addEventListener('change', (e) => {
+                currentFilters.province = e.target.value;
+                updateClientsDisplay(salesData, currentFilters);
+            });
 
-        function updateClientSummary(clientsData, sortBy) {
-            const totalRevenue = clientsData.reduce((sum, c) => sum + c.totalRevenue, 0);
-            const totalOrders = clientsData.reduce((sum, c) => sum + c.orders, 0);
-            const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-            
-            const summaryContainer = document.getElementById('clientSummary');
-            summaryContainer.innerHTML = `
-                <div class="chart-header">
-                    <div class="chart-title">Top 5 Overview</div>
-                    <div class="chart-subtitle">${sortBy === 'revenue' ? 'Per fatturato' : 'Per volume ordini'}</div>
-                </div>
-                <div class="chart-summary">
-                    <div class="summary-grid">
-                        <div class="summary-item">
-                            <div class="summary-value">${formatCurrency(totalRevenue)}</div>
-                            <div class="summary-label">Fatturato Totale</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-value">${totalOrders}</div>
-                            <div class="summary-label">Ordini Totali</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-value">${formatCurrency(avgOrderValue)}</div>
-                            <div class="summary-label">Valore Medio</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-value">${clientsData.length}</div>
-                            <div class="summary-label">Clienti Attivi</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            document.getElementById('limitSelect').addEventListener('change', (e) => {
+                currentFilters.limit = parseInt(e.target.value);
+                updateClientsDisplay(salesData, currentFilters);
+            });
+
+            // Inizializzazione
+            const salesData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+            updateClientsDisplay(salesData, currentFilters);
         }
 
         function createProvinceCards(allData) {
@@ -1431,10 +1524,8 @@
                 document.getElementById('dashboardContent').style.display = 'block';
                 updateDashboard();
                 
-                // Crea la TOP 10 clienti
-                currentClientData = allData; // Store per toggle functionality
-                const topClients = createTopClientsLeaderboard(allData, 'revenue');
-                createClientsChart(topClients, 'revenue');
+                // Crea la sezione TOP clienti con filtri avanzati
+                createTopClientsSection(allData);
                 
                 // Crea le sezioni province e grafico
                 const chartData = createProvinceCards(allData);
@@ -1459,25 +1550,6 @@
             selectedProvince = e.target.value;
             updateDashboard();
             // Il grafico della ripartizione fatturato rimane sempre uguale indipendentemente dalla provincia
-        });
-
-        // Event listeners per toggle view TOP 10 clienti
-        let currentClientData = [];
-        
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('toggle-btn')) {
-                const viewType = e.target.dataset.view;
-                
-                // Update active state
-                document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                
-                // Update leaderboard and chart
-                if (currentClientData.length > 0) {
-                    const topClients = createTopClientsLeaderboard(currentClientData, viewType);
-                    createClientsChart(topClients, viewType);
-                }
-            }
         });
 
         // Inizializzazione
