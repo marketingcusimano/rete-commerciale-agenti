@@ -1,100 +1,1146 @@
-==================== CARABOT NATALINO ====================
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CARABOT NATALINO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            color: #2d3748;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .header {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+        
+        .header-subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .refresh-button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .refresh-button:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+        
+        .refresh-button.loading {
+            background: #4299e1;
+        }
+        
+        .theme-toggle {
+            background: #2d3748;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            background: #1a202c;
+            transform: translateY(-1px);
+        }
+        
+        .info-bar {
+            background: white;
+            padding: 20px 32px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .info-item i {
+            color: #667eea;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.loading {
+            background: #4299e1;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-indicator.error {
+            background: #e53e3e;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .filter-section {
+            background: white;
+            padding: 24px 32px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+        
+        .filter-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        
+        .province-selector {
+            position: relative;
+        }
+        
+        .selector-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .selector-button:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
+        }
+        
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            padding: 16px;
+            min-width: 320px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s;
+        }
+        
+        .dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-header {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .dropdown-subtitle {
+            color: #718096;
+            font-size: 0.875rem;
+            margin-bottom: 16px;
+        }
+        
+        .province-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+        
+        .province-option:hover {
+            background: #f7fafc;
+        }
+        
+        .province-option.selected {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .province-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        .province-option.selected .province-icon {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .province-option:not(.selected) .province-icon {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+        
+        .province-info h4 {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .province-info span {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .radio-button {
+            margin-left: auto;
+            width: 20px;
+            height: 20px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .province-option.selected .radio-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        .cancel-btn {
+            width: 100%;
+            background: #f7fafc;
+            color: #4a5568;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 12px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .metric-title {
+            color: #718096;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .growth-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .growth-positive {
+            background: #c6f6d5;
+            color: #25855a;
+        }
+        
+        .growth-negative {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+        
+        .metric-subtitle {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        
+        .progress-section {
+            margin-top: 20px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .progress-label {
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .progress-percentage {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #48bb78;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #edf2f7;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #ed8936, #dd6b20);
+        }
+        
+        .progress-details {
+            color: #718096;
+            font-size: 0.85rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 4px;
+        }
+        
+        .performance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .performance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .performance-card .metric-title,
+        .performance-card .metric-subtitle {
+            color: white;
+        }
+        
+        .performance-card .metric-value {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .performance-card .growth-indicator {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .performance-card .stat-value {
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .performance-card .stat-label {
+            color: white;
+        }
+        
+        .trend-card {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .trend-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .trend-card .metric-title,
+        .trend-card .metric-subtitle {
+            color: white;
+        }
+        
+        .trend-card .metric-value {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .trend-card .growth-indicator {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .trend-card .stat-value {
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .trend-card .stat-label {
+            color: white;
+        }
+        
+        .efficiency-card {
+            background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .efficiency-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .efficiency-card .metric-title,
+        .efficiency-card .metric-subtitle {
+            color: white;
+        }
+        
+        .efficiency-card .metric-value {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .efficiency-card .growth-indicator {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .efficiency-card .stat-value {
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .efficiency-card .stat-label {
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+            
+            .info-bar {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            
+            .dropdown {
+                min-width: 280px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>CARABOT NATALINO</h1>
+                <div class="header-subtitle">Dashboard Performance Vendite</div>
+            </div>
+            <div class="header-right">
+                <button class="refresh-button" onclick="manualRefresh()">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Aggiorna</span>
+                </button>
+                <button class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Info Bar -->
+        <div class="info-bar">
+            <div class="info-item">
+                <i class="fas fa-id-card"></i>
+                <span>ID: <strong>631.00238</strong></span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Gen - Ago 2025 (8 mesi)</span>
+            </div>
+            <div class="info-item">
+                <span class="status-indicator" id="status-indicator"></span>
+                <span id="status-text">Caricamento dati...</span>
+            </div>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-title">Filtro Territorio</div>
+            <div class="province-selector">
+                <button class="selector-button" onclick="toggleDropdown()">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="selected-province">Tutte le Province</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                
+                <div class="dropdown" id="province-dropdown">
+                    <div class="dropdown-header">Selezione Provincia</div>
+                    <div class="dropdown-subtitle">Scegli il territorio da visualizzare</div>
+                    
+                    <div class="province-option selected" data-province="all">
+                        <div class="province-icon">
+                            <i class="fas fa-globe-europe"></i>
+                        </div>
+                        <div class="province-info">
+                            <h4>Tutte le Province</h4>
+                            <span>Panoramica completa</span>
+                        </div>
+                        <div class="radio-button"></div>
+                    </div>
+                    
+                    <div class="province-option" data-province="LT">
+                        <div class="province-icon">
+                            <i class="fas fa-map-marker-alt" style="color: #48bb78;"></i>
+                        </div>
+                        <div class="province-info">
+                            <h4>Latina</h4>
+                            <span id="lt-stats">Caricamento...</span>
+                        </div>
+                        <div class="radio-button"></div>
+                    </div>
+                    
+                    <div class="province-option" data-province="RM">
+                        <div class="province-icon">
+                            <i class="fas fa-map-marker-alt" style="color: #3182ce;"></i>
+                        </div>
+                        <div class="province-info">
+                            <h4>Roma</h4>
+                            <span id="rm-stats">Caricamento...</span>
+                        </div>
+                        <div class="radio-button"></div>
+                    </div>
+                    
+                    <button class="cancel-btn" onclick="closeDropdown()">Annulla</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Fatturato Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Fatturato 2025</div>
+                    <div class="growth-indicator growth-positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="growth-rate">+0%</span>
+                    </div>
+                </div>
+                <div class="metric-value" id="fatturato-value">€0</div>
+                <div class="metric-subtitle">vs 2024: <strong>€80k</strong></div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Obiettivo Fatturato</span>
+                        <span class="progress-percentage">€155k</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="fatturato-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-details">
+                        Mancano: <strong id="fatturato-mancante">€155k</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Obiettivo Card -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Obiettivo 2025</div>
+                </div>
+                <div class="metric-value">€155k</div>
+                <div class="metric-subtitle">Da raggiungere: <strong id="da-raggiungere">€155k</strong></div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Progressione Obiettivo</span>
+                        <span class="progress-percentage" id="progressione-perc">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="obiettivo-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-details">
+                        Mancano: <strong id="obiettivo-mancante">€155k</strong> • <strong id="obiettivo-percent">0%</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Clienti Attivi -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Clienti Attivi</div>
+                </div>
+                <div class="metric-value" id="clienti-value">0</div>
+                <div class="metric-subtitle" id="clienti-obiettivo">Obiettivo: 35 clienti</div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Obiettivo Clienti</span>
+                        <span class="progress-percentage" id="clienti-perc">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill warning" id="clienti-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-details">
+                        Obiettivo: <strong>35 clienti</strong> • Mancano: <strong id="clienti-mancanti">35</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Performance -->
+            <div class="metric-card performance-card">
+                <div class="metric-header">
+                    <div class="metric-title">Top Performance</div>
+                    <div class="growth-indicator">
+                        <i class="fas fa-arrow-up"></i>
+                        +4.3%
+                    </div>
+                </div>
+                <div class="metric-value" id="top-province">--</div>
+                <div class="metric-subtitle" id="top-province-name">Caricamento...</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="top-fatturato">€0</div>
+                        <div class="stat-label">fatturato totale</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="top-clienti">0</div>
+                        <div class="stat-label">clienti</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trend Mensile -->
+            <div class="metric-card trend-card">
+                <div class="metric-header">
+                    <div class="metric-title">Trend Mensile</div>
+                    <div class="growth-indicator">
+                        <i class="fas fa-chart-line"></i>
+                        Stabile
+                    </div>
+                </div>
+                <div class="metric-value" id="media-mensile">€0</div>
+                <div class="metric-subtitle">Media mensile 2025</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">€10.6k</div>
+                        <div class="stat-label">Media 2024</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="vs-2024">+0%</div>
+                        <div class="stat-label">vs 2024</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Efficienza Vendite -->
+            <div class="metric-card efficiency-card">
+                <div class="metric-header">
+                    <div class="metric-title">Efficienza Vendite</div>
+                    <div class="growth-indicator">
+                        <i class="fas fa-trophy"></i>
+                        Alta
+                    </div>
+                </div>
+                <div class="metric-value" id="media-cliente">€0</div>
+                <div class="metric-subtitle">Fatturato medio per cliente</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="media-giorno">€0</div>
+                        <div class="stat-label">Media/Giorno</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="clienti-mese">0</div>
+                        <div class="stat-label">Clienti/Mese</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-=== INFORMAZIONI AGENTE ===
-Codice Agente,Ragione Sociale,Dalla data,Alla data
-631.00238,CARABOT NATALINO,01/01/2025,24/08/2025
-
-=== VERIFICA OBIETTIVI ===
-Provincia,AnnoPrec.,AnnoCorr.,Obiettivo,% su obiet.,ClientiAnnoPrec.,ClientiAnnoCorr.,Obiettivo,% su obiet.
-Generale,"80.238,72","190.159,79",,,352,20,,
-LT,"79.029,16","82.389,23","135.000,00","38, %",23,28,35,"51, %"
-
-=== CLIENTI PER PROVINCIA ===
-Provincia,Clienti Serviti,Fatturato
-LT,18,"60.437,22"
-RM,2,"7.770,56"
-
-=== RIPARTIZIONE FATTURATO ===
-Categoria,Importo,Percentuale
-Pieni e Coppi,54.909,62,61%
-Altro,35.250,17,39%
-
-=== DETTAGLIO VENDITE PER CLIENTE ===
-Provincia,Ragione Sociale Cliente,Categoria ARTICOLI,Fatturato
-LT,EDILIZIA SETINA S.R.L.,MATTONE PIENO,"1.512,00"
-LT,EDILIZIA SETINA S.R.L.,PAVIMENTAZIONE POLIS,"1.665,62"
-LT,ROSSETTI EDILIZIA SRL,FACCIAVISTA,"583,78"
-LT,ROSSETTI EDILIZIA SRL,LINEA ARCHEO,"743,00"
-LT,ROSSETTI EDILIZIA SRL,MATTONE PIENO,"151,20"
-LT,ROSSETTI EDILIZIA SRL,PAVIMENTAZIONE POLIS,"416,40"
-LT,F.LLI TORA SRL,COPERTURE,"3,36"
-LT,F.LLI TORA SRL,LINEA ARCHEO,"1,74"
-LT,F.LLI TORA SRL,MATTONE PIENO,"3.110,40"
-LT,F.LLI TORA SRL,PAVIMENTAZIONE POLIS,"1.382,40"
-LT,ADDESSI COMMERCIALE SRL,MATTONE PIENO,"3.693,60"
-LT,ADDESSI COMMERCIALE SRL,OUTLET,"0,01"
-LT,ADDESSI COMMERCIALE SRL,PIASTRELLE,"1.240,95"
-LT,CENTRO EDILE DE GREGORIS SRL,CORRIM.COPRIM.,"73,26"
-LT,CENTRO EDILE DE GREGORIS SRL,MATTONE PIENO,"7.776,00"
-LT,CENTRO EDILE DE GREGORIS SRL,PAVIMENTAZIONE POLIS,"8,67"
-LT,CENTRO EDILE DE GREGORIS SRL,REFRATTARI RETTIFICATI,"1.281,60"
-LT,STENI SRL,MATTONE PIENO,"547,20"
-LT,STENI SRL,PAVIMENTAZIONE POLIS,"984,96"
-RM,DOVAL SRL,REFRATTARI,"1.019,82"
-LT,ROSANCOS SRL,MATTONE PIENO,"1.528,80"
-LT,ROSANCOS SRL,PAVIMENTAZIONE POLIS,"604,80"
-LT,EDILCERAMICA SAS DI VEGLIA CRISTIAN & C.,MATTONE PIENO,"1.440,00"
-LT,D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS,MATTONE PIENO,"3.744,00"
-LT,D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS,PAVIMENTAZIONE POLIS,"832,81"
-LT,DIMED SRL,MATTONE PIENO,"1.326,96"
-LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,MATTONE PIENO,"1.209,60"
-LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,REFRATTARI,"900,83"
-LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,REFRATTARI RETTIFICATI,"1.935,58"
-LT,EDILIM SRL,MATTONE PIENO,"1.370,88"
-LT,EDILIM SRL,PAVIMENTAZIONE POLIS,"984,96"
-LT,EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC,MATTONE PIENO,"3.456,00"
-LT,EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC,PAVIMENTAZIONE POLIS,"2.230,80"
-LT,L'EMPORIO DI IOZZI SONIA,MATTONE PIENO,"957,60"
-LT,L'EMPORIO DI IOZZI SONIA,PAVIMENTAZIONE POLIS,"984,96"
-LT,EDIL PONTINA SRLS,MATTONE PIENO,"864,00"
-LT,EDIL PONTINA SRLS,REFRATTARI,"379,47"
-LT,EDIL PONTINA SRLS,REFRATTARI RETTIFICATI,"819,98"
-LT,FER.COM. COSTRUZIONI SRL,PAVIMENTAZIONE POLIS,"2.695,68"
-LT,FER.COM. COSTRUZIONI SRL,REFRATTARI,"640,35"
-LT,FER.COM. COSTRUZIONI SRL,REFRATTARI RETTIFICATI,"460,34"
-LT,EDILIZIA PRIMAVERA SRL,PAVIMENTAZIONE POLIS,"933,12"
-LT,EDILIZIA PRIMAVERA SRL,REFRATTARI,"1.969,92"
-LT,EDILIZIA PRIMAVERA SRL,REFRATTARI RETTIFICATI,"870,33"
-RM,COLANTUONO 1918 SRL,LINEA ARCHEO,"1,94"
-RM,COLANTUONO 1918 SRL,MATTONE PIENO,"5.150,40"
-RM,COLANTUONO 1918 SRL,PAVIMENTAZIONE POLIS,"1.598,40"
-LT,LATINA BETON SERVIZI SRL,FACCIAVISTA,"1.007,62"
-LT,LATINA BETON SERVIZI SRL,MATTONE PIENO,"720,00"
-LT,LATINA BETON SERVIZI SRL,PAVIMENTAZIONE POLIS,"362,88"
-
-=== RIEPILOGO PER CATEGORIA ===
-Categoria,Importo Totale,Provincia LT Clienti,Provincia RM Clienti
-COPERTURE,"3,36",1,0
-CORRIM.COPRIM.,"73,26",1,0
-COTTO A MANO ANTICHE TERRE,"0,00",0,0
-FACCIAVISTA,"1.591,40",2,0
-GANCI E ACCESSO,"0,00",0,0
-LINEA ARCHEO,"746,68",2,1
-MATTONE PIENO,"38.558,64",16,1
-OUTLET,"0,01",1,0
-PAVIMENTAZIONE POLIS,"15.686,46",13,1
-PEZ.SPEC.COPPI,"0,00",0,0
-PIASTRELLE,"1.240,95",1,0
-PRODOTTI FORNO,"0,00",0,0
-TAVELLONI,"0,00",0,0
-REFRATTARI,"4.910,39",4,1
-REFRATTARI RETTIFICATI,"5.367,83",5,0
-PROMOZIONALI,"0,00",0,0
-,"68.178,98",0,0
-
-=== TOTALI ===
-Descrizione,Valore
-Fatturato Totale,6820778.00
-Clienti Totali,20
-Province Servite,2
-Periodo,01/01/2025 - 24/08/2025
+    <script>
+        let selectedProvince = 'all';
+        let csvData = [];
+        let productsChart = null;
+        
+        // URL del CSV (raw GitHub)
+        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/63100238_CARABOT-NATALINO.csv';
+        
+        // Funzione per caricare e aggiornare i dati dal CSV
+        async function loadDataFromCSV() {
+            const statusIndicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            try {
+                // Mostra stato di caricamento
+                statusIndicator.className = 'status-indicator loading';
+                statusText.textContent = 'Caricamento dati...';
+                
+                console.log('Caricamento CSV da:', CSV_URL);
+                
+                const response = await fetch(CSV_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const csvContent = await response.text();
+                console.log('CSV caricato, dimensione:', csvContent.length, 'caratteri');
+                
+                // Parsing semplificato del CSV
+                const lines = csvContent.split('\n');
+                const data = [];
+                let headers = [];
+                
+                // Trova le intestazioni (prima riga non vuota con separatori)
+                let headerIndex = -1;
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line && line.includes(';') && line.split(';').length > 3) {
+                        headers = line.split(';').map(h => h.trim().replace(/"/g, ''));
+                        headerIndex = i;
+                        break;
+                    }
+                }
+                
+                if (headerIndex >= 0) {
+                    // Processa le righe di dati
+                    for (let i = headerIndex + 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (line && !line.includes('===')) {
+                            const values = line.split(';').map(v => v.trim().replace(/"/g, ''));
+                            if (values.length >= headers.length) {
+                                const row = {};
+                                headers.forEach((header, index) => {
+                                    row[header] = values[index] || '';
+                                });
+                                data.push(row);
+                            }
+                        }
+                    }
+                }
+                
+                console.log('Dati elaborati:', data.length, 'righe');
+                csvData = data;
+                
+                // Aggiorna la dashboard
+                updateDashboardFromData(data);
+                
+                // Stato successo
+                statusIndicator.className = 'status-indicator';
+                statusText.textContent = `Dati aggiornati: ${new Date().toLocaleTimeString()}`;
+                
+            } catch (error) {
+                console.error('Errore nel caricamento:', error);
+                statusIndicator.className = 'status-indicator error';
+                statusText.textContent = 'Errore caricamento dati: ' + error.message;
+            }
+        }
+        
+        // Funzione per aggiornare la dashboard con i dati
+        function updateDashboardFromData(data) {
+            let totalFatturato = 0;
+            let clientiUnici = new Set();
+            let provinceStats = { LT: { fatturato: 0, clienti: new Set() }, RM: { fatturato: 0, clienti: new Set() } };
+            
+            // Elabora i dati
+            data.forEach(row => {
+                // Cerca il fatturato (prova diverse colonne possibili)
+                let fatturato = 0;
+                const possibleColumns = ['Fatturato', 'Importo', 'Totale', 'Valore'];
+                for (const col of possibleColumns) {
+                    if (row[col]) {
+                        const val = parseFloat(row[col].toString().replace(/[€\.,\s]/g, ''));
+                        if (!isNaN(val) && val > 0) {
+                            fatturato = val;
+                            break;
+                        }
+                    }
+                }
+                
+                const cliente = row['Cliente'] || row['Ragione Sociale'] || row['Nome'] || '';
+                const provincia = row['Provincia'] || row['Prov'] || row['PR'] || '';
+                
+                if (fatturato > 0) {
+                    totalFatturato += fatturato;
+                }
+                
+                if (cliente) {
+                    clientiUnici.add(cliente);
+                }
+                
+                // Statistiche province
+                if (provincia === 'LT' || provincia === 'Latina') {
+                    provinceStats.LT.fatturato += fatturato;
+                    if (cliente) provinceStats.LT.clienti.add(cliente);
+                } else if (provincia === 'RM' || provincia === 'Roma') {
+                    provinceStats.RM.fatturato += fatturato;
+                    if (cliente) provinceStats.RM.clienti.add(cliente);
+                }
+            });
+            
+            // Aggiorna i valori nella dashboard
+            const fatturatoK = Math.round(totalFatturato / 1000);
+            const obiettivo = 155000; // €155k
+            const progressione = Math.round((totalFatturato / obiettivo) * 100);
+            const mancante = Math.max(0, obiettivo - totalFatturato);
+            
+            // Aggiorna elementi
+            document.getElementById('fatturato-value').textContent = `€${fatturatoK}k`;
+            document.getElementById('clienti-value').textContent = clientiUnici.size;
+            document.getElementById('fatturato-progress').style.width = `${Math.min(progressione, 100)}%`;
+            document.getElementById('obiettivo-progress').style.width = `${Math.min(progressione, 100)}%`;
+            document.getElementById('progressione-perc').textContent = `${progressione}%`;
+            document.getElementById('fatturato-mancante').textContent = `€${Math.round(mancante/1000)}k`;
+            document.getElementById('da-raggiungere').textContent = `€${Math.round(mancante/1000)}k`;
+            document.getElementById('obiettivo-mancante').textContent = `€${Math.round(mancante/1000)}k`;
+            document.getElementById('obiettivo-percent').textContent = `${progressione}%`;
+            
+            // Crescita (calcolo mockup)
+            const crescita = 12.4; // Puoi calcolare questo in base ai dati storici
+            document.getElementById('growth-rate').textContent = `+${crescita}%`;
+            
+            // Clienti
+            const obiettivoClienti = 35;
+            const progressioneClienti = Math.round((clientiUnici.size / obiettivoClienti) * 100);
+            document.getElementById('clienti-progress').style.width = `${Math.min(progressioneClienti, 100)}%`;
+            document.getElementById('clienti-perc').textContent = `${progressioneClienti}%`;
+            document.getElementById('clienti-mancanti').textContent = Math.max(0, obiettivoClienti - clientiUnici.size);
+            
+            // Media mensile (8 mesi)
+            const mesi = 8;
+            const mediaMensile = Math.round(totalFatturato / mesi / 1000);
+            document.getElementById('media-mensile').textContent = `€${mediaMensile}k`;
+            
+            // Efficienza
+            const mediaCliente = clientiUnici.size > 0 ? Math.round(totalFatturato / clientiUnici.size / 1000) : 0;
+            document.getElementById('media-cliente').textContent = `€${mediaCliente}k`;
+            
+            const mediaGiorno = Math.round(totalFatturato / (30 * mesi));
+            document.getElementById('media-giorno').textContent = `€${mediaGiorno}`;
+            
+            const clientiMese = Math.round(clientiUnici.size / mesi * 10) / 10;
+            document.getElementById('clienti-mese').textContent = clientiMese;
+            
+            // Top performance
+            const topProv = provinceStats.LT.fatturato >= provinceStats.RM.fatturato ? 'LT' : 'RM';
+            const topStats = provinceStats[topProv];
+            document.getElementById('top-province').textContent = topProv;
+            document.getElementById('top-province-name').textContent = `Provincia ${topProv === 'LT' ? 'Latina' : 'Roma'}`;
+            document.getElementById('top-fatturato').textContent = `€${Math.round(topStats.fatturato/1000)}k`;
+            document.getElementById('top-clienti').textContent = topStats.clienti.size;
+            
+            // Aggiorna statistiche province nel dropdown
+            document.getElementById('lt-stats').textContent = `€${Math.round(provinceStats.LT.fatturato/1000)}k • ${provinceStats.LT.clienti.size} clienti`;
+            document.getElementById('rm-stats').textContent = `€${Math.round(provinceStats.RM.fatturato/1000)}k • ${provinceStats.RM.clienti.size} clienti`;
+            
+            console.log('Dashboard aggiornata con i dati CSV');
+        }
+        
+        // Refresh manuale
+        async function manualRefresh() {
+            const button = document.querySelector('.refresh-button');
+            const originalContent = button.innerHTML;
+            
+            // Stato loading
+            button.classList.add('loading');
+            button.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i><span>Aggiornando...</span>';
+            
+            try {
+                await loadDataFromCSV();
+                
+                // Successo
+                button.innerHTML = '<i class="fas fa-check"></i><span>Aggiornato!</span>';
+                button.style.background = '#48bb78';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.classList.remove('loading');
+                    button.style.background = '';
+                }, 2000);
+                
+            } catch (error) {
+                // Errore
+                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Errore</span>';
+                button.style.background = '#e53e3e';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.classList.remove('loading');
+                    button.style.background = '';
+                }, 3000);
+            }
+        }
+        
+        // Funzioni dropdown province
+        function toggleDropdown() {
+            const dropdown = document.getElementById('province-dropdown');
+            dropdown.classList.toggle('active');
+        }
+        
+        function closeDropdown() {
+            const dropdown = document.getElementById('province-dropdown');
+            dropdown.classList.remove('active');
+        }
+        
+        // Gestione selezione provincia
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.province-option')) {
+                const option = e.target.closest('.province-option');
+                const province = option.getAttribute('data-province');
+                
+                // Rimuovi selezione precedente
+                document.querySelectorAll('.province-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Aggiungi selezione corrente
+                option.classList.add('selected');
+                
+                // Aggiorna testo bottone
+                const provinceName = option.querySelector('h4').textContent;
+                document.getElementById('selected-province').textContent = provinceName;
+                
+                // Aggiorna dati per provincia specifica
+                updateDashboardForProvince(province);
+                closeDropdown();
+            }
+            
+            // Chiudi dropdown se click esterno
+            if (!e.target.closest('.province-selector')) {
+                closeDropdown();
+            }
+        });
+        
+        // Aggiorna dashboard per provincia specifica
+        function updateDashboardForProvince(province) {
+            selectedProvince = province;
+            
+            if (!csvData || csvData.length === 0) {
+                console.log('Nessun dato disponibile per il filtro');
+                return;
+            }
+            
+            let filteredData = csvData;
+            
+            if (province !== 'all') {
+                filteredData = csvData.filter(row => {
+                    const prov = (row['Provincia'] || row['Prov'] || row['PR'] || '').toUpperCase();
+                    return prov === province.toUpperCase() || 
+                           (province === 'LT' && prov === 'LATINA') ||
+                           (province === 'RM' && prov === 'ROMA');
+                });
+            }
+            
+            console.log(`Filtrati ${filteredData.length} righe per provincia ${province}`);
+            updateDashboardFromData(filteredData);
+        }
+        
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Inizializzazione dashboard...');
+            
+            // Carica i dati iniziali
+            loadDataFromCSV();
+            
+            // Auto-refresh ogni 5 minuti (300000 ms)
+            setInterval(loadDataFromCSV, 300000);
+            
+            console.log('Auto-refresh impostato ogni 5 minuti');
+        });
+    </script>
+</body>
+</html>
