@@ -1015,7 +1015,7 @@
         let lastUpdateTime = null;
         
         // Funzioni di utilità per il parsing e formattazione
-        function parseFloat(str) {
+        function parseFloatSafe(str) {
             if (!str || str === '') return 0;
             // Rimuovi caratteri non numerici eccetto punto e virgola
             const cleaned = str.toString().replace(/[^\d.,-]/g, '');
@@ -1160,7 +1160,7 @@
             data.forEach(row => {
                 // Trova le colonne dei dati (assumendo struttura standard)
                 const provincia = row['Provincia'] || row['PROVINCIA'] || row['provincia'] || '';
-                const fatturato = parseFloat(row['Fatturato'] || row['FATTURATO'] || row['fatturato'] || '0');
+                const fatturato = parseFloatSafe(row['Fatturato'] || row['FATTURATO'] || row['fatturato'] || '0');
                 const cliente = row['Cliente'] || row['CLIENTE'] || row['cliente'] || '';
                 const prodotto = row['Prodotto'] || row['PRODOTTO'] || row['prodotto'] || '';
                 
