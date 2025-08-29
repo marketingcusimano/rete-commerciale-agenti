@@ -6,6 +6,7 @@
     <title>Dashboard Agente CARABOT NATALINO</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -127,20 +128,8 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
-        }
-
-        @media (max-width: 1024px) {
-            .cards-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 640px) {
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         .metric-card {
@@ -281,6 +270,7 @@
             padding: 32px;
             margin: 32px 0;
             border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .section-header {
@@ -288,83 +278,77 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 32px;
-            padding-bottom: 20px;
+            padding-bottom: 16px;
             border-bottom: 2px solid #f1f5f9;
         }
 
-        .section-header h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e293b;
+        .section-title-with-icon {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
         .section-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 16px;
+            font-size: 18px;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
         }
 
         .chart-container {
             display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 40px;
-            align-items: start;
+            grid-template-columns: 1fr auto;
+            gap: 48px;
+            align-items: center;
         }
 
         .chart-wrapper {
             position: relative;
-            height: 400px;
+            height: 350px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #fafbfc;
-            border-radius: 12px;
-            padding: 20px;
         }
 
-        .chart-info {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
+        .chart-center-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
         }
 
-        .info-card {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 20px;
-            border-left: 4px solid #3b82f6;
-        }
-
-        .info-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-description {
+        .chart-center-title {
             font-size: 0.9rem;
             color: #64748b;
-            line-height: 1.5;
-            margin-bottom: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .chart-center-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
         }
 
         .chart-legend {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
+            min-width: 280px;
         }
 
         .legend-item {
@@ -372,24 +356,24 @@
             align-items: center;
             justify-content: space-between;
             padding: 20px;
-            background: white;
-            border-radius: 12px;
-            border: 2px solid #f1f5f9;
-            transition: all 0.2s ease;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .legend-item:hover {
-            border-color: #cbd5e1;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .legend-item.pieni-coppi {
-            border-left: 4px solid #3b82f6;
+            border-left-color: #3b82f6;
         }
 
         .legend-item.altro {
-            border-left: 4px solid #f59e0b;
+            border-left-color: #f59e0b;
         }
 
         .legend-content {
@@ -398,31 +382,47 @@
             gap: 16px;
         }
 
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .legend-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            font-weight: 600;
         }
 
-        .legend-color.pieni-coppi {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        .legend-icon-wrapper.pieni-coppi {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
         }
 
-        .legend-color.altro {
+        .legend-icon-wrapper.altro {
             background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .legend-text {
+            flex: 1;
         }
 
         .legend-label {
             font-size: 1rem;
             font-weight: 600;
             color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .legend-description {
+            font-size: 0.85rem;
+            color: #6b7280;
         }
 
         .legend-value {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+            gap: 4px;
         }
 
         .legend-amount {
@@ -433,39 +433,21 @@
 
         .legend-percentage {
             font-size: 0.9rem;
-            color: #64748b;
-            font-weight: 500;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
         }
 
-        .chart-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 20px;
+        .legend-percentage.pieni-coppi {
+            background: #3b82f6;
         }
 
-        .stat-item {
-            text-align: center;
-            padding: 16px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+        .legend-percentage.altro {
+            background: #f59e0b;
         }
 
-        .stat-label {
-            font-size: 0.8rem;
-            color: #64748b;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        @media (max-width: 1024px) {
+        @media (max-width: 768px) {
             .chart-container {
                 grid-template-columns: 1fr;
                 gap: 32px;
@@ -474,30 +456,17 @@
             .chart-section {
                 padding: 24px;
             }
-            
-            .chart-wrapper {
-                height: 350px;
-            }
-        }
 
-        @media (max-width: 640px) {
-            .chart-container {
-                gap: 24px;
-            }
-            
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
-            }
-            
             .chart-wrapper {
-                height: 300px;
+                height: 280px;
+            }
+
+            .legend-item {
                 padding: 16px;
             }
-            
-            .chart-stats {
-                grid-template-columns: 1fr;
+
+            .section-header h2 {
+                font-size: 1.25rem;
             }
         }
             .dashboard-container {
@@ -572,39 +541,27 @@
             <!-- SEZIONE 5: RIPARTIZIONE FATTURATO -->
             <div class="chart-section">
                 <div class="section-header">
-                    <h2>
-                        <div class="section-icon">📊</div>
-                        RIPARTIZIONE FATTURATO
-                    </h2>
+                    <div class="section-title-with-icon">
+                        <div class="section-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <h2>RIPARTIZIONE FATTURATO</h2>
+                    </div>
                     <div class="status-indicator">
-                        <span>●</span>
-                        <span>Aggiornato automaticamente</span>
+                        <span><i class="fas fa-sync-alt"></i></span>
+                        <span>Aggiornamento automatico</span>
                     </div>
                 </div>
                 <div class="chart-container">
                     <div class="chart-wrapper">
                         <canvas id="fatturato-chart"></canvas>
+                        <div class="chart-center-info" id="chartCenterInfo">
+                            <div class="chart-center-title">Totale</div>
+                            <div class="chart-center-value" id="chartCenterValue">€90k</div>
+                        </div>
                     </div>
-                    <div class="chart-info">
-                        <div class="info-card">
-                            <div class="info-title">
-                                <span>ℹ️</span>
-                                Analisi Distribuzione
-                            </div>
-                            <div class="info-description">
-                                La ripartizione del fatturato mostra la distribuzione tra i prodotti principali 
-                                (Pieni e Coppi) e le altre categorie merceologiche. Questo indicatore è fondamentale 
-                                per comprendere il focus commerciale e le opportunità di diversificazione.
-                            </div>
-                        </div>
-                        
-                        <div class="chart-legend" id="chartLegend">
-                            <!-- Legend sarà generata dinamicamente -->
-                        </div>
-                        
-                        <div class="chart-stats" id="chartStats">
-                            <!-- Stats saranno generate dinamicamente -->
-                        </div>
+                    <div class="chart-legend" id="chartLegend">
+                        <!-- Legend sarà generata dinamicamente -->
                     </div>
                 </div>
             </div>
@@ -905,44 +862,41 @@
 
             console.log(`Ripartizione automatica: Pieni e Coppi €${pieniCoppiValue} (${pieniCoppiPerc}%), Altro €${altroValue} (${altroPerc}%)`);
 
-            // Aggiorna legend dinamicamente
+            // Aggiorna il valore centrale
+            document.getElementById('chartCenterValue').textContent = formatCurrency(total);
+
+            // Aggiorna legend dinamicamente con icone
             const legendContainer = document.getElementById('chartLegend');
             legendContainer.innerHTML = `
                 <div class="legend-item pieni-coppi">
                     <div class="legend-content">
-                        <div class="legend-color pieni-coppi"></div>
-                        <div class="legend-label">Pieni e Coppi</div>
+                        <div class="legend-icon-wrapper pieni-coppi">
+                            <i class="fas fa-th-large"></i>
+                        </div>
+                        <div class="legend-text">
+                            <div class="legend-label">Pieni e Coppi</div>
+                            <div class="legend-description">Prodotti principali</div>
+                        </div>
                     </div>
                     <div class="legend-value">
                         <div class="legend-amount">${formatCurrency(pieniCoppiValue)}</div>
-                        <div class="legend-percentage">${pieniCoppiPerc}%</div>
+                        <div class="legend-percentage pieni-coppi">${pieniCoppiPerc}%</div>
                     </div>
                 </div>
                 <div class="legend-item altro">
                     <div class="legend-content">
-                        <div class="legend-color altro"></div>
-                        <div class="legend-label">Altro</div>
+                        <div class="legend-icon-wrapper altro">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="legend-text">
+                            <div class="legend-label">Altri Prodotti</div>
+                            <div class="legend-description">Articoli vari</div>
+                        </div>
                     </div>
                     <div class="legend-value">
                         <div class="legend-amount">${formatCurrency(altroValue)}</div>
-                        <div class="legend-percentage">${altroPerc}%</div>
+                        <div class="legend-percentage altro">${altroPerc}%</div>
                     </div>
-                </div>
-            `;
-
-            // Aggiorna statistiche
-            const statsContainer = document.getElementById('chartStats');
-            const avgTicket = total > 0 ? total / 2 : 0; // Media tra le due categorie
-            const dominantCategory = pieniCoppiValue > altroValue ? 'Pieni e Coppi' : 'Altro';
-            
-            statsContainer.innerHTML = `
-                <div class="stat-item">
-                    <div class="stat-label">FATTURATO TOTALE</div>
-                    <div class="stat-value">${formatCurrency(total)}</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">CATEGORIA DOMINANTE</div>
-                    <div class="stat-value">${dominantCategory}</div>
                 </div>
             `;
 
@@ -951,12 +905,12 @@
                 fatturato_chart.destroy();
             }
 
-            // Crea nuovo chart con dati dinamici e design migliorato
+            // Crea nuovo chart con dati dinamici e design moderno
             const ctx = document.getElementById('fatturato-chart').getContext('2d');
             fatturato_chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Pieni e Coppi', 'Altro'],
+                    labels: ['Pieni e Coppi', 'Altri Prodotti'],
                     datasets: [{
                         data: [pieniCoppiValue, altroValue],
                         backgroundColor: [
@@ -968,18 +922,18 @@
                             'rgba(245, 158, 11, 1)'
                         ],
                         borderWidth: 3,
+                        hoverBorderWidth: 5,
+                        hoverOffset: 12,
                         hoverBackgroundColor: [
                             'rgba(59, 130, 246, 0.9)',
                             'rgba(245, 158, 11, 0.9)'
-                        ],
-                        hoverBorderWidth: 4,
-                        hoverOffset: 10
+                        ]
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '65%',
+                    cutout: '75%',
                     plugins: {
                         legend: {
                             display: false
@@ -993,68 +947,41 @@
                             cornerRadius: 12,
                             displayColors: true,
                             titleFont: {
+                                family: 'Montserrat',
                                 size: 14,
                                 weight: '600'
                             },
                             bodyFont: {
+                                family: 'Montserrat',
                                 size: 13,
                                 weight: '500'
                             },
+                            padding: 12,
                             callbacks: {
                                 label: function(context) {
                                     const value = context.parsed;
                                     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                                     return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
-                                },
-                                afterLabel: function(context) {
-                                    const value = context.parsed;
-                                    const isMain = context.label === 'Pieni e Coppi';
-                                    return isMain ? 'Categoria principale' : 'Prodotti complementari';
                                 }
                             }
                         }
                     },
                     interaction: {
                         intersect: false,
-                        mode: 'point'
+                        mode: 'index'
                     },
                     animation: {
                         animateScale: true,
                         animateRotate: true,
                         duration: 1200,
-                        easing: 'easeInOutQuart'
+                        easing: 'easeInOutCubic'
                     },
                     elements: {
                         arc: {
-                            borderWidth: 3,
                             borderJoinStyle: 'round'
                         }
                     }
-                },
-                plugins: [{
-                    id: 'centerText',
-                    beforeDraw: function(chart) {
-                        const ctx = chart.ctx;
-                        const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
-                        const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
-                        
-                        ctx.save();
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        
-                        // Totale
-                        ctx.font = 'bold 28px Montserrat';
-                        ctx.fillStyle = '#1e293b';
-                        ctx.fillText(formatCurrency(total), centerX, centerY - 10);
-                        
-                        // Label
-                        ctx.font = '500 14px Montserrat';
-                        ctx.fillStyle = '#64748b';
-                        ctx.fillText('FATTURATO TOTALE', centerX, centerY + 15);
-                        
-                        ctx.restore();
-                    }
-                }]
+                }
             });
         }
 
