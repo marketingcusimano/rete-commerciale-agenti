@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Agente CARABOT NATALINO</title>
+    <title>Ripartizione Fatturato - CARABOT NATALINO</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -47,242 +48,196 @@
             margin-bottom: 16px;
         }
 
-        .agent-details {
-            display: flex;
-            gap: 32px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            color: #475569;
-        }
-
-        .detail-item .label {
-            font-weight: 600;
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #dcfce7;
-            color: #166534;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
         .section-title {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: #1e293b;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
         }
 
-        .filter-controls {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .filter-label {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        .province-selector {
-            position: relative;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-        }
-
-        .province-selector select {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 12px 40px 12px 16px;
-            border: none;
-            background: transparent;
-            color: #1e293b;
-            cursor: pointer;
-            min-width: 180px;
-            outline: none;
-        }
-
-        .cards-grid {
+        .ripartizione-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
         }
 
-        .metric-card {
+        .chart-card {
             background: white;
             border-radius: 16px;
             padding: 24px;
             border: 1px solid #e2e8f0;
-            transition: all 0.2s ease;
-            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .metric-card:hover {
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border-color: #cbd5e1;
         }
 
-        .card-header {
+        .stat-header {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
-        .card-title {
+        .stat-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .stat-label {
             font-size: 0.9rem;
             font-weight: 500;
             color: #64748b;
-            line-height: 1.4;
         }
 
-        .trend-badge {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 12px;
-        }
-
-        .trend-positive {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .trend-negative {
-            background: #fef2f2;
-            color: #dc2626;
-        }
-
-        .main-value {
-            font-size: 2rem;
+        .stat-value {
+            font-size: 1.8rem;
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
-        .comparison {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            font-size: 0.85rem;
-        }
-
-        .prev-value {
-            color: #64748b;
-        }
-
-        .change-value {
+        .stat-percentage {
+            font-size: 0.9rem;
             font-weight: 600;
-        }
-
-        .progress-section {
-            margin-top: 16px;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .progress-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #475569;
-        }
-
-        .progress-percentage {
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        .progress-bar {
-            background: #f1f5f9;
-            border-radius: 8px;
-            height: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 8px;
-            transition: width 0.6s ease;
-        }
-
-        .progress-green {
-            background: #22c55e;
-        }
-
-        .progress-blue {
-            background: #3b82f6;
-        }
-
-        .progress-details {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.8rem;
             color: #64748b;
+        }
+
+        .breakdown-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .breakdown-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .breakdown-table th,
+        .breakdown-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .breakdown-table th {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+            background: #f8fafc;
+        }
+
+        .breakdown-table td {
+            font-size: 0.9rem;
+        }
+
+        .category-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
         }
 
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 200px;
+            height: 300px;
             color: #64748b;
             font-size: 1rem;
         }
+
+        .color-pieni { background-color: #3b82f6; }
+        .color-altro { background-color: #10b981; }
 
         @media (max-width: 768px) {
             .dashboard-container {
                 padding: 16px;
             }
             
-            .header {
-                padding: 20px;
-            }
-            
-            .agent-details {
-                gap: 16px;
-            }
-            
-            .cards-grid {
+            .ripartizione-grid {
                 grid-template-columns: 1fr;
             }
             
-            .controls {
+            .chart-container {
+                height: 250px;
+            }
+            
+            .chart-legend {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
+                align-items: center;
+                gap: 12px;
             }
         }
     </style>
@@ -291,45 +246,108 @@
     <div class="dashboard-container">
         <div class="header">
             <h1 id="agentName">CARABOT NATALINO</h1>
-            <div class="subtitle">Dashboard Performance Vendite</div>
-            <div class="agent-details">
-                <div class="detail-item">
-                    <span class="label">ID:</span>
-                    <span id="agentCode">631.00238</span>
-                </div>
-                <div class="detail-item">
-                    <span class="label">📅</span>
-                    <span id="period">Gen - Ago 2025 (8 mesi)</span>
-                </div>
-                <div class="status-indicator">
-                    <span>●</span>
-                    <span>Dati aggiornati dal file HTML</span>
-                </div>
-            </div>
+            <div class="subtitle">Ripartizione Fatturato per Categoria Prodotto</div>
         </div>
 
-        <div class="controls">
-            <div class="section-title">FILTRO TERRITORIO</div>
-            <div class="filter-controls">
-                <div class="filter-label">Selezione Provincia</div>
-                <div class="province-selector">
-                    <select id="provinceSelect">
-                        <option value="all">● Tutte le Province</option>
-                        <option value="generale">Generale</option>
-                        <option value="LT">LT</option>
-                        <option value="RM">RM</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+        <div class="section-title">📊 SEZIONE 5: RIPARTIZIONE FATTURATO</div>
 
         <div id="loadingMessage" class="loading">
-            Caricamento dati in corso...
+            Caricamento dati ripartizione fatturato...
         </div>
 
         <div id="dashboardContent" style="display: none;">
-            <div class="cards-grid" id="metricsCards">
-                <!-- Le card verranno generate dinamicamente -->
+            <!-- Grafici principali -->
+            <div class="ripartizione-grid">
+                <div class="chart-card">
+                    <div class="chart-title">Ripartizione per Valore</div>
+                    <div class="chart-container">
+                        <canvas id="valueChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color color-pieni"></div>
+                            <span>Pieni e Coppi</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color color-altro"></div>
+                            <span>Altro</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">Distribuzione Percentuale</div>
+                    <div class="chart-container">
+                        <canvas id="percentageChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color color-pieni"></div>
+                            <span id="pieniPercentage">60.8%</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color color-altro"></div>
+                            <span id="altroPercentage">39.2%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card statistiche -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon color-pieni"></div>
+                        <div class="stat-label">Pieni e Coppi</div>
+                    </div>
+                    <div class="stat-value" id="pieniValue">€54.910</div>
+                    <div class="stat-percentage" id="pieniPercText">60.8% del fatturato totale</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon color-altro"></div>
+                        <div class="stat-label">Altri Prodotti</div>
+                    </div>
+                    <div class="stat-value" id="altroValue">€35.250</div>
+                    <div class="stat-percentage" id="altroPercText">39.2% del fatturato totale</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon" style="background: linear-gradient(45deg, #3b82f6, #10b981);"></div>
+                        <div class="stat-label">Fatturato Totale</div>
+                    </div>
+                    <div class="stat-value" id="totalValue">€90.160</div>
+                    <div class="stat-percentage">Somma di tutte le categorie</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon" style="background: #f59e0b;"></div>
+                        <div class="stat-label">Differenza</div>
+                    </div>
+                    <div class="stat-value" id="differenceValue">€19.660</div>
+                    <div class="stat-percentage" id="differenceText">Pieni e Coppi vs Altri</div>
+                </div>
+            </div>
+
+            <!-- Tabella breakdown -->
+            <div class="breakdown-section">
+                <div class="breakdown-title">💼 Dettaglio Ripartizione Fatturato</div>
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>Categoria Prodotto</th>
+                            <th>Importo</th>
+                            <th>Percentuale</th>
+                            <th>Differenza vs Media</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdownTableBody">
+                        <!-- Popolato dinamicamente -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -338,9 +356,8 @@
         // URL del CSV su GitHub
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
         
-        let currentData = [];
-        let agentInfo = {};
-        let selectedProvince = 'all';
+        let ripartizioneData = [];
+        let valueChart, percentageChart;
 
         function formatNumber(num) {
             return new Intl.NumberFormat('it-IT', {
@@ -351,19 +368,15 @@
         }
 
         function formatCurrency(num) {
-            if (num >= 1000) {
-                return '€' + Math.round(num / 1000) + 'k';
-            }
-            return '€' + formatNumber(num);
+            return new Intl.NumberFormat('it-IT', {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(num);
         }
 
-        function calculateChange(current, previous) {
-            const change = current - previous;
-            const percentage = previous > 0 ? ((change / previous) * 100) : 0;
-            return { change, percentage };
-        }
-
-        // Funzione per parsificare il CSV personalizzato
+        // Funzione per parsificare il CSV
         function parseCSV(csvText) {
             const lines = csvText.trim().split('\n');
             const data = [];
@@ -372,16 +385,13 @@
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 
-                // Salta righe vuote e commenti
                 if (!line || line.startsWith('#')) continue;
                 
-                // Se la riga contiene "Tipo_Dato" è un header
                 if (line.includes('Tipo_Dato')) {
                     currentHeaders = line.split(',').map(h => h.trim());
                     continue;
                 }
                 
-                // Processa i dati se abbiamo headers
                 if (currentHeaders && line) {
                     const values = line.split(',').map(v => v.trim());
                     if (values.length >= currentHeaders.length) {
@@ -390,10 +400,7 @@
                         currentHeaders.forEach((header, index) => {
                             let value = values[index] || '';
                             
-                            // Converti numeri
-                            if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Percentuale_Obiettivo', 
-                                'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Obiettivo_Clienti', 
-                                'Percentuale_Obiettivo_Clienti', 'Fatturato', 'Clienti_Serviti'].includes(header)) {
+                            if (['Importo', 'Percentuale'].includes(header)) {
                                 value = parseFloat(value) || 0;
                             }
                             
@@ -408,199 +415,153 @@
             return data;
         }
 
-        function createFatturatoCard(data) {
-            const current = data.Anno_Corrente;
-            const previous = data.Anno_Precedente;
-            const { change, percentage } = calculateChange(current, previous);
-            const isPositive = change >= 0;
+        function createCharts() {
+            const pieData = ripartizioneData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
             
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Fatturato 2025</div>
-                        <div class="trend-badge ${isPositive ? 'trend-positive' : 'trend-negative'}">
-                            ${isPositive ? '↗' : '↘'} ${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCurrency(current)}</div>
-                    <div class="comparison">
-                        <span class="prev-value">vs 2024: ${formatCurrency(previous)}</span>
-                    </div>
-                    ${data.Obiettivo > 0 ? `
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <span class="progress-label">● Obiettivo Fatturato</span>
-                                <span class="progress-percentage">${formatCurrency(data.Obiettivo)}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill progress-green" style="width: ${Math.min((current/data.Obiettivo)*100, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span>Mancano: ${formatCurrency(Math.max(0, data.Obiettivo - current))}</span>
-                                <span>${Math.round((current/data.Obiettivo)*100)}%</span>
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        function createObiettivoCard(data) {
-            const current = data.Anno_Corrente;
-            const target = data.Obiettivo;
-            const progressPerc = target > 0 ? (current / target) * 100 : 0;
-            const remaining = Math.max(0, target - current);
+            if (pieData.length === 0) return;
             
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Obiettivo 2025</div>
-                        <div class="trend-badge trend-positive">
-                            ${Math.round(progressPerc)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCurrency(target)}</div>
-                    <div class="comparison">
-                        <span class="prev-value">Da raggiungere: ${formatCurrency(remaining)}</span>
-                    </div>
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <span class="progress-label">● Progressione Obiettivo</span>
-                            <span class="progress-percentage">${formatCurrency(target)}</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill progress-blue" style="width: ${Math.min(progressPerc, 100)}%"></div>
-                        </div>
-                        <div class="progress-details">
-                            <span>Mancano: ${formatCurrency(remaining)}</span>
-                            <span>${Math.round(progressPerc)}%</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function createTopPerformanceCard(data) {
-            // Trova la provincia con performance migliore
-            const allProvData = currentData.filter(d => d.Provincia !== 'Generale');
-            let topProv = allProvData[0];
-            let bestGrowth = 0;
+            const labels = pieData.map(item => item.Categoria_Prodotto);
+            const values = pieData.map(item => item.Importo);
+            const percentages = pieData.map(item => item.Percentuale);
             
-            allProvData.forEach(prov => {
-                const growth = ((prov.Anno_Corrente - prov.Anno_Precedente) / prov.Anno_Precedente) * 100;
-                if (growth > bestGrowth) {
-                    bestGrowth = growth;
-                    topProv = prov;
+            const colors = ['#3b82f6', '#10b981'];
+            const backgroundColors = colors.map(color => color + '20');
+            
+            // Grafico valori assoluti
+            const valueCtx = document.getElementById('valueChart').getContext('2d');
+            valueChart = new Chart(valueCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: colors,
+                        borderWidth: 2,
+                        cutout: '60%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const percentage = ((value / values.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                                    return `${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
                 }
             });
-            
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Top Performance</div>
-                        <div class="trend-badge trend-positive">
-                            +${bestGrowth.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${topProv?.Provincia || 'LT'}</div>
-                    <div class="comparison">
-                        <span class="prev-value">Provincia ${topProv?.Provincia === 'LT' ? 'Latina' : 'Roma'}</span>
-                        <span class="change-value" style="color: #22c55e;">crescita totale</span>
-                    </div>
-                    <div class="progress-details">
-                        <span style="color: #64748b; font-size: 0.85rem;">${formatCurrency(topProv?.Anno_Corrente || 0)}</span>
-                    </div>
-                </div>
-            `;
+
+            // Grafico percentuali
+            const percCtx = document.getElementById('percentageChart').getContext('2d');
+            percentageChart = new Chart(percCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: percentages,
+                        backgroundColor: colors,
+                        borderColor: colors,
+                        borderWidth: 2,
+                        cutout: '60%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed.toFixed(1)}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
-        function createClientiAttiviCard(data) {
-            const currentClients = data.Clienti_Anno_Corrente || 0;
-            const prevClients = data.Clienti_Anno_Precedente || 0;
-            const targetClients = data.Obiettivo_Clienti || 0;
-            const clientProgress = targetClients > 0 ? (currentClients / targetClients) * 100 : 0;
+        function updateStats() {
+            const ripartizione = ripartizioneData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
             
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Clienti Attivi</div>
-                        <div class="trend-badge ${clientProgress >= 50 ? 'trend-positive' : 'trend-negative'}">
-                            ${Math.round(clientProgress)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${currentClients}</div>
-                    <div class="comparison">
-                        <span class="prev-value">vs 2024: ${prevClients}</span>
-                        <span class="change-value" style="color: #64748b;">raggiunto</span>
-                    </div>
-                    ${targetClients > 0 ? `
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <span class="progress-label">● Obiettivo Clienti</span>
-                                <span class="progress-percentage">${targetClients}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill progress-blue" style="width: ${Math.min(clientProgress, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span>Mancano: ${Math.max(0, targetClients - currentClients)}</span>
-                                <span>${Math.round(clientProgress)}%</span>
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        function filterData(province) {
-            if (province === 'all') {
-                return currentData;
-            } else if (province === 'generale') {
-                return currentData.filter(item => item.Provincia === 'Generale');
-            } else {
-                return currentData.filter(item => item.Provincia === province);
+            if (ripartizione.length >= 2) {
+                const pieni = ripartizione.find(item => item.Categoria_Prodotto === 'Pieni_e_Coppi');
+                const altro = ripartizione.find(item => item.Categoria_Prodotto === 'Altro');
+                
+                if (pieni && altro) {
+                    const totalValue = pieni.Importo + altro.Importo;
+                    const difference = Math.abs(pieni.Importo - altro.Importo);
+                    
+                    // Aggiorna valori
+                    document.getElementById('pieniValue').textContent = formatCurrency(pieni.Importo);
+                    document.getElementById('altroValue').textContent = formatCurrency(altro.Importo);
+                    document.getElementById('totalValue').textContent = formatCurrency(totalValue);
+                    document.getElementById('differenceValue').textContent = formatCurrency(difference);
+                    
+                    // Aggiorna percentuali
+                    document.getElementById('pieniPercentage').textContent = `${pieni.Percentuale.toFixed(1)}%`;
+                    document.getElementById('altroPercentage').textContent = `${altro.Percentuale.toFixed(1)}%`;
+                    document.getElementById('pieniPercText').textContent = `${pieni.Percentuale.toFixed(1)}% del fatturato totale`;
+                    document.getElementById('altroPercText').textContent = `${altro.Percentuale.toFixed(1)}% del fatturato totale`;
+                    
+                    // Testo differenza
+                    const majorCategory = pieni.Importo > altro.Importo ? 'Pieni e Coppi' : 'Altri prodotti';
+                    document.getElementById('differenceText').textContent = `${majorCategory} in vantaggio`;
+                }
             }
         }
 
-        function updateDashboard() {
-            const filteredData = filterData(selectedProvince);
-            const container = document.getElementById('metricsCards');
+        function updateBreakdownTable() {
+            const ripartizione = ripartizioneData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
+            const tbody = document.getElementById('breakdownTableBody');
             
-            if (filteredData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato disponibile per la selezione corrente</div>';
-                return;
-            }
-
+            if (ripartizione.length === 0) return;
+            
+            const totalValue = ripartizione.reduce((sum, item) => sum + item.Importo, 0);
+            const avgValue = totalValue / ripartizione.length;
+            
             let html = '';
-            
-            filteredData.forEach(data => {
-                // Card Fatturato
-                html += createFatturatoCard(data);
+            ripartizione.forEach((item, index) => {
+                const difference = item.Importo - avgValue;
+                const colorClass = index === 0 ? 'color-pieni' : 'color-altro';
+                const categoryName = item.Categoria_Prodotto === 'Pieni_e_Coppi' ? 'Pieni e Coppi' : 'Altri Prodotti';
                 
-                // Card Obiettivo (solo se presente)
-                if (data.Obiettivo > 0) {
-                    html += createObiettivoCard(data);
-                }
-                
-                // Card Clienti Attivi
-                html += createClientiAttiviCard(data);
+                html += `
+                    <tr>
+                        <td>
+                            <div class="category-indicator">
+                                <div class="category-dot ${colorClass}"></div>
+                                <span>${categoryName}</span>
+                            </div>
+                        </td>
+                        <td><strong>${formatCurrency(item.Importo)}</strong></td>
+                        <td><strong>${item.Percentuale.toFixed(1)}%</strong></td>
+                        <td style="color: ${difference >= 0 ? '#10b981' : '#ef4444'};">
+                            ${difference >= 0 ? '+' : ''}${formatCurrency(difference)}
+                        </td>
+                    </tr>
+                `;
             });
             
-            // Aggiungi Top Performance solo per vista "all"
-            if (selectedProvince === 'all') {
-                const generalData = currentData.find(d => d.Provincia === 'Generale');
-                if (generalData) {
-                    html += createTopPerformanceCard(generalData);
-                }
-            }
-            
-            container.innerHTML = html;
+            tbody.innerHTML = html;
         }
 
         // Carica dati dal CSV GitHub
         async function loadData() {
             try {
-                console.log('Caricamento dati da:', CSV_URL);
                 const response = await fetch(CSV_URL);
                 
                 if (!response.ok) {
@@ -608,50 +569,19 @@
                 }
                 
                 const csvText = await response.text();
-                console.log('CSV caricato');
-                
                 const allData = parseCSV(csvText);
-                console.log('Dati parsificati:', allData);
                 
-                // Estrai info agente dai commenti
-                const lines = csvText.split('\n');
-                agentInfo = {
-                    codice: '631.00238',
-                    nome: 'CARABOT NATALINO', 
-                    periodo_da: '01/01/2025',
-                    periodo_a: '24/08/2025'
-                };
+                // Filtra dati ripartizione
+                ripartizioneData = allData;
+                console.log('Dati ripartizione:', ripartizioneData);
                 
-                // Cerca info nei commenti
-                lines.forEach(line => {
-                    if (line.includes('Codice Agente:')) {
-                        agentInfo.codice = line.split(':')[1]?.trim() || agentInfo.codice;
-                    }
-                    if (line.includes('Ragione Sociale:')) {
-                        agentInfo.nome = line.split(':')[1]?.trim() || agentInfo.nome;
-                    }
-                    if (line.includes('Periodo:')) {
-                        const periodo = line.split(':')[1]?.trim() || '';
-                        const dates = periodo.split(' - ');
-                        if (dates.length === 2) {
-                            agentInfo.periodo_da = dates[0].trim();
-                            agentInfo.periodo_a = dates[1].trim();
-                        }
-                    }
-                });
-                
-                // Aggiorna header
-                document.getElementById('agentCode').textContent = agentInfo.codice;
-                document.getElementById('agentName').textContent = agentInfo.nome;
-                document.getElementById('period').textContent = 'Gen - Ago 2025 (8 mesi)';
-                
-                // Filtra solo i record OBIETTIVI per la sezione 1
-                currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
-                console.log('Dati obiettivi filtrati:', currentData);
+                // Aggiorna interfaccia
+                updateStats();
+                updateBreakdownTable();
+                createCharts();
                 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
-                updateDashboard();
                 
             } catch (error) {
                 console.error('Errore nel caricamento dei dati:', error);
@@ -663,12 +593,6 @@
                 `;
             }
         }
-
-        // Event listeners
-        document.getElementById('provinceSelect').addEventListener('change', (e) => {
-            selectedProvince = e.target.value;
-            updateDashboard();
-        });
 
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', () => {
