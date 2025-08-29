@@ -276,31 +276,6 @@
             </div>
         </div>
 
-        <!-- Pulsanti di Test -->
-        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
-            <button id="testLocalBtn" onclick="testLocalData()" 
-                    style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-family: 'Montserrat', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                🧪 Test Dati Locali
-            </button>
-            <button id="testGithubBtn" onclick="testGitHubConnection()" 
-                    style="background: #27ae60; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-family: 'Montserrat', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                🌐 Test GitHub
-            </button>
-            <button id="reloadBtn" onclick="location.reload()" 
-                    style="background: #e74c3c; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-family: 'Montserrat', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                🔄 Ricarica
-            </button>
-        </div>
-
-        <!-- Console di Debug -->
-        <div id="debugConsole" style="background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 15px; margin-bottom: 20px; font-family: 'Courier New', monospace; display: none;">
-            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 15px;">
-                <h3 style="color: #3498db; margin: 0;">🔍 Debug Console</h3>
-                <button onclick="clearDebugConsole()" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Clear</button>
-            </div>
-            <div id="debugMessages" style="max-height: 200px; overflow-y: auto; white-space: pre-wrap;"></div>
-        </div>
-
         <div id="loadingMessage" class="loading">
             Caricamento dati in corso...
         </div>
@@ -490,14 +465,12 @@
         }
 
         function loadData() {
-            debugLog('🚀 Avvio caricamento dati da GitHub...');
             loadDataFromGitHub(GITHUB_CSV_URL);
         }
 
         // Funzione per caricare dati da GitHub
         async function loadDataFromGitHub(githubRawUrl) {
             try {
-                debugLog(`🌐 Connessione a: ${githubRawUrl}`);
                 document.getElementById('loadingMessage').innerHTML = 'Caricamento dati da GitHub...';
                 document.getElementById('loadingMessage').style.display = 'block';
                 document.getElementById('dashboardContent').style.display = 'none';
@@ -515,12 +488,8 @@
                 }
                 
                 const csvText = await response.text();
-                debugLog(`📥 CSV scaricato: ${csvText.length} caratteri`);
-                
                 const rawData = parseCSV(csvText);
                 currentData = processDataForDashboard(rawData);
-                
-                debugLog(`🔄 Processati ${currentData.length} record`, 'success');
                 
                 // Aggiorna header dinamicamente
                 if (currentData.length > 0) {
@@ -528,17 +497,13 @@
                     document.getElementById('agentCode').textContent = firstRow.codice_agente;
                     document.getElementById('agentName').textContent = firstRow.ragione_sociale;
                     document.getElementById('period').textContent = `${firstRow.periodo_da} - ${firstRow.periodo_a}`;
-                    debugLog('🏷️ Header aggiornato dinamicamente');
                 }
                 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'block';
                 updateDashboard();
                 
-                debugLog('🎉 Dashboard caricata con successo da GitHub!', 'success');
-                
             } catch (error) {
-                debugLog(`❌ Errore caricamento GitHub: ${error.message}`, 'error');
                 document.getElementById('loadingMessage').innerHTML = 
                     `<span style="color: #e74c3c;">❌ Errore connessione GitHub: ${error.message}</span>
                      <br><button onclick="loadDataFromGitHub('${GITHUB_CSV_URL}')" style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">🔄 Riprova</button>`;
@@ -553,13 +518,11 @@
 
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', () => {
-            debugLog('🎯 DOM caricato, inizializzazione dashboard...');
             loadData();
         });
 
         // Auto-refresh ogni 5 minuti per dati sempre aggiornati
         setInterval(() => {
-            debugLog('🔄 Auto-refresh dati...');
             loadDataFromGitHub(GITHUB_CSV_URL);
         }, 300000); // 5 minuti
     </script>
