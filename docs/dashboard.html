@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Agente CARABOT NATALINO</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -262,7 +263,119 @@
             font-size: 1rem;
         }
 
+        .chart-section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin: 32px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .chart-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .legend-item.pieni-coppi {
+            border-left-color: #3b82f6;
+        }
+
+        .legend-item.altro {
+            border-left-color: #f59e0b;
+        }
+
+        .legend-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .legend-color.pieni-coppi {
+            background: #3b82f6;
+        }
+
+        .legend-color.altro {
+            background: #f59e0b;
+        }
+
+        .legend-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .legend-value {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .legend-amount {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .legend-percentage {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
         @media (max-width: 768px) {
+            .chart-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .chart-section {
+                padding: 20px;
+            }
+        }
             .dashboard-container {
                 padding: 16px;
             }
@@ -331,6 +444,25 @@
             <div class="cards-grid" id="metricsCards">
                 <!-- Le card verranno generate dinamicamente -->
             </div>
+
+            <!-- SEZIONE 5: RIPARTIZIONE FATTURATO -->
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2>RIPARTIZIONE FATTURATO</h2>
+                    <div class="status-indicator">
+                        <span>●</span>
+                        <span>Aggiornato automaticamente</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <canvas id="fatturato-chart"></canvas>
+                    </div>
+                    <div class="chart-legend" id="chartLegend">
+                        <!-- Legend sarà generata dinamicamente -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -341,6 +473,7 @@
         let currentData = [];
         let agentInfo = {};
         let selectedProvince = 'all';
+        let fatturato_chart = null;
 
         function formatNumber(num) {
             return new Intl.NumberFormat('it-IT', {
@@ -597,6 +730,120 @@
             container.innerHTML = html;
         }
 
+        function createFatturatoChart(allData) {
+            // Cerca i dati di ripartizione dal CSV
+            const ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
+            console.log('Dati ripartizione trovati:', ripartizioneData);
+            
+            let pieniCoppiValue = 0;
+            let altroValue = 0;
+            
+            // Estrai valori dalla sezione RIPARTIZIONE del CSV
+            ripartizioneData.forEach(item => {
+                if (item.Categoria_Prodotto === 'Pieni_e_Coppi') {
+                    pieniCoppiValue = parseFloat(item.Importo) || 0;
+                } else if (item.Categoria_Prodotto === 'Altro') {
+                    altroValue = parseFloat(item.Importo) || 0;
+                }
+            });
+            
+            // Fallback ai valori originali se non trovati nel CSV
+            if (pieniCoppiValue === 0 && altroValue === 0) {
+                console.warn('Dati ripartizione non trovati nel CSV, uso valori fallback');
+                pieniCoppiValue = 54909.62;
+                altroValue = 35250.17;
+            }
+            
+            const total = pieniCoppiValue + altroValue;
+            const pieniCoppiPerc = total > 0 ? (pieniCoppiValue / total * 100).toFixed(1) : 0;
+            const altroPerc = total > 0 ? (altroValue / total * 100).toFixed(1) : 0;
+
+            console.log(`Ripartizione automatica: Pieni e Coppi €${pieniCoppiValue} (${pieniCoppiPerc}%), Altro €${altroValue} (${altroPerc}%)`);
+
+            // Aggiorna legend dinamicamente
+            const legendContainer = document.getElementById('chartLegend');
+            legendContainer.innerHTML = `
+                <div class="legend-item pieni-coppi">
+                    <div class="legend-content">
+                        <div class="legend-color pieni-coppi"></div>
+                        <div class="legend-label">Pieni e Coppi</div>
+                    </div>
+                    <div class="legend-value">
+                        <div class="legend-amount">${formatCurrency(pieniCoppiValue)}</div>
+                        <div class="legend-percentage">${pieniCoppiPerc}%</div>
+                    </div>
+                </div>
+                <div class="legend-item altro">
+                    <div class="legend-content">
+                        <div class="legend-color altro"></div>
+                        <div class="legend-label">Altro</div>
+                    </div>
+                    <div class="legend-value">
+                        <div class="legend-amount">${formatCurrency(altroValue)}</div>
+                        <div class="legend-percentage">${altroPerc}%</div>
+                    </div>
+                </div>
+            `;
+
+            // Distruggi chart esistente se presente
+            if (fatturato_chart) {
+                fatturato_chart.destroy();
+            }
+
+            // Crea nuovo chart con dati dinamici
+            const ctx = document.getElementById('fatturato-chart').getContext('2d');
+            fatturato_chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pieni e Coppi', 'Altro'],
+                    datasets: [{
+                        data: [pieniCoppiValue, altroValue],
+                        backgroundColor: ['#3b82f6', '#f59e0b'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverBorderWidth: 5,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#64748b',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
         // Carica dati dal CSV GitHub
         async function loadData() {
             try {
@@ -653,6 +900,9 @@
                 document.getElementById('dashboardContent').style.display = 'block';
                 updateDashboard();
                 
+                // Crea il grafico della ripartizione fatturato con tutti i dati
+                createFatturatoChart(allData);
+                
             } catch (error) {
                 console.error('Errore nel caricamento dei dati:', error);
                 document.getElementById('loadingMessage').innerHTML = `
@@ -668,6 +918,7 @@
         document.getElementById('provinceSelect').addEventListener('change', (e) => {
             selectedProvince = e.target.value;
             updateDashboard();
+            // Il grafico della ripartizione fatturato rimane sempre uguale indipendentemente dalla provincia
         });
 
         // Inizializzazione
