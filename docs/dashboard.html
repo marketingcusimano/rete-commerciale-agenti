@@ -133,7 +133,6 @@
             width: 100% !important;
         }
 
-        /* Force responsive behavior */
         @media screen and (max-width: 1200px) {
             .cards-grid {
                 grid-template-columns: repeat(2, 1fr) !important;
@@ -486,6 +485,111 @@
             text-align: center;
         }
 
+        /* Stili per sezione clienti */
+        .clients-table-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .clients-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .clients-table th,
+        .clients-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .clients-table th {
+            background: white;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .clients-table td {
+            font-size: 0.9rem;
+            color: #1e293b;
+        }
+
+        .client-name {
+            font-weight: 500;
+            max-width: 200px;
+        }
+
+        .client-revenue {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .client-province {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .client-province.LT {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .client-province.RM {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        /* Stili per categorie prodotto */
+        .categories-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .category-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
+        }
+
+        .category-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .category-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .category-clients {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
         @media (max-width: 1024px) {
             .province-stats-container {
                 grid-template-columns: 1fr;
@@ -497,6 +601,30 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 16px;
             }
+
+            .categories-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .chart-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .chart-section {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         @media (max-width: 640px) {
@@ -507,16 +635,15 @@
             .province-card {
                 padding: 16px;
             }
-        }
-            .chart-container {
+
+            .categories-grid {
                 grid-template-columns: 1fr;
-                gap: 24px;
             }
             
-            .chart-section {
-                padding: 20px;
+            .clients-table-container {
+                overflow-x: auto;
             }
-        }
+
             .dashboard-container {
                 padding: 16px;
             }
@@ -582,36 +709,9 @@
         </div>
 
         <div id="dashboardContent" style="display: none;">
+            <!-- SEZIONE 1: METRICHE PRINCIPALI -->
             <div class="cards-grid" id="metricsCards">
                 <!-- Le card verranno generate dinamicamente -->
-            </div>
-
-            <!-- SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE -->
-            <div class="chart-section">
-                <div class="section-header">
-                    <h2>DETTAGLIO VENDITE PER CLIENTE</h2>
-                    <div class="status-indicator">
-                        <span>●</span>
-                        <span>Top 10 automatico</span>
-                    </div>
-                </div>
-                
-                <!-- Podio Top 3 -->
-                <div class="podium-section">
-                    <div class="podium-container" id="podiumContainer">
-                        <!-- Podio generato dinamicamente -->
-                    </div>
-                </div>
-
-                <!-- Tabella Top 10 -->
-                <div class="top-clients-section">
-                    <h3>Classifica Completa Top 10</h3>
-                    <div class="clients-table-container">
-                        <div class="clients-table" id="clientsTable">
-                            <!-- Tabella generata dinamicamente -->
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- SEZIONE 2: CLIENTI SERVITI PER PROVINCIA -->
@@ -631,6 +731,39 @@
                         <div class="chart-wrapper">
                             <canvas id="province-chart"></canvas>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEZIONE 3: TOP CLIENTI PER FATTURATO -->
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2>TOP CLIENTI PER FATTURATO</h2>
+                    <div class="status-indicator">
+                        <span>●</span>
+                        <span>Aggiornato dal CSV</span>
+                    </div>
+                </div>
+                <div class="clients-table-container" id="clientsTable">
+                    <!-- Tabella clienti generata dinamicamente -->
+                </div>
+            </div>
+
+            <!-- SEZIONE 4: PERFORMANCE PER CATEGORIA PRODOTTO -->
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2>PERFORMANCE PER CATEGORIA PRODOTTO</h2>
+                    <div class="status-indicator">
+                        <span>●</span>
+                        <span>Dati live dal CSV</span>
+                    </div>
+                </div>
+                <div class="categories-container">
+                    <div class="chart-wrapper">
+                        <canvas id="categories-chart"></canvas>
+                    </div>
+                    <div class="categories-grid" id="categoriesGrid">
+                        <!-- Cards categorie generate dinamicamente -->
                     </div>
                 </div>
             </div>
@@ -665,6 +798,7 @@
         let selectedProvince = 'all';
         let fatturato_chart = null;
         let province_chart = null;
+        let categories_chart = null;
 
         function formatNumber(num) {
             return new Intl.NumberFormat('it-IT', {
@@ -717,7 +851,8 @@
                             // Converti numeri
                             if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Percentuale_Obiettivo', 
                                 'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Obiettivo_Clienti', 
-                                'Percentuale_Obiettivo_Clienti', 'Fatturato', 'Clienti_Serviti'].includes(header)) {
+                                'Percentuale_Obiettivo_Clienti', 'Fatturato', 'Clienti_Serviti', 'Importo_Totale',
+                                'Clienti_Prov_1', 'Clienti_Prov_2', 'Importo', 'Valore'].includes(header)) {
                                 value = parseFloat(value) || 0;
                             }
                             
@@ -874,6 +1009,162 @@
                     ` : ''}
                 </div>
             `;
+        }
+
+        function createClientsTable(allData) {
+            const venditeLData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+            
+            // Raggruppa per cliente
+            const clientsMap = new Map();
+            
+            venditeLData.forEach(sale => {
+                const clientName = sale.Ragione_Sociale_Cliente;
+                const revenue = parseFloat(sale.Fatturato) || 0;
+                const province = sale.Provincia;
+                
+                if (!clientsMap.has(clientName)) {
+                    clientsMap.set(clientName, {
+                        name: clientName,
+                        totalRevenue: 0,
+                        province: province,
+                        categories: new Set()
+                    });
+                }
+                
+                const client = clientsMap.get(clientName);
+                client.totalRevenue += revenue;
+                client.categories.add(sale.Categoria_Articoli);
+            });
+            
+            // Converti in array e ordina per fatturato
+            const clientsArray = Array.from(clientsMap.values())
+                .sort((a, b) => b.totalRevenue - a.totalRevenue);
+            
+            const container = document.getElementById('clientsTable');
+            
+            let html = `
+                <table class="clients-table">
+                    <thead>
+                        <tr>
+                            <th>Pos.</th>
+                            <th>Cliente</th>
+                            <th>Provincia</th>
+                            <th>Fatturato</th>
+                            <th>Categorie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            clientsArray.slice(0, 10).forEach((client, index) => {
+                html += `
+                    <tr>
+                        <td><strong>${index + 1}</strong></td>
+                        <td class="client-name">${client.name}</td>
+                        <td><span class="client-province ${client.province}">${client.province}</span></td>
+                        <td class="client-revenue">${formatCurrency(client.totalRevenue)}</td>
+                        <td>${client.categories.size} categorie</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function createCategoriesSection(allData) {
+            const categoriesData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
+            
+            // Filtra solo categorie con importo > 0
+            const activeCategories = categoriesData.filter(cat => parseFloat(cat.Importo_Totale) > 0);
+            
+            // Ordina per importo decrescente
+            activeCategories.sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale));
+            
+            // Crea cards
+            const gridContainer = document.getElementById('categoriesGrid');
+            let cardsHtml = '';
+            
+            activeCategories.forEach(cat => {
+                const importo = parseFloat(cat.Importo_Totale);
+                const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
+                const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
+                const totalClienti = clientiLT + clientiRM;
+                
+                cardsHtml += `
+                    <div class="category-card">
+                        <div class="category-name">${cat.Categoria}</div>
+                        <div class="category-value">${formatCurrency(importo)}</div>
+                        <div class="category-clients">${totalClienti} clienti (LT: ${clientiLT}, RM: ${clientiRM})</div>
+                    </div>
+                `;
+            });
+            
+            gridContainer.innerHTML = cardsHtml;
+            
+            // Crea grafico
+            createCategoriesChart(activeCategories);
+        }
+
+        function createCategoriesChart(categoriesData) {
+            if (categories_chart) {
+                categories_chart.destroy();
+            }
+            
+            // Prendi le top 6 categorie
+            const topCategories = categoriesData.slice(0, 6);
+            
+            const ctx = document.getElementById('categories-chart').getContext('2d');
+            categories_chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: topCategories.map(cat => cat.Categoria.replace('_', ' ')),
+                    datasets: [{
+                        data: topCategories.map(cat => parseFloat(cat.Importo_Totale)),
+                        backgroundColor: [
+                            '#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#64748b',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 1000
+                    }
+                }
+            });
         }
 
         function filterData(province) {
@@ -1034,119 +1325,6 @@
                     }
                 }
             });
-        }
-
-        function createTopClientsSection(allData) {
-            // Cerca i dati delle vendite per cliente dal CSV
-            const venditeData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
-            console.log('Dati vendite clienti trovati:', venditeData);
-            
-            if (venditeData.length === 0) {
-                document.getElementById('podiumContainer').innerHTML = 
-                    '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato vendite disponibile</div>';
-                return;
-            }
-
-            // Raggruppa per cliente e somma il fatturato
-            const clientiMap = new Map();
-            venditeData.forEach(vendita => {
-                const clienteKey = vendita.Ragione_Sociale_Cliente;
-                const provincia = vendita.Provincia;
-                const fatturato = parseFloat(vendita.Fatturato) || 0;
-                
-                if (clientiMap.has(clienteKey)) {
-                    clientiMap.get(clienteKey).fatturato += fatturato;
-                } else {
-                    clientiMap.set(clienteKey, {
-                        nome: clienteKey,
-                        provincia: provincia,
-                        fatturato: fatturato
-                    });
-                }
-            });
-
-            // Converti in array e ordina per fatturato decrescente
-            const clientiOrdinati = Array.from(clientiMap.values())
-                .sort((a, b) => b.fatturato - a.fatturato)
-                .slice(0, 10); // Top 10
-
-            console.log('Top 10 clienti:', clientiOrdinati);
-
-            // Crea il podio (top 3)
-            createPodium(clientiOrdinati.slice(0, 3));
-            
-            // Crea la tabella completa top 10
-            createClientsTable(clientiOrdinati);
-        }
-
-        function createPodium(top3) {
-            const container = document.getElementById('podiumContainer');
-            
-            if (top3.length < 3) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b;">Dati insufficienti per il podio</div>';
-                return;
-            }
-
-            const positions = [
-                { data: top3[1], rank: '2', class: 'podium-second' }, // Secondo a sinistra
-                { data: top3[0], rank: '1', class: 'podium-first' },  // Primo al centro
-                { data: top3[2], rank: '3', class: 'podium-third' }   // Terzo a destra
-            ];
-
-            let html = '';
-            positions.forEach(pos => {
-                const shortName = pos.data.nome.length > 30 ? 
-                    pos.data.nome.substring(0, 30) + '...' : 
-                    pos.data.nome;
-
-                html += `
-                    <div class="podium-position">
-                        <div class="podium-card ${pos.class}">
-                            <div class="podium-rank">${pos.rank}</div>
-                            <div class="podium-client-name">${shortName}</div>
-                            <div class="podium-amount">${formatCurrency(pos.data.fatturato)}</div>
-                            <div class="podium-province">${pos.data.provincia}</div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function createClientsTable(clienti) {
-            const container = document.getElementById('clientsTable');
-            
-            let html = `
-                <div class="table-header">
-                    <div>Pos.</div>
-                    <div>Cliente</div>
-                    <div>Fatturato</div>
-                    <div class="province-cell">Prov.</div>
-                </div>
-            `;
-
-            clienti.forEach((cliente, index) => {
-                const rank = index + 1;
-                const rankClass = rank === 1 ? 'rank-1' : 
-                                 rank === 2 ? 'rank-2' : 
-                                 rank === 3 ? 'rank-3' : 'rank-other';
-                
-                const shortName = cliente.nome.length > 50 ? 
-                    cliente.nome.substring(0, 50) + '...' : 
-                    cliente.nome;
-
-                html += `
-                    <div class="table-row">
-                        <div class="rank-cell ${rankClass}">${rank}</div>
-                        <div class="client-name-cell">${shortName}</div>
-                        <div class="amount-cell">${formatCurrency(cliente.fatturato)}</div>
-                        <div class="province-cell">${cliente.provincia}</div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
         }
 
         function createProvinceCards(allData) {
@@ -1357,12 +1535,15 @@
                 document.getElementById('dashboardContent').style.display = 'block';
                 updateDashboard();
                 
-                // Crea la sezione top clienti con podio
-                createTopClientsSection(allData);
-                
                 // Crea le sezioni province e grafico
                 const chartData = createProvinceCards(allData);
                 createProvinceChart(chartData);
+                
+                // Crea la tabella dei top clienti
+                createClientsTable(allData);
+                
+                // Crea l'analisi delle categorie prodotto
+                createCategoriesSection(allData);
                 
                 // Crea il grafico della ripartizione fatturato con tutti i dati
                 createFatturatoChart(allData);
