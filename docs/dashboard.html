@@ -1004,6 +1004,50 @@
             .main-value {
                 font-size: 1.75rem;
             }
+
+            /* Ottimizzazioni specifiche per la sezione province */
+            .province-stats-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .province-cards-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .province-card {
+                padding: 18px;
+                min-width: 0;
+            }
+
+            .province-name {
+                font-size: 1rem;
+            }
+
+            .province-clients {
+                font-size: 1.6rem;
+            }
+
+            .province-revenue {
+                font-size: 1rem;
+                margin-top: 6px;
+            }
+
+            .province-details {
+                font-size: 0.85rem;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+
+            .province-chart-section {
+                padding: 18px;
+            }
+
+            .province-chart-section .chart-wrapper {
+                height: 250px;
+            }
         }
 
         @media (max-width: 640px) {
