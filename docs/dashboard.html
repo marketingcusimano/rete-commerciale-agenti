@@ -923,7 +923,7 @@
             }
             
             .categories-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .chart-container {
@@ -932,31 +932,21 @@
             }
             
             .chart-section {
-                padding: 20px;
+                padding: 24px;
+            }
+
+            .dashboard-container {
+                padding: 24px;
             }
         }
 
         @media (max-width: 768px) {
             .categories-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
-        }
 
-        @media (max-width: 640px) {
             .province-cards-grid {
                 grid-template-columns: 1fr;
-            }
-            
-            .province-card {
-                padding: 16px;
-            }
-
-            .categories-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .clients-table-container {
-                overflow-x: auto;
             }
 
             .dashboard-container {
@@ -964,21 +954,247 @@
             }
             
             .header {
+                padding: 24px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .agent-details {
+                gap: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .filter-controls {
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .province-selector-btn {
+                min-width: 100%;
+            }
+
+            .chart-section {
+                padding: 20px;
+                margin: 20px 0;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .section-header h2 {
+                font-size: 1.1rem;
+            }
+
+            .metric-card {
                 padding: 20px;
             }
+
+            .main-value {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .dashboard-container {
+                padding: 12px;
+            }
             
+            .header {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
             .agent-details {
                 gap: 16px;
             }
-            
-            .cards-grid {
-                grid-template-columns: 1fr;
+
+            .detail-item {
+                font-size: 0.85rem;
             }
-            
-            .controls {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
+
+            .pdf-download-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 14px 20px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+            }
+
+            .metric-card {
+                padding: 16px;
+            }
+
+            .main-value {
+                font-size: 1.5rem;
+            }
+
+            .chart-section {
+                padding: 16px;
+                margin: 16px 0;
+            }
+
+            .section-header h2 {
+                font-size: 1rem;
+            }
+
+            .chart-wrapper {
+                height: 250px;
+            }
+
+            .clients-table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .clients-table {
+                min-width: 500px;
+            }
+
+            .clients-table th,
+            .clients-table td {
+                padding: 12px 8px;
+                font-size: 0.85rem;
+            }
+
+            .podium-position {
+                width: 24px;
+                height: 24px;
+                font-size: 0.8rem;
+            }
+
+            .category-card {
+                padding: 16px;
+            }
+
+            .category-value {
+                font-size: 1.1rem;
+            }
+
+            .province-card {
+                padding: 16px;
+            }
+
+            .province-clients {
+                font-size: 1.5rem;
+            }
+
+            .province-revenue {
+                font-size: 1rem;
+            }
+        }
+
+        /* Ottimizzazioni specifiche per il popup mobile */
+        @media (max-width: 640px) {
+            .province-modal {
+                margin: 16px;
+                padding: 24px;
+                max-height: 85vh;
+                width: calc(100% - 32px);
+            }
+
+            .modal-title {
+                font-size: 1.25rem;
+            }
+
+            .province-option {
+                padding: 12px;
+            }
+
+            .province-option-icon {
+                width: 36px;
+                height: 36px;
+                margin-right: 12px;
+            }
+
+            .province-option-title {
+                font-size: 0.9rem;
+            }
+
+            .province-option-subtitle {
+                font-size: 0.8rem;
+            }
+
+            .modal-cancel {
+                padding: 14px 24px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Ottimizzazioni per schermi molto piccoli */
+        @media (max-width: 480px) {
+            .dashboard-container {
+                padding: 8px;
+            }
+
+            .header {
+                padding: 16px 12px;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .chart-section {
+                padding: 12px;
+            }
+
+            .metric-card {
+                padding: 12px;
+            }
+
+            .main-value {
+                font-size: 1.25rem;
+            }
+
+            .chart-wrapper {
+                height: 200px;
+            }
+
+            .category-card {
+                padding: 12px;
+            }
+
+            .province-card {
+                padding: 12px;
+            }
+
+            .province-modal {
+                padding: 20px;
+                margin: 12px;
+                width: calc(100% - 24px);
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (pointer: coarse) {
+            .province-option,
+            .pdf-download-btn,
+            .province-selector-btn,
+            .modal-close,
+            .modal-cancel {
+                min-height: 44px;
+            }
+
+            .province-option {
+                padding: 16px;
             }
         }
     </style>
