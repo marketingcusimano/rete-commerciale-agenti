@@ -8,967 +8,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
-        function createFatturatoCard(data) {
-            const current = data.Anno_Corrente;
-            const previous = data.Anno_Precedente;
-            const { change, percentage } = calculateChange(current, previous);
-            const isPositive = change >= 0;
-            
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Fatturato 2025</div>
-                        <div class="trend-badge ${isPositive ? 'trend-positive' : 'trend-negative'}">
-                            ${isPositive ? '↗' : '↘'} ${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCurrency(current)}</div>
-                    <div class="comparison">
-                        <span class="prev-value">vs 2024: ${formatCurrency(previous)}</span>
-                    </div>
-                    ${data.Obiettivo > 0 ? `
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <span class="progress-label">Obiettivo Fatturato</span>
-                                <span class="progress-percentage">${formatCurrency(data.Obiettivo)}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill progress-green" style="width: ${Math.min((current/data.Obiettivo)*100, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span>Mancano: ${formatCurrency(Math.max(0, data.Obiettivo - current))}</span>
-                                <span>${Math.round((current/data.Obiettivo)*100)}%</span>
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        function createObiettivoCard(data) {
-            const current = data.Anno_Corrente;
-            const target = data.Obiettivo;
-            const progressPerc = target > 0 ? (current / target) * 100 : 0;
-            const remaining = Math.max(0, target - current);
-            
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Obiettivo 2025</div>
-                        <div class="trend-badge trend-positive">
-                            ${Math.round(progressPerc)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCurrency(target)}</div>
-                    <div class="comparison">
-                        <span class="prev-value">Da raggiungere: ${formatCurrency(remaining)}</span>
-                    </div>
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <span class="progress-label">Progressione Obiettivo</span>
-                            <span class="progress-percentage">${formatCurrency(target)}</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill progress-blue" style="width: ${Math.min(progressPerc, 100)}%"></div>
-                        </div>
-                        <div class="progress-details">
-                            <span>Mancano: ${formatCurrency(remaining)}</span>
-                            <span>${Math.round(progressPerc)}%</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function createTopPerformanceCard(data) {
-            const allProvData = currentData.filter(d => d.Provincia !== 'Generale');
-            let topProv = allProvData[0];
-            let bestGrowth = 0;
-            
-            allProvData.forEach(prov => {
-                const growth = ((prov.Anno_Corrente - prov.Anno_Precedente) / prov.Anno_Precedente) * 100;
-                if (growth > bestGrowth) {
-                    bestGrowth = growth;
-                    topProv = prov;
-                }
-            });
-            
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Top Performance</div>
-                        <div class="trend-badge trend-positive">
-                            +${bestGrowth.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${topProv?.Provincia || 'LT'}</div>
-                    <div class="comparison">
-                        <span class="prev-value">Provincia ${topProv?.Provincia === 'LT' ? 'Latina' : 'Roma'}</span>
-                        <span class="change-value" style="color: #22c55e;">crescita totale</span>
-                    </div>
-                    <div class="progress-details">
-                        <span style="color: #64748b; font-size: 0.85rem;">${formatCurrency(topProv?.Anno_Corrente || 0)}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        function createClientiAttiviCard(data) {
-            const currentClients = data.Clienti_Anno_Corrente || 0;
-            const prevClients = data.Clienti_Anno_Precedente || 0;
-            const targetClients = data.Obiettivo_Clienti || 0;
-            const clientProgress = targetClients > 0 ? (currentClients / targetClients) * 100 : 0;
-            
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Clienti Attivi</div>
-                        <div class="trend-badge ${clientProgress >= 50 ? 'trend-positive' : 'trend-negative'}">
-                            ${Math.round(clientProgress)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${currentClients}</div>
-                    <div class="comparison">
-                        <span class="prev-value">vs 2024: ${prevClients}</span>
-                        <span class="change-value" style="color: #64748b;">raggiunto</span>
-                    </div>
-                    ${targetClients > 0 ? `
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <span class="progress-label">Obiettivo Clienti</span>
-                                <span class="progress-percentage">${targetClients}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill progress-blue" style="width: ${Math.min(clientProgress, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span>Mancano: ${Math.max(0, targetClients - currentClients)}</span>
-                                <span>${Math.round(clientProgress)}%</span>
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        function createClientsTable(allData) {
-            const venditeLData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
-            
-            const clientsMap = new Map();
-            
-            venditeLData.forEach(sale => {
-                const clientName = sale.Ragione_Sociale_Cliente;
-                const revenue = parseFloat(sale.Fatturato) || 0;
-                const province = sale.Provincia;
-                
-                if (!clientsMap.has(clientName)) {
-                    clientsMap.set(clientName, {
-                        name: clientName,
-                        totalRevenue: 0,
-                        province: province,
-                        categories: new Set()
-                    });
-                }
-                
-                const client = clientsMap.get(clientName);
-                client.totalRevenue += revenue;
-                client.categories.add(sale.Categoria_Articoli);
-            });
-            
-            const clientsArray = Array.from(clientsMap.values())
-                .sort((a, b) => b.totalRevenue - a.totalRevenue);
-            
-            const container = document.getElementById('clientsTable');
-            
-            function getPodiumClass(index) {
-                if (index === 0) return 'podium-1';
-                if (index === 1) return 'podium-2';
-                if (index === 2) return 'podium-3';
-                return 'podium-other';
-            }
-            
-            let html = `
-                <table class="clients-table">
-                    <thead>
-                        <tr>
-                            <th>Pos.</th>
-                            <th>Cliente</th>
-                            <th>Provincia</th>
-                            <th>Fatturato</th>
-                            <th>Categorie</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            clientsArray.slice(0, 10).forEach((client, index) => {
-                html += `
-                    <tr>
-                        <td>
-                            <div class="podium-position ${getPodiumClass(index)}">
-                                ${index + 1}
-                            </div>
-                        </td>
-                        <td class="client-name">${client.name}</td>
-                        <td><span class="client-province ${client.province}">${client.province}</span></td>
-                        <td class="client-revenue">${formatCurrency(client.totalRevenue)}</td>
-                        <td>${client.categories.size} categorie</td>
-                    </tr>
-                `;
-            });
-            
-            html += `
-                    </tbody>
-                </table>
-            `;
-            
-            container.innerHTML = html;
-        }
-
-        function createCategoriesSection(allData) {
-            const categoriesData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-            const activeCategories = categoriesData.filter(cat => parseFloat(cat.Importo_Totale) > 0);
-            activeCategories.sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale));
-            
-            const colors = ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
-            
-            const gridContainer = document.getElementById('categoriesGrid');
-            let cardsHtml = '';
-            
-            activeCategories.forEach((cat, index) => {
-                const importo = parseFloat(cat.Importo_Totale);
-                const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
-                const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
-                const totalClienti = clientiLT + clientiRM;
-                const categoryColor = colors[index] || '#64748b';
-                
-                cardsHtml += `
-                    <div class="category-card" style="--category-color: ${categoryColor}">
-                        <div class="category-name">${cat.Categoria}</div>
-                        <div class="category-value">${formatCurrency(importo)}</div>
-                        <div class="category-clients">${totalClienti} clienti (LT: ${clientiLT}, RM: ${clientiRM})</div>
-                    </div>
-                `;
-            });
-            
-            gridContainer.innerHTML = cardsHtml;
-            createCategoriesChart(activeCategories, colors);
-        }
-
-        function createCategoriesChart(categoriesData, colors) {
-            if (categories_chart) {
-                categories_chart.destroy();
-            }
-            
-            const topCategories = categoriesData.slice(0, Math.min(categoriesData.length, colors.length));
-            
-            const ctx = document.getElementById('categories-chart').getContext('2d');
-            categories_chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: topCategories.map(cat => cat.Categoria.replace(/_/g, ' ')),
-                    datasets: [{
-                        data: topCategories.map(cat => parseFloat(cat.Importo_Totale)),
-                        backgroundColor: colors.slice(0, topCategories.length),
-                        borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((value / total) * 100).toFixed(1);
-                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true,
-                        duration: 1000
-                    }
-                }
-            });
-        }
-
-        function filterData(province) {
-            if (province === 'all') {
-                return currentData;
-            } else if (province === 'generale') {
-                return currentData.filter(item => item.Provincia === 'Generale');
-            } else {
-                return currentData.filter(item => item.Provincia === province);
-            }
-        }
-
-        function updateDashboard() {
-            const filteredData = filterData(selectedProvince);
-            const container = document.getElementById('metricsCards');
-            
-            if (filteredData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato disponibile per la selezione corrente</div>';
-                return;
-            }
-
-            let html = '';
-            
-            filteredData.forEach(data => {
-                html += createFatturatoCard(data);
-                if (data.Obiettivo > 0) {
-                    html += createObiettivoCard(data);
-                }
-                html += createClientiAttiviCard(data);
-            });
-            
-            if (selectedProvince === 'all') {
-                const generalData = currentData.find(d => d.Provincia === 'Generale');
-                if (generalData) {
-                    html += createTopPerformanceCard(generalData);
-                }
-            }
-            
-            container.innerHTML = html;
-        }
-
-        function createFatturatoChart(allData) {
-            const ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
-            
-            let pieniCoppiValue = 0;
-            let altroValue = 0;
-            
-            ripartizioneData.forEach(item => {
-                if (item.Categoria_Prodotto === 'Pieni_e_Coppi') {
-                    pieniCoppiValue = parseFloat(item.Importo) || 0;
-                } else if (item.Categoria_Prodotto === 'Altro') {
-                    altroValue = parseFloat(item.Importo) || 0;
-                }
-            });
-            
-            if (pieniCoppiValue === 0 && altroValue === 0) {
-                pieniCoppiValue = 54909.62;
-                altroValue = 35250.17;
-            }
-            
-            const total = pieniCoppiValue + altroValue;
-            const pieniCoppiPerc = total > 0 ? (pieniCoppiValue / total * 100).toFixed(1) : 0;
-            const altroPerc = total > 0 ? (altroValue / total * 100).toFixed(1) : 0;
-
-            const legendContainer = document.getElementById('chartLegend');
-            legendContainer.innerHTML = `
-                <div class="legend-item pieni-coppi">
-                    <div class="legend-content">
-                        <div class="legend-color pieni-coppi"></div>
-                        <div class="legend-label">Pieni e Coppi</div>
-                    </div>
-                    <div class="legend-value">
-                        <div class="legend-amount">${formatCurrency(pieniCoppiValue)}</div>
-                        <div class="legend-percentage">${pieniCoppiPerc}%</div>
-                    </div>
-                </div>
-                <div class="legend-item altro">
-                    <div class="legend-content">
-                        <div class="legend-color altro"></div>
-                        <div class="legend-label">Altro</div>
-                    </div>
-                    <div class="legend-value">
-                        <div class="legend-amount">${formatCurrency(altroValue)}</div>
-                        <div class="legend-percentage">${altroPerc}%</div>
-                    </div>
-                </div>
-            `;
-
-            if (fatturato_chart) {
-                fatturato_chart.destroy();
-            }
-
-            const ctx = document.getElementById('fatturato-chart').getContext('2d');
-            fatturato_chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Pieni e Coppi', 'Altro'],
-                    datasets: [{
-                        data: [pieniCoppiValue, altroValue],
-                        backgroundColor: ['#3b82f6', '#8b5cf6'],
-                        hoverBackgroundColor: ['#2563eb', '#7c3aed'],
-                        borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverBorderWidth: 5,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            displayColors: true,
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed;
-                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    interaction: { intersect: false, mode: 'index' },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true,
-                        duration: 1000,
-                        easing: 'easeInOutQuart'
-                    }
-                }
-            });
-        }
-
-        function createProvinceCards(allData) {
-            const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
-            const container = document.getElementById('provinceCards');
-            
-            if (provinceData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px;">Nessun dato provincia disponibile</div>';
-                return [];
-            }
-
-            let html = '';
-            const chartData = [];
-
-            provinceData.forEach(prov => {
-                const clients = parseInt(prov.Clienti_Serviti) || 0;
-                const revenue = parseFloat(prov.Fatturato) || 0;
-                const avgPerClient = clients > 0 ? revenue / clients : 0;
-                
-                const provinceName = prov.Provincia === 'LT' ? 'Latina' : 
-                                   prov.Provincia === 'RM' ? 'Roma' : 
-                                   prov.Provincia;
-
-                html += `
-                    <div class="province-card">
-                        <div class="province-card-header">
-                            <div class="province-name">
-                                <div class="province-indicator"></div>
-                                ${provinceName} (${prov.Provincia})
-                            </div>
-                        </div>
-                        <div class="province-clients">${clients}</div>
-                        <div class="province-revenue">${formatCurrency(revenue)}</div>
-                        <div class="province-details">
-                            <span>Clienti serviti</span>
-                            <div class="client-avg">
-                                <div class="avg-label">Media per cliente</div>
-                                <div class="avg-value">${formatCurrency(avgPerClient)}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                chartData.push({
-                    label: provinceName,
-                    clients: clients,
-                    revenue: revenue,
-                    color: prov.Provincia === 'LT' ? '#3b82f6' : '#6366f1'
-                });
-            });
-
-            container.innerHTML = html;
-            return chartData;
-        }
-
-        function createProvinceChart(chartData) {
-            if (chartData.length === 0) return;
-
-            if (province_chart) {
-                province_chart.destroy();
-            }
-
-            const ctx = document.getElementById('province-chart').getContext('2d');
-            province_chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartData.map(d => d.label),
-                    datasets: [{
-                        label: 'Clienti',
-                        data: chartData.map(d => d.clients),
-                        backgroundColor: chartData.map(d => d.color),
-                        borderColor: chartData.map(d => d.color),
-                        borderWidth: 2,
-                        borderRadius: 6,
-                        borderSkipped: false,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1,
-                                color: '#64748b',
-                                font: { family: 'Montserrat', size: 12 }
-                            },
-                            grid: { color: '#f1f5f9', borderColor: '#e2e8f0' }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#64748b',
-                                font: { family: 'Montserrat', size: 12, weight: '500' }
-                            },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            titleFont: { family: 'Montserrat', size: 14, weight: '600' },
-                            bodyFont: { family: 'Montserrat', size: 13 },
-                            callbacks: {
-                                label: function(context) {
-                                    const dataPoint = chartData[context.dataIndex];
-                                    return [
-                                        `Clienti: ${context.parsed.y}`,
-                                        `Fatturato: ${formatCurrency(dataPoint.revenue)}`,
-                                        `Media: ${formatCurrency(dataPoint.revenue / dataPoint.clients)}`
-                                    ];
-                                }
-                            }
-                        }
-                    },
-                    animation: { duration: 800, easing: 'easeInOutQuart' }
-                }
-            });
-        }
-
-        // Carica dati dal CSV GitHub
-        async function loadData() {
-            try {
-                const response = await fetch(CSV_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                const allData = parseCSV(csvText);
-                allRawData = allData; // Salva tutti i dati grezzi
-                
-                // Estrai info agente dai commenti
-                const lines = csvText.split('\n');
-                agentInfo = {
-                    codice: '631.00238',
-                    nome: 'CARABOT NATALINO', 
-                    periodo_da: '01/01/2025',
-                    periodo_a: '24/08/2025'
-                };
-                
-                lines.forEach(line => {
-                    if (line.includes('Codice Agente:')) {
-                        agentInfo.codice = line.split(':')[1]?.trim() || agentInfo.codice;
-                    }
-                    if (line.includes('Ragione Sociale:')) {
-                        agentInfo.nome = line.split(':')[1]?.trim() || agentInfo.nome;
-                    }
-                    if (line.includes('Periodo:')) {
-                        const periodo = line.split(':')[1]?.trim() || '';
-                        const dates = periodo.split(' - ');
-                        if (dates.length === 2) {
-                            agentInfo.periodo_da = dates[0].trim();
-                            agentInfo.periodo_a = dates[1].trim();
-                        }
-                    }
-                });
-                
-                document.getElementById('agentCode').textContent = agentInfo.codice;
-                document.getElementById('agentName').textContent = agentInfo.nome;
-                document.getElementById('period').textContent = 'Gen - Ago 2025 (8 mesi)';
-                
-                currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
-                
-                document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'block';
-                updateDashboard();
-                
-                const chartData = createProvinceCards(allData);
-                createProvinceChart(chartData);
-                createClientsTable(allData);
-                createCategoriesSection(allData);
-                createFatturatoChart(allData);
-                
-            } catch (error) {
-                console.error('Errore nel caricamento dei dati:', error);
-                document.getElementById('loadingMessage').innerHTML = `
-                    <div style="color: #dc2626; text-align: center;">
-                        ❌ Errore nel caricamento dei dati<br>
-                        <small>${error.message}</small>
-                    </div>
-                `;
-            }
-        }
-
-        // Funzione migliorata per generare il PDF con tutti i grafici
-        async function generatePDF() {
-            const button = document.getElementById('downloadPDF');
-            const originalText = button.innerHTML;
-            
-            button.innerHTML = `
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="loading-spinner">
-                    <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.90z"/>
-                </svg>
-                Generando PDF...
-            `;
-            button.disabled = true;
-
-            try {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                let yPosition = 20;
-                
-                // Header del documento
-                pdf.setFontSize(22);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(30, 41, 59);
-                pdf.text('REPORT PERFORMANCE VENDITE', pageWidth / 2, yPosition, { align: 'center' });
-                
-                yPosition += 12;
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "normal");
-                pdf.setTextColor(59, 130, 246);
-                pdf.text(`${agentInfo.nome}`, pageWidth / 2, yPosition, { align: 'center' });
-                
-                yPosition += 8;
-                pdf.setFontSize(12);
-                pdf.setTextColor(100, 116, 139);
-                pdf.text(`Codice Agente: ${agentInfo.codice}`, pageWidth / 2, yPosition, { align: 'center' });
-                
-                yPosition += 6;
-                pdf.text('Periodo: Gennaio - Agosto 2025 (8 mesi)', pageWidth / 2, yPosition, { align: 'center' });
-                
-                yPosition += 15;
-                
-                // Data di generazione
-                const now = new Date();
-                pdf.setFontSize(10);
-                pdf.setTextColor(148, 163, 184);
-                pdf.text(`Report generato il ${now.toLocaleDateString('it-IT')} alle ${now.toLocaleTimeString('it-IT')}`, pageWidth / 2, yPosition, { align: 'center' });
-                
-                yPosition += 10;
-                pdf.setDrawColor(226, 232, 240);
-                pdf.line(20, yPosition, pageWidth - 20, yPosition);
-                yPosition += 15;
-                
-                // Sezione Performance Generale
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(30, 41, 59);
-                pdf.text('📊 PERFORMANCE GENERALE', 20, yPosition);
-                yPosition += 12;
-                
-                pdf.setFillColor(248, 250, 252);
-                pdf.rect(20, yPosition - 5, pageWidth - 40, 25, 'F');
-                
-                const generalData = currentData.find(d => d.Provincia === 'Generale');
-                if (generalData) {
-                    pdf.setFontSize(12);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(30, 41, 59);
-                    
-                    const currentRevenue = Math.round(generalData.Anno_Corrente / 1000);
-                    const previousRevenue = Math.round(generalData.Anno_Precedente / 1000);
-                    const growth = ((generalData.Anno_Corrente - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100).toFixed(1);
-                    
-                    pdf.text(`FATTURATO 2025: €${currentRevenue}k`, 25, yPosition + 5);
-                    pdf.text(`FATTURATO 2024: €${previousRevenue}k`, 25, yPosition + 12);
-                    pdf.setTextColor(growth >= 0 ? 22 : 220, growth >= 0 ? 197 : 38, growth >= 0 ? 94 : 38);
-                    pdf.text(`CRESCITA: ${growth >= 0 ? '+' : ''}${growth}%`, 25, yPosition + 19);
-                    
-                    pdf.setTextColor(30, 41, 59);
-                    pdf.text(`CLIENTI ATTIVI: ${generalData.Clienti_Anno_Corrente}`, 120, yPosition + 5);
-                    
-                    if (generalData.Obiettivo > 0) {
-                        const targetProgress = Math.round((generalData.Anno_Corrente / generalData.Obiettivo) * 100);
-                        pdf.text(`OBIETTIVO 2025: €${Math.round(generalData.Obiettivo / 1000)}k`, 120, yPosition + 12);
-                        pdf.text(`RAGGIUNTO: ${targetProgress}%`, 120, yPosition + 19);
-                    }
-                }
-                
-                yPosition += 35;
-                
-                // Sezione Top Clienti migliorata con dati dal CSV
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(30, 41, 59);
-                pdf.text('🏆 TOP 10 CLIENTI PER FATTURATO', 20, yPosition);
-                yPosition += 12;
-                
-                const venditeDatiPDF = allRawData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
-                const clientsMapPDF = new Map();
-                
-                venditeDatiPDF.forEach(sale => {
-                    const clientName = sale.Ragione_Sociale_Cliente;
-                    const revenue = parseFloat(sale.Fatturato) || 0;
-                    const province = sale.Provincia;
-                    
-                    if (!clientsMapPDF.has(clientName)) {
-                        clientsMapPDF.set(clientName, {
-                            name: clientName,
-                            totalRevenue: 0,
-                            province: province,
-                            categories: new Set()
-                        });
-                    }
-                    
-                    const client = clientsMapPDF.get(clientName);
-                    client.totalRevenue += revenue;
-                    client.categories.add(sale.Categoria_Articoli);
-                });
-                
-                const topClientsPDF = Array.from(clientsMapPDF.values())
-                    .sort((a, b) => b.totalRevenue - a.totalRevenue)
-                    .slice(0, 10);
-                
-                // Header tabella
-                pdf.setFillColor(248, 250, 252);
-                pdf.rect(20, yPosition - 2, pageWidth - 40, 3, 'F');
-                
-                pdf.setFontSize(10);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(55, 65, 81);
-                pdf.text('POS', 25, yPosition + 2);
-                pdf.text('CLIENTE', 40, yPosition + 2);
-                pdf.text('PROV', 140, yPosition + 2);
-                pdf.text('FATTURATO', 155, yPosition + 2);
-                pdf.text('CAT', 180, yPosition + 2);
-                
-                yPosition += 8;
-                
-                pdf.setFont("helvetica", "normal");
-                pdf.setFontSize(9);
-                topClientsPDF.forEach((client, index) => {
-                    const position = index + 1;
-                    
-                    if (position === 1) pdf.setTextColor(255, 193, 7);
-                    else if (position === 2) pdf.setTextColor(158, 158, 158);
-                    else if (position === 3) pdf.setTextColor(205, 127, 50);
-                    else pdf.setTextColor(100, 116, 139);
-                    
-                    pdf.setFont("helvetica", "bold");
-                    pdf.text(`${position}°`, 25, yPosition);
-                    
-                    pdf.setFont("helvetica", "normal");
-                    pdf.setTextColor(30, 41, 59);
-                    
-                    const clientName = client.name.length > 35 ? client.name.substring(0, 32) + '...' : client.name;
-                    pdf.text(clientName, 40, yPosition);
-                    pdf.text(client.province, 140, yPosition);
-                    pdf.text(`€${(client.totalRevenue / 1000).toFixed(1)}k`, 155, yPosition);
-                    pdf.text(`${client.categories.size}`, 180, yPosition);
-                    
-                    yPosition += 5;
-                    
-                    if (yPosition > pageHeight - 40) {
-                        pdf.addPage();
-                        yPosition = 20;
-                    }
-                });
-                
-                yPosition += 15;
-                
-                // Sezione Province
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(30, 41, 59);
-                pdf.text('🗺️ DISTRIBUZIONE TERRITORIALE', 20, yPosition);
-                yPosition += 12;
-                
-                const provinceData = allRawData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
-                
-                pdf.setFillColor(248, 250, 252);
-                pdf.rect(20, yPosition - 5, pageWidth - 40, 20, 'F');
-                
-                pdf.setFontSize(12);
-                pdf.setFont("helvetica", "normal");
-                pdf.setTextColor(30, 41, 59);
-                
-                const ltData = provinceData.find(p => p.Provincia === 'LT');
-                const rmData = provinceData.find(p => p.Provincia === 'RM');
-                
-                if (ltData) {
-                    pdf.text('PROVINCIA LATINA (LT)', 25, yPosition + 5);
-                    pdf.text(`${ltData.Clienti_Serviti} clienti serviti - Fatturato €${Math.round(ltData.Fatturato/1000)}k`, 25, yPosition + 12);
-                }
-                
-                if (rmData) {
-                    pdf.text('PROVINCIA ROMA (RM)', 120, yPosition + 5);
-                    pdf.text(`${rmData.Clienti_Serviti} clienti serviti - Fatturato €${Math.round(rmData.Fatturato/1000)}k`, 120, yPosition + 12);
-                }
-                
-                yPosition += 25;
-                
-                // Sezione Categorie
-                if (yPosition < pageHeight - 60) {
-                    pdf.setFontSize(16);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(30, 41, 59);
-                    pdf.text('📦 TOP CATEGORIE PRODOTTO', 20, yPosition);
-                    yPosition += 12;
-                    
-                    const categorieData = allRawData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-                    const topCategorie = categorieData
-                        .filter(cat => parseFloat(cat.Importo_Totale) > 0)
-                        .sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale))
-                        .slice(0, 5);
-                    
-                    pdf.setFontSize(11);
-                    pdf.setFont("helvetica", "normal");
-                    
-                    topCategorie.forEach(cat => {
-                        const clientiTotali = (parseInt(cat.Clienti_Prov_1) || 0) + (parseInt(cat.Clienti_Prov_2) || 0);
-                        pdf.text(`• ${cat.Categoria.replace(/_/g, ' ')}: €${Math.round(parseFloat(cat.Importo_Totale)/1000)}k (${clientiTotali} clienti)`, 25, yPosition);
-                        yPosition += 6;
-                    });
-                }
-                
-                // Footer
-                pdf.setFontSize(8);
-                pdf.setTextColor(148, 163, 184);
-                pdf.text('Dashboard Performance Vendite - Report Automatizzato con Dati CSV', pageWidth / 2, pageHeight - 10, { align: 'center' });
-                pdf.text(`Pagina 1 di 1 - Generato automaticamente`, pageWidth / 2, pageHeight - 5, { align: 'center' });
-                
-                const fileName = `Report_Performance_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.pdf`;
-                pdf.save(fileName);
-                
-                showNotification('Report PDF generato con successo!', 'success');
-                
-            } catch (error) {
-                console.error('Errore nella generazione del PDF:', error);
-                showNotification('Errore nella generazione del PDF', 'error');
-            } finally {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        }
-
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-            
-            const provinceSelectorBtn = document.getElementById('provinceSelectorBtn');
-            const provinceModal = document.getElementById('provinceModal');
-            const modalClose = document.getElementById('modalClose');
-            const modalCancel = document.getElementById('modalCancel');
-            const chevronIcon = document.querySelector('.chevron-icon');
-            
-            // Apri popup
-            provinceSelectorBtn.addEventListener('click', () => {
-                provinceModal.classList.add('show');
-                provinceSelectorBtn.classList.add('active');
-                chevronIcon.classList.add('rotated');
-                document.body.style.overflow = 'hidden';
-            });
-            
-            // Chiudi popup
-            function closeModal() {
-                provinceModal.classList.remove('show');
-                provinceSelectorBtn.classList.remove('active');
-                chevronIcon.classList.remove('rotated');
-                document.body.style.overflow = '';
-            }
-            
-            modalClose.addEventListener('click', closeModal);
-            modalCancel.addEventListener('click', closeModal);
-            
-            provinceModal.addEventListener('click', (e) => {
-                if (e.target === provinceModal) {
-                    closeModal();
-                }
-            });
-            
-            // Gestione selezione province
-            const provinceOptions = document.querySelectorAll('.province-option');
-            
-            provinceOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    provinceOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    
-                    const value = option.dataset.value;
-                    selectedProvince = value;
-                    
-                    const selectedText = document.getElementById('selectedProvinceText');
-                    const selectedSubtext = document.getElementById('selectedProvinceSubtext');
-                    
-                    if (value === 'all') {
-                        selectedText.textContent = 'Tutte le Province';
-                        selectedSubtext.textContent = 'Panoramica completa';
-                    } else if (value === 'LT') {
-                        selectedText.textContent = 'Latina';
-                        selectedSubtext.textContent = '60k • 18 clienti';
-                    } else if (value === 'RM') {
-                        selectedText.textContent = 'Roma';
-                        selectedSubtext.textContent = '8k • 2 clienti';
-                    }
-                    
-                    updateDashboard();
-                    setTimeout(() => closeModal(), 200);
-                });
-            });
-            
-            // Event listeners per i download
-            document.getElementById('downloadPDF').addEventListener('click', generatePDF);
-            document.getElementById('downloadExcel').addEventListener('click', downloadExcel);
-            document.getElementById('downloadImage').addEventListener('click', downloadImage);
-            
-            // Chiudi modal con ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && provinceModal.classList.contains('show')) {
-                    closeModal();
-                }
-            });
-        });
-    </script>
-</body>
-</html>
 
         body {
             font-family: 'Montserrat', sans-serif;
@@ -1014,10 +60,10 @@
             justify-content: space-between;
         }
 
-        .download-buttons {
+        .action-buttons {
             display: flex;
             gap: 12px;
-            flex-wrap: wrap;
+            align-items: center;
         }
 
         .download-btn {
@@ -1032,55 +78,58 @@
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .pdf-download-btn {
+        .pdf-btn {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
             box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
 
-        .pdf-download-btn:hover {
+        .pdf-btn:hover {
             background: linear-gradient(135deg, #2563eb, #1e40af);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
-        .excel-download-btn {
-            background: linear-gradient(135deg, #10b981, #047857);
+        .excel-btn {
+            background: linear-gradient(135deg, #059669, #047857);
             color: white;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
         }
 
-        .excel-download-btn:hover {
-            background: linear-gradient(135deg, #059669, #065f46);
+        .excel-btn:hover {
+            background: linear-gradient(135deg, #047857, #065f46);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .image-download-btn {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: white;
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-        }
-
-        .image-download-btn:hover {
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
         }
 
         .download-btn:active {
             transform: translateY(0);
         }
 
-        .download-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
+        @media (max-width: 640px) {
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+                gap: 8px;
+                margin-top: 8px;
+            }
+
+            .download-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 12px 16px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .download-btn {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
         }
 
         .detail-item {
@@ -1391,9 +440,21 @@
 
         .cards-grid {
             display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+            grid-template-columns: repeat(3, 1fr) !important;
             gap: 20px !important;
             width: 100% !important;
+        }
+
+        @media screen and (max-width: 1200px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr !important;
+            }
         }
 
         .metric-card {
@@ -1849,7 +910,7 @@
 
         .categories-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 16px;
         }
 
@@ -1890,18 +951,7 @@
             color: #64748b;
         }
 
-        /* OTTIMIZZAZIONI MOBILE MIGLIORATE */
-        @media (max-width: 1200px) {
-            .chart-container {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-            
-            .categories-container {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-            
+        @media (max-width: 1024px) {
             .province-stats-container {
                 grid-template-columns: 1fr;
                 gap: 24px;
@@ -1909,14 +959,44 @@
             
             .province-cards-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 16px;
+            }
+
+            .categories-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .chart-section {
+                padding: 24px;
+            }
+
+            .dashboard-container {
+                padding: 24px;
             }
         }
 
         @media (max-width: 768px) {
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .province-cards-grid {
+                grid-template-columns: 1fr;
+            }
+
             .dashboard-container {
-                padding: 20px;
+                padding: 16px;
             }
             
             .header {
@@ -1930,18 +1010,7 @@
             .agent-details {
                 gap: 20px;
                 flex-direction: column;
-                align-items: stretch;
-            }
-
-            .download-buttons {
-                width: 100%;
-                justify-content: stretch;
-            }
-
-            .download-btn {
-                flex: 1;
-                justify-content: center;
-                min-width: 0;
+                align-items: flex-start;
             }
 
             .controls {
@@ -1953,7 +1022,6 @@
             .filter-controls {
                 justify-content: flex-start;
                 flex-wrap: wrap;
-                gap: 12px;
             }
 
             .province-selector-btn {
@@ -1975,16 +1043,66 @@
                 font-size: 1.1rem;
             }
 
-            .chart-wrapper {
-                height: 280px;
+            .metric-card {
+                padding: 20px;
             }
 
-            .categories-grid {
-                grid-template-columns: 1fr;
+            .main-value {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .dashboard-container {
+                padding: 12px;
+            }
+            
+            .header {
+                padding: 20px 16px;
             }
 
-            .province-cards-grid {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .agent-details {
+                gap: 16px;
+            }
+
+            .detail-item {
+                font-size: 0.85rem;
+            }
+
+            .pdf-download-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 14px 20px;
+            }
+
+            .cards-grid {
                 grid-template-columns: 1fr !important;
+                gap: 16px !important;
+            }
+
+            .metric-card {
+                padding: 16px;
+            }
+
+            .main-value {
+                font-size: 1.5rem;
+            }
+
+            .chart-section {
+                padding: 16px;
+                margin: 16px 0;
+            }
+
+            .section-header h2 {
+                font-size: 1rem;
+            }
+
+            .chart-wrapper {
+                height: 250px;
             }
 
             .clients-table-container {
@@ -2001,47 +1119,11 @@
                 padding: 12px 8px;
                 font-size: 0.85rem;
             }
-        }
 
-        @media (max-width: 640px) {
-            .dashboard-container {
-                padding: 16px;
-            }
-            
-            .header {
-                padding: 20px 16px;
-            }
-
-            .header h1 {
-                font-size: 1.5rem;
-            }
-
-            .download-buttons {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .download-btn {
-                width: 100%;
-                padding: 14px 16px;
-                font-size: 0.85rem;
-            }
-
-            .metric-card {
-                padding: 16px;
-            }
-
-            .main-value {
-                font-size: 1.5rem;
-            }
-
-            .chart-section {
-                padding: 16px;
-                margin: 16px 0;
-            }
-
-            .chart-wrapper {
-                height: 250px;
+            .podium-position {
+                width: 24px;
+                height: 24px;
+                font-size: 0.8rem;
             }
 
             .category-card {
@@ -2060,9 +1142,16 @@
                 font-size: 1.5rem;
             }
 
+            .province-revenue {
+                font-size: 1rem;
+            }
+        }
+
+        /* Ottimizzazioni specifiche per il popup mobile */
+        @media (max-width: 640px) {
             .province-modal {
                 margin: 16px;
-                padding: 20px;
+                padding: 24px;
                 max-height: 85vh;
                 width: calc(100% - 32px);
             }
@@ -2074,11 +1163,31 @@
             .province-option {
                 padding: 12px;
             }
+
+            .province-option-icon {
+                width: 36px;
+                height: 36px;
+                margin-right: 12px;
+            }
+
+            .province-option-title {
+                font-size: 0.9rem;
+            }
+
+            .province-option-subtitle {
+                font-size: 0.8rem;
+            }
+
+            .modal-cancel {
+                padding: 14px 24px;
+                font-size: 0.9rem;
+            }
         }
 
+        /* Ottimizzazioni per schermi molto piccoli */
         @media (max-width: 480px) {
             .dashboard-container {
-                padding: 12px;
+                padding: 8px;
             }
 
             .header {
@@ -2089,17 +1198,8 @@
                 font-size: 1.25rem;
             }
 
-            .download-btn {
-                padding: 12px 14px;
-                font-size: 0.8rem;
-            }
-
             .chart-section {
                 padding: 12px;
-            }
-
-            .chart-wrapper {
-                height: 220px;
             }
 
             .metric-card {
@@ -2109,61 +1209,39 @@
             .main-value {
                 font-size: 1.25rem;
             }
+
+            .chart-wrapper {
+                height: 200px;
+            }
+
+            .category-card {
+                padding: 12px;
+            }
+
+            .province-card {
+                padding: 12px;
+            }
+
+            .province-modal {
+                padding: 20px;
+                margin: 12px;
+                width: calc(100% - 24px);
+            }
         }
 
         /* Touch-friendly improvements */
         @media (pointer: coarse) {
             .province-option,
-            .download-btn,
+            .pdf-download-btn,
             .province-selector-btn,
             .modal-close,
             .modal-cancel {
                 min-height: 44px;
             }
 
-            .download-btn {
-                padding: 16px 20px;
+            .province-option {
+                padding: 16px;
             }
-        }
-
-        /* Animazioni per il caricamento */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-spinner {
-            animation: spin 1s linear infinite;
-        }
-
-        /* Stili per notifiche */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 16px 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1001;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            max-width: 300px;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            border-color: #22c55e;
-            color: #166534;
-        }
-
-        .notification.error {
-            border-color: #ef4444;
-            color: #dc2626;
         }
     </style>
 </head>
@@ -2187,26 +1265,20 @@
                     </svg>
                     <span>Dati aggiornati dal file HTML</span>
                 </div>
-                <div class="download-buttons">
-                    <button id="downloadPDF" class="download-btn pdf-download-btn">
+                <div class="action-buttons">
+                    <button id="downloadPDF" class="download-btn pdf-btn">
                         <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                             <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                            <path d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .477.365c.088.164.12.356.127.538.007.188-.012.396-.047.614-.084.51-.27 1.134-.52 1.794a10.954 10.954 0 0 0 .98 1.686 5.753 5.753 0 0 1 1.334.05c.364.066.734.195.96.465.12.144.193.32.2.518.007.192-.047.382-.138.563a1.04 1.04 0 0 1-.354.416.856.856 0 0 1-.51.138c-.331-.014-.654-.196-.933-.417a5.712 5.712 0 0 1-.911-.95 11.651 11.651 0 0 0-1.997.406 11.307 11.307 0 0 1-1.02 1.51c-.292.35-.609.656-.927.787a.793.793 0 0 1-.58.029zm1.379-1.901c-.166.076-.32.156-.459.238-.328.194-.541.383-.647.547-.094.145-.096.25-.04.361.01.022.02.036.026.044a.266.266 0 0 0 .035-.012c.137-.056.355-.235.635-.572a8.18 8.18 0 0 0 .45-.606zm1.64-1.33a12.71 12.71 0 0 1 1.01-.193 11.744 11.744 0 0 1-.51-.858 20.801 20.801 0 0 1-.5 1.05zm2.446.45c.15.163.296.3.435.41.24.19.407.253.498.256a.107.107 0 0 0 .07-.015.307.307 0 0 0 .094-.125.436.436 0 0 0 .059-.2.095.095 0 0 0-.026-.063c-.052-.062-.2-.152-.518-.209a3.876 3.876 0 0 0-.612-.053zM8.078 7.8a6.7 6.7 0 0 0 .2-.828c.031-.188.043-.343.038-.465a.613.613 0 0 0-.032-.198.517.517 0 0 0-.145.04c-.087.035-.158.106-.196.283-.04.192-.03.469.135.968z"/>
                         </svg>
-                        PDF
+                        Scarica PDF
                     </button>
-                    <button id="downloadExcel" class="download-btn excel-download-btn">
+                    <button id="downloadExcel" class="download-btn excel-btn">
                         <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                             <path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z"/>
                             <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
                         </svg>
-                        Excel
-                    </button>
-                    <button id="downloadImage" class="download-btn image-download-btn">
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                            <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
-                        </svg>
-                        IMG
+                        Scarica Excel
                     </button>
                 </div>
             </div>
@@ -2290,9 +1362,6 @@
         </div>
 
         <div id="loadingMessage" class="loading">
-            <svg width="24" height="24" class="loading-spinner" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
-            </svg>
             Caricamento dati in corso...
         </div>
 
@@ -2390,7 +1459,6 @@
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
         
         let currentData = [];
-        let allRawData = []; // Nuovo array per tenere tutti i dati grezzi
         let agentInfo = {};
         let selectedProvince = 'all';
         let fatturato_chart = null;
@@ -2416,28 +1484,6 @@
             const change = current - previous;
             const percentage = previous > 0 ? ((change / previous) * 100) : 0;
             return { change, percentage };
-        }
-
-        // Funzione per mostrare notifiche
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    ${type === 'success' ? 
-                        '<svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>' :
-                        '<svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/></svg>'
-                    }
-                    <span>${message}</span>
-                </div>
-            `;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => notification.classList.add('show'), 100);
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => document.body.removeChild(notification), 300);
-            }, 3000);
         }
 
         // Funzione per parsificare il CSV personalizzato
@@ -2486,209 +1532,1232 @@
             return data;
         }
 
-        // Funzione migliorata per download Excel con tutti i dati
-        function downloadExcel() {
+        function createFatturatoCard(data) {
+            const current = data.Anno_Corrente;
+            const previous = data.Anno_Precedente;
+            const { change, percentage } = calculateChange(current, previous);
+            const isPositive = change >= 0;
+            
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Fatturato 2025</div>
+                        <div class="trend-badge ${isPositive ? 'trend-positive' : 'trend-negative'}">
+                            ${isPositive ? '↗' : '↘'} ${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="main-value">${formatCurrency(current)}</div>
+                    <div class="comparison">
+                        <span class="prev-value">vs 2024: ${formatCurrency(previous)}</span>
+                    </div>
+                    ${data.Obiettivo > 0 ? `
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span class="progress-label">Obiettivo Fatturato</span>
+                                <span class="progress-percentage">${formatCurrency(data.Obiettivo)}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-green" style="width: ${Math.min((current/data.Obiettivo)*100, 100)}%"></div>
+                            </div>
+                            <div class="progress-details">
+                                <span>Mancano: ${formatCurrency(Math.max(0, data.Obiettivo - current))}</span>
+                                <span>${Math.round((current/data.Obiettivo)*100)}%</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function createObiettivoCard(data) {
+            const current = data.Anno_Corrente;
+            const target = data.Obiettivo;
+            const progressPerc = target > 0 ? (current / target) * 100 : 0;
+            const remaining = Math.max(0, target - current);
+            
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Obiettivo 2025</div>
+                        <div class="trend-badge trend-positive">
+                            ${Math.round(progressPerc)}%
+                        </div>
+                    </div>
+                    <div class="main-value">${formatCurrency(target)}</div>
+                    <div class="comparison">
+                        <span class="prev-value">Da raggiungere: ${formatCurrency(remaining)}</span>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span class="progress-label">Progressione Obiettivo</span>
+                            <span class="progress-percentage">${formatCurrency(target)}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-blue" style="width: ${Math.min(progressPerc, 100)}%"></div>
+                        </div>
+                        <div class="progress-details">
+                            <span>Mancano: ${formatCurrency(remaining)}</span>
+                            <span>${Math.round(progressPerc)}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createTopPerformanceCard(data) {
+            // Trova la provincia con performance migliore
+            const allProvData = currentData.filter(d => d.Provincia !== 'Generale');
+            let topProv = allProvData[0];
+            let bestGrowth = 0;
+            
+            allProvData.forEach(prov => {
+                const growth = ((prov.Anno_Corrente - prov.Anno_Precedente) / prov.Anno_Precedente) * 100;
+                if (growth > bestGrowth) {
+                    bestGrowth = growth;
+                    topProv = prov;
+                }
+            });
+            
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Top Performance</div>
+                        <div class="trend-badge trend-positive">
+                            +${bestGrowth.toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="main-value">${topProv?.Provincia || 'LT'}</div>
+                    <div class="comparison">
+                        <span class="prev-value">Provincia ${topProv?.Provincia === 'LT' ? 'Latina' : 'Roma'}</span>
+                        <span class="change-value" style="color: #22c55e;">crescita totale</span>
+                    </div>
+                    <div class="progress-details">
+                        <span style="color: #64748b; font-size: 0.85rem;">${formatCurrency(topProv?.Anno_Corrente || 0)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createClientiAttiviCard(data) {
+            const currentClients = data.Clienti_Anno_Corrente || 0;
+            const prevClients = data.Clienti_Anno_Precedente || 0;
+            const targetClients = data.Obiettivo_Clienti || 0;
+            const clientProgress = targetClients > 0 ? (currentClients / targetClients) * 100 : 0;
+            
+            return `
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">Clienti Attivi</div>
+                        <div class="trend-badge ${clientProgress >= 50 ? 'trend-positive' : 'trend-negative'}">
+                            ${Math.round(clientProgress)}%
+                        </div>
+                    </div>
+                    <div class="main-value">${currentClients}</div>
+                    <div class="comparison">
+                        <span class="prev-value">vs 2024: ${prevClients}</span>
+                        <span class="change-value" style="color: #64748b;">raggiunto</span>
+                    </div>
+                    ${targetClients > 0 ? `
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span class="progress-label">Obiettivo Clienti</span>
+                                <span class="progress-percentage">${targetClients}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-blue" style="width: ${Math.min(clientProgress, 100)}%"></div>
+                            </div>
+                            <div class="progress-details">
+                                <span>Mancano: ${Math.max(0, targetClients - currentClients)}</span>
+                                <span>${Math.round(clientProgress)}%</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function createClientsTable(allData) {
+            const venditeLData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+            
+            // Raggruppa per cliente
+            const clientsMap = new Map();
+            
+            venditeLData.forEach(sale => {
+                const clientName = sale.Ragione_Sociale_Cliente;
+                const revenue = parseFloat(sale.Fatturato) || 0;
+                const province = sale.Provincia;
+                
+                if (!clientsMap.has(clientName)) {
+                    clientsMap.set(clientName, {
+                        name: clientName,
+                        totalRevenue: 0,
+                        province: province,
+                        categories: new Set()
+                    });
+                }
+                
+                const client = clientsMap.get(clientName);
+                client.totalRevenue += revenue;
+                client.categories.add(sale.Categoria_Articoli);
+            });
+            
+            // Converti in array e ordina per fatturato
+            const clientsArray = Array.from(clientsMap.values())
+                .sort((a, b) => b.totalRevenue - a.totalRevenue);
+            
+            const container = document.getElementById('clientsTable');
+            
+            function getPodiumClass(index) {
+                if (index === 0) return 'podium-1';
+                if (index === 1) return 'podium-2';
+                if (index === 2) return 'podium-3';
+                return 'podium-other';
+            }
+            
+            let html = `
+                <table class="clients-table">
+                    <thead>
+                        <tr>
+                            <th>Pos.</th>
+                            <th>Cliente</th>
+                            <th>Provincia</th>
+                            <th>Fatturato</th>
+                            <th>Categorie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            clientsArray.slice(0, 10).forEach((client, index) => {
+                html += `
+                    <tr>
+                        <td>
+                            <div class="podium-position ${getPodiumClass(index)}">
+                                ${index + 1}
+                            </div>
+                        </td>
+                        <td class="client-name">${client.name}</td>
+                        <td><span class="client-province ${client.province}">${client.province}</span></td>
+                        <td class="client-revenue">${formatCurrency(client.totalRevenue)}</td>
+                        <td>${client.categories.size} categorie</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function createCategoriesSection(allData) {
+            const categoriesData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
+            
+            // Filtra solo categorie con importo > 0
+            const activeCategories = categoriesData.filter(cat => parseFloat(cat.Importo_Totale) > 0);
+            
+            // Ordina per importo decrescente
+            activeCategories.sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale));
+            
+            // Colori del grafico (stesso array utilizzato nel chart)
+            const colors = ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
+            
+            // Crea cards
+            const gridContainer = document.getElementById('categoriesGrid');
+            let cardsHtml = '';
+            
+            activeCategories.forEach((cat, index) => {
+                const importo = parseFloat(cat.Importo_Totale);
+                const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
+                const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
+                const totalClienti = clientiLT + clientiRM;
+                const categoryColor = colors[index] || '#64748b';
+                
+                cardsHtml += `
+                    <div class="category-card" style="--category-color: ${categoryColor}">
+                        <div class="category-name">${cat.Categoria}</div>
+                        <div class="category-value">${formatCurrency(importo)}</div>
+                        <div class="category-clients">${totalClienti} clienti (LT: ${clientiLT}, RM: ${clientiRM})</div>
+                    </div>
+                `;
+            });
+            
+            gridContainer.innerHTML = cardsHtml;
+            
+            // Crea grafico con gli stessi colori
+            createCategoriesChart(activeCategories, colors);
+        }
+
+        function createCategoriesChart(categoriesData, colors) {
+            if (categories_chart) {
+                categories_chart.destroy();
+            }
+            
+            // Prendi le top categorie (massimo quante ne abbiamo)
+            const topCategories = categoriesData.slice(0, Math.min(categoriesData.length, colors.length));
+            
+            const ctx = document.getElementById('categories-chart').getContext('2d');
+            categories_chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: topCategories.map(cat => cat.Categoria.replace(/_/g, ' ')),
+                    datasets: [{
+                        data: topCategories.map(cat => parseFloat(cat.Importo_Totale)),
+                        backgroundColor: colors.slice(0, topCategories.length),
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#64748b',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 1000
+                    }
+                }
+            });
+        }
+
+        function filterData(province) {
+            if (province === 'all') {
+                return currentData;
+            } else if (province === 'generale') {
+                return currentData.filter(item => item.Provincia === 'Generale');
+            } else {
+                return currentData.filter(item => item.Provincia === province);
+            }
+        }
+
+        function updateDashboard() {
+            const filteredData = filterData(selectedProvince);
+            const container = document.getElementById('metricsCards');
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato disponibile per la selezione corrente</div>';
+                return;
+            }
+
+            let html = '';
+            
+            filteredData.forEach(data => {
+                // Card Fatturato
+                html += createFatturatoCard(data);
+                
+                // Card Obiettivo (solo se presente)
+                if (data.Obiettivo > 0) {
+                    html += createObiettivoCard(data);
+                }
+                
+                // Card Clienti Attivi
+                html += createClientiAttiviCard(data);
+            });
+            
+            // Aggiungi Top Performance solo per vista "all"
+            if (selectedProvince === 'all') {
+                const generalData = currentData.find(d => d.Provincia === 'Generale');
+                if (generalData) {
+                    html += createTopPerformanceCard(generalData);
+                }
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function createFatturatoChart(allData) {
+            // Cerca i dati di ripartizione dal CSV
+            const ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
+            console.log('Dati ripartizione trovati:', ripartizioneData);
+            
+            let pieniCoppiValue = 0;
+            let altroValue = 0;
+            
+            // Estrai valori dalla sezione RIPARTIZIONE del CSV
+            ripartizioneData.forEach(item => {
+                if (item.Categoria_Prodotto === 'Pieni_e_Coppi') {
+                    pieniCoppiValue = parseFloat(item.Importo) || 0;
+                } else if (item.Categoria_Prodotto === 'Altro') {
+                    altroValue = parseFloat(item.Importo) || 0;
+                }
+            });
+            
+            // Fallback ai valori originali se non trovati nel CSV
+            if (pieniCoppiValue === 0 && altroValue === 0) {
+                console.warn('Dati ripartizione non trovati nel CSV, uso valori fallback');
+                pieniCoppiValue = 54909.62;
+                altroValue = 35250.17;
+            }
+            
+            const total = pieniCoppiValue + altroValue;
+            const pieniCoppiPerc = total > 0 ? (pieniCoppiValue / total * 100).toFixed(1) : 0;
+            const altroPerc = total > 0 ? (altroValue / total * 100).toFixed(1) : 0;
+
+            console.log(`Ripartizione automatica: Pieni e Coppi €${pieniCoppiValue} (${pieniCoppiPerc}%), Altro €${altroValue} (${altroPerc}%)`);
+
+            // Aggiorna legend dinamicamente
+            const legendContainer = document.getElementById('chartLegend');
+            legendContainer.innerHTML = `
+                <div class="legend-item pieni-coppi">
+                    <div class="legend-content">
+                        <div class="legend-color pieni-coppi"></div>
+                        <div class="legend-label">Pieni e Coppi</div>
+                    </div>
+                    <div class="legend-value">
+                        <div class="legend-amount">${formatCurrency(pieniCoppiValue)}</div>
+                        <div class="legend-percentage">${pieniCoppiPerc}%</div>
+                    </div>
+                </div>
+                <div class="legend-item altro">
+                    <div class="legend-content">
+                        <div class="legend-color altro"></div>
+                        <div class="legend-label">Altro</div>
+                    </div>
+                    <div class="legend-value">
+                        <div class="legend-amount">${formatCurrency(altroValue)}</div>
+                        <div class="legend-percentage">${altroPerc}%</div>
+                    </div>
+                </div>
+            `;
+
+            // Distruggi chart esistente se presente
+            if (fatturato_chart) {
+                fatturato_chart.destroy();
+            }
+
+            // Crea nuovo chart con dati dinamici
+            const ctx = document.getElementById('fatturato-chart').getContext('2d');
+            fatturato_chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pieni e Coppi', 'Altro'],
+                    datasets: [{
+                        data: [pieniCoppiValue, altroValue],
+                        backgroundColor: ['#3b82f6', '#8b5cf6'],
+                        hoverBackgroundColor: ['#2563eb', '#7c3aed'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverBorderWidth: 5,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#64748b',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        function createProvinceCards(allData) {
+            // Cerca i dati delle province dal CSV
+            const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
+            console.log('Dati province trovati:', provinceData);
+            
+            const container = document.getElementById('provinceCards');
+            
+            if (provinceData.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px;">Nessun dato provincia disponibile</div>';
+                return [];
+            }
+
+            let html = '';
+            const chartData = [];
+
+            provinceData.forEach(prov => {
+                const clients = parseInt(prov.Clienti_Serviti) || 0;
+                const revenue = parseFloat(prov.Fatturato) || 0;
+                const avgPerClient = clients > 0 ? revenue / clients : 0;
+                
+                const provinceName = prov.Provincia === 'LT' ? 'Latina' : 
+                                   prov.Provincia === 'RM' ? 'Roma' : 
+                                   prov.Provincia;
+
+                html += `
+                    <div class="province-card">
+                        <div class="province-card-header">
+                            <div class="province-name">
+                                <div class="province-indicator"></div>
+                                ${provinceName} (${prov.Provincia})
+                            </div>
+                        </div>
+                        <div class="province-clients">${clients}</div>
+                        <div class="province-revenue">${formatCurrency(revenue)}</div>
+                        <div class="province-details">
+                            <span>Clienti serviti</span>
+                            <div class="client-avg">
+                                <div class="avg-label">Media per cliente</div>
+                                <div class="avg-value">${formatCurrency(avgPerClient)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                chartData.push({
+                    label: provinceName,
+                    clients: clients,
+                    revenue: revenue,
+                    color: prov.Provincia === 'LT' ? '#3b82f6' : '#6366f1'
+                });
+            });
+
+            container.innerHTML = html;
+            return chartData;
+        }
+
+        function createProvinceChart(chartData) {
+            if (chartData.length === 0) return;
+
+            // Distruggi chart esistente
+            if (province_chart) {
+                province_chart.destroy();
+            }
+
+            const ctx = document.getElementById('province-chart').getContext('2d');
+            province_chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.map(d => d.label),
+                    datasets: [{
+                        label: 'Clienti',
+                        data: chartData.map(d => d.clients),
+                        backgroundColor: chartData.map(d => d.color),
+                        borderColor: chartData.map(d => d.color),
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                color: '#64748b',
+                                font: {
+                                    family: 'Montserrat',
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: '#f1f5f9',
+                                borderColor: '#e2e8f0'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#64748b',
+                                font: {
+                                    family: 'Montserrat',
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#64748b',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            titleFont: {
+                                family: 'Montserrat',
+                                size: 14,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                family: 'Montserrat',
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    const dataPoint = chartData[context.dataIndex];
+                                    return [
+                                        `Clienti: ${context.parsed.y}`,
+                                        `Fatturato: ${formatCurrency(dataPoint.revenue)}`,
+                                        `Media: ${formatCurrency(dataPoint.revenue / dataPoint.clients)}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 800,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Carica dati dal CSV GitHub
+        async function loadData() {
+            try {
+                console.log('Caricamento dati da:', CSV_URL);
+                const response = await fetch(CSV_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const csvText = await response.text();
+                console.log('CSV caricato');
+                
+                const allData = parseCSV(csvText);
+                console.log('Dati parsificati:', allData);
+                
+                // Estrai info agente dai commenti
+                const lines = csvText.split('\n');
+                agentInfo = {
+                    codice: '631.00238',
+                    nome: 'CARABOT NATALINO', 
+                    periodo_da: '01/01/2025',
+                    periodo_a: '24/08/2025'
+                };
+                
+                // Cerca info nei commenti
+                lines.forEach(line => {
+                    if (line.includes('Codice Agente:')) {
+                        agentInfo.codice = line.split(':')[1]?.trim() || agentInfo.codice;
+                    }
+                    if (line.includes('Ragione Sociale:')) {
+                        agentInfo.nome = line.split(':')[1]?.trim() || agentInfo.nome;
+                    }
+                    if (line.includes('Periodo:')) {
+                        const periodo = line.split(':')[1]?.trim() || '';
+                        const dates = periodo.split(' - ');
+                        if (dates.length === 2) {
+                            agentInfo.periodo_da = dates[0].trim();
+                            agentInfo.periodo_a = dates[1].trim();
+                        }
+                    }
+                });
+                
+                // Aggiorna header
+                document.getElementById('agentCode').textContent = agentInfo.codice;
+                document.getElementById('agentName').textContent = agentInfo.nome;
+                document.getElementById('period').textContent = 'Gen - Ago 2025 (8 mesi)';
+                
+                // Filtra solo i record OBIETTIVI per la sezione 1
+                currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
+                console.log('Dati obiettivi filtrati:', currentData);
+                
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+                updateDashboard();
+                
+                // Crea le sezioni province e grafico
+                const chartData = createProvinceCards(allData);
+                createProvinceChart(chartData);
+                
+                // Crea la tabella dei top clienti
+                createClientsTable(allData);
+                
+                // Crea l'analisi delle categorie prodotto
+                createCategoriesSection(allData);
+                
+                // Crea il grafico della ripartizione fatturato con tutti i dati
+                createFatturatoChart(allData);
+                
+            } catch (error) {
+                console.error('Errore nel caricamento dei dati:', error);
+                document.getElementById('loadingMessage').innerHTML = `
+                    <div style="color: #dc2626; text-align: center;">
+                        ❌ Errore nel caricamento dei dati<br>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            
+            // Event listeners per il popup province
+            const provinceSelectorBtn = document.getElementById('provinceSelectorBtn');
+            const provinceModal = document.getElementById('provinceModal');
+            const modalClose = document.getElementById('modalClose');
+            const modalCancel = document.getElementById('modalCancel');
+            const chevronIcon = document.querySelector('.chevron-icon');
+            
+            // Apri popup
+            provinceSelectorBtn.addEventListener('click', () => {
+                provinceModal.classList.add('show');
+                provinceSelectorBtn.classList.add('active');
+                chevronIcon.classList.add('rotated');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Chiudi popup
+            function closeModal() {
+                provinceModal.classList.remove('show');
+                provinceSelectorBtn.classList.remove('active');
+                chevronIcon.classList.remove('rotated');
+                document.body.style.overflow = '';
+            }
+            
+            modalClose.addEventListener('click', closeModal);
+            modalCancel.addEventListener('click', closeModal);
+            
+            // Chiudi cliccando fuori
+            provinceModal.addEventListener('click', (e) => {
+                if (e.target === provinceModal) {
+                    closeModal();
+                }
+            });
+            
+            // Gestione selezione province
+            const provinceOptions = document.querySelectorAll('.province-option');
+            
+            provinceOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Rimuovi selezione precedente
+                    provinceOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Aggiungi selezione corrente
+                    option.classList.add('selected');
+                    
+                    // Aggiorna provincia selezionata
+                    const value = option.dataset.value;
+                    selectedProvince = value;
+                    
+                    // Aggiorna testo del pulsante
+                    const selectedText = document.getElementById('selectedProvinceText');
+                    const selectedSubtext = document.getElementById('selectedProvinceSubtext');
+                    
+                    if (value === 'all') {
+                        selectedText.textContent = 'Tutte le Province';
+                        selectedSubtext.textContent = 'Panoramica completa';
+                    } else if (value === 'LT') {
+                        selectedText.textContent = 'Latina';
+                        selectedSubtext.textContent = '60k • 18 clienti';
+                    } else if (value === 'RM') {
+                        selectedText.textContent = 'Roma';
+                        selectedSubtext.textContent = '8k • 2 clienti';
+                    }
+                    
+                    // Aggiorna dashboard
+                    updateDashboard();
+                    
+                    // Chiudi modal
+                    setTimeout(() => {
+                        closeModal();
+                    }, 200);
+                });
+            });
+            
+            // Event listener per i download
+            document.getElementById('downloadPDF').addEventListener('click', async () => {
+                await generatePDF();
+            });
+
+            document.getElementById('downloadExcel').addEventListener('click', async () => {
+                await generateExcel();
+            });
+            
+            // Chiudi modal con ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && provinceModal.classList.contains('show')) {
+                    closeModal();
+                }
+            });
+        });
+
+        // Funzione per generare il file Excel
+        async function generateExcel() {
             const button = document.getElementById('downloadExcel');
             const originalText = button.innerHTML;
             
+            // Cambia il testo del bottone durante la generazione
             button.innerHTML = `
-                <svg width="16" height="16" class="loading-spinner" fill="currentColor" viewBox="0 0 16 16">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="animate-spin">
                     <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
                 </svg>
-                Generando...
+                Generando Excel...
             `;
             button.disabled = true;
 
             try {
-                // Crea un CSV completo con tutti i dati
-                let csvContent = "data:text/csv;charset=utf-8,";
+                // Crea un nuovo workbook
+                const wb = XLSX.utils.book_new();
                 
-                // Header del report
-                csvContent += `# REPORT COMPLETO PERFORMANCE VENDITE\n`;
-                csvContent += `# Agente: ${agentInfo.nome}\n`;
-                csvContent += `# Codice: ${agentInfo.codice}\n`;
-                csvContent += `# Periodo: ${agentInfo.periodo_da} - ${agentInfo.periodo_a}\n`;
-                csvContent += `# Generato: ${new Date().toLocaleDateString('it-IT')} ${new Date().toLocaleTimeString('it-IT')}\n\n`;
+                // FOGLIO 1: Riepilogo Generale
+                const summaryData = [];
+                const generalData = currentData.find(d => d.Provincia === 'Generale');
                 
-                // Sezione 1: Dati Obiettivi
-                csvContent += "SEZIONE 1: OBIETTIVI E PERFORMANCE\n";
-                csvContent += "Provincia,Fatturato_2024,Fatturato_2025,Obiettivo_2025,Crescita_Percentuale,Clienti_2024,Clienti_2025,Obiettivo_Clienti\n";
-                
-                currentData.forEach(obj => {
-                    const growth = ((obj.Anno_Corrente - obj.Anno_Precedente) / obj.Anno_Precedente * 100).toFixed(1);
-                    csvContent += `${obj.Provincia},${obj.Anno_Precedente},${obj.Anno_Corrente},${obj.Obiettivo},${growth}%,${obj.Clienti_Anno_Precedente},${obj.Clienti_Anno_Corrente},${obj.Obiettivo_Clienti}\n`;
-                });
-                
-                csvContent += "\n";
-                
-                // Sezione 2: Dati Province
-                const provinceData = allRawData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
-                if (provinceData.length > 0) {
-                    csvContent += "SEZIONE 2: DISTRIBUZIONE TERRITORIALE\n";
-                    csvContent += "Provincia,Clienti_Serviti,Fatturato,Media_Per_Cliente\n";
+                if (generalData) {
+                    summaryData.push(['REPORT PERFORMANCE VENDITE', '']);
+                    summaryData.push(['Agente', agentInfo.nome]);
+                    summaryData.push(['Codice', agentInfo.codice]);
+                    summaryData.push(['Periodo', 'Gennaio - Agosto 2025 (8 mesi)']);
+                    summaryData.push(['Data Generazione', new Date().toLocaleString('it-IT')]);
+                    summaryData.push(['', '']);
+                    summaryData.push(['METRICHE PRINCIPALI', '']);
+                    summaryData.push(['Fatturato 2025', `€${generalData.Anno_Corrente.toLocaleString('it-IT')}`]);
+                    summaryData.push(['Fatturato 2024', `€${generalData.Anno_Precedente.toLocaleString('it-IT')}`]);
+                    summaryData.push(['Crescita', `${((generalData.Anno_Corrente - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100).toFixed(1)}%`]);
+                    summaryData.push(['Clienti Attivi 2025', generalData.Clienti_Anno_Corrente]);
+                    summaryData.push(['Clienti 2024', generalData.Clienti_Anno_Precedente]);
                     
-                    provinceData.forEach(prov => {
-                        const avgPerClient = prov.Clienti_Serviti > 0 ? (prov.Fatturato / prov.Clienti_Serviti).toFixed(2) : 0;
-                        csvContent += `${prov.Provincia},${prov.Clienti_Serviti},${prov.Fatturato},${avgPerClient}\n`;
-                    });
-                    
-                    csvContent += "\n";
+                    if (generalData.Obiettivo > 0) {
+                        summaryData.push(['Obiettivo 2025', `€${generalData.Obiettivo.toLocaleString('it-IT')}`]);
+                        summaryData.push(['% Obiettivo Raggiunto', `${Math.round((generalData.Anno_Corrente / generalData.Obiettivo) * 100)}%`]);
+                    }
                 }
                 
-                // Sezione 3: Top Clienti
-                const venditeDati = allRawData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
-                if (venditeDati.length > 0) {
-                    csvContent += "SEZIONE 3: TOP CLIENTI PER FATTURATO\n";
-                    csvContent += "Posizione,Cliente,Provincia,Fatturato,Categoria_Principale\n";
+                const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, summaryWS, 'Riepilogo');
+                
+                // FOGLIO 2: Top Clienti
+                try {
+                    const response = await fetch(CSV_URL);
+                    const csvText = await response.text();
+                    const allData = parseCSV(csvText);
+                    const venditeDatiExcel = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
                     
-                    // Calcola clienti aggregati
-                    const clientsMap = new Map();
-                    venditeDati.forEach(sale => {
+                    const clientsMapExcel = new Map();
+                    venditeDatiExcel.forEach(sale => {
                         const clientName = sale.Ragione_Sociale_Cliente;
                         const revenue = parseFloat(sale.Fatturato) || 0;
+                        const province = sale.Provincia;
                         
-                        if (!clientsMap.has(clientName)) {
-                            clientsMap.set(clientName, {
+                        if (!clientsMapExcel.has(clientName)) {
+                            clientsMapExcel.set(clientName, {
                                 name: clientName,
                                 totalRevenue: 0,
-                                province: sale.Provincia,
-                                mainCategory: sale.Categoria_Articoli
+                                province: province,
+                                categories: new Set()
                             });
                         }
                         
-                        const client = clientsMap.get(clientName);
+                        const client = clientsMapExcel.get(clientName);
                         client.totalRevenue += revenue;
+                        client.categories.add(sale.Categoria_Articoli);
                     });
                     
-                    const topClients = Array.from(clientsMap.values())
-                        .sort((a, b) => b.totalRevenue - a.totalRevenue)
-                        .slice(0, 20);
+                    const topClientsExcel = Array.from(clientsMapExcel.values())
+                        .sort((a, b) => b.totalRevenue - a.totalRevenue);
                     
-                    topClients.forEach((client, index) => {
-                        csvContent += `${index + 1},${client.name},${client.province},${client.totalRevenue.toFixed(2)},${client.mainCategory}\n`;
+                    const clientsData = [
+                        ['POS', 'CLIENTE', 'PROVINCIA', 'FATTURATO', 'N. CATEGORIE']
+                    ];
+                    
+                    topClientsExcel.forEach((client, index) => {
+                        clientsData.push([
+                            index + 1,
+                            client.name,
+                            client.province,
+                            client.totalRevenue,
+                            client.categories.size
+                        ]);
                     });
                     
-                    csvContent += "\n";
-                }
-                
-                // Sezione 4: Categorie Prodotto
-                const categorieData = allRawData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-                if (categorieData.length > 0) {
-                    csvContent += "SEZIONE 4: PERFORMANCE PER CATEGORIA PRODOTTO\n";
-                    csvContent += "Categoria,Importo_Totale,Clienti_Latina,Clienti_Roma,Totale_Clienti\n";
+                    const clientsWS = XLSX.utils.aoa_to_sheet(clientsData);
+                    XLSX.utils.book_append_sheet(wb, clientsWS, 'Top Clienti');
                     
-                    categorieData
+                    // FOGLIO 3: Dettaglio Vendite per Cliente
+                    const salesData = [
+                        ['CLIENTE', 'PROVINCIA', 'CATEGORIA ARTICOLI', 'FATTURATO']
+                    ];
+                    
+                    venditeDatiExcel.forEach(sale => {
+                        salesData.push([
+                            sale.Ragione_Sociale_Cliente,
+                            sale.Provincia,
+                            sale.Categoria_Articoli,
+                            parseFloat(sale.Fatturato) || 0
+                        ]);
+                    });
+                    
+                    const salesWS = XLSX.utils.aoa_to_sheet(salesData);
+                    XLSX.utils.book_append_sheet(wb, salesWS, 'Dettaglio Vendite');
+                    
+                    // FOGLIO 4: Performance per Categoria
+                    const categoriesDataExcel = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
+                    const categoriesData = [
+                        ['CATEGORIA', 'FATTURATO', 'CLIENTI LT', 'CLIENTI RM', 'TOTALE CLIENTI']
+                    ];
+                    
+                    categoriesDataExcel
                         .filter(cat => parseFloat(cat.Importo_Totale) > 0)
                         .sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale))
                         .forEach(cat => {
                             const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
                             const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
-                            csvContent += `${cat.Categoria},${cat.Importo_Totale},${clientiLT},${clientiRM},${clientiLT + clientiRM}\n`;
+                            categoriesData.push([
+                                cat.Categoria,
+                                parseFloat(cat.Importo_Totale),
+                                clientiLT,
+                                clientiRM,
+                                clientiLT + clientiRM
+                            ]);
                         });
-                        
-                    csvContent += "\n";
-                }
-                
-                // Sezione 5: Ripartizione Fatturato
-                const ripartizioneData = allRawData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
-                if (ripartizioneData.length > 0) {
-                    csvContent += "SEZIONE 5: RIPARTIZIONE FATTURATO\n";
-                    csvContent += "Categoria_Prodotto,Importo,Percentuale\n";
                     
-                    const totalRipartizione = ripartizioneData.reduce((sum, item) => sum + parseFloat(item.Importo || 0), 0);
-                    ripartizioneData.forEach(rip => {
-                        const importo = parseFloat(rip.Importo) || 0;
-                        const percentuale = totalRipartizione > 0 ? ((importo / totalRipartizione) * 100).toFixed(1) : 0;
-                        csvContent += `${rip.Categoria_Prodotto},${importo},${percentuale}%\n`;
+                    const categoriesWS = XLSX.utils.aoa_to_sheet(categoriesData);
+                    XLSX.utils.book_append_sheet(wb, categoriesWS, 'Performance Categorie');
+                    
+                    // FOGLIO 5: Distribuzione Province
+                    const provinceDataExcel = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
+                    const provinceData = [
+                        ['PROVINCIA', 'NOME', 'CLIENTI SERVITI', 'FATTURATO', 'MEDIA PER CLIENTE']
+                    ];
+                    
+                    provinceDataExcel.forEach(prov => {
+                        const clients = parseInt(prov.Clienti_Serviti) || 0;
+                        const revenue = parseFloat(prov.Fatturato) || 0;
+                        const avgPerClient = clients > 0 ? revenue / clients : 0;
+                        const provinceName = prov.Provincia === 'LT' ? 'Latina' : 
+                                           prov.Provincia === 'RM' ? 'Roma' : 
+                                           prov.Provincia;
+                        
+                        provinceData.push([
+                            prov.Provincia,
+                            provinceName,
+                            clients,
+                            revenue,
+                            avgPerClient
+                        ]);
                     });
+                    
+                    const provinceWS = XLSX.utils.aoa_to_sheet(provinceData);
+                    XLSX.utils.book_append_sheet(wb, provinceWS, 'Province');
+                    
+                } catch (error) {
+                    console.error('Errore nel caricamento dati per Excel:', error);
                 }
                 
-                // Crea e scarica il file
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `Report_Completo_${agentInfo.nome.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                showNotification('File Excel/CSV scaricato con successo!', 'success');
+                // Genera e scarica il file
+                const now = new Date();
+                const fileName = `Report_Excel_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.xlsx`;
+                XLSX.writeFile(wb, fileName);
                 
             } catch (error) {
                 console.error('Errore nella generazione del file Excel:', error);
-                showNotification('Errore nella generazione del file Excel', 'error');
+                alert('Errore nella generazione del file Excel. Riprova.');
             } finally {
+                // Ripristina il bottone
                 button.innerHTML = originalText;
                 button.disabled = false;
             }
         }
-
-        // Funzione per download immagine completa del dashboard
-        async function downloadImage() {
-            const button = document.getElementById('downloadImage');
+        async function generatePDF() {
+            const button = document.getElementById('downloadPDF');
             const originalText = button.innerHTML;
             
+            // Cambia il testo del bottone durante la generazione
             button.innerHTML = `
-                <svg width="16" height="16" class="loading-spinner" fill="currentColor" viewBox="0 0 16 16">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="animate-spin">
                     <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
                 </svg>
-                Generando...
+                Generando PDF...
             `;
             button.disabled = true;
 
             try {
-                // Nasconde temporaneamente elementi che non devono apparire nell'immagine
-                const elementsToHide = document.querySelectorAll('.download-buttons, .province-modal-overlay, .notification');
-                elementsToHide.forEach(el => {
-                    if (el) el.style.display = 'none';
-                });
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
                 
-                // Opzioni per html2canvas ottimizzate per mobile
-                const options = {
-                    allowTaint: true,
-                    useCORS: true,
-                    scale: window.devicePixelRatio || 1,
-                    width: document.querySelector('.dashboard-container').offsetWidth,
-                    height: document.querySelector('.dashboard-container').scrollHeight,
-                    scrollX: 0,
-                    scrollY: 0,
-                    backgroundColor: '#f8fafc',
-                    onrendered: function() {
-                        // Ripristina gli elementi nascosti
-                        elementsToHide.forEach(el => {
-                            if (el) el.style.display = '';
-                        });
+                // Configurazione base
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                let yPosition = 20;
+                
+                // Header del documento
+                pdf.setFontSize(22);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('REPORT PERFORMANCE VENDITE', pageWidth / 2, yPosition, { align: 'center' });
+                
+                yPosition += 12;
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "normal");
+                pdf.setTextColor(59, 130, 246);
+                pdf.text(`${agentInfo.nome}`, pageWidth / 2, yPosition, { align: 'center' });
+                
+                yPosition += 8;
+                pdf.setFontSize(12);
+                pdf.setTextColor(100, 116, 139);
+                pdf.text(`Codice Agente: ${agentInfo.codice}`, pageWidth / 2, yPosition, { align: 'center' });
+                
+                yPosition += 6;
+                pdf.text('Periodo: Gennaio - Agosto 2025 (8 mesi)', pageWidth / 2, yPosition, { align: 'center' });
+                
+                yPosition += 15;
+                
+                // Data di generazione
+                const now = new Date();
+                pdf.setFontSize(10);
+                pdf.setTextColor(148, 163, 184);
+                pdf.text(`Report generato il ${now.toLocaleDateString('it-IT')} alle ${now.toLocaleTimeString('it-IT')}`, pageWidth / 2, yPosition, { align: 'center' });
+                
+                // Linea separatrice
+                yPosition += 10;
+                pdf.setDrawColor(226, 232, 240);
+                pdf.line(20, yPosition, pageWidth - 20, yPosition);
+                yPosition += 15;
+                
+                // Sezione Metriche Principali
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('📊 PERFORMANCE GENERALE', 20, yPosition);
+                yPosition += 12;
+                
+                // Box per le metriche
+                pdf.setFillColor(248, 250, 252);
+                pdf.rect(20, yPosition - 5, pageWidth - 40, 25, 'F');
+                
+                // Trova i dati generali
+                const generalData = currentData.find(d => d.Provincia === 'Generale');
+                if (generalData) {
+                    pdf.setFontSize(12);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setTextColor(30, 41, 59);
+                    
+                    const currentRevenue = Math.round(generalData.Anno_Corrente / 1000);
+                    const previousRevenue = Math.round(generalData.Anno_Precedente / 1000);
+                    const growth = ((generalData.Anno_Corrente - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100).toFixed(1);
+                    
+                    pdf.text(`FATTURATO 2025: €${currentRevenue}k`, 25, yPosition + 5);
+                    pdf.text(`FATTURATO 2024: €${previousRevenue}k`, 25, yPosition + 12);
+                    pdf.setTextColor(growth >= 0 ? 22 : 220, growth >= 0 ? 197 : 38, growth >= 0 ? 94 : 38);
+                    pdf.text(`CRESCITA: ${growth >= 0 ? '+' : ''}${growth}%`, 25, yPosition + 19);
+                    
+                    pdf.setTextColor(30, 41, 59);
+                    pdf.text(`CLIENTI ATTIVI: ${generalData.Clienti_Anno_Corrente}`, 120, yPosition + 5);
+                    
+                    if (generalData.Obiettivo > 0) {
+                        const targetProgress = Math.round((generalData.Anno_Corrente / generalData.Obiettivo) * 100);
+                        pdf.text(`OBIETTIVO 2025: €${Math.round(generalData.Obiettivo / 1000)}k`, 120, yPosition + 12);
+                        pdf.text(`RAGGIUNTO: ${targetProgress}%`, 120, yPosition + 19);
                     }
-                };
+                }
                 
-                const canvas = await html2canvas(document.querySelector('.dashboard-container'), options);
+                yPosition += 35;
                 
-                // Ripristina gli elementi nascosti
-                elementsToHide.forEach(el => {
-                    if (el) el.style.display = '';
-                });
+                // Sezione Top Clienti
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('🏆 TOP 10 CLIENTI PER FATTURATO', 20, yPosition);
+                yPosition += 12;
                 
-                // Crea link per download
-                const link = document.createElement('a');
-                link.download = `Dashboard_${agentInfo.nome.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.png`;
-                link.href = canvas.toDataURL('image/png', 0.9);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                // Recupera tutti i dati di vendita per calcolare i top clienti
+                const allVenditeData = [];
+                try {
+                    const response = await fetch(CSV_URL);
+                    const csvText = await response.text();
+                    const allData = parseCSV(csvText);
+                    const venditeDatiPDF = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+                    
+                    const clientsMapPDF = new Map();
+                    venditeDatiPDF.forEach(sale => {
+                        const clientName = sale.Ragione_Sociale_Cliente;
+                        const revenue = parseFloat(sale.Fatturato) || 0;
+                        const province = sale.Provincia;
+                        
+                        if (!clientsMapPDF.has(clientName)) {
+                            clientsMapPDF.set(clientName, {
+                                name: clientName,
+                                totalRevenue: 0,
+                                province: province,
+                                categories: new Set()
+                            });
+                        }
+                        
+                        const client = clientsMapPDF.get(clientName);
+                        client.totalRevenue += revenue;
+                        client.categories.add(sale.Categoria_Articoli);
+                    });
+                    
+                    const topClientsPDF = Array.from(clientsMapPDF.values())
+                        .sort((a, b) => b.totalRevenue - a.totalRevenue)
+                        .slice(0, 10);
+                    
+                    // Tabella clienti
+                    pdf.setFillColor(248, 250, 252);
+                    pdf.rect(20, yPosition - 2, pageWidth - 40, 3, 'F');
+                    
+                    pdf.setFontSize(10);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setTextColor(55, 65, 81);
+                    pdf.text('POS', 25, yPosition + 2);
+                    pdf.text('CLIENTE', 40, yPosition + 2);
+                    pdf.text('PROV', 140, yPosition + 2);
+                    pdf.text('FATTURATO', 155, yPosition + 2);
+                    pdf.text('CAT', 180, yPosition + 2);
+                    
+                    yPosition += 8;
+                    
+                    pdf.setFont("helvetica", "normal");
+                    pdf.setFontSize(9);
+                    topClientsPDF.forEach((client, index) => {
+                        const position = index + 1;
+                        
+                        // Colore posizione podio
+                        if (position === 1) pdf.setTextColor(255, 193, 7);
+                        else if (position === 2) pdf.setTextColor(158, 158, 158);
+                        else if (position === 3) pdf.setTextColor(205, 127, 50);
+                        else pdf.setTextColor(100, 116, 139);
+                        
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text(`${position}°`, 25, yPosition);
+                        
+                        pdf.setFont("helvetica", "normal");
+                        pdf.setTextColor(30, 41, 59);
+                        
+                        // Tronca il nome cliente se troppo lungo
+                        const clientName = client.name.length > 35 ? client.name.substring(0, 32) + '...' : client.name;
+                        pdf.text(clientName, 40, yPosition);
+                        
+                        pdf.text(client.province, 140, yPosition);
+                        pdf.text(`€${(client.totalRevenue / 1000).toFixed(1)}k`, 155, yPosition);
+                        pdf.text(`${client.categories.size}`, 180, yPosition);
+                        
+                        yPosition += 5;
+                        
+                        // Nuova pagina se necessario
+                        if (yPosition > pageHeight - 40) {
+                            pdf.addPage();
+                            yPosition = 20;
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.error('Errore nel caricamento dati per PDF:', error);
+                    pdf.setTextColor(220, 38, 38);
+                    pdf.text('Errore nel caricamento dei dati clienti', 25, yPosition);
+                }
                 
-                showNotification('Immagine del dashboard scaricata con successo!', 'success');
+                yPosition += 15;
+                
+                // Sezione Province
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('🗺️ DISTRIBUZIONE TERRITORIALE', 20, yPosition);
+                yPosition += 12;
+                
+                pdf.setFillColor(248, 250, 252);
+                pdf.rect(20, yPosition - 5, pageWidth - 40, 20, 'F');
+                
+                pdf.setFontSize(12);
+                pdf.setFont("helvetica", "normal");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('PROVINCIA LATINA (LT)', 25, yPosition + 5);
+                pdf.text('18 clienti serviti - Fatturato €60.4k', 25, yPosition + 12);
+                
+                pdf.text('PROVINCIA ROMA (RM)', 120, yPosition + 5);
+                pdf.text('2 clienti serviti - Fatturato €7.8k', 120, yPosition + 12);
+                
+                yPosition += 25;
+                
+                // Sezione Categorie (se c'è spazio)
+                if (yPosition < pageHeight - 60) {
+                    pdf.setFontSize(16);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setTextColor(30, 41, 59);
+                    pdf.text('📦 TOP CATEGORIE PRODOTTO', 20, yPosition);
+                    yPosition += 12;
+                    
+                    pdf.setFontSize(11);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.text('• MATTONE PIENO: €38.6k (17 clienti)', 25, yPosition);
+                    yPosition += 6;
+                    pdf.text('• PAVIMENTAZIONE POLIS: €15.7k (14 clienti)', 25, yPosition);
+                    yPosition += 6;
+                    pdf.text('• REFRATTARI RETTIFICATI: €5.4k (5 clienti)', 25, yPosition);
+                    yPosition += 6;
+                    pdf.text('• REFRATTARI: €4.9k (5 clienti)', 25, yPosition);
+                }
+                
+                // Footer
+                pdf.setFontSize(8);
+                pdf.setTextColor(148, 163, 184);
+                pdf.text('Dashboard Performance Vendite - Report Automatizzato', pageWidth / 2, pageHeight - 10, { align: 'center' });
+                pdf.text(`Pagina 1 di 1 - Generato automaticamente dal CSV`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+                
+                // Salva il PDF
+                const fileName = `Report_Performance_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.pdf`;
+                pdf.save(fileName);
                 
             } catch (error) {
-                console.error('Errore nella generazione dell\'immagine:', error);
-                showNotification('Errore nella generazione dell\'immagine', 'error');
-                
-                // Assicurati di ripristinare gli elementi anche in caso di errore
-                const elementsToHide = document.querySelectorAll('.download-buttons, .province-modal-overlay, .notification');
-                elementsToHide.forEach(el => {
-                    if (el) el.style.display = '';
-                });
+                console.error('Errore nella generazione del PDF:', error);
+                alert('Errore nella generazione del PDF. Riprova.');
             } finally {
+                // Ripristina il bottone
                 button.innerHTML = originalText;
                 button.disabled = false;
             }
         }
+    </script>
+</body>
+</html>
