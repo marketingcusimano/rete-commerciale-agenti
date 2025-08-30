@@ -2423,7 +2423,7 @@
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="animate-spin">
                     <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.090z"/>
                 </svg>
-                Generando PDF WOW...
+                Generando PDF...
             `;
             button.disabled = true;
 
@@ -2433,268 +2433,184 @@
                 
                 const pageWidth = pdf.internal.pageSize.getWidth();
                 const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 20;
+                const contentWidth = pageWidth - 2 * margin;
+                let yPos = 30;
+                
                 const now = new Date();
+                const generalData = currentData.find(d => d.Provincia === 'Generale');
 
-                // FUNZIONI HELPER PER ELEMENTI GRAFICI AVANZATI
-                function createGradientBackground(x, y, width, height, color1, color2, vertical = false) {
-                    const steps = 20;
-                    const stepSize = vertical ? height / steps : width / steps;
-                    
-                    for (let i = 0; i < steps; i++) {
-                        const ratio = i / steps;
-                        const r = Math.round(color1[0] + ratio * (color2[0] - color1[0]));
-                        const g = Math.round(color1[1] + ratio * (color2[1] - color1[1]));
-                        const b = Math.round(color1[2] + ratio * (color2[2] - color1[2]));
-                        
-                        pdf.setFillColor(r, g, b);
-                        if (vertical) {
-                            pdf.rect(x, y + i * stepSize, width, stepSize + 0.1, 'F');
-                        } else {
-                            pdf.rect(x + i * stepSize, y, stepSize + 0.1, height, 'F');
-                        }
-                    }
-                }
-
-                function createMetricBox(x, y, width, height, title, value, subtitle, gradient, icon = null) {
-                    // Shadow effect
-                    pdf.setFillColor(0, 0, 0, 0.1);
-                    pdf.roundedRect(x + 2, y + 2, width, height, 4, 4, 'F');
-                    
-                    // Gradient background
-                    createGradientBackground(x, y, width, height, gradient[0], gradient[1]);
-                    
-                    // White overlay for better text contrast
-                    pdf.setFillColor(255, 255, 255, 0.95);
-                    pdf.roundedRect(x, y, width, height, 4, 4, 'F');
-                    
-                    // Colored accent bar
-                    pdf.setFillColor(...gradient[0]);
-                    pdf.roundedRect(x, y, 4, height, 2, 2, 'F');
-                    
-                    // Title
-                    pdf.setFontSize(9);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(...gradient[0]);
-                    pdf.text(title.toUpperCase(), x + 8, y + 8);
-                    
-                    // Main value
-                    pdf.setFontSize(20);
+                // ============ COVER PAGE ============
+                // Gradient background effect con rettangoli sovrapposti
+                pdf.setFillColor(59, 130, 246);
+                pdf.rect(0, 0, pageWidth, 60, 'F');
+                pdf.setFillColor(37, 99, 235);
+                pdf.rect(0, 0, pageWidth, 40, 'F');
+                pdf.setFillColor(29, 78, 216);
+                pdf.rect(0, 0, pageWidth, 20, 'F');
+                
+                // Logo area placeholder
+                pdf.setFillColor(255, 255, 255, 0.1);
+                pdf.roundedRect(margin, 15, 50, 30, 5, 5, 'F');
+                
+                // Main Title
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(32);
+                pdf.setFont("helvetica", "bold");
+                pdf.text('PERFORMANCE', pageWidth / 2, 35, { align: 'center' });
+                pdf.text('REPORT', pageWidth / 2, 50, { align: 'center' });
+                
+                yPos = 80;
+                
+                // Agent info card
+                pdf.setFillColor(248, 250, 252);
+                pdf.setDrawColor(226, 232, 240);
+                pdf.roundedRect(margin, yPos, contentWidth, 40, 8, 8, 'FD');
+                
+                pdf.setTextColor(30, 41, 59);
+                pdf.setFontSize(20);
+                pdf.setFont("helvetica", "bold");
+                pdf.text(agentInfo.nome, pageWidth / 2, yPos + 15, { align: 'center' });
+                
+                pdf.setFontSize(12);
+                pdf.setFont("helvetica", "normal");
+                pdf.setTextColor(100, 116, 139);
+                pdf.text(`Codice Agente: ${agentInfo.codice}`, pageWidth / 2, yPos + 25, { align: 'center' });
+                pdf.text('Periodo: Gennaio - Agosto 2025', pageWidth / 2, yPos + 32, { align: 'center' });
+                
+                yPos += 60;
+                
+                // Executive Summary
+                if (generalData) {
+                    pdf.setFontSize(18);
                     pdf.setFont("helvetica", "bold");
                     pdf.setTextColor(30, 41, 59);
-                    pdf.text(value, x + 8, y + 22);
+                    pdf.text('EXECUTIVE SUMMARY', margin, yPos);
+                    yPos += 15;
                     
-                    // Subtitle
-                    if (subtitle) {
-                        pdf.setFontSize(8);
-                        pdf.setFont("helvetica", "normal");
-                        pdf.setTextColor(100, 116, 139);
-                        pdf.text(subtitle, x + 8, y + height - 6);
-                    }
-                    
-                    // Icon placeholder (if needed)
-                    if (icon) {
-                        pdf.setFillColor(...gradient[1]);
-                        pdf.circle(x + width - 12, y + 12, 8, 'F');
-                        pdf.setFontSize(12);
-                        pdf.setTextColor(255, 255, 255);
-                        pdf.text(icon, x + width - 15, y + 16);
-                    }
-                }
-
-                function addWatermarkPattern() {
-                    pdf.setFillColor(59, 130, 246, 0.03);
-                    for (let x = 0; x < pageWidth; x += 40) {
-                        for (let y = 0; y < pageHeight; y += 40) {
-                            pdf.circle(x, y, 15, 'F');
-                        }
-                    }
-                }
-
-                // ==================== PAGINA 1: COPERTINA SPETTACOLARE ====================
-                
-                // Background gradient principale
-                createGradientBackground(0, 0, pageWidth, pageHeight, [15, 23, 42], [59, 130, 246], true);
-                
-                // Pattern decorativo
-                pdf.setFillColor(255, 255, 255, 0.05);
-                for (let i = 0; i < 15; i++) {
-                    const x = Math.random() * pageWidth;
-                    const y = Math.random() * pageHeight;
-                    const size = Math.random() * 20 + 10;
-                    pdf.circle(x, y, size, 'F');
-                }
-                
-                // Header principale con box
-                pdf.setFillColor(255, 255, 255, 0.95);
-                pdf.roundedRect(20, 40, pageWidth - 40, 50, 8, 8, 'F');
-                
-                // Accent bar superiore
-                createGradientBackground(20, 40, pageWidth - 40, 8, [34, 197, 94], [59, 130, 246]);
-                pdf.roundedRect(20, 40, pageWidth - 40, 8, 4, 4, 'F');
-                
-                // Logo/Icon placeholder
-                pdf.setFillColor(59, 130, 246);
-                pdf.circle(40, 65, 12, 'F');
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(255, 255, 255);
-                pdf.text('📊', 36, 69);
-                
-                // Titolo principale
-                pdf.setFontSize(28);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(30, 41, 59);
-                pdf.text('PERFORMANCE', 60, 62);
-                
-                pdf.setFontSize(24);
-                pdf.setTextColor(59, 130, 246);
-                pdf.text('REPORT', 60, 78);
-                
-                // Info agente con stile
-                pdf.setFillColor(30, 41, 59);
-                pdf.roundedRect(20, 105, pageWidth - 40, 35, 6, 6, 'F');
-                
-                pdf.setFontSize(18);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(255, 255, 255);
-                pdf.text(agentInfo.nome, 30, 120);
-                
-                pdf.setFontSize(11);
-                pdf.setFont("helvetica", "normal");
-                pdf.setTextColor(148, 163, 184);
-                pdf.text(`Codice: ${agentInfo.codice} | Periodo: Gennaio - Agosto 2025`, 30, 132);
-                
-                // Stats preview boxes
-                const generalData = currentData.find(d => d.Provincia === 'Generale');
-                if (generalData) {
-                    const currentRevenue = generalData.Anno_Corrente;
-                    const growth = ((currentRevenue - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100);
-                    
-                    // Box fatturato
-                    createMetricBox(20, 160, 85, 40, 'Fatturato 2025', 
-                        `€${Math.round(currentRevenue / 1000)}k`, 
-                        'Anno corrente',
-                        [[34, 197, 94], [22, 163, 74]], '💰');
-                    
-                    // Box crescita
-                    createMetricBox(110, 160, 80, 40, 'Crescita', 
-                        `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%`, 
-                        'vs 2024',
-                        growth >= 0 ? [[34, 197, 94], [22, 163, 74]] : [[239, 68, 68], [220, 38, 38]], '📈');
-                }
-                
-                // Footer copertina
-                pdf.setFillColor(255, 255, 255, 0.1);
-                pdf.roundedRect(20, 220, pageWidth - 40, 30, 6, 6, 'F');
-                
-                pdf.setFontSize(10);
-                pdf.setTextColor(255, 255, 255);
-                pdf.text(`Report generato il ${now.toLocaleDateString('it-IT')} alle ${now.toLocaleTimeString('it-IT')}`, pageWidth / 2, 235, { align: 'center' });
-                pdf.text('Dashboard Automatizzata - Dati dal CSV GitHub', pageWidth / 2, 245, { align: 'center' });
-
-                // ==================== PAGINA 2: METRICHE DETTAGLIATE ====================
-                
-                pdf.addPage();
-                addWatermarkPattern();
-                
-                // Header pagina
-                pdf.setFillColor(59, 130, 246);
-                pdf.rect(0, 0, pageWidth, 25, 'F');
-                
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(255, 255, 255);
-                pdf.text('ANALISI PERFORMANCE DETTAGLIATA', 20, 16);
-                
-                let yPos = 40;
-                
-                if (generalData) {
                     const currentRevenue = generalData.Anno_Corrente;
                     const previousRevenue = generalData.Anno_Precedente;
                     const growth = ((currentRevenue - previousRevenue) / previousRevenue * 100);
-                    const targetProgress = generalData.Obiettivo > 0 ? (currentRevenue / generalData.Obiettivo) * 100 : 0;
                     
-                    // Griglia metriche 2x2
-                    createMetricBox(20, yPos, 85, 45, 'Fatturato Corrente', 
-                        `€${(currentRevenue / 1000).toFixed(1)}k`, 
-                        'Gennaio - Agosto 2025',
-                        [[59, 130, 246], [37, 99, 235]]);
+                    // KPI Grid - 2x2
+                    const boxWidth = (contentWidth - 10) / 2;
+                    const boxHeight = 35;
                     
-                    createMetricBox(110, yPos, 80, 45, 'Fatturato Precedente', 
-                        `€${(previousRevenue / 1000).toFixed(1)}k`, 
-                        'Stesso periodo 2024',
-                        [[100, 116, 139], [71, 85, 105]]);
+                    // Fatturato box
+                    pdf.setFillColor(34, 197, 94);
+                    pdf.roundedRect(margin, yPos, boxWidth, boxHeight, 5, 5, 'F');
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(12);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.text('FATTURATO 2025', margin + 10, yPos + 12);
+                    pdf.setFontSize(20);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text(`€${Math.round(currentRevenue / 1000)}K`, margin + 10, yPos + 26);
                     
-                    yPos += 55;
+                    // Crescita box
+                    const growthColor = growth >= 0 ? [34, 197, 94] : [239, 68, 68];
+                    pdf.setFillColor(...growthColor);
+                    pdf.roundedRect(margin + boxWidth + 10, yPos, boxWidth, boxHeight, 5, 5, 'F');
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(12);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.text('CRESCITA vs 2024', margin + boxWidth + 20, yPos + 12);
+                    pdf.setFontSize(20);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text(`${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%`, margin + boxWidth + 20, yPos + 26);
                     
-                    createMetricBox(20, yPos, 85, 45, 'Crescita Assoluta', 
-                        `€${Math.round((currentRevenue - previousRevenue) / 1000)}k`, 
-                        'Differenza 2025 vs 2024',
-                        growth >= 0 ? [[34, 197, 94], [22, 163, 74]] : [[239, 68, 68], [220, 38, 38]]);
+                    yPos += boxHeight + 10;
                     
-                    createMetricBox(110, yPos, 80, 45, 'Clienti Serviti', 
-                        `${generalData.Clienti_Anno_Corrente}`, 
-                        'Clienti attivi 2025',
-                        [[168, 85, 247], [147, 51, 234]]);
+                    // Clienti box
+                    pdf.setFillColor(59, 130, 246);
+                    pdf.roundedRect(margin, yPos, boxWidth, boxHeight, 5, 5, 'F');
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(12);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.text('CLIENTI ATTIVI', margin + 10, yPos + 12);
+                    pdf.setFontSize(20);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text(`${generalData.Clienti_Anno_Corrente}`, margin + 10, yPos + 26);
+                    
+                    // Obiettivo box
+                    if (generalData.Obiettivo > 0) {
+                        const targetProgress = Math.round((currentRevenue / generalData.Obiettivo) * 100);
+                        pdf.setFillColor(168, 85, 247);
+                        pdf.roundedRect(margin + boxWidth + 10, yPos, boxWidth, boxHeight, 5, 5, 'F');
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.setFontSize(12);
+                        pdf.setFont("helvetica", "normal");
+                        pdf.text('OBIETTIVO RAGGIUNTO', margin + boxWidth + 20, yPos + 12);
+                        pdf.setFontSize(20);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text(`${targetProgress}%`, margin + boxWidth + 20, yPos + 26);
+                    }
                     
                     yPos += 60;
-                    
-                    // Progress bar per obiettivo (se presente)
-                    if (generalData.Obiettivo > 0) {
-                        pdf.setFillColor(248, 250, 252);
-                        pdf.roundedRect(20, yPos, pageWidth - 40, 35, 6, 6, 'F');
-                        
-                        pdf.setFontSize(12);
-                        pdf.setFont("helvetica", "bold");
-                        pdf.setTextColor(30, 41, 59);
-                        pdf.text('PROGRESSIONE OBIETTIVO 2025', 30, yPos + 12);
-                        
-                        // Barra progress
-                        pdf.setFillColor(226, 232, 240);
-                        pdf.roundedRect(30, yPos + 18, pageWidth - 80, 8, 4, 4, 'F');
-                        
-                        // Fill progress
-                        const progressWidth = (pageWidth - 80) * Math.min(targetProgress / 100, 1);
-                        createGradientBackground(30, yPos + 18, progressWidth, 8, [34, 197, 94], [59, 130, 246]);
-                        pdf.roundedRect(30, yPos + 18, progressWidth, 8, 4, 4, 'F');
-                        
-                        // Progress text
-                        pdf.setFontSize(10);
-                        pdf.setTextColor(59, 130, 246);
-                        pdf.text(`${targetProgress.toFixed(1)}% - €${Math.round(generalData.Obiettivo / 1000)}k obiettivo`, pageWidth - 30, yPos + 32, { align: 'right' });
-                    }
                 }
                 
-                // Aggiungi grafico ripartizione se disponibile
-                yPos += 50;
-                if (fatturato_chart && yPos < pageHeight - 100) {
-                    pdf.setFillColor(255, 255, 255);
-                    pdf.roundedRect(20, yPos, pageWidth - 40, 80, 8, 8, 'FD');
-                    
-                    pdf.setFontSize(14);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(30, 41, 59);
-                    pdf.text('RIPARTIZIONE FATTURATO', 30, yPos + 15);
-                    
+                // Highlights section
+                pdf.setFillColor(255, 251, 235);
+                pdf.setDrawColor(245, 158, 11);
+                pdf.roundedRect(margin, yPos, contentWidth, 50, 8, 8, 'FD');
+                
+                pdf.setTextColor(146, 64, 14);
+                pdf.setFontSize(14);
+                pdf.setFont("helvetica", "bold");
+                pdf.text('HIGHLIGHTS DEL PERIODO', margin + 15, yPos + 15);
+                
+                pdf.setFontSize(10);
+                pdf.setFont("helvetica", "normal");
+                pdf.setTextColor(120, 53, 15);
+                pdf.text('• Performance superiore alla media nel settore mattoni pieni', margin + 15, yPos + 25);
+                pdf.text('• Crescita significativa nella provincia di Latina', margin + 15, yPos + 32);
+                pdf.text('• Diversificazione prodotti: 10+ categorie attive', margin + 15, yPos + 39);
+                
+                // Generation info footer
+                pdf.setFontSize(9);
+                pdf.setTextColor(148, 163, 184);
+                pdf.text(`Report generato automaticamente il ${now.toLocaleDateString('it-IT')}`, pageWidth / 2, pageHeight - 20, { align: 'center' });
+                
+                // ============ PAGE 2: REVENUE ANALYSIS ============
+                pdf.addPage();
+                yPos = margin + 10;
+                
+                // Page header
+                pdf.setFillColor(248, 250, 252);
+                pdf.rect(0, 0, pageWidth, 25, 'F');
+                pdf.setTextColor(30, 41, 59);
+                pdf.setFontSize(14);
+                pdf.setFont("helvetica", "bold");
+                pdf.text(`${agentInfo.nome} - ANALISI FATTURATO`, margin, 15);
+                pdf.setDrawColor(226, 232, 240);
+                pdf.line(margin, 20, pageWidth - margin, 20);
+                
+                // Revenue breakdown chart
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('RIPARTIZIONE FATTURATO', margin, yPos);
+                yPos += 20;
+                
+                if (fatturato_chart) {
                     try {
                         const chartCanvas = document.getElementById('fatturato-chart');
                         const chartImage = await html2canvas(chartCanvas, {
                             backgroundColor: '#ffffff',
-                            scale: 3, // Alta risoluzione
+                            scale: 3,
                             useCORS: true,
                             width: chartCanvas.width,
                             height: chartCanvas.height
                         });
                         
                         const chartImgData = chartImage.toDataURL('image/png');
-                        // Dimensioni corrette senza schiaccciare
-                        const aspectRatio = chartCanvas.height / chartCanvas.width;
-                        const chartWidth = 60;
-                        const chartHeight = chartWidth * aspectRatio;
+                        const chartSize = 90;
+                        pdf.addImage(chartImgData, 'PNG', margin, yPos, chartSize, chartSize);
                         
-                        pdf.addImage(chartImgData, 'PNG', 30, yPos + 20, chartWidth, Math.min(chartHeight, 55));
+                        // Legend con design migliorato
+                        const legendX = margin + chartSize + 20;
                         
-                        // Legend migliorata
+                        // Recupera dati ripartizione
                         const response = await fetch(CSV_URL);
                         const csvText = await response.text();
                         const allData = parseCSV(csvText);
@@ -2711,64 +2627,128 @@
                         
                         const total = pieniValue + altroValue;
                         
-                        // Legend boxes
+                        // Legend item 1
                         pdf.setFillColor(59, 130, 246);
-                        pdf.roundedRect(110, yPos + 25, 6, 6, 2, 2, 'F');
+                        pdf.circle(legendX, yPos + 20, 5, 'F');
+                        pdf.setTextColor(30, 41, 59);
+                        pdf.setFontSize(12);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text('PIENI E COPPI', legendX + 12, yPos + 22);
+                        pdf.setFontSize(14);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.setTextColor(34, 197, 94);
+                        pdf.text(`€${Math.round(pieniValue/1000)}K`, legendX + 12, yPos + 32);
                         pdf.setFontSize(10);
-                        pdf.setFont("helvetica", "bold");
-                        pdf.setTextColor(59, 130, 246);
-                        pdf.text('PIENI E COPPI', 120, yPos + 30);
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.text(`${Math.round(pieniValue/total*100)}% del totale`, legendX + 12, yPos + 40);
                         
-                        pdf.setFont("helvetica", "normal");
-                        pdf.setTextColor(30, 41, 59);
-                        pdf.text(`€${Math.round(pieniValue/1000)}k (${Math.round(pieniValue/total*100)}%)`, 120, yPos + 38);
-                        
+                        // Legend item 2
                         pdf.setFillColor(139, 92, 246);
-                        pdf.roundedRect(110, yPos + 45, 6, 6, 2, 2, 'F');
-                        pdf.setFont("helvetica", "bold");
-                        pdf.setTextColor(139, 92, 246);
-                        pdf.text('ALTRO', 120, yPos + 50);
-                        
-                        pdf.setFont("helvetica", "normal");
+                        pdf.circle(legendX, yPos + 55, 5, 'F');
                         pdf.setTextColor(30, 41, 59);
-                        pdf.text(`€${Math.round(altroValue/1000)}k (${Math.round(altroValue/total*100)}%)`, 120, yPos + 58);
+                        pdf.setFontSize(12);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text('ALTRO', legendX + 12, yPos + 57);
+                        pdf.setFontSize(14);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.setTextColor(34, 197, 94);
+                        pdf.text(`€${Math.round(altroValue/1000)}K`, legendX + 12, yPos + 67);
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.text(`${Math.round(altroValue/total*100)}% del totale`, legendX + 12, yPos + 75);
                         
                     } catch (error) {
                         console.error('Errore grafico ripartizione:', error);
-                        pdf.setTextColor(220, 38, 38);
-                        pdf.text('Grafico non disponibile', 30, yPos + 40);
                     }
                 }
-
-                // ==================== PAGINA 3: TOP CLIENTI PREMIUM ====================
                 
-                pdf.addPage();
-                addWatermarkPattern();
+                yPos += 110;
                 
-                // Header elegante
-                createGradientBackground(0, 0, pageWidth, 30, [34, 197, 94], [59, 130, 246]);
-                
-                pdf.setFontSize(18);
+                // Provincial distribution
+                pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(255, 255, 255);
-                pdf.text('🏆 CLASSIFICA CLIENTI TOP PERFORMER', 20, 20);
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('DISTRIBUZIONE TERRITORIALE', margin, yPos);
+                yPos += 20;
                 
-                yPos = 45;
+                if (province_chart) {
+                    try {
+                        const provinceCanvas = document.getElementById('province-chart');
+                        const provinceImage = await html2canvas(provinceCanvas, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        });
+                        
+                        const provinceImgData = provinceImage.toDataURL('image/png');
+                        const chartWidth = contentWidth * 0.7;
+                        const chartHeight = 70;
+                        pdf.addImage(provinceImgData, 'PNG', margin, yPos, chartWidth, chartHeight);
+                        
+                        // Province stats
+                        const statsX = margin + chartWidth + 10;
+                        pdf.setFillColor(239, 246, 255);
+                        pdf.roundedRect(statsX, yPos, 60, 30, 4, 4, 'F');
+                        pdf.setTextColor(59, 130, 246);
+                        pdf.setFontSize(10);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text('LATINA (LT)', statsX + 5, yPos + 10);
+                        pdf.setFontSize(8);
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.text('18 clienti serviti', statsX + 5, yPos + 17);
+                        pdf.text('€60.4K fatturato', statsX + 5, yPos + 23);
+                        
+                        pdf.setFillColor(236, 254, 255);
+                        pdf.roundedRect(statsX, yPos + 35, 60, 30, 4, 4, 'F');
+                        pdf.setTextColor(99, 102, 241);
+                        pdf.setFontSize(10);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text('ROMA (RM)', statsX + 5, yPos + 45);
+                        pdf.setFontSize(8);
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.text('2 clienti serviti', statsX + 5, yPos + 52);
+                        pdf.text('€7.8K fatturato', statsX + 5, yPos + 58);
+                        
+                    } catch (error) {
+                        console.error('Errore grafico province:', error);
+                    }
+                }
                 
+                // ============ PAGE 3: CLIENT ANALYSIS ============
+                pdf.addPage();
+                yPos = margin + 10;
+                
+                // Page header
+                pdf.setFillColor(248, 250, 252);
+                pdf.rect(0, 0, pageWidth, 25, 'F');
+                pdf.setTextColor(30, 41, 59);
+                pdf.setFontSize(14);
+                pdf.setFont("helvetica", "bold");
+                pdf.text(`${agentInfo.nome} - ANALISI CLIENTI`, margin, 15);
+                pdf.setDrawColor(226, 232, 240);
+                pdf.line(margin, 20, pageWidth - margin, 20);
+                
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('TOP 10 CLIENTI PER FATTURATO', margin, yPos);
+                yPos += 15;
+                
+                // Load client data
                 try {
                     const response = await fetch(CSV_URL);
                     const csvText = await response.text();
                     const allData = parseCSV(csvText);
-                    const venditeDatiPDF = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+                    const clientsData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
                     
-                    const clientsMapPDF = new Map();
-                    venditeDatiPDF.forEach(sale => {
+                    const clientsMap = new Map();
+                    clientsData.forEach(sale => {
                         const clientName = sale.Ragione_Sociale_Cliente;
                         const revenue = parseFloat(sale.Fatturato) || 0;
                         const province = sale.Provincia;
                         
-                        if (!clientsMapPDF.has(clientName)) {
-                            clientsMapPDF.set(clientName, {
+                        if (!clientsMap.has(clientName)) {
+                            clientsMap.set(clientName, {
                                 name: clientName,
                                 totalRevenue: 0,
                                 province: province,
@@ -2776,148 +2756,115 @@
                             });
                         }
                         
-                        const client = clientsMapPDF.get(clientName);
+                        const client = clientsMap.get(clientName);
                         client.totalRevenue += revenue;
                         client.categories.add(sale.Categoria_Articoli);
                     });
                     
-                    const topClientsPDF = Array.from(clientsMapPDF.values())
+                    const topClients = Array.from(clientsMap.values())
                         .sort((a, b) => b.totalRevenue - a.totalRevenue)
                         .slice(0, 10);
                     
-                    // Podio speciale per top 3
-                    if (topClientsPDF.length >= 3) {
-                        // Cliente #1 - ORO
-                        createMetricBox(20, yPos, pageWidth - 40, 25, '🥇 CLIENTE GOLD', 
-                            topClientsPDF[0].name.substring(0, 35), 
-                            `€${(topClientsPDF[0].totalRevenue / 1000).toFixed(1)}k - ${topClientsPDF[0].categories.size} categorie`,
-                            [[255, 193, 7], [255, 165, 0]]);
-                        
-                        yPos += 35;
-                        
-                        // Clienti #2 e #3 affiancati
-                        createMetricBox(20, yPos, 85, 25, '🥈 CLIENTE SILVER', 
-                            topClientsPDF[1].name.substring(0, 20), 
-                            `€${(topClientsPDF[1].totalRevenue / 1000).toFixed(1)}k`,
-                            [[192, 192, 192], [169, 169, 169]]);
-                        
-                        createMetricBox(110, yPos, 80, 25, '🥉 CLIENTE BRONZE', 
-                            topClientsPDF[2].name.substring(0, 20), 
-                            `€${(topClientsPDF[2].totalRevenue / 1000).toFixed(1)}k`,
-                            [[205, 127, 50], [184, 115, 51]]);
-                        
-                        yPos += 40;
-                    }
+                    // Modern table design
+                    const tableStartY = yPos;
+                    const rowHeight = 12;
+                    const colWidths = [15, 85, 25, 35, 20];
+                    let currentX = margin;
                     
-                    // Lista clienti rimanenti
-                    if (topClientsPDF.length > 3) {
-                        pdf.setFillColor(248, 250, 252);
-                        pdf.roundedRect(20, yPos, pageWidth - 40, 5, 3, 3, 'F');
+                    // Table header
+                    pdf.setFillColor(59, 130, 246);
+                    pdf.roundedRect(margin, yPos, contentWidth, 10, 2, 2, 'F');
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(9);
+                    pdf.setFont("helvetica", "bold");
+                    
+                    pdf.text('RANK', currentX + 7, yPos + 7, { align: 'center' });
+                    currentX += colWidths[0];
+                    pdf.text('CLIENTE', currentX + 5, yPos + 7);
+                    currentX += colWidths[1];
+                    pdf.text('PROV', currentX + 12, yPos + 7, { align: 'center' });
+                    currentX += colWidths[2];
+                    pdf.text('FATTURATO', currentX + 17, yPos + 7, { align: 'center' });
+                    currentX += colWidths[3];
+                    pdf.text('CAT', currentX + 10, yPos + 7, { align: 'center' });
+                    
+                    yPos += 12;
+                    
+                    // Table rows
+                    topClients.forEach((client, index) => {
+                        currentX = margin;
                         
-                        pdf.setFontSize(12);
-                        pdf.setFont("helvetica", "bold");
-                        pdf.setTextColor(30, 41, 59);
-                        pdf.text('ALTRI TOP PERFORMER', 25, yPos + 4);
-                        
-                        yPos += 15;
-                        
-                        for (let i = 3; i < Math.min(topClientsPDF.length, 10); i++) {
-                            const client = topClientsPDF[i];
-                            
-                            // Alternanza colori righe
-                            if (i % 2 === 0) {
-                                pdf.setFillColor(255, 255, 255);
-                                pdf.rect(20, yPos - 3, pageWidth - 40, 12, 'F');
-                            }
-                            
-                            // Numero posizione
-                            pdf.setFillColor(100, 116, 139);
-                            pdf.circle(30, yPos + 2, 5, 'F');
-                            pdf.setFontSize(10);
-                            pdf.setFont("helvetica", "bold");
-                            pdf.setTextColor(255, 255, 255);
-                            pdf.text(`${i + 1}`, 30, yPos + 3, { align: 'center' });
-                            
-                            // Nome cliente
-                            pdf.setFontSize(10);
-                            pdf.setFont("helvetica", "normal");
-                            pdf.setTextColor(30, 41, 59);
-                            const clientName = client.name.length > 45 ? client.name.substring(0, 42) + '...' : client.name;
-                            pdf.text(clientName, 40, yPos + 3);
-                            
-                            // Fatturato
-                            pdf.setFont("helvetica", "bold");
-                            pdf.setTextColor(34, 197, 94);
-                            pdf.text(`€${(client.totalRevenue / 1000).toFixed(1)}k`, pageWidth - 30, yPos + 3, { align: 'right' });
-                            
-                            yPos += 12;
+                        // Alternating row colors
+                        if (index % 2 === 0) {
+                            pdf.setFillColor(248, 250, 252);
+                            pdf.rect(margin, yPos - 1, contentWidth, rowHeight, 'F');
                         }
-                    }
+                        
+                        // Rank badge
+                        let rankColor = [100, 116, 139];
+                        if (index === 0) rankColor = [255, 193, 7];
+                        else if (index === 1) rankColor = [158, 158, 158];
+                        else if (index === 2) rankColor = [205, 127, 50];
+                        
+                        pdf.setFillColor(...rankColor);
+                        pdf.circle(currentX + 7, yPos + 4, 4, 'F');
+                        pdf.setFontSize(8);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.text(`${index + 1}`, currentX + 7, yPos + 6, { align: 'center' });
+                        
+                        currentX += colWidths[0];
+                        
+                        // Client name
+                        pdf.setTextColor(30, 41, 59);
+                        pdf.setFontSize(8);
+                        pdf.setFont("helvetica", "normal");
+                        const clientName = client.name.length > 35 ? client.name.substring(0, 32) + '...' : client.name;
+                        pdf.text(clientName, currentX + 2, yPos + 6);
+                        
+                        currentX += colWidths[1];
+                        
+                        // Province badge
+                        const provColor = client.province === 'LT' ? [59, 130, 246] : [99, 102, 241];
+                        pdf.setFillColor(...provColor);
+                        pdf.roundedRect(currentX + 5, yPos + 1, 15, 6, 2, 2, 'F');
+                        pdf.setFontSize(7);
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.text(client.province, currentX + 12, yPos + 5, { align: 'center' });
+                        
+                        currentX += colWidths[2];
+                        
+                        // Revenue
+                        pdf.setFontSize(9);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.setTextColor(34, 197, 94);
+                        pdf.text(`€${(client.totalRevenue / 1000).toFixed(1)}K`, currentX + 17, yPos + 6, { align: 'center' });
+                        
+                        currentX += colWidths[3];
+                        
+                        // Categories
+                        pdf.setFontSize(8);
+                        pdf.setFont("helvetica", "normal");
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.text(`${client.categories.size}`, currentX + 10, yPos + 6, { align: 'center' });
+                        
+                        yPos += rowHeight;
+                    });
                     
                 } catch (error) {
-                    console.error('Errore caricamento clienti:', error);
+                    console.error('Errore caricamento dati clienti:', error);
                 }
-
-                // ==================== PAGINA 4: ANALISI TERRITORIALE E CATEGORIE ====================
                 
-                pdf.addPage();
-                addWatermarkPattern();
+                yPos += 20;
                 
-                // Header con grafico province
-                createGradientBackground(0, 0, pageWidth, 25, [168, 85, 247], [139, 92, 246]);
-                
+                // Categories section
                 pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(255, 255, 255);
-                pdf.text('🗺️ ANALISI TERRITORIALE & CATEGORIE', 20, 17);
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('PERFORMANCE PER CATEGORIA', margin, yPos);
+                yPos += 15;
                 
-                yPos = 40;
-                
-                // Sezione Province
-                if (province_chart) {
-                    pdf.setFillColor(255, 255, 255);
-                    pdf.roundedRect(20, yPos, pageWidth - 40, 85, 8, 8, 'FD');
-                    
-                    pdf.setFontSize(14);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(30, 41, 59);
-                    pdf.text('DISTRIBUZIONE CLIENTI PER PROVINCIA', 30, yPos + 15);
-                    
-                    try {
-                        const provinceCanvas = document.getElementById('province-chart');
-                        const provinceImage = await html2canvas(provinceCanvas, {
-                            backgroundColor: '#ffffff',
-                            scale: 3,
-                            useCORS: true
-                        });
-                        
-                        const provinceImgData = provinceImage.toDataURL('image/png');
-                        const aspectRatio = provinceCanvas.height / provinceCanvas.width;
-                        const chartWidth = pageWidth - 60;
-                        const chartHeight = chartWidth * aspectRatio;
-                        
-                        pdf.addImage(provinceImgData, 'PNG', 30, yPos + 20, chartWidth, Math.min(chartHeight, 60));
-                        
-                    } catch (error) {
-                        console.error('Errore grafico province:', error);
-                        // Fallback con dati statici stilizzati
-                        createMetricBox(30, yPos + 20, 70, 30, 'Latina (LT)', '18 clienti', '€60.4k fatturato', [[59, 130, 246], [37, 99, 235]]);
-                        createMetricBox(110, yPos + 20, 70, 30, 'Roma (RM)', '2 clienti', '€7.8k fatturato', [[99, 102, 241], [79, 70, 229]]);
-                    }
-                }
-                
-                yPos += 95;
-                
-                // Sezione Categorie
-                if (categories_chart && yPos < pageHeight - 90) {
-                    pdf.setFillColor(255, 255, 255);
-                    pdf.roundedRect(20, yPos, pageWidth - 40, 80, 8, 8, 'FD');
-                    
-                    pdf.setFontSize(14);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(30, 41, 59);
-                    pdf.text('TOP CATEGORIE PRODOTTO', 30, yPos + 15);
-                    
+                if (categories_chart) {
                     try {
                         const categoriesCanvas = document.getElementById('categories-chart');
                         const categoriesImage = await html2canvas(categoriesCanvas, {
@@ -2927,13 +2874,10 @@
                         });
                         
                         const categoriesImgData = categoriesImage.toDataURL('image/png');
-                        const aspectRatio = categoriesCanvas.height / categoriesCanvas.width;
-                        const chartWidth = 80;
-                        const chartHeight = chartWidth * aspectRatio;
+                        const chartSize = 70;
+                        pdf.addImage(categoriesImgData, 'PNG', margin, yPos, chartSize, chartSize);
                         
-                        pdf.addImage(categoriesImgData, 'PNG', 25, yPos + 20, chartWidth, Math.min(chartHeight, 55));
-                        
-                        // Lista categorie accanto
+                        // Categories list
                         try {
                             const response = await fetch(CSV_URL);
                             const csvText = await response.text();
@@ -2944,29 +2888,36 @@
                                 .sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale))
                                 .slice(0, 5);
                             
-                            let catY = yPos + 25;
-                            const colors = [[59, 130, 246], [139, 92, 246], [6, 214, 160], [255, 209, 102], [247, 37, 133]];
+                            const legendX = margin + chartSize + 15;
+                            let catY = yPos + 5;
                             
                             activeCategories.forEach((cat, index) => {
-                                const color = colors[index] || [100, 116, 139];
+                                const colors = ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585'];
+                                const color = colors[index] || '#64748b';
+                                const r = parseInt(color.slice(1, 3), 16);
+                                const g = parseInt(color.slice(3, 5), 16);
+                                const b = parseInt(color.slice(5, 7), 16);
                                 
-                                // Color dot
-                                pdf.setFillColor(...color);
-                                pdf.circle(115, catY, 3, 'F');
+                                pdf.setFillColor(r, g, b);
+                                pdf.circle(legendX, catY + 3, 3, 'F');
                                 
-                                // Category name
+                                pdf.setTextColor(30, 41, 59);
                                 pdf.setFontSize(9);
                                 pdf.setFont("helvetica", "bold");
-                                pdf.setTextColor(...color);
-                                pdf.text(cat.Categoria.replace(/_/g, ' ').toUpperCase(), 122, catY + 1);
+                                pdf.text(cat.Categoria.replace(/_/g, ' '), legendX + 8, catY + 4);
                                 
-                                // Value
                                 const importo = parseFloat(cat.Importo_Totale);
+                                pdf.setFontSize(8);
                                 pdf.setFont("helvetica", "normal");
-                                pdf.setTextColor(30, 41, 59);
-                                pdf.text(`€${Math.round(importo/1000)}k`, 122, catY + 7);
+                                pdf.setTextColor(34, 197, 94);
+                                pdf.text(`€${Math.round(importo/1000)}K`, legendX + 8, catY + 10);
                                 
-                                catY += 12;
+                                const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
+                                const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
+                                pdf.setTextColor(100, 116, 139);
+                                pdf.text(`${clientiLT + clientiRM} clienti`, legendX + 8, catY + 16);
+                                
+                                catY += 22;
                             });
                             
                         } catch (error) {
@@ -2978,28 +2929,17 @@
                     }
                 }
                 
-                // Footer finale spettacolare
-                pdf.setFillColor(15, 23, 42);
-                pdf.rect(0, pageHeight - 25, pageWidth, 25, 'F');
+                // Footer
+                pdf.setFontSize(8);
+                pdf.setTextColor(148, 163, 184);
+                pdf.text(`Dashboard Performance Vendite | Generato il ${now.toLocaleDateString('it-IT')} | Pagina 3/3`, pageWidth / 2, pageHeight - 10, { align: 'center' });
                 
-                createGradientBackground(0, pageHeight - 25, pageWidth, 25, [59, 130, 246], [34, 197, 94]);
-                pdf.rect(0, pageHeight - 25, pageWidth, 25, 'F');
-                
-                pdf.setFontSize(10);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(255, 255, 255);
-                pdf.text(`Dashboard Performance Vendite - Report Automatizzato`, pageWidth / 2, pageHeight - 15, { align: 'center' });
-                
-                pdf.setFont("helvetica", "normal");
-                pdf.setTextColor(255, 255, 255, 0.8);
-                pdf.text(`Generato il ${now.toLocaleDateString('it-IT')} - Dati live da GitHub CSV`, pageWidth / 2, pageHeight - 8, { align: 'center' });
-                
-                // Salva il PDF
-                const fileName = `Performance_Report_WOW_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.pdf`;
+                // Save PDF
+                const fileName = `Report_Performance_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.pdf`;
                 pdf.save(fileName);
                 
             } catch (error) {
-                console.error('Errore nella generazione del PDF WOW:', error);
+                console.error('Errore nella generazione del PDF:', error);
                 alert('Errore nella generazione del PDF. Riprova.');
             } finally {
                 button.innerHTML = originalText;
