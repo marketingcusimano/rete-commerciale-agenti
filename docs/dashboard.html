@@ -2237,100 +2237,6 @@
             }
         }
 
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-            
-            // Event listeners per il popup province
-            const provinceSelectorBtn = document.getElementById('provinceSelectorBtn');
-            const provinceModal = document.getElementById('provinceModal');
-            const modalClose = document.getElementById('modalClose');
-            const modalCancel = document.getElementById('modalCancel');
-            const chevronIcon = document.querySelector('.chevron-icon');
-            
-            // Apri popup
-            provinceSelectorBtn.addEventListener('click', () => {
-                provinceModal.classList.add('show');
-                provinceSelectorBtn.classList.add('active');
-                chevronIcon.classList.add('rotated');
-                document.body.style.overflow = 'hidden';
-            });
-            
-            // Chiudi popup
-            function closeModal() {
-                provinceModal.classList.remove('show');
-                provinceSelectorBtn.classList.remove('active');
-                chevronIcon.classList.remove('rotated');
-                document.body.style.overflow = '';
-            }
-            
-            modalClose.addEventListener('click', closeModal);
-            modalCancel.addEventListener('click', closeModal);
-            
-            // Chiudi cliccando fuori
-            provinceModal.addEventListener('click', (e) => {
-                if (e.target === provinceModal) {
-                    closeModal();
-                }
-            });
-            
-            // Gestione selezione province
-            const provinceOptions = document.querySelectorAll('.province-option');
-            
-            provinceOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    // Rimuovi selezione precedente
-                    provinceOptions.forEach(opt => opt.classList.remove('selected'));
-                    
-                    // Aggiungi selezione corrente
-                    option.classList.add('selected');
-                    
-                    // Aggiorna provincia selezionata
-                    const value = option.dataset.value;
-                    selectedProvince = value;
-                    
-                    // Aggiorna testo del pulsante
-                    const selectedText = document.getElementById('selectedProvinceText');
-                    const selectedSubtext = document.getElementById('selectedProvinceSubtext');
-                    
-                    if (value === 'all') {
-                        selectedText.textContent = 'Tutte le Province';
-                        selectedSubtext.textContent = 'Panoramica completa';
-                    } else if (value === 'LT') {
-                        selectedText.textContent = 'Latina';
-                        selectedSubtext.textContent = '60k • 18 clienti';
-                    } else if (value === 'RM') {
-                        selectedText.textContent = 'Roma';
-                        selectedSubtext.textContent = '8k • 2 clienti';
-                    }
-                    
-                    // Aggiorna dashboard
-                    updateDashboard();
-                    
-                    // Chiudi modal
-                    setTimeout(() => {
-                        closeModal();
-                    }, 200);
-                });
-            });
-            
-            // Event listener per i download
-            document.getElementById('downloadPDF').addEventListener('click', async () => {
-                await generatePDF();
-            });
-
-            document.getElementById('downloadExcel').addEventListener('click', async () => {
-                await generateExcel();
-            });
-            
-            // Chiudi modal con ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && provinceModal.classList.contains('show')) {
-                    closeModal();
-                }
-            });
-        });
-
         // Funzione per generare il file Excel
         async function generateExcel() {
             const button = document.getElementById('downloadExcel');
@@ -2339,7 +2245,7 @@
             // Cambia il testo del bottone durante la generazione
             button.innerHTML = `
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="animate-spin">
-                    <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
+                    <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.90z"/>
                 </svg>
                 Generando Excel...
             `;
@@ -2508,6 +2414,7 @@
                 button.disabled = false;
             }
         }
+
         async function generatePDF() {
             const button = document.getElementById('downloadPDF');
             const originalText = button.innerHTML;
@@ -2515,7 +2422,7 @@
             // Cambia il testo del bottone durante la generazione
             button.innerHTML = `
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="animate-spin">
-                    <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
+                    <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.090z"/>
                 </svg>
                 Generando PDF...
             `;
@@ -2529,89 +2436,190 @@
                 const pageWidth = pdf.internal.pageSize.getWidth();
                 const pageHeight = pdf.internal.pageSize.getHeight();
                 let yPosition = 20;
+                let currentPage = 1;
                 
-                // Header del documento
-                pdf.setFontSize(22);
+                // Funzione helper per aggiungere header delle pagine successive
+                function addPageHeader() {
+                    pdf.setFontSize(14);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setTextColor(30, 41, 59);
+                    pdf.text(`REPORT PERFORMANCE - ${agentInfo.nome}`, 20, 15);
+                    pdf.setDrawColor(226, 232, 240);
+                    pdf.line(20, 18, pageWidth - 20, 18);
+                }
+
+                // PAGINA 1: Header principale e metriche
+                pdf.setFontSize(24);
                 pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(30, 41, 59);
-                pdf.text('REPORT PERFORMANCE VENDITE', pageWidth / 2, yPosition, { align: 'center' });
+                pdf.setTextColor(59, 130, 246);
+                pdf.text('DASHBOARD', pageWidth / 2, yPosition, { align: 'center' });
                 
-                yPosition += 12;
+                yPosition += 10;
+                pdf.setFontSize(20);
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('PERFORMANCE VENDITE', pageWidth / 2, yPosition, { align: 'center' });
+                
+                // Aggiunge un box colorato per il titolo
+                pdf.setFillColor(239, 246, 255);
+                pdf.setDrawColor(59, 130, 246);
+                pdf.roundedRect(15, yPosition + 5, pageWidth - 30, 25, 3, 3, 'FD');
+                
+                yPosition += 15;
                 pdf.setFontSize(16);
-                pdf.setFont("helvetica", "normal");
+                pdf.setFont("helvetica", "bold");
                 pdf.setTextColor(59, 130, 246);
                 pdf.text(`${agentInfo.nome}`, pageWidth / 2, yPosition, { align: 'center' });
                 
                 yPosition += 8;
-                pdf.setFontSize(12);
+                pdf.setFontSize(11);
                 pdf.setTextColor(100, 116, 139);
-                pdf.text(`Codice Agente: ${agentInfo.codice}`, pageWidth / 2, yPosition, { align: 'center' });
-                
-                yPosition += 6;
-                pdf.text('Periodo: Gennaio - Agosto 2025 (8 mesi)', pageWidth / 2, yPosition, { align: 'center' });
+                pdf.text(`Codice Agente: ${agentInfo.codice} | Periodo: Gennaio - Agosto 2025`, pageWidth / 2, yPosition, { align: 'center' });
                 
                 yPosition += 15;
                 
-                // Data di generazione
+                // Data di generazione in un box
                 const now = new Date();
-                pdf.setFontSize(10);
+                pdf.setFillColor(248, 250, 252);
+                pdf.roundedRect(20, yPosition, pageWidth - 40, 8, 2, 2, 'F');
+                pdf.setFontSize(9);
                 pdf.setTextColor(148, 163, 184);
-                pdf.text(`Report generato il ${now.toLocaleDateString('it-IT')} alle ${now.toLocaleTimeString('it-IT')}`, pageWidth / 2, yPosition, { align: 'center' });
+                pdf.text(`Report generato automaticamente il ${now.toLocaleDateString('it-IT')} alle ${now.toLocaleTimeString('it-IT')}`, pageWidth / 2, yPosition + 5, { align: 'center' });
                 
-                // Linea separatrice
-                yPosition += 10;
-                pdf.setDrawColor(226, 232, 240);
-                pdf.line(20, yPosition, pageWidth - 20, yPosition);
-                yPosition += 15;
+                yPosition += 20;
                 
-                // Sezione Metriche Principali
+                // METRICHE PRINCIPALI con boxes colorati
                 pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
                 pdf.setTextColor(30, 41, 59);
-                pdf.text('📊 PERFORMANCE GENERALE', 20, yPosition);
+                pdf.text('PERFORMANCE GENERALE', 20, yPosition);
                 yPosition += 12;
                 
-                // Box per le metriche
-                pdf.setFillColor(248, 250, 252);
-                pdf.rect(20, yPosition - 5, pageWidth - 40, 25, 'F');
-                
-                // Trova i dati generali
                 const generalData = currentData.find(d => d.Provincia === 'Generale');
                 if (generalData) {
-                    pdf.setFontSize(12);
+                    const currentRevenue = generalData.Anno_Corrente;
+                    const previousRevenue = generalData.Anno_Precedente;
+                    const growth = ((currentRevenue - previousRevenue) / previousRevenue * 100).toFixed(1);
+                    
+                    // Box Fatturato 2025
+                    pdf.setFillColor(34, 197, 94);
+                    pdf.roundedRect(20, yPosition, 85, 25, 3, 3, 'F');
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.text('FATTURATO 2025', 25, yPosition + 8);
+                    pdf.setFontSize(16);
                     pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(30, 41, 59);
+                    pdf.text(`€${Math.round(currentRevenue / 1000)}k`, 25, yPosition + 18);
                     
-                    const currentRevenue = Math.round(generalData.Anno_Corrente / 1000);
-                    const previousRevenue = Math.round(generalData.Anno_Precedente / 1000);
-                    const growth = ((generalData.Anno_Corrente - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100).toFixed(1);
+                    // Box Crescita
+                    const growthColor = growth >= 0 ? [34, 197, 94] : [239, 68, 68];
+                    pdf.setFillColor(...growthColor);
+                    pdf.roundedRect(110, yPosition, 80, 25, 3, 3, 'F');
+                    pdf.setFontSize(10);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.text('CRESCITA vs 2024', 115, yPosition + 8);
+                    pdf.setFontSize(16);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text(`${growth >= 0 ? '+' : ''}${growth}%`, 115, yPosition + 18);
                     
-                    pdf.text(`FATTURATO 2025: €${currentRevenue}k`, 25, yPosition + 5);
-                    pdf.text(`FATTURATO 2024: €${previousRevenue}k`, 25, yPosition + 12);
-                    pdf.setTextColor(growth >= 0 ? 22 : 220, growth >= 0 ? 197 : 38, growth >= 0 ? 94 : 38);
-                    pdf.text(`CRESCITA: ${growth >= 0 ? '+' : ''}${growth}%`, 25, yPosition + 19);
+                    yPosition += 35;
                     
-                    pdf.setTextColor(30, 41, 59);
-                    pdf.text(`CLIENTI ATTIVI: ${generalData.Clienti_Anno_Corrente}`, 120, yPosition + 5);
+                    // Box Clienti
+                    pdf.setFillColor(59, 130, 246);
+                    pdf.roundedRect(20, yPosition, 85, 25, 3, 3, 'F');
+                    pdf.setFontSize(10);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.text('CLIENTI ATTIVI', 25, yPosition + 8);
+                    pdf.setFontSize(16);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text(`${generalData.Clienti_Anno_Corrente}`, 25, yPosition + 18);
                     
+                    // Box Obiettivo
                     if (generalData.Obiettivo > 0) {
-                        const targetProgress = Math.round((generalData.Anno_Corrente / generalData.Obiettivo) * 100);
-                        pdf.text(`OBIETTIVO 2025: €${Math.round(generalData.Obiettivo / 1000)}k`, 120, yPosition + 12);
-                        pdf.text(`RAGGIUNTO: ${targetProgress}%`, 120, yPosition + 19);
+                        const targetProgress = Math.round((currentRevenue / generalData.Obiettivo) * 100);
+                        pdf.setFillColor(168, 85, 247);
+                        pdf.roundedRect(110, yPosition, 80, 25, 3, 3, 'F');
+                        pdf.setFontSize(10);
+                        pdf.setFont("helvetica", "normal");
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.text('OBIETTIVO', 115, yPosition + 8);
+                        pdf.setFontSize(16);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text(`${targetProgress}%`, 115, yPosition + 18);
                     }
                 }
                 
-                yPosition += 35;
+                yPosition += 40;
                 
-                // Sezione Top Clienti
+                // Aggiungi il grafico della ripartizione fatturato
+                if (fatturato_chart && yPosition < pageHeight - 80) {
+                    pdf.setFontSize(14);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.setTextColor(30, 41, 59);
+                    pdf.text('RIPARTIZIONE FATTURATO', 20, yPosition);
+                    yPosition += 10;
+                    
+                    try {
+                        const chartCanvas = document.getElementById('fatturato-chart');
+                        const chartImage = await html2canvas(chartCanvas, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        });
+                        
+                        const chartImgData = chartImage.toDataURL('image/png');
+                        pdf.addImage(chartImgData, 'PNG', 20, yPosition, 80, 60);
+                        
+                        // Aggiungi legend accanto al grafico
+                        pdf.setFontSize(10);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.setTextColor(59, 130, 246);
+                        pdf.text('Pieni e Coppi', 110, yPosition + 15);
+                        
+                        pdf.setTextColor(139, 92, 246);
+                        pdf.text('Altro', 110, yPosition + 35);
+                        
+                        // Trova i valori reali dalla ripartizione
+                        const response = await fetch(CSV_URL);
+                        const csvText = await response.text();
+                        const allData = parseCSV(csvText);
+                        const ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
+                        
+                        let pieniValue = 54909.62, altroValue = 35250.17; // fallback
+                        ripartizioneData.forEach(item => {
+                            if (item.Categoria_Prodotto === 'Pieni_e_Coppi') {
+                                pieniValue = parseFloat(item.Importo) || pieniValue;
+                            } else if (item.Categoria_Prodotto === 'Altro') {
+                                altroValue = parseFloat(item.Importo) || altroValue;
+                            }
+                        });
+                        
+                        const total = pieniValue + altroValue;
+                        pdf.setFont("helvetica", "normal");
+                        pdf.setTextColor(30, 41, 59);
+                        pdf.text(`€${Math.round(pieniValue/1000)}k (${Math.round(pieniValue/total*100)}%)`, 110, yPosition + 20);
+                        pdf.text(`€${Math.round(altroValue/1000)}k (${Math.round(altroValue/total*100)}%)`, 110, yPosition + 40);
+                        
+                    } catch (error) {
+                        console.error('Errore cattura grafico ripartizione:', error);
+                        pdf.setTextColor(220, 38, 38);
+                        pdf.text('Grafico non disponibile', 20, yPosition + 20);
+                    }
+                }
+                
+                // PAGINA 2: Top Clienti
+                pdf.addPage();
+                currentPage++;
+                yPosition = 25;
+                addPageHeader();
+                
                 pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
                 pdf.setTextColor(30, 41, 59);
-                pdf.text('🏆 TOP 10 CLIENTI PER FATTURATO', 20, yPosition);
-                yPosition += 12;
+                pdf.text('TOP 10 CLIENTI PER FATTURATO', 20, yPosition);
+                yPosition += 15;
                 
-                // Recupera tutti i dati di vendita per calcolare i top clienti
-                const allVenditeData = [];
                 try {
                     const response = await fetch(CSV_URL);
                     const csvText = await response.text();
@@ -2642,111 +2650,207 @@
                         .sort((a, b) => b.totalRevenue - a.totalRevenue)
                         .slice(0, 10);
                     
-                    // Tabella clienti
-                    pdf.setFillColor(248, 250, 252);
-                    pdf.rect(20, yPosition - 2, pageWidth - 40, 3, 'F');
-                    
+                    // Header tabella con stile
+                    pdf.setFillColor(59, 130, 246);
+                    pdf.roundedRect(20, yPosition, pageWidth - 40, 8, 2, 2, 'F');
                     pdf.setFontSize(10);
                     pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(55, 65, 81);
-                    pdf.text('POS', 25, yPosition + 2);
-                    pdf.text('CLIENTE', 40, yPosition + 2);
-                    pdf.text('PROV', 140, yPosition + 2);
-                    pdf.text('FATTURATO', 155, yPosition + 2);
-                    pdf.text('CAT', 180, yPosition + 2);
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.text('POS', 25, yPosition + 5);
+                    pdf.text('CLIENTE', 50, yPosition + 5);
+                    pdf.text('PROV', 130, yPosition + 5);
+                    pdf.text('FATTURATO', 150, yPosition + 5);
+                    pdf.text('CAT', 175, yPosition + 5);
                     
-                    yPosition += 8;
+                    yPosition += 12;
                     
+                    // Righe clienti con alternanza colori
                     pdf.setFont("helvetica", "normal");
                     pdf.setFontSize(9);
                     topClientsPDF.forEach((client, index) => {
+                        // Sfondo alternato
+                        if (index % 2 === 0) {
+                            pdf.setFillColor(248, 250, 252);
+                            pdf.rect(20, yPosition - 2, pageWidth - 40, 6, 'F');
+                        }
+                        
                         const position = index + 1;
                         
-                        // Colore posizione podio
-                        if (position === 1) pdf.setTextColor(255, 193, 7);
-                        else if (position === 2) pdf.setTextColor(158, 158, 158);
-                        else if (position === 3) pdf.setTextColor(205, 127, 50);
-                        else pdf.setTextColor(100, 116, 139);
+                        // Badge posizione con colori podio
+                        let badgeColor = [100, 116, 139]; // default
+                        if (position === 1) badgeColor = [255, 193, 7];      // oro
+                        else if (position === 2) badgeColor = [158, 158, 158]; // argento
+                        else if (position === 3) badgeColor = [205, 127, 50];  // bronzo
                         
+                        pdf.setFillColor(...badgeColor);
+                        pdf.circle(28, yPosition, 3, 'F');
+                        pdf.setFontSize(8);
                         pdf.setFont("helvetica", "bold");
-                        pdf.text(`${position}°`, 25, yPosition);
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.text(`${position}`, 28, yPosition + 1, { align: 'center' });
                         
+                        // Dati cliente
                         pdf.setFont("helvetica", "normal");
+                        pdf.setFontSize(9);
                         pdf.setTextColor(30, 41, 59);
                         
-                        // Tronca il nome cliente se troppo lungo
-                        const clientName = client.name.length > 35 ? client.name.substring(0, 32) + '...' : client.name;
-                        pdf.text(clientName, 40, yPosition);
+                        const clientName = client.name.length > 30 ? client.name.substring(0, 27) + '...' : client.name;
+                        pdf.text(clientName, 35, yPosition + 1);
                         
-                        pdf.text(client.province, 140, yPosition);
-                        pdf.text(`€${(client.totalRevenue / 1000).toFixed(1)}k`, 155, yPosition);
-                        pdf.text(`${client.categories.size}`, 180, yPosition);
+                        // Badge provincia
+                        const provColor = client.province === 'LT' ? [59, 130, 246] : [99, 102, 241];
+                        pdf.setFillColor(...provColor);
+                        pdf.roundedRect(128, yPosition - 2, 15, 5, 1, 1, 'F');
+                        pdf.setFontSize(7);
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.text(client.province, 135, yPosition + 1, { align: 'center' });
                         
-                        yPosition += 5;
+                        pdf.setFontSize(9);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.setTextColor(34, 197, 94);
+                        pdf.text(`€${(client.totalRevenue / 1000).toFixed(1)}k`, 150, yPosition + 1);
                         
-                        // Nuova pagina se necessario
-                        if (yPosition > pageHeight - 40) {
-                            pdf.addPage();
-                            yPosition = 20;
-                        }
+                        pdf.setFont("helvetica", "normal");
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.text(`${client.categories.size}`, 175, yPosition + 1);
+                        
+                        yPosition += 8;
                     });
                     
                 } catch (error) {
-                    console.error('Errore nel caricamento dati per PDF:', error);
-                    pdf.setTextColor(220, 38, 38);
-                    pdf.text('Errore nel caricamento dei dati clienti', 25, yPosition);
+                    console.error('Errore caricamento dati clienti:', error);
                 }
                 
-                yPosition += 15;
+                // PAGINA 3: Analisi Province e Categorie
+                pdf.addPage();
+                currentPage++;
+                yPosition = 25;
+                addPageHeader();
                 
-                // Sezione Province
+                // Sezione Province con grafico
                 pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
                 pdf.setTextColor(30, 41, 59);
-                pdf.text('🗺️ DISTRIBUZIONE TERRITORIALE', 20, yPosition);
-                yPosition += 12;
+                pdf.text('DISTRIBUZIONE TERRITORIALE', 20, yPosition);
+                yPosition += 15;
                 
-                pdf.setFillColor(248, 250, 252);
-                pdf.rect(20, yPosition - 5, pageWidth - 40, 20, 'F');
-                
-                pdf.setFontSize(12);
-                pdf.setFont("helvetica", "normal");
-                pdf.setTextColor(30, 41, 59);
-                pdf.text('PROVINCIA LATINA (LT)', 25, yPosition + 5);
-                pdf.text('18 clienti serviti - Fatturato €60.4k', 25, yPosition + 12);
-                
-                pdf.text('PROVINCIA ROMA (RM)', 120, yPosition + 5);
-                pdf.text('2 clienti serviti - Fatturato €7.8k', 120, yPosition + 12);
-                
-                yPosition += 25;
-                
-                // Sezione Categorie (se c'è spazio)
-                if (yPosition < pageHeight - 60) {
-                    pdf.setFontSize(16);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(30, 41, 59);
-                    pdf.text('📦 TOP CATEGORIE PRODOTTO', 20, yPosition);
-                    yPosition += 12;
-                    
-                    pdf.setFontSize(11);
-                    pdf.setFont("helvetica", "normal");
-                    pdf.text('• MATTONE PIENO: €38.6k (17 clienti)', 25, yPosition);
-                    yPosition += 6;
-                    pdf.text('• PAVIMENTAZIONE POLIS: €15.7k (14 clienti)', 25, yPosition);
-                    yPosition += 6;
-                    pdf.text('• REFRATTARI RETTIFICATI: €5.4k (5 clienti)', 25, yPosition);
-                    yPosition += 6;
-                    pdf.text('• REFRATTARI: €4.9k (5 clienti)', 25, yPosition);
+                // Grafico Province
+                if (province_chart) {
+                    try {
+                        const provinceCanvas = document.getElementById('province-chart');
+                        const provinceImage = await html2canvas(provinceCanvas, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        });
+                        
+                        const provinceImgData = provinceImage.toDataURL('image/png');
+                        pdf.addImage(provinceImgData, 'PNG', 20, yPosition, 170, 80);
+                        yPosition += 90;
+                        
+                    } catch (error) {
+                        console.error('Errore cattura grafico province:', error);
+                        // Dati statici in caso di errore
+                        pdf.setFillColor(239, 246, 255);
+                        pdf.roundedRect(20, yPosition, 80, 30, 3, 3, 'F');
+                        pdf.setFontSize(12);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.setTextColor(59, 130, 246);
+                        pdf.text('LATINA (LT)', 25, yPosition + 10);
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.text('18 clienti - €60.4k', 25, yPosition + 20);
+                        
+                        pdf.setFillColor(236, 254, 255);
+                        pdf.roundedRect(110, yPosition, 80, 30, 3, 3, 'F');
+                        pdf.setFontSize(12);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.setTextColor(99, 102, 241);
+                        pdf.text('ROMA (RM)', 115, yPosition + 10);
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.text('2 clienti - €7.8k', 115, yPosition + 20);
+                        
+                        yPosition += 40;
+                    }
                 }
                 
-                // Footer
+                // Sezione Categorie
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('TOP CATEGORIE PRODOTTO', 20, yPosition);
+                yPosition += 15;
+                
+                // Grafico Categorie
+                if (categories_chart) {
+                    try {
+                        const categoriesCanvas = document.getElementById('categories-chart');
+                        const categoriesImage = await html2canvas(categoriesCanvas, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        });
+                        
+                        const categoriesImgData = categoriesImage.toDataURL('image/png');
+                        pdf.addImage(categoriesImgData, 'PNG', 20, yPosition, 80, 60);
+                        
+                        // Lista categorie accanto al grafico
+                        try {
+                            const response = await fetch(CSV_URL);
+                            const csvText = await response.text();
+                            const allData = parseCSV(csvText);
+                            const categoriesData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
+                            const activeCategories = categoriesData
+                                .filter(cat => parseFloat(cat.Importo_Totale) > 0)
+                                .sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale))
+                                .slice(0, 5);
+                            
+                            pdf.setFontSize(10);
+                            pdf.setFont("helvetica", "bold");
+                            pdf.setTextColor(30, 41, 59);
+                            let catY = yPosition + 10;
+                            
+                            activeCategories.forEach((cat, index) => {
+                                const colors = ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585'];
+                                const color = colors[index] || '#64748b';
+                                
+                                // Converti hex to RGB
+                                const r = parseInt(color.slice(1, 3), 16);
+                                const g = parseInt(color.slice(3, 5), 16);
+                                const b = parseInt(color.slice(5, 7), 16);
+                                
+                                pdf.setFillColor(r, g, b);
+                                pdf.circle(115, catY, 2, 'F');
+                                
+                                pdf.setTextColor(30, 41, 59);
+                                pdf.text(`${cat.Categoria.replace(/_/g, ' ')}`, 120, catY + 1);
+                                
+                                const importo = parseFloat(cat.Importo_Totale);
+                                pdf.setFont("helvetica", "normal");
+                                pdf.setTextColor(34, 197, 94);
+                                pdf.text(`€${Math.round(importo/1000)}k`, 120, catY + 6);
+                                
+                                catY += 12;
+                            });
+                            
+                        } catch (error) {
+                            console.error('Errore dati categorie:', error);
+                        }
+                        
+                    } catch (error) {
+                        console.error('Errore cattura grafico categorie:', error);
+                    }
+                }
+                
+                // Footer finale
                 pdf.setFontSize(8);
                 pdf.setTextColor(148, 163, 184);
-                pdf.text('Dashboard Performance Vendite - Report Automatizzato', pageWidth / 2, pageHeight - 10, { align: 'center' });
-                pdf.text(`Pagina 1 di 1 - Generato automaticamente dal CSV`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+                pdf.text(`Dashboard Performance Vendite - Pagina ${currentPage} di ${currentPage}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                pdf.text(`Report generato automaticamente dal sistema - ${now.toLocaleDateString('it-IT')}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
                 
                 // Salva il PDF
-                const fileName = `Report_Performance_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.pdf`;
+                const fileName = `Dashboard_Performance_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.pdf`;
                 pdf.save(fileName);
                 
             } catch (error) {
@@ -2758,6 +2862,100 @@
                 button.disabled = false;
             }
         }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            
+            // Event listeners per il popup province
+            const provinceSelectorBtn = document.getElementById('provinceSelectorBtn');
+            const provinceModal = document.getElementById('provinceModal');
+            const modalClose = document.getElementById('modalClose');
+            const modalCancel = document.getElementById('modalCancel');
+            const chevronIcon = document.querySelector('.chevron-icon');
+            
+            // Apri popup
+            provinceSelectorBtn.addEventListener('click', () => {
+                provinceModal.classList.add('show');
+                provinceSelectorBtn.classList.add('active');
+                chevronIcon.classList.add('rotated');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Chiudi popup
+            function closeModal() {
+                provinceModal.classList.remove('show');
+                provinceSelectorBtn.classList.remove('active');
+                chevronIcon.classList.remove('rotated');
+                document.body.style.overflow = '';
+            }
+            
+            modalClose.addEventListener('click', closeModal);
+            modalCancel.addEventListener('click', closeModal);
+            
+            // Chiudi cliccando fuori
+            provinceModal.addEventListener('click', (e) => {
+                if (e.target === provinceModal) {
+                    closeModal();
+                }
+            });
+            
+            // Gestione selezione province
+            const provinceOptions = document.querySelectorAll('.province-option');
+            
+            provinceOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Rimuovi selezione precedente
+                    provinceOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Aggiungi selezione corrente
+                    option.classList.add('selected');
+                    
+                    // Aggiorna provincia selezionata
+                    const value = option.dataset.value;
+                    selectedProvince = value;
+                    
+                    // Aggiorna testo del pulsante
+                    const selectedText = document.getElementById('selectedProvinceText');
+                    const selectedSubtext = document.getElementById('selectedProvinceSubtext');
+                    
+                    if (value === 'all') {
+                        selectedText.textContent = 'Tutte le Province';
+                        selectedSubtext.textContent = 'Panoramica completa';
+                    } else if (value === 'LT') {
+                        selectedText.textContent = 'Latina';
+                        selectedSubtext.textContent = '60k • 18 clienti';
+                    } else if (value === 'RM') {
+                        selectedText.textContent = 'Roma';
+                        selectedSubtext.textContent = '8k • 2 clienti';
+                    }
+                    
+                    // Aggiorna dashboard
+                    updateDashboard();
+                    
+                    // Chiudi modal
+                    setTimeout(() => {
+                        closeModal();
+                    }, 200);
+                });
+            });
+            
+            // Event listener per i download
+            document.getElementById('downloadPDF').addEventListener('click', async () => {
+                await generatePDF();
+            });
+
+            document.getElementById('downloadExcel').addEventListener('click', async () => {
+                await generateExcel();
+            });
+            
+            // Chiudi modal con ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && provinceModal.classList.contains('show')) {
+                    closeModal();
+                }
+            });
+        });
     </script>
 </body>
 </html>
