@@ -109,6 +109,29 @@
             transform: translateY(0);
         }
 
+        @media (max-width: 640px) {
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+                gap: 8px;
+                margin-top: 8px;
+            }
+
+            .download-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 12px 16px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .download-btn {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
         .detail-item {
             display: flex;
             align-items: center;
@@ -216,6 +239,7 @@
             transform: rotate(180deg);
         }
 
+        /* Modal Overlay */
         .province-modal-overlay {
             position: fixed;
             top: 0;
@@ -238,6 +262,7 @@
             visibility: visible;
         }
 
+        /* Modal Content */
         .province-modal {
             background: white;
             border-radius: 20px;
@@ -780,6 +805,7 @@
             text-align: center;
         }
 
+        /* Stili per sezione clienti */
         .clients-table-container {
             background: #f8fafc;
             border-radius: 12px;
@@ -838,6 +864,7 @@
             color: #4338ca;
         }
 
+        /* Stili per podio clienti */
         .podium-position {
             display: flex;
             align-items: center;
@@ -873,6 +900,7 @@
             border: 2px solid #e2e8f0;
         }
 
+        /* Stili per categorie prodotto */
         .categories-container {
             display: grid;
             grid-template-columns: 350px 1fr;
@@ -1045,18 +1073,10 @@
                 font-size: 0.85rem;
             }
 
-            .action-buttons {
-                flex-direction: column;
-                width: 100%;
-                gap: 8px;
-                margin-top: 8px;
-            }
-
-            .download-btn {
+            .pdf-download-btn {
                 width: 100%;
                 justify-content: center;
-                padding: 12px 16px;
-                font-size: 0.85rem;
+                padding: 14px 20px;
             }
 
             .cards-grid {
@@ -1125,7 +1145,10 @@
             .province-revenue {
                 font-size: 1rem;
             }
+        }
 
+        /* Ottimizzazioni specifiche per il popup mobile */
+        @media (max-width: 640px) {
             .province-modal {
                 margin: 16px;
                 padding: 24px;
@@ -1161,6 +1184,7 @@
             }
         }
 
+        /* Ottimizzazioni per schermi molto piccoli */
         @media (max-width: 480px) {
             .dashboard-container {
                 padding: 8px;
@@ -1203,16 +1227,12 @@
                 margin: 12px;
                 width: calc(100% - 24px);
             }
-
-            .download-btn {
-                padding: 10px 12px;
-                font-size: 0.8rem;
-            }
         }
 
+        /* Touch-friendly improvements */
         @media (pointer: coarse) {
             .province-option,
-            .download-btn,
+            .pdf-download-btn,
             .province-selector-btn,
             .modal-close,
             .modal-cancel {
@@ -1243,7 +1263,7 @@
                     <svg width="10" height="10" fill="currentColor" viewBox="0 0 16 16">
                         <circle cx="8" cy="8" r="8"/>
                     </svg>
-                    <span>Dati aggiornati dal file CSV</span>
+                    <span>Dati aggiornati dal file HTML</span>
                 </div>
                 <div class="action-buttons">
                     <button id="downloadPDF" class="download-btn pdf-btn">
@@ -1282,6 +1302,7 @@
             </div>
         </div>
 
+        <!-- Modal Popup Province -->
         <div class="province-modal-overlay" id="provinceModal">
             <div class="province-modal">
                 <button class="modal-close" id="modalClose">
@@ -1345,9 +1366,12 @@
         </div>
 
         <div id="dashboardContent" style="display: none;">
+            <!-- SEZIONE 1: METRICHE PRINCIPALI -->
             <div class="cards-grid" id="metricsCards">
+                <!-- Le card verranno generate dinamicamente -->
             </div>
 
+            <!-- SEZIONE 2: CLIENTI SERVITI PER PROVINCIA -->
             <div class="chart-section">
                 <div class="section-header">
                     <h2>CLIENTI SERVITI PER PROVINCIA</h2>
@@ -1360,6 +1384,7 @@
                 </div>
                 <div class="province-stats-container">
                     <div class="province-cards-grid" id="provinceCards">
+                        <!-- Le card province verranno generate dinamicamente -->
                     </div>
                     <div class="province-chart-section">
                         <div class="chart-wrapper">
@@ -1369,6 +1394,7 @@
                 </div>
             </div>
 
+            <!-- SEZIONE 3: TOP CLIENTI PER FATTURATO -->
             <div class="chart-section">
                 <div class="section-header">
                     <h2>TOP CLIENTI PER FATTURATO</h2>
@@ -1380,9 +1406,11 @@
                     </div>
                 </div>
                 <div class="clients-table-container" id="clientsTable">
+                    <!-- Tabella clienti generata dinamicamente -->
                 </div>
             </div>
 
+            <!-- SEZIONE 4: PERFORMANCE PER CATEGORIA PRODOTTO -->
             <div class="chart-section">
                 <div class="section-header">
                     <h2>PERFORMANCE PER CATEGORIA PRODOTTO</h2>
@@ -1398,10 +1426,12 @@
                         <canvas id="categories-chart"></canvas>
                     </div>
                     <div class="categories-grid" id="categoriesGrid">
+                        <!-- Cards categorie generate dinamicamente -->
                     </div>
                 </div>
             </div>
 
+            <!-- SEZIONE 5: RIPARTIZIONE FATTURATO -->
             <div class="chart-section">
                 <div class="section-header">
                     <h2>RIPARTIZIONE FATTURATO</h2>
@@ -1417,6 +1447,7 @@
                         <canvas id="fatturato-chart"></canvas>
                     </div>
                     <div class="chart-legend" id="chartLegend">
+                        <!-- Legend sarà generata dinamicamente -->
                     </div>
                 </div>
             </div>
@@ -1424,6 +1455,7 @@
     </div>
 
     <script>
+        // URL del CSV su GitHub
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
         
         let currentData = [];
@@ -1454,6 +1486,7 @@
             return { change, percentage };
         }
 
+        // Funzione per parsificare il CSV personalizzato
         function parseCSV(csvText) {
             const lines = csvText.trim().split('\n');
             const data = [];
@@ -1462,13 +1495,16 @@
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 
+                // Salta righe vuote e commenti
                 if (!line || line.startsWith('#')) continue;
                 
+                // Se la riga contiene "Tipo_Dato" è un header
                 if (line.includes('Tipo_Dato')) {
                     currentHeaders = line.split(',').map(h => h.trim());
                     continue;
                 }
                 
+                // Processa i dati se abbiamo headers
                 if (currentHeaders && line) {
                     const values = line.split(',').map(v => v.trim());
                     if (values.length >= currentHeaders.length) {
@@ -1477,6 +1513,7 @@
                         currentHeaders.forEach((header, index) => {
                             let value = values[index] || '';
                             
+                            // Converti numeri
                             if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Percentuale_Obiettivo', 
                                 'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Obiettivo_Clienti', 
                                 'Percentuale_Obiettivo_Clienti', 'Fatturato', 'Clienti_Serviti', 'Importo_Totale',
@@ -1568,6 +1605,7 @@
         }
 
         function createTopPerformanceCard(data) {
+            // Trova la provincia con performance migliore
             const allProvData = currentData.filter(d => d.Provincia !== 'Generale');
             let topProv = allProvData[0];
             let bestGrowth = 0;
@@ -1641,6 +1679,7 @@
         function createClientsTable(allData) {
             const venditeLData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
             
+            // Raggruppa per cliente
             const clientsMap = new Map();
             
             venditeLData.forEach(sale => {
@@ -1662,1306 +1701,5 @@
                 client.categories.add(sale.Categoria_Articoli);
             });
             
-            const clientsArray = Array.from(clientsMap.values())
-                .sort((a, b) => b.totalRevenue - a.totalRevenue);
-            
-            const container = document.getElementById('clientsTable');
-            
-            function getPodiumClass(index) {
-                if (index === 0) return 'podium-1';
-                if (index === 1) return 'podium-2';
-                if (index === 2) return 'podium-3';
-                return 'podium-other';
-            }
-            
-            let html = `
-                <table class="clients-table">
-                    <thead>
-                        <tr>
-                            <th>Pos.</th>
-                            <th>Cliente</th>
-                            <th>Provincia</th>
-                            <th>Fatturato</th>
-                            <th>Categorie</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            clientsArray.slice(0, 10).forEach((client, index) => {
-                html += `
-                    <tr>
-                        <td>
-                            <div class="podium-position ${getPodiumClass(index)}">
-                                ${index + 1}
-                            </div>
-                        </td>
-                        <td class="client-name">${client.name}</td>
-                        <td><span class="client-province ${client.province}">${client.province}</span></td>
-                        <td class="client-revenue">${formatCurrency(client.totalRevenue)}</td>
-                        <td>${client.categories.size} categorie</td>
-                    </tr>
-                `;
-            });
-            
-            html += `
-                    </tbody>
-                </table>
-            `;
-            
-            container.innerHTML = html;
-        }
-
-        function createCategoriesSection(allData) {
-            const categoriesData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-            
-            const activeCategories = categoriesData.filter(cat => parseFloat(cat.Importo_Totale) > 0);
-            
-            activeCategories.sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale));
-            
-            const colors = ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
-            
-            const gridContainer = document.getElementById('categoriesGrid');
-            let cardsHtml = '';
-            
-            activeCategories.forEach((cat, index) => {
-                const importo = parseFloat(cat.Importo_Totale);
-                const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
-                const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
-                const totalClienti = clientiLT + clientiRM;
-                const categoryColor = colors[index] || '#64748b';
-                
-                cardsHtml += `
-                    <div class="category-card" style="--category-color: ${categoryColor}">
-                        <div class="category-name">${cat.Categoria}</div>
-                        <div class="category-value">${formatCurrency(importo)}</div>
-                        <div class="category-clients">${totalClienti} clienti (LT: ${clientiLT}, RM: ${clientiRM})</div>
-                    </div>
-                `;
-            });
-            
-            gridContainer.innerHTML = cardsHtml;
-            
-            createCategoriesChart(activeCategories, colors);
-        }
-
-        function createCategoriesChart(categoriesData, colors) {
-            if (categories_chart) {
-                categories_chart.destroy();
-            }
-            
-            const topCategories = categoriesData.slice(0, Math.min(categoriesData.length, colors.length));
-            
-            const ctx = document.getElementById('categories-chart').getContext('2d');
-            categories_chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: topCategories.map(cat => cat.Categoria.replace(/_/g, ' ')),
-                    datasets: [{
-                        data: topCategories.map(cat => parseFloat(cat.Importo_Totale)),
-                        backgroundColor: colors.slice(0, topCategories.length),
-                        borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((value / total) * 100).toFixed(1);
-                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true,
-                        duration: 1000
-                    }
-                }
-            });
-        }
-
-        function filterData(province) {
-            if (province === 'all') {
-                return currentData;
-            } else if (province === 'generale') {
-                return currentData.filter(item => item.Provincia === 'Generale');
-            } else {
-                return currentData.filter(item => item.Provincia === province);
-            }
-        }
-
-        function updateDashboard() {
-            const filteredData = filterData(selectedProvince);
-            const container = document.getElementById('metricsCards');
-            
-            if (filteredData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">Nessun dato disponibile per la selezione corrente</div>';
-                return;
-            }
-
-            let html = '';
-            
-            filteredData.forEach(data => {
-                html += createFatturatoCard(data);
-                
-                if (data.Obiettivo > 0) {
-                    html += createObiettivoCard(data);
-                }
-                
-                html += createClientiAttiviCard(data);
-            });
-            
-            if (selectedProvince === 'all') {
-                const generalData = currentData.find(d => d.Provincia === 'Generale');
-                if (generalData) {
-                    html += createTopPerformanceCard(generalData);
-                }
-            }
-            
-            container.innerHTML = html;
-        }
-
-        function createFatturatoChart(allData) {
-            const ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
-            console.log('Dati ripartizione trovati:', ripartizioneData);
-            
-            let pieniCoppiValue = 0;
-            let altroValue = 0;
-            
-            ripartizioneData.forEach(item => {
-                if (item.Categoria_Prodotto === 'Pieni_e_Coppi') {
-                    pieniCoppiValue = parseFloat(item.Importo) || 0;
-                } else if (item.Categoria_Prodotto === 'Altro') {
-                    altroValue = parseFloat(item.Importo) || 0;
-                }
-            });
-            
-            if (pieniCoppiValue === 0 && altroValue === 0) {
-                console.warn('Dati ripartizione non trovati nel CSV, uso valori fallback');
-                pieniCoppiValue = 54909.62;
-                altroValue = 35250.17;
-            }
-            
-            const total = pieniCoppiValue + altroValue;
-            const pieniCoppiPerc = total > 0 ? (pieniCoppiValue / total * 100).toFixed(1) : 0;
-            const altroPerc = total > 0 ? (altroValue / total * 100).toFixed(1) : 0;
-
-            console.log(`Ripartizione automatica: Pieni e Coppi €${pieniCoppiValue} (${pieniCoppiPerc}%), Altro €${altroValue} (${altroPerc}%)`);
-
-            const legendContainer = document.getElementById('chartLegend');
-            legendContainer.innerHTML = `
-                <div class="legend-item pieni-coppi">
-                    <div class="legend-content">
-                        <div class="legend-color pieni-coppi"></div>
-                        <div class="legend-label">Pieni e Coppi</div>
-                    </div>
-                    <div class="legend-value">
-                        <div class="legend-amount">${formatCurrency(pieniCoppiValue)}</div>
-                        <div class="legend-percentage">${pieniCoppiPerc}%</div>
-                    </div>
-                </div>
-                <div class="legend-item altro">
-                    <div class="legend-content">
-                        <div class="legend-color altro"></div>
-                        <div class="legend-label">Altro</div>
-                    </div>
-                    <div class="legend-value">
-                        <div class="legend-amount">${formatCurrency(altroValue)}</div>
-                        <div class="legend-percentage">${altroPerc}%</div>
-                    </div>
-                </div>
-            `;
-
-            if (fatturato_chart) {
-                fatturato_chart.destroy();
-            }
-
-            const ctx = document.getElementById('fatturato-chart').getContext('2d');
-            fatturato_chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Pieni e Coppi', 'Altro'],
-                    datasets: [{
-                        data: [pieniCoppiValue, altroValue],
-                        backgroundColor: ['#3b82f6', '#8b5cf6'],
-                        hoverBackgroundColor: ['#2563eb', '#7c3aed'],
-                        borderColor: '#ffffff',
-                        borderWidth: 3,
-                        hoverBorderWidth: 5,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            displayColors: true,
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed;
-                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true,
-                        duration: 1000,
-                        easing: 'easeInOutQuart'
-                    }
-                }
-            });
-        }
-
-        function createProvinceCards(allData) {
-            const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
-            console.log('Dati province trovati:', provinceData);
-            
-            const container = document.getElementById('provinceCards');
-            
-            if (provinceData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px;">Nessun dato provincia disponibile</div>';
-                return [];
-            }
-
-            let html = '';
-            const chartData = [];
-
-            provinceData.forEach(prov => {
-                const clients = parseInt(prov.Clienti_Serviti) || 0;
-                const revenue = parseFloat(prov.Fatturato) || 0;
-                const avgPerClient = clients > 0 ? revenue / clients : 0;
-                
-                const provinceName = prov.Provincia === 'LT' ? 'Latina' : 
-                                   prov.Provincia === 'RM' ? 'Roma' : 
-                                   prov.Provincia;
-
-                html += `
-                    <div class="province-card">
-                        <div class="province-card-header">
-                            <div class="province-name">
-                                <div class="province-indicator"></div>
-                                ${provinceName} (${prov.Provincia})
-                            </div>
-                        </div>
-                        <div class="province-clients">${clients}</div>
-                        <div class="province-revenue">${formatCurrency(revenue)}</div>
-                        <div class="province-details">
-                            <span>Clienti serviti</span>
-                            <div class="client-avg">
-                                <div class="avg-label">Media per cliente</div>
-                                <div class="avg-value">${formatCurrency(avgPerClient)}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                chartData.push({
-                    label: provinceName,
-                    clients: clients,
-                    revenue: revenue,
-                    color: prov.Provincia === 'LT' ? '#3b82f6' : '#6366f1'
-                });
-            });
-
-            container.innerHTML = html;
-            return chartData;
-        }
-
-        function createProvinceChart(chartData) {
-            if (chartData.length === 0) return;
-
-            if (province_chart) {
-                province_chart.destroy();
-            }
-
-            const ctx = document.getElementById('province-chart').getContext('2d');
-            province_chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartData.map(d => d.label),
-                    datasets: [{
-                        label: 'Clienti',
-                        data: chartData.map(d => d.clients),
-                        backgroundColor: chartData.map(d => d.color),
-                        borderColor: chartData.map(d => d.color),
-                        borderWidth: 2,
-                        borderRadius: 6,
-                        borderSkipped: false,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1,
-                                color: '#64748b',
-                                font: {
-                                    family: 'Montserrat',
-                                    size: 12
-                                }
-                            },
-                            grid: {
-                                color: '#f1f5f9',
-                                borderColor: '#e2e8f0'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#64748b',
-                                font: {
-                                    family: 'Montserrat',
-                                    size: 12,
-                                    weight: '500'
-                                }
-                            },
-                            grid: {
-                                display: false
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#64748b',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            titleFont: {
-                                family: 'Montserrat',
-                                size: 14,
-                                weight: '600'
-                            },
-                            bodyFont: {
-                                family: 'Montserrat',
-                                size: 13
-                            },
-                            callbacks: {
-                                label: function(context) {
-                                    const dataPoint = chartData[context.dataIndex];
-                                    return [
-                                        `Clienti: ${context.parsed.y}`,
-                                        `Fatturato: ${formatCurrency(dataPoint.revenue)}`,
-                                        `Media: ${formatCurrency(dataPoint.revenue / dataPoint.clients)}`
-                                    ];
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        duration: 800,
-                        easing: 'easeInOutQuart'
-                    }
-                }
-            });
-        }
-
-        async function loadData() {
-            try {
-                console.log('Caricamento dati da:', CSV_URL);
-                const response = await fetch(CSV_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('CSV caricato');
-                
-                const allData = parseCSV(csvText);
-                console.log('Dati parsificati:', allData);
-                
-                const lines = csvText.split('\n');
-                agentInfo = {
-                    codice: '631.00238',
-                    nome: 'CARABOT NATALINO', 
-                    periodo_da: '01/01/2025',
-                    periodo_a: '24/08/2025'
-                };
-                
-                lines.forEach(line => {
-                    if (line.includes('Codice Agente:')) {
-                        agentInfo.codice = line.split(':')[1]?.trim() || agentInfo.codice;
-                    }
-                    if (line.includes('Ragione Sociale:')) {
-                        agentInfo.nome = line.split(':')[1]?.trim() || agentInfo.nome;
-                    }
-                    if (line.includes('Periodo:')) {
-                        const periodo = line.split(':')[1]?.trim() || '';
-                        const dates = periodo.split(' - ');
-                        if (dates.length === 2) {
-                            agentInfo.periodo_da = dates[0].trim();
-                            agentInfo.periodo_a = dates[1].trim();
-                        }
-                    }
-                });
-                
-                document.getElementById('agentCode').textContent = agentInfo.codice;
-                document.getElementById('agentName').textContent = agentInfo.nome;
-                document.getElementById('period').textContent = 'Gen - Ago 2025 (8 mesi)';
-                
-                currentData = allData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
-                console.log('Dati obiettivi filtrati:', currentData);
-                
-                document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'block';
-                updateDashboard();
-                
-                const chartData = createProvinceCards(allData);
-                createProvinceChart(chartData);
-                
-                createClientsTable(allData);
-                
-                createCategoriesSection(allData);
-                
-                createFatturatoChart(allData);
-                
-            } catch (error) {
-                console.error('Errore nel caricamento dei dati:', error);
-                document.getElementById('loadingMessage').innerHTML = `
-                    <div style="color: #dc2626; text-align: center;">
-                        ❌ Errore nel caricamento dei dati<br>
-                        <small>${error.message}</small>
-                    </div>
-                `;
-            }
-        }
-
-        async function generateExcel() {
-            const button = document.getElementById('downloadExcel');
-            const originalText = button.innerHTML;
-            
-            button.innerHTML = `
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="animate-spin">
-                    <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.90z"/>
-                </svg>
-                Generando Excel...
-            `;
-            button.disabled = true;
-
-            try {
-                const wb = XLSX.utils.book_new();
-                
-                const summaryData = [];
-                const generalData = currentData.find(d => d.Provincia === 'Generale');
-                
-                if (generalData) {
-                    summaryData.push(['REPORT PERFORMANCE VENDITE', '']);
-                    summaryData.push(['Agente', agentInfo.nome]);
-                    summaryData.push(['Codice', agentInfo.codice]);
-                    summaryData.push(['Periodo', 'Gennaio - Agosto 2025 (8 mesi)']);
-                    summaryData.push(['Data Generazione', new Date().toLocaleString('it-IT')]);
-                    summaryData.push(['', '']);
-                    summaryData.push(['METRICHE PRINCIPALI', '']);
-                    summaryData.push(['Fatturato 2025', `€${generalData.Anno_Corrente.toLocaleString('it-IT')}`]);
-                    summaryData.push(['Fatturato 2024', `€${generalData.Anno_Precedente.toLocaleString('it-IT')}`]);
-                    summaryData.push(['Crescita', `${((generalData.Anno_Corrente - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100).toFixed(1)}%`]);
-                    summaryData.push(['Clienti Attivi 2025', generalData.Clienti_Anno_Corrente]);
-                    summaryData.push(['Clienti 2024', generalData.Clienti_Anno_Precedente]);
-                    
-                    if (generalData.Obiettivo > 0) {
-                        summaryData.push(['Obiettivo 2025', `€${generalData.Obiettivo.toLocaleString('it-IT')}`]);
-                        summaryData.push(['% Obiettivo Raggiunto', `${Math.round((generalData.Anno_Corrente / generalData.Obiettivo) * 100)}%`]);
-                    }
-                }
-                
-                const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
-                XLSX.utils.book_append_sheet(wb, summaryWS, 'Riepilogo');
-                
-                try {
-                    const response = await fetch(CSV_URL);
-                    const csvText = await response.text();
-                    const allData = parseCSV(csvText);
-                    const venditeDatiExcel = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
-                    
-                    const clientsMapExcel = new Map();
-                    venditeDatiExcel.forEach(sale => {
-                        const clientName = sale.Ragione_Sociale_Cliente;
-                        const revenue = parseFloat(sale.Fatturato) || 0;
-                        const province = sale.Provincia;
-                        
-                        if (!clientsMapExcel.has(clientName)) {
-                            clientsMapExcel.set(clientName, {
-                                name: clientName,
-                                totalRevenue: 0,
-                                province: province,
-                                categories: new Set()
-                            });
-                        }
-                        
-                        const client = clientsMapExcel.get(clientName);
-                        client.totalRevenue += revenue;
-                        client.categories.add(sale.Categoria_Articoli);
-                    });
-                    
-                    const topClientsExcel = Array.from(clientsMapExcel.values())
-                        .sort((a, b) => b.totalRevenue - a.totalRevenue);
-                    
-                    const clientsData = [
-                        ['POS', 'CLIENTE', 'PROVINCIA', 'FATTURATO', 'N. CATEGORIE']
-                    ];
-                    
-                    topClientsExcel.forEach((client, index) => {
-                        clientsData.push([
-                            index + 1,
-                            client.name,
-                            client.province,
-                            client.totalRevenue,
-                            client.categories.size
-                        ]);
-                    });
-                    
-                    const clientsWS = XLSX.utils.aoa_to_sheet(clientsData);
-                    XLSX.utils.book_append_sheet(wb, clientsWS, 'Top Clienti');
-                    
-                    const salesData = [
-                        ['CLIENTE', 'PROVINCIA', 'CATEGORIA ARTICOLI', 'FATTURATO']
-                    ];
-                    
-                    venditeDatiExcel.forEach(sale => {
-                        salesData.push([
-                            sale.Ragione_Sociale_Cliente,
-                            sale.Provincia,
-                            sale.Categoria_Articoli,
-                            parseFloat(sale.Fatturato) || 0
-                        ]);
-                    });
-                    
-                    const salesWS = XLSX.utils.aoa_to_sheet(salesData);
-                    XLSX.utils.book_append_sheet(wb, salesWS, 'Dettaglio Vendite');
-                    
-                    const categoriesDataExcel = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-                    const categoriesData = [
-                        ['CATEGORIA', 'FATTURATO', 'CLIENTI LT', 'CLIENTI RM', 'TOTALE CLIENTI']
-                    ];
-                    
-                    categoriesDataExcel
-                        .filter(cat => parseFloat(cat.Importo_Totale) > 0)
-                        .sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale))
-                        .forEach(cat => {
-                            const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
-                            const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
-                            categoriesData.push([
-                                cat.Categoria,
-                                parseFloat(cat.Importo_Totale),
-                                clientiLT,
-                                clientiRM,
-                                clientiLT + clientiRM
-                            ]);
-                        });
-                    
-                    const categoriesWS = XLSX.utils.aoa_to_sheet(categoriesData);
-                    XLSX.utils.book_append_sheet(wb, categoriesWS, 'Performance Categorie');
-                    
-                    const provinceDataExcel = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
-                    const provinceData = [
-                        ['PROVINCIA', 'NOME', 'CLIENTI SERVITI', 'FATTURATO', 'MEDIA PER CLIENTE']
-                    ];
-                    
-                    provinceDataExcel.forEach(prov => {
-                        const clients = parseInt(prov.Clienti_Serviti) || 0;
-                        const revenue = parseFloat(prov.Fatturato) || 0;
-                        const avgPerClient = clients > 0 ? revenue / clients : 0;
-                        const provinceName = prov.Provincia === 'LT' ? 'Latina' : 
-                                           prov.Provincia === 'RM' ? 'Roma' : 
-                                           prov.Provincia;
-                        
-                        provinceData.push([
-                            prov.Provincia,
-                            provinceName,
-                            clients,
-                            revenue,
-                            avgPerClient
-                        ]);
-                    });
-                    
-                    const provinceWS = XLSX.utils.aoa_to_sheet(provinceData);
-                    XLSX.utils.book_append_sheet(wb, provinceWS, 'Province');
-                    
-                } catch (error) {
-                    console.error('Errore nel caricamento dati per Excel:', error);
-                }
-                
-                const now = new Date();
-                const fileName = `Report_Excel_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 10)}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-                
-            } catch (error) {
-                console.error('Errore nella generazione del file Excel:', error);
-                alert('Errore nella generazione del file Excel. Riprova.');
-            } finally {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        }
-
-        async function generatePDF() {
-            const button = document.getElementById('downloadPDF');
-            const originalText = button.innerHTML;
-            
-            button.innerHTML = `
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="animate-spin">
-                    <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364.843l8-8.5a.5.5 0 0 1 .615-.090z"/>
-                </svg>
-                Generando Analytics Report...
-            `;
-            button.disabled = true;
-
-            try {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const margin = 20;
-                const contentWidth = pageWidth - 2 * margin;
-                let yPos = 25;
-                
-                const now = new Date();
-                const generalData = currentData.find(d => d.Provincia === 'Generale');
-
-                // Clean page header function
-                function addCleanHeader(title, pageNum) {
-                    pdf.setFillColor(248, 250, 252);
-                    pdf.rect(0, 0, pageWidth, 15, 'F');
-                    
-                    pdf.setTextColor(71, 85, 105);
-                    pdf.setFontSize(10);
-                    pdf.setFont("helvetica", "normal");
-                    pdf.text(title, margin, 10);
-                    
-                    pdf.setTextColor(148, 163, 184);
-                    pdf.setFontSize(8);
-                    pdf.text(`Page ${pageNum} | ${now.toLocaleDateString('en-GB')}`, pageWidth - margin, 10, { align: 'right' });
-                    
-                    pdf.setDrawColor(226, 232, 240);
-                    pdf.setLineWidth(0.5);
-                    pdf.line(0, 15, pageWidth, 15);
-                }
-
-                // ===================== PAGE 1: EXECUTIVE OVERVIEW =====================
-                pdf.setFillColor(255, 255, 255);
-                pdf.rect(0, 0, pageWidth, pageHeight, 'F');
-                
-                // Clean header
-                pdf.setTextColor(15, 23, 42);
-                pdf.setFontSize(24);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('SALES PERFORMANCE REPORT', margin, yPos);
-                
-                pdf.setTextColor(100, 116, 139);
-                pdf.setFontSize(12);
-                pdf.setFont("helvetica", "normal");
-                pdf.text(`${agentInfo.nome} | Jan - Aug 2025`, margin, yPos + 10);
-                
-                yPos += 30;
-
-                // Key metrics cards - analytics style
-                if (generalData) {
-                    const currentRevenue = generalData.Anno_Corrente;
-                    const previousRevenue = generalData.Anno_Precedente;
-                    const growth = ((currentRevenue - previousRevenue) / previousRevenue * 100);
-                    const targetProgress = generalData.Obiettivo > 0 ? (currentRevenue / generalData.Obiettivo * 100) : 0;
-                    
-                    const metrics = [
-                        {
-                            title: 'Total Revenue',
-                            subtitle: 'Current Period',
-                            value: `€${Math.round(currentRevenue / 1000)}K`,
-                            change: `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%`,
-                            changeColor: growth >= 0 ? [34, 197, 94] : [239, 68, 68],
-                            prevValue: `€${Math.round(previousRevenue / 1000)}K`
-                        },
-                        {
-                            title: 'Active Clients', 
-                            subtitle: 'Portfolio Size',
-                            value: `${generalData.Clienti_Anno_Corrente}`,
-                            change: `${generalData.Clienti_Anno_Corrente - generalData.Clienti_Anno_Precedente >= 0 ? '+' : ''}${generalData.Clienti_Anno_Corrente - generalData.Clienti_Anno_Precedente}`,
-                            changeColor: [59, 130, 246],
-                            prevValue: `${generalData.Clienti_Anno_Precedente} prev`
-                        },
-                        {
-                            title: 'Target Progress',
-                            subtitle: 'Achievement Rate', 
-                            value: `${targetProgress.toFixed(0)}%`,
-                            change: generalData.Obiettivo > 0 ? `of €${Math.round(generalData.Obiettivo / 1000)}K` : 'No target',
-                            changeColor: targetProgress >= 80 ? [34, 197, 94] : [245, 158, 11],
-                            prevValue: 'target'
-                        },
-                        {
-                            title: 'Growth Rate',
-                            subtitle: 'Year over Year',
-                            value: `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%`,
-                            change: growth >= 0 ? 'Positive' : 'Negative',
-                            changeColor: growth >= 0 ? [34, 197, 94] : [239, 68, 68],
-                            prevValue: 'trend'
-                        }
-                    ];
-                    
-                    const cardWidth = (contentWidth - 20) / 2;
-                    const cardHeight = 45;
-                    
-                    metrics.forEach((metric, index) => {
-                        const x = margin + (index % 2) * (cardWidth + 20);
-                        const y = yPos + Math.floor(index / 2) * (cardHeight + 15);
-                        
-                        // Clean card background
-                        pdf.setFillColor(249, 250, 251);
-                        pdf.setDrawColor(226, 232, 240);
-                        pdf.setLineWidth(0.5);
-                        pdf.roundedRect(x, y, cardWidth, cardHeight, 4, 4, 'FD');
-                        
-                        // Card content
-                        pdf.setTextColor(100, 116, 139);
-                        pdf.setFontSize(9);
-                        pdf.setFont("helvetica", "normal");
-                        pdf.text(metric.title, x + 12, y + 12);
-                        
-                        pdf.setTextColor(148, 163, 184);
-                        pdf.setFontSize(7);
-                        pdf.text(metric.subtitle, x + 12, y + 18);
-                        
-                        // Main value - bold and large
-                        pdf.setTextColor(15, 23, 42);
-                        pdf.setFontSize(22);
-                        pdf.setFont("helvetica", "bold");
-                        pdf.text(metric.value, x + 12, y + 32);
-                        
-                        // Change indicator
-                        pdf.setTextColor(...metric.changeColor);
-                        pdf.setFontSize(9);
-                        pdf.setFont("helvetica", "bold");
-                        pdf.text(metric.change, x + cardWidth - 12, y + 25, { align: 'right' });
-                        
-                        pdf.setTextColor(148, 163, 184);
-                        pdf.setFontSize(7);
-                        pdf.setFont("helvetica", "normal");
-                        pdf.text(metric.prevValue, x + cardWidth - 12, y + 32, { align: 'right' });
-                    });
-                    
-                    yPos += 120;
-                }
-
-                // Revenue composition section
-                pdf.setTextColor(15, 23, 42);
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('Revenue Composition', margin, yPos);
-                
-                pdf.setTextColor(100, 116, 139);
-                pdf.setFontSize(9);
-                pdf.setFont("helvetica", "normal");
-                pdf.text('Product category breakdown', margin, yPos + 8);
-                
-                yPos += 25;
-
-                // Chart with clean layout
-                if (fatturato_chart) {
-                    try {
-                        const chartCanvas = document.getElementById('fatturato-chart');
-                        const chartImage = await html2canvas(chartCanvas, {
-                            backgroundColor: '#ffffff',
-                            scale: 4,
-                            useCORS: true,
-                            logging: false
-                        });
-                        
-                        const chartImgData = chartImage.toDataURL('image/png', 1.0);
-                        const chartSize = 70;
-                        
-                        // Chart container
-                        pdf.setFillColor(255, 255, 255);
-                        pdf.setDrawColor(226, 232, 240);
-                        pdf.setLineWidth(0.5);
-                        pdf.roundedRect(margin, yPos, chartSize + 20, chartSize + 20, 4, 4, 'FD');
-                        pdf.addImage(chartImgData, 'PNG', margin + 10, yPos + 10, chartSize, chartSize);
-                        
-                        // Clean data table
-                        const tableX = margin + chartSize + 40;
-                        
-                        const response = await fetch(CSV_URL);
-                        const csvText = await response.text();
-                        const allData = parseCSV(csvText);
-                        const ripartizioneData = allData.filter(item => item.Tipo_Dato === 'RIPARTIZIONE');
-                        
-                        let pieniValue = 54909.62, altroValue = 35250.17;
-                        ripartizioneData.forEach(item => {
-                            if (item.Categoria_Prodotto === 'Pieni_e_Coppi') {
-                                pieniValue = parseFloat(item.Importo) || pieniValue;
-                            } else if (item.Categoria_Prodotto === 'Altro') {
-                                altroValue = parseFloat(item.Importo) || altroValue;
-                            }
-                        });
-                        
-                        const total = pieniValue + altroValue;
-                        
-                        // Analytics-style data presentation
-                        const categories = [
-                            { name: 'Pieni e Coppi', value: pieniValue, color: [59, 130, 246] },
-                            { name: 'Other Products', value: altroValue, color: [139, 92, 246] }
-                        ];
-                        
-                        categories.forEach((cat, index) => {
-                            const rowY = yPos + 20 + (index * 25);
-                            
-                            // Category indicator
-                            pdf.setFillColor(...cat.color);
-                            pdf.circle(tableX, rowY, 4, 'F');
-                            
-                            // Category name
-                            pdf.setTextColor(71, 85, 105);
-                            pdf.setFontSize(11);
-                            pdf.setFont("helvetica", "bold");
-                            pdf.text(cat.name, tableX + 12, rowY + 2);
-                            
-                            // Value - large and prominent
-                            pdf.setTextColor(15, 23, 42);
-                            pdf.setFontSize(18);
-                            pdf.setFont("helvetica", "bold");
-                            pdf.text(`€${(cat.value/1000).toFixed(0)}K`, tableX + 12, rowY + 12);
-                            
-                            // Percentage
-                            pdf.setTextColor(100, 116, 139);
-                            pdf.setFontSize(9);
-                            pdf.setFont("helvetica", "normal");
-                            pdf.text(`${(cat.value/total*100).toFixed(1)}%`, tableX + 60, rowY + 12);
-                            
-                            // Progress bar
-                            const barWidth = 40;
-                            const barHeight = 6;
-                            const percentage = cat.value / total;
-                            
-                            pdf.setFillColor(240, 240, 240);
-                            pdf.roundedRect(tableX + 75, rowY + 8, barWidth, barHeight, 3, 3, 'F');
-                            
-                            pdf.setFillColor(...cat.color);
-                            pdf.roundedRect(tableX + 75, rowY + 8, barWidth * percentage, barHeight, 3, 3, 'F');
-                        });
-                        
-                    } catch (error) {
-                        console.error('Chart error:', error);
-                    }
-                }
-
-                // ===================== PAGE 2: TERRITORIAL PERFORMANCE =====================
-                pdf.addPage();
-                addCleanHeader('Territorial Performance Analysis', 2);
-                yPos = 30;
-                
-                pdf.setTextColor(15, 23, 42);
-                pdf.setFontSize(20);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('Territorial Performance', margin, yPos);
-                
-                pdf.setTextColor(100, 116, 139);
-                pdf.setFontSize(10);
-                pdf.setFont("helvetica", "normal");
-                pdf.text('Geographic distribution and client analysis', margin, yPos + 10);
-                
-                yPos += 30;
-
-                // Territory metrics
-                try {
-                    const response = await fetch(CSV_URL);
-                    const csvText = await response.text();
-                    const allData = parseCSV(csvText);
-                    const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
-                    
-                    if (provinceData.length > 0) {
-                        const territories = [];
-                        provinceData.forEach(prov => {
-                            const clients = parseInt(prov.Clienti_Serviti) || 0;
-                            const revenue = parseFloat(prov.Fatturato) || 0;
-                            territories.push({
-                                name: prov.Provincia === 'LT' ? 'Latina' : 'Roma',
-                                code: prov.Provincia,
-                                clients: clients,
-                                revenue: revenue,
-                                avgPerClient: clients > 0 ? revenue / clients : 0
-                            });
-                        });
-                        
-                        // Territory cards
-                        const cardWidth = (contentWidth - 20) / 2;
-                        const cardHeight = 60;
-                        
-                        territories.forEach((territory, index) => {
-                            const x = margin + (index % 2) * (cardWidth + 20);
-                            const y = yPos;
-                            
-                            // Clean territory card
-                            pdf.setFillColor(249, 250, 251);
-                            pdf.setDrawColor(226, 232, 240);
-                            pdf.setLineWidth(0.5);
-                            pdf.roundedRect(x, y, cardWidth, cardHeight, 4, 4, 'FD');
-                            
-                            // Territory header
-                            pdf.setTextColor(71, 85, 105);
-                            pdf.setFontSize(14);
-                            pdf.setFont("helvetica", "bold");
-                            pdf.text(`${territory.name} (${territory.code})`, x + 12, y + 15);
-                            
-                            // Metrics grid
-                            pdf.setTextColor(100, 116, 139);
-                            pdf.setFontSize(8);
-                            pdf.setFont("helvetica", "normal");
-                            pdf.text('CLIENTS', x + 12, y + 28);
-                            pdf.text('REVENUE', x + 60, y + 28);
-                            pdf.text('AVG/CLIENT', x + 110, y + 28);
-                            
-                            // Values
-                            pdf.setTextColor(15, 23, 42);
-                            pdf.setFontSize(16);
-                            pdf.setFont("helvetica", "bold");
-                            pdf.text(`${territory.clients}`, x + 12, y + 40);
-                            pdf.text(`€${(territory.revenue/1000).toFixed(0)}K`, x + 60, y + 40);
-                            pdf.text(`€${(territory.avgPerClient/1000).toFixed(1)}K`, x + 110, y + 40);
-                            
-                            // Market share indicator
-                            const totalRevenue = territories.reduce((sum, t) => sum + t.revenue, 0);
-                            const share = (territory.revenue / totalRevenue * 100).toFixed(1);
-                            
-                            pdf.setTextColor(100, 116, 139);
-                            pdf.setFontSize(8);
-                            pdf.text(`${share}% of total`, x + 12, y + 50);
-                        });
-                        
-                        yPos += 80;
-                    }
-                } catch (error) {
-                    console.error('Territory data error:', error);
-                }
-
-                // Client portfolio analysis
-                pdf.setTextColor(15, 23, 42);
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('Client Portfolio', margin, yPos);
-                
-                pdf.setTextColor(100, 116, 139);
-                pdf.setFontSize(9);
-                pdf.setFont("helvetica", "normal");
-                pdf.text('Top performing accounts', margin, yPos + 8);
-                
-                yPos += 25;
-
-                // Clean client table
-                try {
-                    const response = await fetch(CSV_URL);
-                    const csvText = await response.text();
-                    const allData = parseCSV(csvText);
-                    const clientsData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
-                    
-                    const clientsMap = new Map();
-                    clientsData.forEach(sale => {
-                        const clientName = sale.Ragione_Sociale_Cliente;
-                        const revenue = parseFloat(sale.Fatturato) || 0;
-                        const province = sale.Provincia;
-                        
-                        if (!clientsMap.has(clientName)) {
-                            clientsMap.set(clientName, {
-                                name: clientName,
-                                totalRevenue: 0,
-                                province: province,
-                                categories: new Set()
-                            });
-                        }
-                        
-                        const client = clientsMap.get(clientName);
-                        client.totalRevenue += revenue;
-                        client.categories.add(sale.Categoria_Articoli);
-                    });
-                    
-                    const topClients = Array.from(clientsMap.values())
-                        .sort((a, b) => b.totalRevenue - a.totalRevenue)
-                        .slice(0, 8);
-                    
-                    // Clean table header
-                    pdf.setFillColor(248, 250, 252);
-                    pdf.roundedRect(margin, yPos, contentWidth, 12, 2, 2, 'F');
-                    
-                    pdf.setTextColor(71, 85, 105);
-                    pdf.setFontSize(9);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.text('CLIENT', margin + 8, yPos + 8);
-                    pdf.text('TERRITORY', margin + 100, yPos + 8);
-                    pdf.text('REVENUE', margin + 130, yPos + 8);
-                    pdf.text('SHARE', margin + 160, yPos + 8);
-                    
-                    yPos += 15;
-                    
-                    // Client rows
-                    const totalClientRevenue = topClients.reduce((sum, client) => sum + client.totalRevenue, 0);
-                    
-                    topClients.forEach((client, index) => {
-                        const rowY = yPos + (index * 15);
-                        
-                        // Alternating background
-                        if (index % 2 === 0) {
-                            pdf.setFillColor(252, 252, 253);
-                            pdf.rect(margin, rowY - 2, contentWidth, 15, 'F');
-                        }
-                        
-                        // Client name
-                        pdf.setTextColor(15, 23, 42);
-                        pdf.setFontSize(9);
-                        pdf.setFont("helvetica", "normal");
-                        const clientName = client.name.length > 25 ? client.name.substring(0, 22) + '...' : client.name;
-                        pdf.text(clientName, margin + 8, rowY + 8);
-                        
-                        // Territory
-                        pdf.setTextColor(100, 116, 139);
-                        pdf.setFontSize(8);
-                        pdf.text(client.province, margin + 100, rowY + 8);
-                        
-                        // Revenue
-                        pdf.setTextColor(15, 23, 42);
-                        pdf.setFontSize(10);
-                        pdf.setFont("helvetica", "bold");
-                        pdf.text(`€${(client.totalRevenue / 1000).toFixed(1)}K`, margin + 130, rowY + 8);
-                        
-                        // Share
-                        const share = (client.totalRevenue / totalClientRevenue * 100).toFixed(1);
-                        pdf.setTextColor(100, 116, 139);
-                        pdf.setFontSize(8);
-                        pdf.setFont("helvetica", "normal");
-                        pdf.text(`${share}%`, margin + 160, rowY + 8);
-                    });
-                    
-                } catch (error) {
-                    console.error('Client data error:', error);
-                }
-
-                // ===================== PAGE 3: PRODUCT PERFORMANCE =====================
-                pdf.addPage();
-                addCleanHeader('Product Performance Analysis', 3);
-                yPos = 30;
-                
-                pdf.setTextColor(15, 23, 42);
-                pdf.setFontSize(20);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('Product Categories', margin, yPos);
-                
-                pdf.setTextColor(100, 116, 139);
-                pdf.setFontSize(10);
-                pdf.setFont("helvetica", "normal");
-                pdf.text('Revenue breakdown by product category', margin, yPos + 10);
-                
-                yPos += 30;
-
-                // Product categories analysis
-                try {
-                    const response = await fetch(CSV_URL);
-                    const csvText = await response.text();
-                    const allData = parseCSV(csvText);
-                    const categoriesData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-                    const activeCategories = categoriesData
-                        .filter(cat => parseFloat(cat.Importo_Totale) > 0)
-                        .sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale))
-                        .slice(0, 6);
-                    
-                    if (activeCategories.length > 0) {
-                        const totalCategoryRevenue = activeCategories.reduce((sum, cat) => sum + parseFloat(cat.Importo_Totale), 0);
-                        
-                        // Categories list - analytics style
-                        activeCategories.forEach((cat, index) => {
-                            const rowY = yPos + (index * 35);
-                            const revenue = parseFloat(cat.Importo_Totale);
-                            const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
-                            const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
-                            const totalClients = clientiLT + clientiRM;
-                            const share = (revenue / totalCategoryRevenue * 100).toFixed(1);
-                            
-                            // Clean category card
-                            pdf.setFillColor(249, 250, 251);
-                            pdf.setDrawColor(226, 232, 240);
-                            pdf.setLineWidth(0.5);
-                            pdf.roundedRect(margin, rowY, contentWidth, 30, 4, 4, 'FD');
-                            
-                            // Category name
-                            pdf.setTextColor(71, 85, 105);
-                            pdf.setFontSize(11);
-                            pdf.setFont("helvetica", "bold");
-                            const categoryName = cat.Categoria.replace(/_/g, ' ');
-                            pdf.text(categoryName, margin + 12, rowY + 12);
-                            
-                            // Revenue - prominent
-                            pdf.setTextColor(15, 23, 42);
-                            pdf.setFontSize(18);
-                            pdf.setFont("helvetica", "bold");
-                            pdf.text(`€${Math.round(revenue/1000)}K`, margin + 12, rowY + 24);
-                            
-                            // Share and clients info
-                            pdf.setTextColor(100, 116, 139);
-                            pdf.setFontSize(9);
-                            pdf.setFont("helvetica", "normal");
-                            pdf.text(`${share}% of total`, margin + 80, rowY + 12);
-                            pdf.text(`${totalClients} clients`, margin + 80, rowY + 20);
-                            
-                            // Progress bar
-                            const barWidth = 60;
-                            const barHeight = 6;
-                            const maxRevenue = parseFloat(activeCategories[0].Importo_Totale);
-                            const percentage = revenue / maxRevenue;
-                            
-                            pdf.setFillColor(240, 240, 240);
-                            pdf.roundedRect(margin + 130, rowY + 18, barWidth, barHeight, 3, 3, 'F');
-                            
-                            const colors = [
-                                [59, 130, 246], [139, 92, 246], [6, 214, 160],
-                                [255, 209, 102], [247, 37, 133], [16, 185, 129]
-                            ];
-                            const color = colors[index] || [100, 116, 139];
-                            
-                            pdf.setFillColor(...color);
-                            pdf.roundedRect(margin + 130, rowY + 18, barWidth * percentage, barHeight, 3, 3, 'F');
-                        });
-                    }
-                    
-                } catch (error) {
-                    console.error('Categories data error:', error);
-                }
-
-                // Footer
-                pdf.setFontSize(8);
-                pdf.setTextColor(148, 163, 184);
-                pdf.text(`Sales Analytics Report | Generated ${now.toLocaleDateString('en-GB')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-                
-                // Save with clean naming
-                const fileName = `Sales_Analytics_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 7)}.pdf`;
-                pdf.save(fileName);
-                
-            } catch (error) {
-                console.error('PDF generation error:', error);
-                alert('Errore nella generazione del report PDF. Si prega di riprovare.');
-            } finally {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-            
-            const provinceSelectorBtn = document.getElementById('provinceSelectorBtn');
-            const provinceModal = document.getElementById('provinceModal');
-            const modalClose = document.getElementById('modalClose');
-            const modalCancel = document.getElementById('modalCancel');
-            const chevronIcon = document.querySelector('.chevron-icon');
-            
-            provinceSelectorBtn.addEventListener('click', () => {
-                provinceModal.classList.add('show');
-                provinceSelectorBtn.classList.add('active');
-                chevronIcon.classList.add('rotated');
-                document.body.style.overflow = 'hidden';
-            });
-            
-            function closeModal() {
-                provinceModal.classList.remove('show');
-                provinceSelectorBtn.classList.remove('active');
-                chevronIcon.classList.remove('rotated');
-                document.body.style.overflow = '';
-            }
-            
-            modalClose.addEventListener('click', closeModal);
-            modalCancel.addEventListener('click', closeModal);
-            
-            provinceModal.addEventListener('click', (e) => {
-                if (e.target === provinceModal) {
-                    closeModal();
-                }
-            });
-            
-            const provinceOptions = document.querySelectorAll('.province-option');
-            
-            provinceOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    provinceOptions.forEach(opt => opt.classList.remove('selected'));
-                    
-                    option.classList.add('selected');
-                    
-                    const value = option.dataset.value;
-                    selectedProvince = value;
-                    
-                    const selectedText = document.getElementById('selectedProvinceText');
-                    const selectedSubtext = document.getElementById('selectedProvinceSubtext');
-                    
-                    if (value === 'all') {
-                        selectedText.textContent = 'Tutte le Province';
-                        selectedSubtext.textContent = 'Panoramica completa';
-                    } else if (value === 'LT') {
-                        selectedText.textContent = 'Latina';
-                        selectedSubtext.textContent = '60k • 18 clienti';
-                    } else if (value === 'RM') {
-                        selectedText.textContent = 'Roma';
-                        selectedSubtext.textContent = '8k • 2 clienti';
-                    }
-                    
-                    updateDashboard();
-                    
-                    setTimeout(() => {
-                        closeModal();
-                    }, 200);
-                });
-            });
-            
-            document.getElementById('downloadPDF').addEventListener('click', async () => {
-                await generatePDF();
-            });
-
-            document.getElementById('downloadExcel').addEventListener('click', async () => {
-                await generateExcel();
-            });
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && provinceModal.classList.contains('show')) {
-                    closeModal();
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+            // Converti in array e ordina per fatturato
+            const clientsArray = Array.from(clients
