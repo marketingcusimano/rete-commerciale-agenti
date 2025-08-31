@@ -2346,7 +2346,7 @@
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="animate-spin">
                     <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364.843l8-8.5a.5.5 0 0 1 .615-.090z"/>
                 </svg>
-                Generando Report Executive...
+                Generando Analytics Report...
             `;
             button.disabled = true;
 
@@ -2363,253 +2363,164 @@
                 const now = new Date();
                 const generalData = currentData.find(d => d.Provincia === 'Generale');
 
-                function addPageHeader(pageNumber, totalPages, title) {
-                    pdf.setFillColor(15, 23, 42);
-                    pdf.rect(0, 0, pageWidth, 18, 'F');
+                // Clean page header function
+                function addCleanHeader(title, pageNum) {
+                    pdf.setFillColor(248, 250, 252);
+                    pdf.rect(0, 0, pageWidth, 15, 'F');
                     
-                    pdf.setTextColor(255, 255, 255);
-                    pdf.setFontSize(9);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.text('PERFORMANCE ANALYTICS', 15, 12);
-                    
-                    pdf.setFontSize(8);
+                    pdf.setTextColor(71, 85, 105);
+                    pdf.setFontSize(10);
                     pdf.setFont("helvetica", "normal");
-                    pdf.text(`${title} | ${now.toLocaleDateString('en-GB')} | Page ${pageNumber}/${totalPages}`, pageWidth - 15, 12, { align: 'right' });
+                    pdf.text(title, margin, 10);
                     
-                    pdf.setDrawColor(59, 130, 246);
-                    pdf.setLineWidth(1);
-                    pdf.line(0, 18, pageWidth, 18);
+                    pdf.setTextColor(148, 163, 184);
+                    pdf.setFontSize(8);
+                    pdf.text(`Page ${pageNum} | ${now.toLocaleDateString('en-GB')}`, pageWidth - margin, 10, { align: 'right' });
+                    
+                    pdf.setDrawColor(226, 232, 240);
+                    pdf.setLineWidth(0.5);
+                    pdf.line(0, 15, pageWidth, 15);
                 }
 
-                // COVER PAGE
-                for (let i = 0; i < 80; i++) {
-                    const opacity = 0.8 - (i / 100);
-                    const blue = 15 + (i * 0.5);
-                    pdf.setFillColor(blue, blue + 10, blue + 27, opacity);
-                    pdf.rect(0, i, pageWidth, 1, 'F');
-                }
-                
-                pdf.setFillColor(255, 255, 255, 0.95);
-                pdf.roundedRect(margin, 25, 80, 35, 8, 8, 'F');
-                pdf.setFillColor(59, 130, 246);
-                pdf.roundedRect(margin + 10, 35, 60, 15, 4, 4, 'F');
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(12);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('ANALYTICS', margin + 40, 45, { align: 'center' });
-                
-                pdf.setFillColor(239, 68, 68);
-                pdf.roundedRect(pageWidth - margin - 50, 25, 45, 10, 3, 3, 'F');
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(8);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('CONFIDENTIAL', pageWidth - margin - 27.5, 31, { align: 'center' });
-                
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(42);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('EXECUTIVE', pageWidth / 2, 100, { align: 'center' });
-                pdf.setFontSize(32);
-                pdf.text('PERFORMANCE', pageWidth / 2, 120, { align: 'center' });
-                pdf.setFontSize(28);
-                pdf.text('REPORT', pageWidth / 2, 140, { align: 'center' });
-                
-                pdf.setFillColor(0, 0, 0, 0.1);
-                pdf.roundedRect(margin + 2, 162, contentWidth, 60, 12, 12, 'F');
+                // ===================== PAGE 1: EXECUTIVE OVERVIEW =====================
                 pdf.setFillColor(255, 255, 255);
-                pdf.roundedRect(margin, 160, contentWidth, 60, 12, 12, 'F');
+                pdf.rect(0, 0, pageWidth, pageHeight, 'F');
                 
+                // Clean header
                 pdf.setTextColor(15, 23, 42);
                 pdf.setFontSize(24);
                 pdf.setFont("helvetica", "bold");
-                pdf.text(agentInfo.nome, margin + 20, 180);
+                pdf.text('SALES PERFORMANCE REPORT', margin, yPos);
                 
-                const col1X = margin + 20;
-                const col2X = margin + contentWidth/2 + 10;
-                
-                pdf.setFontSize(10);
-                pdf.setTextColor(71, 85, 105);
+                pdf.setTextColor(100, 116, 139);
+                pdf.setFontSize(12);
                 pdf.setFont("helvetica", "normal");
-                pdf.text('POSITION:', col1X, 195);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('Senior Sales Representative', col1X + 25, 195);
-                
-                pdf.setFont("helvetica", "normal");
-                pdf.text('AGENT CODE:', col1X, 202);
-                pdf.setFont("helvetica", "bold");
-                pdf.text(agentInfo.codice, col1X + 30, 202);
-                
-                pdf.setFont("helvetica", "normal");
-                pdf.text('TERRITORY:', col1X, 209);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('Lazio Region (LT, RM)', col1X + 25, 209);
-                
-                pdf.setFont("helvetica", "normal");
-                pdf.text('REPORT PERIOD:', col2X, 195);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('January - August 2025', col2X + 35, 195);
-                
-                pdf.setFont("helvetica", "normal");
-                pdf.text('GENERATION DATE:', col2X, 202);
-                pdf.setFont("helvetica", "bold");
-                pdf.text(now.toLocaleDateString('en-GB'), col2X + 40, 202);
-                
-                pdf.setFont("helvetica", "normal");
-                pdf.text('STATUS:', col2X, 209);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(34, 197, 94);
-                pdf.text('ACTIVE', col2X + 20, 209);
-                
-                yPos = 240;
-                pdf.setFillColor(239, 246, 255);
-                pdf.roundedRect(margin, yPos, contentWidth, 35, 8, 8, 'F');
-                
-                pdf.setTextColor(30, 58, 138);
-                pdf.setFontSize(14);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('EXECUTIVE SUMMARY', margin + 15, yPos + 15);
-                
-                if (generalData) {
-                    const growth = ((generalData.Anno_Corrente - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100);
-                    pdf.setFontSize(10);
-                    pdf.setFont("helvetica", "normal");
-                    pdf.text(`Revenue: €${(generalData.Anno_Corrente/1000).toFixed(0)}K | Growth: ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% | Clients: ${generalData.Clienti_Anno_Corrente}`, margin + 15, yPos + 25);
-                }
-                
-                pdf.setFontSize(7);
-                pdf.setTextColor(148, 163, 184);
-                pdf.text('This document contains confidential business information. Distribution limited to executive management.', pageWidth / 2, pageHeight - 10, { align: 'center' });
-                
-                // PAGE 2: OVERVIEW & METRICS
-                pdf.addPage();
-                addPageHeader(2, 5, 'Financial Overview');
-                yPos = 35;
-                
-                pdf.setFillColor(59, 130, 246);
-                pdf.rect(margin, yPos, 4, 15, 'F');
-                pdf.setTextColor(15, 23, 42);
-                pdf.setFontSize(20);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('FINANCIAL OVERVIEW & KEY METRICS', margin + 10, yPos + 10);
+                pdf.text(`${agentInfo.nome} | Jan - Aug 2025`, margin, yPos + 10);
                 
                 yPos += 30;
-                
+
+                // Key metrics cards - analytics style
                 if (generalData) {
                     const currentRevenue = generalData.Anno_Corrente;
                     const previousRevenue = generalData.Anno_Precedente;
                     const growth = ((currentRevenue - previousRevenue) / previousRevenue * 100);
                     const targetProgress = generalData.Obiettivo > 0 ? (currentRevenue / generalData.Obiettivo * 100) : 0;
                     
-                    const kpiCards = [
-                        { 
-                            label: 'TOTAL REVENUE', 
-                            value: `€${(currentRevenue/1000).toFixed(0)}K`, 
-                            subtext: `€${(previousRevenue/1000).toFixed(0)}K prev. year`,
-                            color: [34, 197, 94],
-                            icon: '€'
+                    const metrics = [
+                        {
+                            title: 'Total Revenue',
+                            subtitle: 'Current Period',
+                            value: `€${Math.round(currentRevenue / 1000)}K`,
+                            change: `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%`,
+                            changeColor: growth >= 0 ? [34, 197, 94] : [239, 68, 68],
+                            prevValue: `€${Math.round(previousRevenue / 1000)}K`
                         },
-                        { 
-                            label: 'GROWTH RATE', 
-                            value: `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%`, 
-                            subtext: 'Year-over-Year',
-                            color: growth >= 0 ? [34, 197, 94] : [239, 68, 68],
-                            icon: growth >= 0 ? '↗' : '↘'
+                        {
+                            title: 'Active Clients', 
+                            subtitle: 'Portfolio Size',
+                            value: `${generalData.Clienti_Anno_Corrente}`,
+                            change: `${generalData.Clienti_Anno_Corrente - generalData.Clienti_Anno_Precedente >= 0 ? '+' : ''}${generalData.Clienti_Anno_Corrente - generalData.Clienti_Anno_Precedente}`,
+                            changeColor: [59, 130, 246],
+                            prevValue: `${generalData.Clienti_Anno_Precedente} prev`
                         },
-                        { 
-                            label: 'ACTIVE CLIENTS', 
-                            value: `${generalData.Clienti_Anno_Corrente}`, 
-                            subtext: `${generalData.Clienti_Anno_Precedente} last year`,
-                            color: [59, 130, 246],
-                            icon: '👥'
+                        {
+                            title: 'Target Progress',
+                            subtitle: 'Achievement Rate', 
+                            value: `${targetProgress.toFixed(0)}%`,
+                            change: generalData.Obiettivo > 0 ? `of €${Math.round(generalData.Obiettivo / 1000)}K` : 'No target',
+                            changeColor: targetProgress >= 80 ? [34, 197, 94] : [245, 158, 11],
+                            prevValue: 'target'
                         },
-                        { 
-                            label: 'TARGET PROGRESS', 
-                            value: `${targetProgress.toFixed(0)}%`, 
-                            subtext: generalData.Obiettivo > 0 ? `of €${(generalData.Obiettivo/1000).toFixed(0)}K target` : 'No target set',
-                            color: targetProgress >= 80 ? [34, 197, 94] : [245, 158, 11],
-                            icon: '🎯'
+                        {
+                            title: 'Growth Rate',
+                            subtitle: 'Year over Year',
+                            value: `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%`,
+                            change: growth >= 0 ? 'Positive' : 'Negative',
+                            changeColor: growth >= 0 ? [34, 197, 94] : [239, 68, 68],
+                            prevValue: 'trend'
                         }
                     ];
                     
-                    const cardWidth = (contentWidth - 15) / 2;
-                    const cardHeight = 40;
+                    const cardWidth = (contentWidth - 20) / 2;
+                    const cardHeight = 45;
                     
-                    kpiCards.forEach((card, index) => {
-                        const x = margin + (index % 2) * (cardWidth + 15);
-                        const y = yPos + Math.floor(index / 2) * (cardHeight + 10);
+                    metrics.forEach((metric, index) => {
+                        const x = margin + (index % 2) * (cardWidth + 20);
+                        const y = yPos + Math.floor(index / 2) * (cardHeight + 15);
                         
-                        pdf.setFillColor(0, 0, 0, 0.08);
-                        pdf.roundedRect(x + 1, y + 1, cardWidth, cardHeight, 6, 6, 'F');
-                        
-                        pdf.setFillColor(255, 255, 255);
-                        pdf.setDrawColor(...card.color);
+                        // Clean card background
+                        pdf.setFillColor(249, 250, 251);
+                        pdf.setDrawColor(226, 232, 240);
                         pdf.setLineWidth(0.5);
-                        pdf.roundedRect(x, y, cardWidth, cardHeight, 6, 6, 'FD');
+                        pdf.roundedRect(x, y, cardWidth, cardHeight, 4, 4, 'FD');
                         
-                        pdf.setFillColor(...card.color);
-                        pdf.circle(x + 15, y + 12, 8, 'F');
-                        pdf.setTextColor(255, 255, 255);
-                        pdf.setFontSize(12);
-                        pdf.text(card.icon, x + 15, y + 15, { align: 'center' });
-                        
+                        // Card content
                         pdf.setTextColor(100, 116, 139);
-                        pdf.setFontSize(8);
-                        pdf.setFont("helvetica", "bold");
-                        pdf.text(card.label, x + 30, y + 8);
+                        pdf.setFontSize(9);
+                        pdf.setFont("helvetica", "normal");
+                        pdf.text(metric.title, x + 12, y + 12);
                         
+                        pdf.setTextColor(148, 163, 184);
+                        pdf.setFontSize(7);
+                        pdf.text(metric.subtitle, x + 12, y + 18);
+                        
+                        // Main value - bold and large
                         pdf.setTextColor(15, 23, 42);
-                        pdf.setFontSize(18);
+                        pdf.setFontSize(22);
                         pdf.setFont("helvetica", "bold");
-                        pdf.text(card.value, x + 30, y + 20);
+                        pdf.text(metric.value, x + 12, y + 32);
                         
-                        pdf.setTextColor(100, 116, 139);
+                        // Change indicator
+                        pdf.setTextColor(...metric.changeColor);
+                        pdf.setFontSize(9);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text(metric.change, x + cardWidth - 12, y + 25, { align: 'right' });
+                        
+                        pdf.setTextColor(148, 163, 184);
                         pdf.setFontSize(7);
                         pdf.setFont("helvetica", "normal");
-                        pdf.text(card.subtext, x + 30, y + 28);
-                        
-                        if (card.label === 'TARGET PROGRESS' && targetProgress > 0) {
-                            const barWidth = cardWidth - 60;
-                            const barHeight = 4;
-                            const barY = y + 32;
-                            
-                            pdf.setFillColor(240, 240, 240);
-                            pdf.roundedRect(x + 30, barY, barWidth, barHeight, 2, 2, 'F');
-                            
-                            pdf.setFillColor(...card.color);
-                            const progressWidth = Math.min(barWidth * (targetProgress / 100), barWidth);
-                            pdf.roundedRect(x + 30, barY, progressWidth, barHeight, 2, 2, 'F');
-                        }
+                        pdf.text(metric.prevValue, x + cardWidth - 12, y + 32, { align: 'right' });
                     });
                     
-                    yPos += 100;
+                    yPos += 120;
                 }
-                
+
+                // Revenue composition section
                 pdf.setTextColor(15, 23, 42);
                 pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
-                pdf.text('REVENUE COMPOSITION ANALYSIS', margin, yPos);
-                yPos += 20;
+                pdf.text('Revenue Composition', margin, yPos);
                 
+                pdf.setTextColor(100, 116, 139);
+                pdf.setFontSize(9);
+                pdf.setFont("helvetica", "normal");
+                pdf.text('Product category breakdown', margin, yPos + 8);
+                
+                yPos += 25;
+
+                // Chart with clean layout
                 if (fatturato_chart) {
                     try {
                         const chartCanvas = document.getElementById('fatturato-chart');
                         const chartImage = await html2canvas(chartCanvas, {
                             backgroundColor: '#ffffff',
-                            scale: 5,
+                            scale: 4,
                             useCORS: true,
-                            logging: false,
-                            allowTaint: false
+                            logging: false
                         });
                         
                         const chartImgData = chartImage.toDataURL('image/png', 1.0);
-                        const chartSize = 80;
+                        const chartSize = 70;
                         
-                        pdf.setFillColor(249, 250, 251);
+                        // Chart container
+                        pdf.setFillColor(255, 255, 255);
                         pdf.setDrawColor(226, 232, 240);
-                        pdf.roundedRect(margin, yPos, chartSize + 10, chartSize + 10, 8, 8, 'FD');
-                        pdf.addImage(chartImgData, 'PNG', margin + 5, yPos + 5, chartSize, chartSize);
+                        pdf.setLineWidth(0.5);
+                        pdf.roundedRect(margin, yPos, chartSize + 20, chartSize + 20, 4, 4, 'FD');
+                        pdf.addImage(chartImgData, 'PNG', margin + 10, yPos + 10, chartSize, chartSize);
                         
-                        const tableX = margin + chartSize + 25;
+                        // Clean data table
+                        const tableX = margin + chartSize + 40;
                         
                         const response = await fetch(CSV_URL);
                         const csvText = await response.text();
@@ -2627,53 +2538,340 @@
                         
                         const total = pieniValue + altroValue;
                         
-                        pdf.setFillColor(255, 255, 255);
-                        pdf.setDrawColor(226, 232, 240);
-                        pdf.roundedRect(tableX, yPos, 85, 60, 8, 8, 'FD');
-                        
-                        pdf.setFillColor(71, 85, 105);
-                        pdf.roundedRect(tableX + 5, yPos + 5, 75, 12, 4, 4, 'F');
-                        pdf.setTextColor(255, 255, 255);
-                        pdf.setFontSize(10);
-                        pdf.setFont("helvetica", "bold");
-                        pdf.text('REVENUE BREAKDOWN', tableX + 42.5, yPos + 13, { align: 'center' });
-                        
+                        // Analytics-style data presentation
                         const categories = [
                             { name: 'Pieni e Coppi', value: pieniValue, color: [59, 130, 246] },
-                            { name: 'Altri Prodotti', value: altroValue, color: [139, 92, 246] }
+                            { name: 'Other Products', value: altroValue, color: [139, 92, 246] }
                         ];
                         
                         categories.forEach((cat, index) => {
-                            const rowY = yPos + 25 + (index * 15);
+                            const rowY = yPos + 20 + (index * 25);
+                            
+                            // Category indicator
+                            pdf.setFillColor(...cat.color);
+                            pdf.circle(tableX, rowY, 4, 'F');
+                            
+                            // Category name
+                            pdf.setTextColor(71, 85, 105);
+                            pdf.setFontSize(11);
+                            pdf.setFont("helvetica", "bold");
+                            pdf.text(cat.name, tableX + 12, rowY + 2);
+                            
+                            // Value - large and prominent
+                            pdf.setTextColor(15, 23, 42);
+                            pdf.setFontSize(18);
+                            pdf.setFont("helvetica", "bold");
+                            pdf.text(`€${(cat.value/1000).toFixed(0)}K`, tableX + 12, rowY + 12);
+                            
+                            // Percentage
+                            pdf.setTextColor(100, 116, 139);
+                            pdf.setFontSize(9);
+                            pdf.setFont("helvetica", "normal");
+                            pdf.text(`${(cat.value/total*100).toFixed(1)}%`, tableX + 60, rowY + 12);
+                            
+                            // Progress bar
+                            const barWidth = 40;
+                            const barHeight = 6;
+                            const percentage = cat.value / total;
+                            
+                            pdf.setFillColor(240, 240, 240);
+                            pdf.roundedRect(tableX + 75, rowY + 8, barWidth, barHeight, 3, 3, 'F');
                             
                             pdf.setFillColor(...cat.color);
-                            pdf.circle(tableX + 12, rowY, 3, 'F');
-                            
-                            pdf.setTextColor(15, 23, 42);
-                            pdf.setFontSize(9);
-                            pdf.setFont("helvetica", "bold");
-                            pdf.text(cat.name, tableX + 18, rowY + 2);
-                            
-                            pdf.setTextColor(34, 197, 94);
-                            pdf.setFontSize(12);
-                            pdf.setFont("helvetica", "bold");
-                            pdf.text(`€${(cat.value/1000).toFixed(0)}K`, tableX + 18, rowY + 8);
-                            
-                            pdf.setTextColor(100, 116, 139);
-                            pdf.setFontSize(8);
-                            pdf.setFont("helvetica", "normal");
-                            pdf.text(`${(cat.value/total*100).toFixed(1)}%`, tableX + 60, rowY + 8);
+                            pdf.roundedRect(tableX + 75, rowY + 8, barWidth * percentage, barHeight, 3, 3, 'F');
                         });
                         
                     } catch (error) {
-                        console.error('Revenue chart error:', error);
+                        console.error('Chart error:', error);
                     }
                 }
+
+                // ===================== PAGE 2: TERRITORIAL PERFORMANCE =====================
+                pdf.addPage();
+                addCleanHeader('Territorial Performance Analysis', 2);
+                yPos = 30;
                 
-                // Continue with remaining pages...
-                // [Additional pages would be added here with similar structure]
+                pdf.setTextColor(15, 23, 42);
+                pdf.setFontSize(20);
+                pdf.setFont("helvetica", "bold");
+                pdf.text('Territorial Performance', margin, yPos);
                 
-                const fileName = `Executive_Performance_Report_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 7)}.pdf`;
+                pdf.setTextColor(100, 116, 139);
+                pdf.setFontSize(10);
+                pdf.setFont("helvetica", "normal");
+                pdf.text('Geographic distribution and client analysis', margin, yPos + 10);
+                
+                yPos += 30;
+
+                // Territory metrics
+                try {
+                    const response = await fetch(CSV_URL);
+                    const csvText = await response.text();
+                    const allData = parseCSV(csvText);
+                    const provinceData = allData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
+                    
+                    if (provinceData.length > 0) {
+                        const territories = [];
+                        provinceData.forEach(prov => {
+                            const clients = parseInt(prov.Clienti_Serviti) || 0;
+                            const revenue = parseFloat(prov.Fatturato) || 0;
+                            territories.push({
+                                name: prov.Provincia === 'LT' ? 'Latina' : 'Roma',
+                                code: prov.Provincia,
+                                clients: clients,
+                                revenue: revenue,
+                                avgPerClient: clients > 0 ? revenue / clients : 0
+                            });
+                        });
+                        
+                        // Territory cards
+                        const cardWidth = (contentWidth - 20) / 2;
+                        const cardHeight = 60;
+                        
+                        territories.forEach((territory, index) => {
+                            const x = margin + (index % 2) * (cardWidth + 20);
+                            const y = yPos;
+                            
+                            // Clean territory card
+                            pdf.setFillColor(249, 250, 251);
+                            pdf.setDrawColor(226, 232, 240);
+                            pdf.setLineWidth(0.5);
+                            pdf.roundedRect(x, y, cardWidth, cardHeight, 4, 4, 'FD');
+                            
+                            // Territory header
+                            pdf.setTextColor(71, 85, 105);
+                            pdf.setFontSize(14);
+                            pdf.setFont("helvetica", "bold");
+                            pdf.text(`${territory.name} (${territory.code})`, x + 12, y + 15);
+                            
+                            // Metrics grid
+                            pdf.setTextColor(100, 116, 139);
+                            pdf.setFontSize(8);
+                            pdf.setFont("helvetica", "normal");
+                            pdf.text('CLIENTS', x + 12, y + 28);
+                            pdf.text('REVENUE', x + 60, y + 28);
+                            pdf.text('AVG/CLIENT', x + 110, y + 28);
+                            
+                            // Values
+                            pdf.setTextColor(15, 23, 42);
+                            pdf.setFontSize(16);
+                            pdf.setFont("helvetica", "bold");
+                            pdf.text(`${territory.clients}`, x + 12, y + 40);
+                            pdf.text(`€${(territory.revenue/1000).toFixed(0)}K`, x + 60, y + 40);
+                            pdf.text(`€${(territory.avgPerClient/1000).toFixed(1)}K`, x + 110, y + 40);
+                            
+                            // Market share indicator
+                            const totalRevenue = territories.reduce((sum, t) => sum + t.revenue, 0);
+                            const share = (territory.revenue / totalRevenue * 100).toFixed(1);
+                            
+                            pdf.setTextColor(100, 116, 139);
+                            pdf.setFontSize(8);
+                            pdf.text(`${share}% of total`, x + 12, y + 50);
+                        });
+                        
+                        yPos += 80;
+                    }
+                } catch (error) {
+                    console.error('Territory data error:', error);
+                }
+
+                // Client portfolio analysis
+                pdf.setTextColor(15, 23, 42);
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.text('Client Portfolio', margin, yPos);
+                
+                pdf.setTextColor(100, 116, 139);
+                pdf.setFontSize(9);
+                pdf.setFont("helvetica", "normal");
+                pdf.text('Top performing accounts', margin, yPos + 8);
+                
+                yPos += 25;
+
+                // Clean client table
+                try {
+                    const response = await fetch(CSV_URL);
+                    const csvText = await response.text();
+                    const allData = parseCSV(csvText);
+                    const clientsData = allData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+                    
+                    const clientsMap = new Map();
+                    clientsData.forEach(sale => {
+                        const clientName = sale.Ragione_Sociale_Cliente;
+                        const revenue = parseFloat(sale.Fatturato) || 0;
+                        const province = sale.Provincia;
+                        
+                        if (!clientsMap.has(clientName)) {
+                            clientsMap.set(clientName, {
+                                name: clientName,
+                                totalRevenue: 0,
+                                province: province,
+                                categories: new Set()
+                            });
+                        }
+                        
+                        const client = clientsMap.get(clientName);
+                        client.totalRevenue += revenue;
+                        client.categories.add(sale.Categoria_Articoli);
+                    });
+                    
+                    const topClients = Array.from(clientsMap.values())
+                        .sort((a, b) => b.totalRevenue - a.totalRevenue)
+                        .slice(0, 8);
+                    
+                    // Clean table header
+                    pdf.setFillColor(248, 250, 252);
+                    pdf.roundedRect(margin, yPos, contentWidth, 12, 2, 2, 'F');
+                    
+                    pdf.setTextColor(71, 85, 105);
+                    pdf.setFontSize(9);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text('CLIENT', margin + 8, yPos + 8);
+                    pdf.text('TERRITORY', margin + 100, yPos + 8);
+                    pdf.text('REVENUE', margin + 130, yPos + 8);
+                    pdf.text('SHARE', margin + 160, yPos + 8);
+                    
+                    yPos += 15;
+                    
+                    // Client rows
+                    const totalClientRevenue = topClients.reduce((sum, client) => sum + client.totalRevenue, 0);
+                    
+                    topClients.forEach((client, index) => {
+                        const rowY = yPos + (index * 15);
+                        
+                        // Alternating background
+                        if (index % 2 === 0) {
+                            pdf.setFillColor(252, 252, 253);
+                            pdf.rect(margin, rowY - 2, contentWidth, 15, 'F');
+                        }
+                        
+                        // Client name
+                        pdf.setTextColor(15, 23, 42);
+                        pdf.setFontSize(9);
+                        pdf.setFont("helvetica", "normal");
+                        const clientName = client.name.length > 25 ? client.name.substring(0, 22) + '...' : client.name;
+                        pdf.text(clientName, margin + 8, rowY + 8);
+                        
+                        // Territory
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.setFontSize(8);
+                        pdf.text(client.province, margin + 100, rowY + 8);
+                        
+                        // Revenue
+                        pdf.setTextColor(15, 23, 42);
+                        pdf.setFontSize(10);
+                        pdf.setFont("helvetica", "bold");
+                        pdf.text(`€${(client.totalRevenue / 1000).toFixed(1)}K`, margin + 130, rowY + 8);
+                        
+                        // Share
+                        const share = (client.totalRevenue / totalClientRevenue * 100).toFixed(1);
+                        pdf.setTextColor(100, 116, 139);
+                        pdf.setFontSize(8);
+                        pdf.setFont("helvetica", "normal");
+                        pdf.text(`${share}%`, margin + 160, rowY + 8);
+                    });
+                    
+                } catch (error) {
+                    console.error('Client data error:', error);
+                }
+
+                // ===================== PAGE 3: PRODUCT PERFORMANCE =====================
+                pdf.addPage();
+                addCleanHeader('Product Performance Analysis', 3);
+                yPos = 30;
+                
+                pdf.setTextColor(15, 23, 42);
+                pdf.setFontSize(20);
+                pdf.setFont("helvetica", "bold");
+                pdf.text('Product Categories', margin, yPos);
+                
+                pdf.setTextColor(100, 116, 139);
+                pdf.setFontSize(10);
+                pdf.setFont("helvetica", "normal");
+                pdf.text('Revenue breakdown by product category', margin, yPos + 10);
+                
+                yPos += 30;
+
+                // Product categories analysis
+                try {
+                    const response = await fetch(CSV_URL);
+                    const csvText = await response.text();
+                    const allData = parseCSV(csvText);
+                    const categoriesData = allData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
+                    const activeCategories = categoriesData
+                        .filter(cat => parseFloat(cat.Importo_Totale) > 0)
+                        .sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale))
+                        .slice(0, 6);
+                    
+                    if (activeCategories.length > 0) {
+                        const totalCategoryRevenue = activeCategories.reduce((sum, cat) => sum + parseFloat(cat.Importo_Totale), 0);
+                        
+                        // Categories list - analytics style
+                        activeCategories.forEach((cat, index) => {
+                            const rowY = yPos + (index * 35);
+                            const revenue = parseFloat(cat.Importo_Totale);
+                            const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
+                            const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
+                            const totalClients = clientiLT + clientiRM;
+                            const share = (revenue / totalCategoryRevenue * 100).toFixed(1);
+                            
+                            // Clean category card
+                            pdf.setFillColor(249, 250, 251);
+                            pdf.setDrawColor(226, 232, 240);
+                            pdf.setLineWidth(0.5);
+                            pdf.roundedRect(margin, rowY, contentWidth, 30, 4, 4, 'FD');
+                            
+                            // Category name
+                            pdf.setTextColor(71, 85, 105);
+                            pdf.setFontSize(11);
+                            pdf.setFont("helvetica", "bold");
+                            const categoryName = cat.Categoria.replace(/_/g, ' ');
+                            pdf.text(categoryName, margin + 12, rowY + 12);
+                            
+                            // Revenue - prominent
+                            pdf.setTextColor(15, 23, 42);
+                            pdf.setFontSize(18);
+                            pdf.setFont("helvetica", "bold");
+                            pdf.text(`€${Math.round(revenue/1000)}K`, margin + 12, rowY + 24);
+                            
+                            // Share and clients info
+                            pdf.setTextColor(100, 116, 139);
+                            pdf.setFontSize(9);
+                            pdf.setFont("helvetica", "normal");
+                            pdf.text(`${share}% of total`, margin + 80, rowY + 12);
+                            pdf.text(`${totalClients} clients`, margin + 80, rowY + 20);
+                            
+                            // Progress bar
+                            const barWidth = 60;
+                            const barHeight = 6;
+                            const maxRevenue = parseFloat(activeCategories[0].Importo_Totale);
+                            const percentage = revenue / maxRevenue;
+                            
+                            pdf.setFillColor(240, 240, 240);
+                            pdf.roundedRect(margin + 130, rowY + 18, barWidth, barHeight, 3, 3, 'F');
+                            
+                            const colors = [
+                                [59, 130, 246], [139, 92, 246], [6, 214, 160],
+                                [255, 209, 102], [247, 37, 133], [16, 185, 129]
+                            ];
+                            const color = colors[index] || [100, 116, 139];
+                            
+                            pdf.setFillColor(...color);
+                            pdf.roundedRect(margin + 130, rowY + 18, barWidth * percentage, barHeight, 3, 3, 'F');
+                        });
+                    }
+                    
+                } catch (error) {
+                    console.error('Categories data error:', error);
+                }
+
+                // Footer
+                pdf.setFontSize(8);
+                pdf.setTextColor(148, 163, 184);
+                pdf.text(`Sales Analytics Report | Generated ${now.toLocaleDateString('en-GB')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                
+                // Save with clean naming
+                const fileName = `Sales_Analytics_${agentInfo.nome.replace(/\s+/g, '_')}_${now.toISOString().slice(0, 7)}.pdf`;
                 pdf.save(fileName);
                 
             } catch (error) {
