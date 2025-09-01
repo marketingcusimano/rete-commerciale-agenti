@@ -1252,15 +1252,28 @@
                 
                 // Foglio 4: Agenti Scansionati
                 const scannedData = [
-                    ['NOME_FILE', 'STATUS', 'TROVATO']
+                    ['NOME_FILE', 'STATUS', 'TROVATO', 'TIPO']
                 ];
                 
-                POSSIBLE_AGENTS.forEach(agentName => {
+                // Prima mostra gli agenti noti
+                KNOWN_AGENTS.forEach(agentName => {
                     const isActive = activeAgents.some(a => a.agentName === agentName);
                     scannedData.push([
                         agentName + '.csv',
                         isActive ? 'ATTIVO' : 'NON TROVATO',
-                        isActive ? 'SI' : 'NO'
+                        isActive ? 'SI' : 'NO',
+                        'PRINCIPALE'
+                    ]);
+                });
+                
+                // Poi mostra gli agenti aggiuntivi testati
+                ADDITIONAL_POSSIBLE_AGENTS.slice(0, 5).forEach(agentName => {
+                    const isActive = activeAgents.some(a => a.agentName === agentName);
+                    scannedData.push([
+                        agentName + '.csv',
+                        isActive ? 'ATTIVO' : 'NON TESTATO',
+                        isActive ? 'SI' : 'NO',
+                        'AGGIUNTIVO'
                     ]);
                 });
                 
@@ -1327,18 +1340,22 @@
         // Configurazione del sistema multi-agente
         const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/';
         
-        // Lista dei possibili nomi di file CSV (fino a 40 agenti)
-        const POSSIBLE_AGENTS = [
-            'CARABOT', 'G2G', 'CINTI', 'RAPPRESENTANZE',
-            'AGENTE_01', 'AGENTE_02', 'AGENTE_03', 'AGENTE_04', 'AGENTE_05',
-            'AGENTE_06', 'AGENTE_07', 'AGENTE_08', 'AGENTE_09', 'AGENTE_10',
-            'AGENTE_11', 'AGENTE_12', 'AGENTE_13', 'AGENTE_14', 'AGENTE_15',
-            'AGENTE_16', 'AGENTE_17', 'AGENTE_18', 'AGENTE_19', 'AGENTE_20',
-            'AGENTE_21', 'AGENTE_22', 'AGENTE_23', 'AGENTE_24', 'AGENTE_25',
-            'AGENTE_26', 'AGENTE_27', 'AGENTE_28', 'AGENTE_29', 'AGENTE_30',
-            'AGENTE_31', 'AGENTE_32', 'AGENTE_33', 'AGENTE_34', 'AGENTE_35',
-            'AGENTE_36', 'AGENTE_37', 'AGENTE_38', 'AGENTE_39', 'AGENTE_40'
+        // Lista dei file CSV noti (aggiungine altri quando li crei)
+        const KNOWN_AGENTS = [
+            'CARABOT',
+            'G2G', 
+            'CINTI',
+            'RAPPRESENTANZE'
         ];
+        
+        // Estendi questa lista quando aggiungi nuovi agenti
+        const ADDITIONAL_POSSIBLE_AGENTS = [
+            'AGENTE_01', 'AGENTE_02', 'AGENTE_03', 'AGENTE_04', 'AGENTE_05',
+            'AGENTE_06', 'AGENTE_07', 'AGENTE_08', 'AGENTE_09', 'AGENTE_10'
+        ];
+        
+        // Combina gli agenti noti con quelli aggiuntivi
+        const ALL_POSSIBLE_AGENTS = [...KNOWN_AGENTS, ...ADDITIONAL_POSSIBLE_AGENTS];
         
         // Dati globali
         let allAgentsData = [];
@@ -1447,46 +1464,96 @@
         // Scansiona e carica tutti gli agenti disponibili
         async function scanAndLoadAgents() {
             try {
-                updateStatusIndicator('loading', 'Scansione agenti...');
-                updateLoadingText('Scansione repository per agenti disponibili...');
-                updateLoadingProgress(10, 'Controllo file CSV disponibili...');
+                updateStatusIndicator('loading', 'Inizializzazione...');
+                updateLoadingText('Controllo agenti noti...');
+                updateLoadingProgress(5, 'Preparazione sistema multi-agente...');
 
-                const agentPromises = POSSIBLE_AGENTS.map(async (agentName, index) => {
+                console.log('Inizio scansione agenti:', KNOWN_AGENTS);
+                
+                // Prima prova con gli agenti noti
+                updateLoadingProgress(10, 'Caricamento agenti principali...');
+                
+                const loadAgent = async (agentName, index, total) => {
                     try {
+                        console.log(`Tentativo caricamento: ${agentName}`);
                         const csvUrl = `${GITHUB_BASE_URL}${agentName}.csv`;
+                        
+                        updateLoadingProgress(10 + (index / total) * 60, 
+                            `Caricamento ${agentName}...`);
+                        
                         const response = await fetch(csvUrl);
                         
-                        updateLoadingProgress(10 + (index / POSSIBLE_AGENTS.length) * 40, 
-                            `Controllo ${agentName}... ${response.ok ? '✓' : '✗'}`);
-                        
-                        if (response.ok) {
-                            const csvText = await response.text();
-                            const parsedData = parseCSV(csvText);
-                            
-                            if (parsedData.length > 0) {
-                                return { agentName, csvText, parsedData, csvUrl };
-                            }
+                        if (!response.ok) {
+                            console.log(`❌ ${agentName}: HTTP ${response.status}`);
+                            return null;
                         }
-                        return null;
+                        
+                        const csvText = await response.text();
+                        
+                        if (!csvText || csvText.trim().length < 50) {
+                            console.log(`❌ ${agentName}: File vuoto o troppo piccolo`);
+                            return null;
+                        }
+                        
+                        const parsedData = parseCSV(csvText);
+                        
+                        if (parsedData.length === 0) {
+                            console.log(`❌ ${agentName}: Nessun dato dopo parsing`);
+                            return null;
+                        }
+                        
+                        console.log(`✅ ${agentName}: ${parsedData.length} righe caricate`);
+                        
+                        return { 
+                            agentName, 
+                            csvText, 
+                            parsedData, 
+                            csvUrl 
+                        };
+                        
                     } catch (error) {
-                        console.log(`Agente ${agentName} non trovato o errore:`, error.message);
+                        console.log(`❌ ${agentName}: Errore - ${error.message}`);
                         return null;
                     }
-                });
+                };
 
-                updateLoadingText('Caricamento dati agenti trovati...');
-                
-                const results = await Promise.all(agentPromises);
-                const foundAgents = results.filter(result => result !== null);
-                
-                activeAgents = foundAgents;
-                updateLoadingProgress(60, `Trovati ${foundAgents.length} agenti attivi`);
-                
-                console.log(`Trovati ${foundAgents.length} agenti:`, foundAgents.map(a => a.agentName));
-                
-                if (foundAgents.length === 0) {
-                    throw new Error('Nessun agente trovato nel repository');
+                // Carica gli agenti noti
+                const knownResults = [];
+                for (let i = 0; i < KNOWN_AGENTS.length; i++) {
+                    const result = await loadAgent(KNOWN_AGENTS[i], i, KNOWN_AGENTS.length);
+                    if (result) {
+                        knownResults.push(result);
+                    }
                 }
+
+                console.log(`Agenti noti caricati: ${knownResults.length}/${KNOWN_AGENTS.length}`);
+                updateLoadingProgress(70, `Trovati ${knownResults.length} agenti principali`);
+
+                if (knownResults.length === 0) {
+                    throw new Error('Nessuno degli agenti principali è disponibile. Verifica la connessione al repository GitHub.');
+                }
+
+                // Opzionalmente prova alcuni agenti aggiuntivi (limitati per performance)
+                updateLoadingText('Controllo agenti aggiuntivi...');
+                const additionalResults = [];
+                
+                // Prova solo i primi 5 agenti aggiuntivi per non rallentare troppo
+                const limitedAdditional = ADDITIONAL_POSSIBLE_AGENTS.slice(0, 5);
+                
+                for (let i = 0; i < limitedAdditional.length; i++) {
+                    const result = await loadAgent(limitedAdditional[i], i, limitedAdditional.length);
+                    if (result) {
+                        additionalResults.push(result);
+                    }
+                }
+
+                const allResults = [...knownResults, ...additionalResults];
+                activeAgents = allResults;
+                
+                console.log(`Totale agenti trovati: ${allResults.length}`);
+                console.log('Agenti attivi:', allResults.map(a => a.agentName));
+                
+                updateLoadingProgress(80, `${allResults.length} agenti pronti per elaborazione`);
 
                 // Processa i dati di ogni agente
                 updateLoadingText('Elaborazione dati agenti...');
@@ -1495,9 +1562,9 @@
                 allVenditeData = [];
                 allCategoriesData = [];
 
-                foundAgents.forEach((agent, index) => {
-                    updateLoadingProgress(60 + (index / foundAgents.length) * 30, 
-                        `Elaborazione dati ${agent.agentName}...`);
+                allResults.forEach((agent, index) => {
+                    updateLoadingProgress(80 + (index / allResults.length) * 15, 
+                        `Elaborazione ${agent.agentName}...`);
                     
                     const { agentName, csvText, parsedData } = agent;
                     
@@ -1523,22 +1590,23 @@
                     const provinceData = parsedData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
                     agentInfo.province = provinceData.map(p => p.Provincia);
                     
+                    // Mappa regioni in base alle province
                     if (agentInfo.province.some(p => ['LT', 'RM', 'FR'].includes(p))) {
                         agentInfo.regione = 'Lazio';
-                    } else if (agentInfo.province.some(p => ['AN', 'PU'].includes(p))) {
+                    } else if (agentInfo.province.some(p => ['AN', 'PU', 'MC'].includes(p))) {
                         agentInfo.regione = 'Marche';
-                    } else if (agentInfo.province.some(p => ['CR', 'LO', 'PC'].includes(p))) {
+                    } else if (agentInfo.province.some(p => ['CR', 'LO', 'PC', 'MI', 'CO', 'VA'].includes(p))) {
                         agentInfo.regione = 'Lombardia';
-                    } else if (agentInfo.province.some(p => ['MI', 'CO', 'VA'].includes(p))) {
-                        agentInfo.regione = 'Lombardia Nord';
-                    } else if (agentInfo.province.some(p => ['NA', 'SA', 'CE'].includes(p))) {
+                    } else if (agentInfo.province.some(p => ['NA', 'SA', 'CE', 'AV'].includes(p))) {
                         agentInfo.regione = 'Campania';
-                    } else if (agentInfo.province.some(p => ['BA', 'BR', 'TA'].includes(p))) {
+                    } else if (agentInfo.province.some(p => ['BA', 'BR', 'TA', 'FG', 'BT'].includes(p))) {
                         agentInfo.regione = 'Puglia';
-                    } else if (agentInfo.province.some(p => ['PA', 'CT', 'ME'].includes(p))) {
+                    } else if (agentInfo.province.some(p => ['PA', 'CT', 'ME', 'AG', 'CL', 'EN', 'RG', 'SR', 'TP'].includes(p))) {
                         agentInfo.regione = 'Sicilia';
-                    } else if (agentInfo.province.some(p => ['FI', 'LI', 'SI'].includes(p))) {
+                    } else if (agentInfo.province.some(p => ['FI', 'LI', 'SI', 'AR', 'GR', 'LU', 'MS', 'PI', 'PT', 'PO'].includes(p))) {
                         agentInfo.regione = 'Toscana';
+                    } else if (agentInfo.province.some(p => ['BO', 'MO', 'RE', 'PR', 'FE', 'RA', 'FC', 'RN'].includes(p))) {
+                        agentInfo.regione = 'Emilia-Romagna';
                     } else if (agentInfo.province.length > 0) {
                         agentInfo.regione = 'Altra Regione';
                     }
@@ -1546,34 +1614,40 @@
                     // Aggiungi dati obiettivi dell'agente
                     const objettiviData = parsedData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
                     objettiviData.forEach(obj => {
-                        allAgentsData.push({
-                            ...agentInfo,
-                            ...obj,
-                            performance: obj.Obiettivo > 0 ? Math.round((obj.Anno_Corrente / obj.Obiettivo) * 100) : 0,
-                            crescita: obj.Anno_Precedente > 0 ? ((obj.Anno_Corrente - obj.Anno_Precedente) / obj.Anno_Precedente * 100) : 0
-                        });
+                        if (obj.Provincia) { // Solo se ha dati validi
+                            allAgentsData.push({
+                                ...agentInfo,
+                                ...obj,
+                                performance: obj.Obiettivo > 0 ? Math.round((obj.Anno_Corrente / obj.Obiettivo) * 100) : 0,
+                                crescita: obj.Anno_Precedente > 0 ? ((obj.Anno_Corrente - obj.Anno_Precedente) / obj.Anno_Precedente * 100) : 0
+                            });
+                        }
                     });
 
                     // Aggiungi dati vendite
                     const venditeData = parsedData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
                     venditeData.forEach(vendita => {
-                        allVenditeData.push({
-                            ...vendita,
-                            agente: agentInfo.nome,
-                            codiceAgente: agentInfo.codice,
-                            regione: agentInfo.regione
-                        });
+                        if (vendita.Ragione_Sociale_Cliente) { // Solo se ha dati validi
+                            allVenditeData.push({
+                                ...vendita,
+                                agente: agentInfo.nome,
+                                codiceAgente: agentInfo.codice,
+                                regione: agentInfo.regione
+                            });
+                        }
                     });
 
                     // Aggiungi dati categorie
                     const categoriesData = parsedData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
                     categoriesData.forEach(cat => {
-                        allCategoriesData.push({
-                            ...cat,
-                            agente: agentInfo.nome,
-                            codiceAgente: agentInfo.codice,
-                            regione: agentInfo.regione
-                        });
+                        if (cat.Categoria && parseFloat(cat.Importo_Totale) > 0) { // Solo se ha dati validi
+                            allCategoriesData.push({
+                                ...cat,
+                                agente: agentInfo.nome,
+                                codiceAgente: agentInfo.codice,
+                                regione: agentInfo.regione
+                            });
+                        }
                     });
                 });
 
@@ -1583,8 +1657,13 @@
                     agent.rank = index + 1;
                 });
 
-                updateLoadingProgress(95, `Finalizzazione dashboard per ${allAgentsData.length} agenti`);
-                updateLoadingText('Rendering dashboard...');
+                updateLoadingProgress(95, `Dashboard pronta con ${allAgentsData.length} agenti`);
+                updateLoadingText('Finalizzazione interfaccia...');
+                
+                console.log(`Dashboard configurata con:`);
+                console.log(`- ${allAgentsData.length} agenti con obiettivi`);
+                console.log(`- ${allVenditeData.length} transazioni clienti`);
+                console.log(`- ${allCategoriesData.length} categorie prodotto`);
                 
                 // Nascondi loading e mostra contenuto
                 setTimeout(() => {
@@ -1592,29 +1671,34 @@
                     document.getElementById('main-content').style.display = 'block';
                     document.getElementById('download-buttons').style.display = 'flex';
                     
-                    updateStatusIndicator('live', `${foundAgents.length} agenti online`);
+                    updateStatusIndicator('live', `${allResults.length} agenti online`);
                     
                     // Inizializza dashboard
                     updateAllData();
                     createCharts();
-                    updateLoadingProgress(100, 'Dashboard pronta!');
+                    updateLoadingProgress(100, 'Dashboard operativa!');
                 }, 500);
                 
             } catch (error) {
                 console.error('Errore nel caricamento degli agenti:', error);
-                updateLoadingText('Errore nel caricamento: ' + error.message);
-                updateStatusIndicator('error', 'Errore di caricamento');
+                updateLoadingText('Errore: ' + error.message);
+                updateStatusIndicator('error', 'Errore caricamento');
                 
                 // Mostra messaggio di errore user-friendly
                 setTimeout(() => {
-                    document.getElementById('loading-text').innerHTML = `
-                        <div class="text-red-600 font-bold">⚠️ Errore di Caricamento</div>
-                        <div class="text-gray-600 text-sm mt-2">
-                            ${error.message}<br>
-                            <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                                Riprova
-                            </button>
+                    document.getElementById('loading-details').innerHTML = `
+                        <div class="text-red-600 font-bold mb-2">⚠️ Problema di Caricamento</div>
+                        <div class="text-gray-700 text-sm mb-4">${error.message}</div>
+                        <div class="text-gray-600 text-xs mb-3">
+                            Verifica che i file CSV siano disponibili su GitHub:<br>
+                            • CARABOT.csv<br>
+                            • G2G.csv<br> 
+                            • CINTI.csv<br>
+                            • RAPPRESENTANZE.csv
                         </div>
+                        <button onclick="location.reload()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
+                            🔄 Riprova
+                        </button>
                     `;
                 }, 1000);
             }
