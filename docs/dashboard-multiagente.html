@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Multi-Agente - Cotto Cusimano</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css');
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        
+        .transform {
+            transform: translateX(var(--tw-translate-x, 0)) translateY(var(--tw-translate-y, 0)) rotate(var(--tw-rotate, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1));
+        }
+        
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        
+        .duration-300 { transition-duration: 300ms; }
+        .duration-700 { transition-duration: 700ms; }
+        .duration-1000 { transition-duration: 1000ms; }
+        .duration-1500 { transition-duration: 1500ms; }
+        
+        .opacity-0 { opacity: 0; }
+        .opacity-20 { opacity: 0.2; }
+        .opacity-100 { opacity: 1; }
+        
+        .scale-95 { --tw-scale-x: 0.95; --tw-scale-y: 0.95; }
+        .scale-100 { --tw-scale-x: 1; --tw-scale-y: 1; }
+        .scale-105 { --tw-scale-x: 1.05; --tw-scale-y: 1.05; }
+        
+        .translate-y-8 { --tw-translate-y: 2rem; }
+        .translate-y-0 { --tw-translate-y: 0px; }
+        .-translate-y-8 { --tw-translate-y: -2rem; }
+        
+        .rotate-180 { --tw-rotate: 180deg; }
+        
+        .backdrop-blur-xl { backdrop-filter: blur(24px); }
+        .backdrop-blur-sm { backdrop-filter: blur(4px); }
+        .backdrop-blur-2xl { backdrop-filter: blur(40px); }
+        
+        .bg-white\/80 { background-color: rgba(255, 255, 255, 0.8); }
+        .bg-white\/90 { background-color: rgba(255, 255, 255, 0.9); }
+        
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        
+        .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
+        .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
+        .bg-gradient-to-tr { background-image: linear-gradient(to top right, var(--tw-gradient-stops)); }
+        .bg-gradient-to-bl { background-image: linear-gradient(to bottom left, var(--tw-gradient-stops)); }
+        
+        .from-gray-50 { --tw-gradient-from: #f9fafb; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(249, 250, 251, 0)); }
+        .via-gray-100 { --tw-gradient-stops: var(--tw-gradient-from), #f3f4f6, var(--tw-gradient-to, rgba(243, 244, 246, 0)); }
+        .to-gray-200 { --tw-gradient-to: #e5e7eb; }
+        
+        .from-blue-500 { --tw-gradient-from: #3b82f6; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(59, 130, 246, 0)); }
+        .to-indigo-600 { --tw-gradient-to: #4f46e5; }
+        
+        .ring-2 { box-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); }
+        .ring-blue-100 { --tw-ring-color: #dbeafe; }
+        
+        .filter { filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow); }
+        .blur-3xl { --tw-blur: blur(64px); }
+        
+        .mix-blend-multiply { mix-blend-mode: multiply; }
+        
+        .bg-clip-text { background-clip: text; }
+        .text-transparent { color: transparent; }
+        
+        .hidden { display: none; }
+        .block { display: block; }
+
+        /* Loading spinner */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Custom chart containers */
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+
+        /* Status indicators */
+        .status-live {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-loading {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .status-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        /* Agent grid responsive */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Progress animations */
+        .progress-bar {
+            overflow: hidden;
+            background: #e5e7eb;
+            border-radius: 9999px;
+            height: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 1.5s ease-in-out;
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        /* Loading dots */
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.4;
+            animation: loading-dot 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes loading-dot {
+            0%, 80%, 100% { opacity: 0.4; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Responsive table */
+        .responsive-table {
+            min-width: 800px;
+        }
+
+        @media (max-width: 1024px) {
+            .responsive-table {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200">
+            <!-- Background Effects -->
+            <div class="fixed inset-0 overflow-hidden pointer-events-none opacity-20">
+                <div class="absolute -top-40 -right-40 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+                <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style="animation-delay: 2s"></div>
+                <div class="absolute top-1/2 left-1/2 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style="animation-delay: 4s"></div>
+            </div>
+
+            <!-- Loading Screen -->
+            <div id="loading-screen" class="fixed inset-0 z-50 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 flex items-center justify-center">
+                <div class="text-center max-w-md">
+                    <div class="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-8"></div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Caricamento Dashboard</h2>
+                    <p class="text-gray-600 mb-6" id="loading-text">Inizializzazione sistema multi-agente...</p>
+                    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-medium text-gray-700">Progresso</span>
+                            <span class="text-sm font-bold text-blue-600" id="loading-progress">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div id="loading-bar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-500" id="loading-details">Scansione repository...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative max-w-7xl mx-auto p-4 sm:p-6 lg:p-8" id="main-content" style="display: none;">
+                <!-- Header Dashboard -->
+                <div class="mb-8 transform transition-all duration-1000 translate-y-0 opacity-100" id="header">
+                    <div class="relative overflow-hidden bg-white rounded-3xl border border-gray-100">
+                        <!-- Background Pattern -->
+                        <div class="absolute inset-0">
+                            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-slate-50/50 via-white to-blue-50/30"></div>
+                            <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-500/5 via-indigo-500/3 to-transparent rounded-full transform translate-x-48 -translate-y-48"></div>
+                            <div class="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-purple-500/5 via-blue-500/3 to-transparent rounded-full transform -translate-x-40 translate-y-40"></div>
+                        </div>
+                        
+                        <div class="relative z-10 p-8">
+                            <!-- Hero Section -->
+                            <div class="text-center mb-8">
+                                <div class="mb-4">
+                                    <h1 class="text-4xl font-black text-gray-900 tracking-tight bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-700 bg-clip-text text-transparent">
+                                        Dashboard Multi-Agente
+                                    </h1>
+                                    <p class="text-lg font-semibold text-gray-600 mt-1">Cotto Cusimano • Controllo Rete Vendita</p>
+                                </div>
+                                
+                                <!-- Status Indicators -->
+                                <div class="flex items-center justify-center gap-6 mb-6 flex-wrap">
+                                    <div class="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span class="text-sm font-bold text-blue-700" id="period-display">Gen - Ago 2025</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl border border-purple-200">
+                                        <div class="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+                                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+                                            </svg>
+                                        </div>
+                                        <span class="text-sm font-bold text-purple-700" id="agenti-count">0 Agenti Operativi</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 px-4 py-2 rounded-xl" id="status-indicator">
+                                        <div class="loading-dots">
+                                            <div class="loading-dot"></div>
+                                            <div class="loading-dot"></div>
+                                            <div class="loading-dot"></div>
+                                        </div>
+                                        <span class="text-sm font-bold" id="status-text">Caricamento...</span>
+                                    </div>
+                                </div>
+
+                                <!-- Download Buttons -->
+                                <div class="flex justify-center gap-4 mb-6" id="download-buttons" style="display: none;">
+                                    <button id="downloadPDF" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-1H8v1a1 1 0 11-2 0v-3a1 1 0 011-1h6z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Scarica PDF
+                                    </button>
+                                    <button id="downloadExcel" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zm10-4a1 1 0 011-1h3a1 1 0 110 2h-3a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Scarica Excel
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Navigation Tabs -->
+                            <div class="flex justify-center gap-4 mb-6">
+                                <button
+                                    onclick="setActiveTab('overview')"
+                                    id="overview-tab"
+                                    class="group relative px-8 py-4 rounded-2xl font-bold transition-all duration-300 bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-white transform scale-105"
+                                >
+                                    <div class="absolute inset-0 bg-white rounded-2xl opacity-20"></div>
+                                    <div class="relative flex items-center gap-3">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                        </svg>
+                                        <span>Panoramica Aziendale</span>
+                                        <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                                    </div>
+                                </button>
+                                
+                                <button
+                                    onclick="setActiveTab('agents')"
+                                    id="agents-tab"
+                                    class="group relative px-8 py-4 rounded-2xl font-bold transition-all duration-300 bg-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 text-gray-700 border-2 border-gray-200 hover:border-blue-300"
+                                >
+                                    <div class="relative flex items-center gap-3">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                        </svg>
+                                        <span>Dettaglio Agenti</span>
+                                    </div>
+                                </button>
+                            </div>
+                            
+                            <!-- Quick Stats -->
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="quick-stats">
+                                <div class="text-center p-4 bg-gradient-to-br from-emerald-50 to-green-100 rounded-xl border border-emerald-200">
+                                    <div class="text-2xl font-black text-emerald-700" id="total-fatturato">€0</div>
+                                    <div class="text-xs font-semibold text-emerald-600">Fatturato Totale</div>
+                                </div>
+                                <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                                    <div class="text-2xl font-black text-blue-700" id="performance-media">0%</div>
+                                    <div class="text-xs font-semibold text-blue-600">Performance Media</div>
+                                </div>
+                                <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                                    <div class="text-2xl font-black text-purple-700" id="clienti-totali">0</div>
+                                    <div class="text-xs font-semibold text-purple-600">Clienti Totali</div>
+                                </div>
+                                <div class="text-center p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl border border-indigo-200">
+                                    <div class="text-2xl font-black text-indigo-700" id="regioni-attive">0</div>
+                                    <div class="text-xs font-semibold text-indigo-600">Regioni Attive</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div id="overview-content">
+                    <!-- Overview Tab Content -->
+                    <div class="space-y-8">
+                        <!-- KPI Cards Overview -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5" id="kpi-cards">
+                            <!-- KPI cards popolate dinamicamente -->
+                        </div>
+
+                        <!-- Charts Section -->
+                        <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-200 shadow-lg">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Analytics Dashboard</h3>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div class="chart-container">
+                                    <canvas id="performance-chart"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="revenue-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tabella Regioni -->
+                        <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-200 shadow-lg">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Dettaglio per Regione</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full responsive-table">
+                                    <thead>
+                                        <tr class="border-b border-gray-300">
+                                            <th class="text-left py-4 px-4 text-sm font-bold text-gray-700">Regione</th>
+                                            <th class="text-center py-4 px-4 text-sm font-bold text-gray-700">Agenti</th>
+                                            <th class="text-right py-4 px-4 text-sm font-bold text-gray-700">Fatturato 2025</th>
+                                            <th class="text-center py-4 px-4 text-sm font-bold text-gray-700">vs 2024</th>
+                                            <th class="text-center py-4 px-4 text-sm font-bold text-gray-700">Performance</th>
+                                            <th class="text-center py-4 px-4 text-sm font-bold text-gray-700">Clienti</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="regioni-table">
+                                        <!-- Dati popolati via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Top Clienti Section -->
+                        <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-200 shadow-lg">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Top Clienti per Fatturato</h3>
+                            <div id="top-clienti-container">
+                                <!-- Tabella clienti generata dinamicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Categorie Prodotto Section -->
+                        <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-200 shadow-lg">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Performance per Categoria</h3>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div class="chart-container">
+                                    <canvas id="categories-chart"></canvas>
+                                </div>
+                                <div id="categories-grid" class="grid grid-cols-1 gap-4">
+                                    <!-- Cards categorie generate dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agents Tab Content -->
+                <div id="agents-content" class="hidden">
+                    <div class="space-y-6">
+                        <!-- Header Agenti -->
+                        <div class="relative bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/50 backdrop-blur-2xl rounded-3xl p-8 border border-blue-200/60 shadow-2xl shadow-blue-500/10 overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-indigo-500/5 rounded-full transform translate-x-16 -translate-y-16"></div>
+                            <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-cyan-500/10 to-blue-500/5 rounded-full transform -translate-x-12 translate-y-12"></div>
+                            
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-3xl font-black text-gray-900 mb-1">Gestione Agenti</h3>
+                                        <p class="text-gray-600 text-sm font-medium">Regioni</p>
+                        </div>
+                        <p class="text-3xl font-black text-gray-900 mb-2">${totals.regioni}</p>
+                        <p class="text-gray-500 text-sm">Copertura territorio</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Renderizza tabella regioni
+        function renderRegions() {
+            const regioniMap = new Map();
+            
+            allAgentsData.forEach(agent => {
+                if (!regioniMap.has(agent.regione)) {
+                    regioniMap.set(agent.regione, {
+                        agenti: 0,
+                        fatturato2025: 0,
+                        fatturato2024: 0,
+                        obiettivo: 0,
+                        clienti: 0
+                    });
+                }
+                
+                const regione = regioniMap.get(agent.regione);
+                regione.agenti++;
+                regione.fatturato2025 += agent.Anno_Corrente || 0;
+                regione.fatturato2024 += agent.Anno_Precedente || 0;
+                regione.obiettivo += agent.Obiettivo || 0;
+                regione.clienti += agent.Clienti_Anno_Corrente || 0;
+            });
+
+            const regioniArray = Array.from(regioniMap.entries()).map(([nome, data]) => ({
+                regione: nome,
+                ...data,
+                crescita: data.fatturato2024 > 0 ? ((data.fatturato2025 - data.fatturato2024) / data.fatturato2024 * 100) : 0,
+                performance: data.obiettivo > 0 ? Math.round((data.fatturato2025 / data.obiettivo) * 100) : 0
+            }));
+
+            const tbody = document.getElementById('regioni-table');
+            tbody.innerHTML = '';
+            
+            regioniArray
+                .sort((a, b) => b.fatturato2025 - a.fatturato2025)
+                .forEach((regione, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-200 hover:bg-gray-50 transition-all duration-200';
+                    tr.innerHTML = `
+                        <td class="py-4 px-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm ${
+                                    index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' :
+                                    index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500' :
+                                    index === 2 ? 'bg-gradient-to-br from-amber-400 to-amber-600' :
+                                    'bg-gradient-to-br from-blue-400 to-blue-600'
+                                }">
+                                    ${index + 1}
+                                </div>
+                                <span class="font-bold text-gray-900">${regione.regione}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold">
+                                ${regione.agenti}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 text-right">
+                            <span class="font-bold text-gray-900">
+                                ${formatCurrency(regione.fatturato2025)}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <span class="font-bold ${regione.crescita >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                ${regione.crescita >= 0 ? '+' : ''}${regione.crescita.toFixed(1)}%
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="font-bold text-gray-900">${regione.performance}%</span>
+                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                    <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-1000" style="width: ${Math.min(regione.performance, 100)}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <span class="text-gray-700 font-medium">${regione.clienti}</span>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+        }
+
+        // Renderizza top clienti
+        function renderTopClienti() {
+            const clientsMap = new Map();
+            
+            allVenditeData.forEach(vendita => {
+                const clientName = vendita.Ragione_Sociale_Cliente;
+                const revenue = parseFloat(vendita.Fatturato) || 0;
+                
+                if (!clientsMap.has(clientName)) {
+                    clientsMap.set(clientName, {
+                        name: clientName,
+                        totalRevenue: 0,
+                        agente: vendita.agente,
+                        regione: vendita.regione,
+                        provincia: vendita.Provincia,
+                        categories: new Set()
+                    });
+                }
+                
+                const client = clientsMap.get(clientName);
+                client.totalRevenue += revenue;
+                client.categories.add(vendita.Categoria_Articoli);
+            });
+            
+            const topClients = Array.from(clientsMap.values())
+                .sort((a, b) => b.totalRevenue - a.totalRevenue)
+                .slice(0, 20);
+            
+            const container = document.getElementById('top-clienti-container');
+            
+            if (topClients.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-8">Nessun dato clienti disponibile</div>';
+                return;
+            }
+            
+            let html = `
+                <div class="overflow-x-auto">
+                    <table class="w-full responsive-table">
+                        <thead>
+                            <tr class="border-b border-gray-300">
+                                <th class="text-left py-4 px-4 text-sm font-bold text-gray-700">Pos.</th>
+                                <th class="text-left py-4 px-4 text-sm font-bold text-gray-700">Cliente</th>
+                                <th class="text-center py-4 px-4 text-sm font-bold text-gray-700">Agente</th>
+                                <th class="text-center py-4 px-4 text-sm font-bold text-gray-700">Regione</th>
+                                <th class="text-right py-4 px-4 text-sm font-bold text-gray-700">Fatturato</th>
+                                <th class="text-center py-4 px-4 text-sm font-bold text-gray-700">Categorie</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            topClients.forEach((client, index) => {
+                const podiumClass = index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white' :
+                                 index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white' :
+                                 index === 2 ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-white' :
+                                 'bg-gray-100 text-gray-600';
+                
+                html += `
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-all duration-200">
+                        <td class="py-4 px-4">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${podiumClass}">
+                                ${index + 1}
+                            </div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="font-bold text-gray-900 max-w-xs truncate">${client.name}</div>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <div class="text-sm font-medium text-gray-700">${client.agente.substring(0, 20)}${client.agente.length > 20 ? '...' : ''}</div>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg font-semibold text-xs">
+                                ${client.regione}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 text-right">
+                            <span class="font-bold text-blue-600">${formatCurrency(client.totalRevenue)}</span>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg font-semibold text-xs">
+                                ${client.categories.size}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        // Renderizza sezione categorie
+        function renderCategories() {
+            const categoriesMap = new Map();
+            
+            allCategoriesData.forEach(cat => {
+                const categoryName = cat.Categoria;
+                const importo = parseFloat(cat.Importo_Totale) || 0;
+                const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
+                const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
+                
+                if (!categoriesMap.has(categoryName)) {
+                    categoriesMap.set(categoryName, {
+                        nome: categoryName,
+                        importo: 0,
+                        clienti: 0
+                    });
+                }
+                
+                const category = categoriesMap.get(categoryName);
+                category.importo += importo;
+                category.clienti += clientiLT + clientiRM;
+            });
+            
+            const categoriesArray = Array.from(categoriesMap.values())
+                .filter(cat => cat.importo > 0)
+                .sort((a, b) => b.importo - a.importo)
+                .slice(0, 12); // Top 12 categorie per dashboard multi-agente
+            
+            const colors = ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1'];
+            
+            // Crea cards categorie
+            const gridContainer = document.getElementById('categories-grid');
+            let cardsHtml = '';
+            
+            if (categoriesArray.length === 0) {
+                cardsHtml = '<div class="text-center text-gray-500 py-8 col-span-full">Nessun dato categorie disponibile</div>';
+            } else {
+                categoriesArray.forEach((cat, index) => {
+                    const categoryColor = colors[index] || '#64748b';
+                    
+                    cardsHtml += `
+                        <div class="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border-l-4 transition-all duration-300 hover:shadow-lg" style="border-left-color: ${categoryColor}">
+                            <div class="text-sm font-bold text-gray-700 mb-2" style="color: ${categoryColor}">${cat.nome.replace(/_/g, ' ')}</div>
+                            <div class="text-xl font-black text-gray-900 mb-1">${formatCompactCurrency(cat.importo)}</div>
+                            <div class="text-xs text-gray-600">${cat.clienti} clienti</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            gridContainer.innerHTML = cardsHtml;
+            
+            // Crea grafico categorie
+            if (categoriesArray.length > 0) {
+                createCategoriesChart(categoriesArray, colors);
+            }
+        }
+
+        // Renderizza sezione agenti
+        function renderAgents() {
+            const grid = document.getElementById('agents-grid');
+            grid.innerHTML = '';
+            
+            if (allAgentsData.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-12">Nessun agente trovato</div>';
+                return;
+            }
+            
+            document.getElementById('agents-board-subtitle').textContent = `${allAgentsData.length} agenti • Classifica per performance`;
+            
+            allAgentsData.forEach(agente => {
+                const div = document.createElement('div');
+                div.className = 'group relative overflow-hidden rounded-2xl border transition-all duration-300 bg-white hover:bg-gradient-to-br hover:from-gray-50 hover:to-blue-50 border-gray-200 hover:border-blue-300 cursor-pointer hover:scale-105';
+                
+                div.innerHTML = `
+                    <div class="relative p-6 pb-4">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="relative">
+                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-black text-2xl transition-all duration-300 ${
+                                    agente.rank === 1 ? 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600' :
+                                    agente.rank === 2 ? 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500' :
+                                    agente.rank === 3 ? 'bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600' :
+                                    'bg-gradient-to-br from-slate-400 via-slate-500 to-slate-600'
+                                }">
+                                    ${agente.rank}
+                                </div>
+                                ${agente.rank <= 3 ? `
+                                    <div class="absolute -top-2 -right-2">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center ${
+                                            agente.rank === 1 ? 'bg-yellow-400' :
+                                            agente.rank === 2 ? 'bg-gray-300' :
+                                            'bg-amber-400'
+                                        }">
+                                            <svg class="w-5 h-5 ${
+                                                agente.rank === 1 ? 'text-yellow-700' :
+                                                agente.rank === 2 ? 'text-gray-600' :
+                                                'text-amber-700'
+                                            }" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="text-right">
+                                <div class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold border ${
+                                    agente.performance >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                    agente.performance >= 60 ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                    'bg-red-50 text-red-700 border-red-200'
+                                }">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    ${agente.performance}%
+                                </div>
+                                ${agente.rank === 1 ? `
+                                    <div class="mt-3">
+                                        <div class="inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-gradient-to-r from-yellow-50 to-amber-50 text-amber-800 rounded-xl font-bold border border-amber-200">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5zM6 12a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            TOP PERFORMER
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5 class="text-xl font-black text-gray-900 mb-2">${agente.nome}</h5>
+                            <div class="flex items-center gap-3 text-sm flex-wrap">
+                                ${agente.codice ? `
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg font-semibold text-xs">
+                                        ${agente.codice}
+                                    </span>
+                                ` : ''}
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg font-semibold text-xs flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    </svg>
+                                    ${agente.regione}
+                                </span>
+                                ${agente.province.length > 0 ? `
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg font-semibold text-xs">
+                                        ${agente.province.slice(0, 3).join(', ')}${agente.province.length > 3 ? '...' : ''}
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                    Progresso Obiettivo
+                                </span>
+                                <span class="text-sm font-black text-gray-900 px-2 py-1 bg-gray-100 rounded-lg">
+                                    ${agente.performance}%
+                                </span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${
+                                    agente.performance >= 80 ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' :
+                                    agente.performance >= 60 ? 'bg-gradient-to-r from-amber-400 to-amber-500' :
+                                    'bg-gradient-to-r from-red-400 to-red-500'
+                                }" style="width: ${Math.min(agente.performance, 100)}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="px-6 pb-6">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200">
+                                <div class="flex items-center justify-center mb-2">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                </div>
+                                <div class="text-lg font-black text-blue-800">
+                                    ${formatCompactCurrency(agente.Anno_Corrente)}
+                                </div>
+                                <div class="text-xs font-bold text-blue-600 mt-1">Fatturato 2025</div>
+                                <div class="text-xs text-emerald-600 font-bold mt-1 flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    ${agente.Anno_Precedente > 0 
+                                        ? `${agente.crescita >= 0 ? '+' : ''}${agente.crescita.toFixed(1)}%`
+                                        : 'Nuovo'
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200">
+                                <div class="flex items-center justify-center mb-2">
+                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="text-lg font-black text-purple-800">${agente.Clienti_Anno_Corrente}</div>
+                                <div class="text-xs font-bold text-purple-600 mt-1">Clienti Attivi</div>
+                                <div class="text-xs text-purple-600 font-bold mt-1 flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    ${agente.Obiettivo_Clienti > 0 ? Math.round((agente.Clienti_Anno_Corrente / agente.Obiettivo_Clienti) * 100) : 0}% target
+                                </div>
+                            </div>
+                            
+                            <div class="text-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
+                                <div class="flex items-center justify-center mb-2">
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                    </svg>
+                                </div>
+                                <div class="text-lg font-black text-gray-800">#${agente.rank}</div>
+                                <div class="text-xs font-bold text-gray-600 mt-1">Posizione</div>
+                                <div class="text-xs text-gray-600 font-bold mt-1">
+                                    su ${allAgentsData.length}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(div);
+            });
+        }
+
+        // Crea grafici
+        function createCharts() {
+            createPerformanceChart();
+            createRevenueChart();
+        }
+
+        // Grafico performance agenti
+        function createPerformanceChart() {
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+            
+            if (allAgentsData.length === 0) return;
+            
+            const ctx = document.getElementById('performance-chart').getContext('2d');
+            const sortedAgents = [...allAgentsData].sort((a, b) => b.performance - a.performance).slice(0, 10);
+            
+            performanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedAgents.map(a => a.nome.length > 15 ? a.nome.substring(0, 12) + '...' : a.nome),
+                    datasets: [{
+                        label: 'Performance %',
+                        data: sortedAgents.map(a => a.performance),
+                        backgroundColor: sortedAgents.map((a, i) => 
+                            i === 0 ? '#10b981' :
+                            i === 1 ? '#3b82f6' :
+                            i === 2 ? '#8b5cf6' :
+                            '#6b7280'
+                        ),
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Top 10 Agenti per Performance (%)',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Grafico fatturato per regione
+        function createRevenueChart() {
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+            
+            if (allAgentsData.length === 0) return;
+            
+            const regioniMap = new Map();
+            
+            allAgentsData.forEach(agent => {
+                if (!regioniMap.has(agent.regione)) {
+                    regioniMap.set(agent.regione, 0);
+                }
+                regioniMap.set(agent.regione, regioniMap.get(agent.regione) + (agent.Anno_Corrente || 0));
+            });
+            
+            const regioniArray = Array.from(regioniMap.entries()).sort((a, b) => b[1] - a[1]);
+            
+            const ctx = document.getElementById('revenue-chart').getContext('2d');
+            
+            revenueChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: regioniArray.map(r => r[0]),
+                    datasets: [{
+                        data: regioniArray.map(r => r[1]),
+                        backgroundColor: ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0', '#ef4444', '#10b981'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Fatturato per Regione',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Grafico categorie
+        function createCategoriesChart(categoriesData, colors) {
+            if (categoriesChart) {
+                categoriesChart.destroy();
+            }
+            
+            const ctx = document.getElementById('categories-chart').getContext('2d');
+            
+            categoriesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoriesData.map(cat => cat.nome.replace(/_/g, ' ')),
+                    datasets: [{
+                        data: categoriesData.map(cat => cat.importo),
+                        backgroundColor: colors.slice(0, categoriesData.length),
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Top Categorie per Fatturato',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return ` ${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Aggiorna tutti i dati della dashboard
+        function updateAllData() {
+            const totals = calculateTotals();
+            
+            // Aggiorna quick stats
+            document.getElementById('total-fatturato').textContent = formatCompactCurrency(totals.fatturato2025);
+            document.getElementById('performance-media').textContent = totals.performance + '%';
+            document.getElementById('clienti-totali').textContent = totals.clienti.toString();
+            document.getElementById('regioni-attive').textContent = totals.regioni.toString();
+            document.getElementById('agenti-count').textContent = totals.agenti + ' Agenti Operativi';
+            
+            // Renderizza tutti i componenti
+            renderKPICards();
+            renderRegions();
+            renderTopClienti();
+            renderCategories();
+        }
+
+        // Funzioni per i download
+        async function generatePDF() {
+            const button = document.getElementById('downloadPDF');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = `
+                <svg class="w-5 h-5 animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+                </svg>
+                Generando PDF...
+            `;
+            button.disabled = true;
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                let yPosition = 20;
+                
+                // Header
+                pdf.setFontSize(24);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('DASHBOARD MULTI-AGENTE', pageWidth / 2, yPosition, { align: 'center' });
+                
+                yPosition += 12;
+                pdf.setFontSize(16);
+                pdf.setTextColor(59, 130, 246);
+                pdf.text('Cotto Cusimano • Controllo Rete Vendita', pageWidth / 2, yPosition, { align: 'center' });
+                
+                yPosition += 15;
+                
+                const totals = calculateTotals();
+                
+                // Metriche principali
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                pdf.text('📊 PERFORMANCE AZIENDALE', 20, yPosition);
+                yPosition += 12;
+                
+                pdf.setFillColor(248, 250, 252);
+                pdf.rect(20, yPosition - 5, pageWidth - 40, 35, 'F');
+                
+                pdf.setFontSize(12);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(30, 41, 59);
+                
+                pdf.text(`FATTURATO TOTALE: ${formatCurrency(totals.fatturato2025)}`, 25, yPosition + 5);
+                pdf.text(`PERFORMANCE MEDIA: ${totals.performance}%`, 25, yPosition + 12);
+                pdf.text(`CRESCITA: ${totals.crescita >= 0 ? '+' : ''}${totals.crescita.toFixed(1)}%`, 25, yPosition + 19);
+                
+                pdf.text(`CLIENTI ATTIVI: ${totals.clienti}`, 120, yPosition + 5);
+                pdf.text(`AGENTI OPERATIVI: ${totals.agenti}`, 120, yPosition + 12);
+                pdf.text(`REGIONI COPERTE: ${totals.regioni}`, 120, yPosition + 19);
+                pdf.text(`AGENTI SCANSIONATI: ${POSSIBLE_AGENTS.length}`, 120, yPosition + 26);
+                
+                yPosition += 45;
+                
+                // Ranking agenti
+                pdf.setFontSize(16);
+                pdf.setFont("helvetica", "bold");
+                pdf.text('🏆 RANKING AGENTI', 20, yPosition);
+                yPosition += 12;
+                
+                pdf.setFontSize(10);
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(55, 65, 81);
+                pdf.text('POS', 25, yPosition);
+                pdf.text('AGENTE', 45, yPosition);
+                pdf.text('REGIONE', 120, yPosition);
+                pdf.text('FATTURATO', 150, yPosition);
+                pdf.text('PERF%', 180, yPosition);
+                
+                yPosition += 6;
+                
+                pdf.setFont("helvetica", "normal");
+                pdf.setFontSize(9);
+                
+                allAgentsData.slice(0, 15).forEach((agent, index) => {
+                    if (yPosition > pageHeight - 30) {
+                        pdf.addPage();
+                        yPosition = 20;
+                    }
+                    
+                    if (index < 3) {
+                        pdf.setTextColor(index === 0 ? 255 : index === 1 ? 158 : 205, 
+                                        index === 0 ? 193 : index === 1 ? 158 : 127, 
+                                        index === 0 ? 7 : index === 1 ? 158 : 50);
+                    } else {
+                        pdf.setTextColor(100, 116, 139);
+                    }
+                    
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text(`${index + 1}°`, 25, yPosition);
+                    
+                    pdf.setFont("helvetica", "normal");
+                    pdf.setTextColor(30, 41, 59);
+                    
+                    const shortName = agent.nome.length > 20 ? agent.nome.substring(0, 17) + '...' : agent.nome;
+                    pdf.text(shortName, 45, yPosition);
+                    pdf.text(agent.regione, 120, yPosition);
+                    pdf.text(`${formatCompactCurrency(agent.Anno_Corrente)}`, 150, yPosition);
+                    pdf.text(`${agent.performance}%`, 180, yPosition);
+                    
+                    yPosition += 5;
+                });
+                
+                // Footer
+                pdf.setFontSize(8);
+                pdf.setTextColor(148, 163, 184);
+                pdf.text('Dashboard Multi-Agente - Cotto Cusimano', pageWidth / 2, pageHeight - 10, { align: 'center' });
+                
+                const now = new Date();
+                const fileName = `Dashboard_MultiAgente_${now.toISOString().slice(0, 10)}.pdf`;
+                pdf.save(fileName);
+                
+            } catch (error) {
+                console.error('Errore nella generazione del PDF:', error);
+                alert('Errore nella generazione del PDF. Riprova.');
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        async function generateExcel() {
+            const button = document.getElementById('downloadExcel');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = `
+                <svg class="w-5 h-5 animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+                </svg>
+                Generando Excel...
+            `;
+            button.disabled = true;
+
+            try {
+                const wb = XLSX.utils.book_new();
+                
+                // Foglio 1: Riepilogo Aziendale
+                const totals = calculateTotals();
+                const summaryData = [
+                    ['DASHBOARD MULTI-AGENTE - COTTO CUSIMANO', ''],
+                    ['Data Generazione', new Date().toLocaleString('it-IT')],
+                    ['Periodo', 'Gennaio - Agosto 2025'],
+                    ['', ''],
+                    ['METRICHE PRINCIPALI', ''],
+                    ['Agenti Scansionati', POSSIBLE_AGENTS.length],
+                    ['Agenti Attivi', totals.agenti],
+                    ['Fatturato Totale 2025', totals.fatturato2025],
+                    ['Fatturato Totale 2024', totals.fatturato2024],
+                    ['Crescita %', totals.crescita.toFixed(2)],
+                    ['Performance Media %', totals.performance],
+                    ['Clienti Attivi', totals.clienti],
+                    ['Regioni Coperte', totals.regioni]
+                ];
+                
+                const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, summaryWS, 'Riepilogo Aziendale');
+                
+                // Foglio 2: Performance Agenti
+                const agentsData = [
+                    ['POSIZIONE', 'NOME', 'CODICE', 'REGIONE', 'PROVINCE', 'FATTURATO_2025', 'FATTURATO_2024', 'OBIETTIVO', 'PERFORMANCE_%', 'CLIENTI_2025', 'OBIETTIVO_CLIENTI', 'CRESCITA_%']
+                ];
+                
+                allAgentsData.forEach(agent => {
+                    agentsData.push([
+                        agent.rank,
+                        agent.nome,
+                        agent.codice || '',
+                        agent.regione,
+                        agent.province.join(', '),
+                        agent.Anno_Corrente || 0,
+                        agent.Anno_Precedente || 0,
+                        agent.Obiettivo || 0,
+                        agent.performance,
+                        agent.Clienti_Anno_Corrente || 0,
+                        agent.Obiettivo_Clienti || 0,
+                        agent.crescita.toFixed(2)
+                    ]);
+                });
+                
+                const agentsWS = XLSX.utils.aoa_to_sheet(agentsData);
+                XLSX.utils.book_append_sheet(wb, agentsWS, 'Performance Agenti');
+                
+                // Foglio 3: Dettaglio Vendite
+                if (allVenditeData.length > 0) {
+                    const salesData = [
+                        ['AGENTE', 'CODICE_AGENTE', 'REGIONE', 'CLIENTE', 'PROVINCIA', 'CATEGORIA', 'FATTURATO']
+                    ];
+                    
+                    allVenditeData.forEach(vendita => {
+                        salesData.push([
+                            vendita.agente,
+                            vendita.codiceAgente,
+                            vendita.regione,
+                            vendita.Ragione_Sociale_Cliente,
+                            vendita.Provincia,
+                            vendita.Categoria_Articoli,
+                            parseFloat(vendita.Fatturato) || 0
+                        ]);
+                    });
+                    
+                    const salesWS = XLSX.utils.aoa_to_sheet(salesData);
+                    XLSX.utils.book_append_sheet(wb, salesWS, 'Dettaglio Vendite');
+                }
+                
+                // Foglio 4: Agenti Scansionati
+                const scannedData = [
+                    ['NOME_FILE', 'STATUS', 'TROVATO']
+                ];
+                
+                POSSIBLE_AGENTS.forEach(agentName => {
+                    const isActive = activeAgents.some(a => a.agentName === agentName);
+                    scannedData.push([
+                        agentName + '.csv',
+                        isActive ? 'ATTIVO' : 'NON TROVATO',
+                        isActive ? 'SI' : 'NO'
+                    ]);
+                });
+                
+                const scannedWS = XLSX.utils.aoa_to_sheet(scannedData);
+                XLSX.utils.book_append_sheet(wb, scannedWS, 'Scansione Agenti');
+                
+                const now = new Date();
+                const fileName = `Dashboard_MultiAgente_Excel_${now.toISOString().slice(0, 10)}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+            } catch (error) {
+                console.error('Errore nella generazione del file Excel:', error);
+                alert('Errore nella generazione del file Excel. Riprova.');
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            scanAndLoadAgents();
+            
+            document.getElementById('downloadPDF').addEventListener('click', generatePDF);
+            document.getElementById('downloadExcel').addEventListener('click', generateExcel);
+        });
+    </script>
+</body>
+</html>-600 font-medium">Monitoraggio performance e risultati rete vendita</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista Agenti -->
+                        <div class="relative bg-white rounded-3xl border border-gray-100 overflow-hidden">
+                            <div class="relative bg-gradient-to-r from-slate-50 to-gray-50 p-8 border-b border-gray-100">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+                                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-2xl font-black text-gray-900">Performance Board</h4>
+                                        <p class="text-gray-600 font-medium" id="agents-board-subtitle">Caricamento agenti...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-8">
+                                <div class="agents-grid" id="agents-grid">
+                                    <!-- Agenti popolati via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configurazione del sistema multi-agente
+        const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/';
+        
+        // Lista dei possibili nomi di file CSV (fino a 40 agenti)
+        const POSSIBLE_AGENTS = [
+            'CARABOT', 'G2G', 'CINTI', 'RAPPRESENTANZE',
+            'AGENTE_01', 'AGENTE_02', 'AGENTE_03', 'AGENTE_04', 'AGENTE_05',
+            'AGENTE_06', 'AGENTE_07', 'AGENTE_08', 'AGENTE_09', 'AGENTE_10',
+            'AGENTE_11', 'AGENTE_12', 'AGENTE_13', 'AGENTE_14', 'AGENTE_15',
+            'AGENTE_16', 'AGENTE_17', 'AGENTE_18', 'AGENTE_19', 'AGENTE_20',
+            'AGENTE_21', 'AGENTE_22', 'AGENTE_23', 'AGENTE_24', 'AGENTE_25',
+            'AGENTE_26', 'AGENTE_27', 'AGENTE_28', 'AGENTE_29', 'AGENTE_30',
+            'AGENTE_31', 'AGENTE_32', 'AGENTE_33', 'AGENTE_34', 'AGENTE_35',
+            'AGENTE_36', 'AGENTE_37', 'AGENTE_38', 'AGENTE_39', 'AGENTE_40'
+        ];
+        
+        // Dati globali
+        let allAgentsData = [];
+        let allVenditeData = [];
+        let allCategoriesData = [];
+        let activeAgents = [];
+        let activeTab = 'overview';
+        let performanceChart = null;
+        let revenueChart = null;
+        let categoriesChart = null;
+        let loadingProgress = 0;
+
+        // Funzioni di utilità
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('it-IT', {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function formatCompactCurrency(value) {
+            if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
+            if (value >= 1000) return `€${Math.round(value / 1000)}k`;
+            return formatCurrency(value);
+        }
+
+        function updateLoadingText(text) {
+            document.getElementById('loading-text').textContent = text;
+        }
+
+        function updateLoadingProgress(progress, details = '') {
+            loadingProgress = Math.min(progress, 100);
+            document.getElementById('loading-progress').textContent = loadingProgress + '%';
+            document.getElementById('loading-bar').style.width = loadingProgress + '%';
+            if (details) {
+                document.getElementById('loading-details').textContent = details;
+            }
+        }
+
+        function updateStatusIndicator(status, text) {
+            const indicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            indicator.className = 'flex items-center gap-3 px-4 py-2 rounded-xl';
+            
+            switch (status) {
+                case 'loading':
+                    indicator.classList.add('status-loading');
+                    statusText.textContent = text || 'Caricamento...';
+                    break;
+                case 'live':
+                    indicator.classList.add('status-live');
+                    statusText.textContent = text || 'Dati Live da GitHub';
+                    break;
+                case 'error':
+                    indicator.classList.add('status-error');
+                    statusText.textContent = text || 'Errore di caricamento';
+                    break;
+            }
+        }
+
+        // Parser CSV personalizzato
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const data = [];
+            let currentHeaders = null;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (!line || line.startsWith('#')) continue;
+                
+                if (line.includes('Tipo_Dato')) {
+                    currentHeaders = line.split(',').map(h => h.trim());
+                    continue;
+                }
+                
+                if (currentHeaders && line) {
+                    const values = line.split(',').map(v => v.trim());
+                    if (values.length >= currentHeaders.length) {
+                        const row = {};
+                        
+                        currentHeaders.forEach((header, index) => {
+                            let value = values[index] || '';
+                            
+                            if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Percentuale_Obiettivo', 
+                                'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Obiettivo_Clienti', 
+                                'Percentuale_Obiettivo_Clienti', 'Fatturato', 'Clienti_Serviti', 'Importo_Totale',
+                                'Clienti_Prov_1', 'Clienti_Prov_2', 'Importo', 'Valore'].includes(header)) {
+                                value = parseFloat(value) || 0;
+                            }
+                            
+                            row[header] = value;
+                        });
+                        
+                        data.push(row);
+                    }
+                }
+            }
+            
+            return data;
+        }
+
+        // Scansiona e carica tutti gli agenti disponibili
+        async function scanAndLoadAgents() {
+            try {
+                updateStatusIndicator('loading', 'Scansione agenti...');
+                updateLoadingText('Scansione repository per agenti disponibili...');
+                updateLoadingProgress(10, 'Controllo file CSV disponibili...');
+
+                const agentPromises = POSSIBLE_AGENTS.map(async (agentName, index) => {
+                    try {
+                        const csvUrl = `${GITHUB_BASE_URL}${agentName}.csv`;
+                        const response = await fetch(csvUrl);
+                        
+                        updateLoadingProgress(10 + (index / POSSIBLE_AGENTS.length) * 40, 
+                            `Controllo ${agentName}... ${response.ok ? '✓' : '✗'}`);
+                        
+                        if (response.ok) {
+                            const csvText = await response.text();
+                            const parsedData = parseCSV(csvText);
+                            
+                            if (parsedData.length > 0) {
+                                return { agentName, csvText, parsedData, csvUrl };
+                            }
+                        }
+                        return null;
+                    } catch (error) {
+                        console.log(`Agente ${agentName} non trovato o errore:`, error.message);
+                        return null;
+                    }
+                });
+
+                updateLoadingText('Caricamento dati agenti trovati...');
+                
+                const results = await Promise.all(agentPromises);
+                const foundAgents = results.filter(result => result !== null);
+                
+                activeAgents = foundAgents;
+                updateLoadingProgress(60, `Trovati ${foundAgents.length} agenti attivi`);
+                
+                console.log(`Trovati ${foundAgents.length} agenti:`, foundAgents.map(a => a.agentName));
+                
+                if (foundAgents.length === 0) {
+                    throw new Error('Nessun agente trovato nel repository');
+                }
+
+                // Processa i dati di ogni agente
+                updateLoadingText('Elaborazione dati agenti...');
+                
+                allAgentsData = [];
+                allVenditeData = [];
+                allCategoriesData = [];
+
+                foundAgents.forEach((agent, index) => {
+                    updateLoadingProgress(60 + (index / foundAgents.length) * 30, 
+                        `Elaborazione dati ${agent.agentName}...`);
+                    
+                    const { agentName, csvText, parsedData } = agent;
+                    
+                    // Estrai info agente dai commenti
+                    const lines = csvText.split('\n');
+                    let agentInfo = {
+                        codice: '',
+                        nome: agentName,
+                        regione: 'Non specificata',
+                        province: []
+                    };
+                    
+                    lines.forEach(line => {
+                        if (line.includes('Codice Agente:')) {
+                            agentInfo.codice = line.split(':')[1]?.trim() || '';
+                        }
+                        if (line.includes('Ragione Sociale:')) {
+                            agentInfo.nome = line.split(':')[1]?.trim() || agentName;
+                        }
+                    });
+
+                    // Determina regione e province dai dati
+                    const provinceData = parsedData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
+                    agentInfo.province = provinceData.map(p => p.Provincia);
+                    
+                    if (agentInfo.province.some(p => ['LT', 'RM', 'FR'].includes(p))) {
+                        agentInfo.regione = 'Lazio';
+                    } else if (agentInfo.province.some(p => ['AN', 'PU'].includes(p))) {
+                        agentInfo.regione = 'Marche';
+                    } else if (agentInfo.province.some(p => ['CR', 'LO', 'PC'].includes(p))) {
+                        agentInfo.regione = 'Lombardia';
+                    } else if (agentInfo.province.some(p => ['MI', 'CO', 'VA'].includes(p))) {
+                        agentInfo.regione = 'Lombardia Nord';
+                    } else if (agentInfo.province.some(p => ['NA', 'SA', 'CE'].includes(p))) {
+                        agentInfo.regione = 'Campania';
+                    } else if (agentInfo.province.some(p => ['BA', 'BR', 'TA'].includes(p))) {
+                        agentInfo.regione = 'Puglia';
+                    } else if (agentInfo.province.some(p => ['PA', 'CT', 'ME'].includes(p))) {
+                        agentInfo.regione = 'Sicilia';
+                    } else if (agentInfo.province.some(p => ['FI', 'LI', 'SI'].includes(p))) {
+                        agentInfo.regione = 'Toscana';
+                    } else if (agentInfo.province.length > 0) {
+                        agentInfo.regione = 'Altra Regione';
+                    }
+
+                    // Aggiungi dati obiettivi dell'agente
+                    const objettiviData = parsedData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
+                    objettiviData.forEach(obj => {
+                        allAgentsData.push({
+                            ...agentInfo,
+                            ...obj,
+                            performance: obj.Obiettivo > 0 ? Math.round((obj.Anno_Corrente / obj.Obiettivo) * 100) : 0,
+                            crescita: obj.Anno_Precedente > 0 ? ((obj.Anno_Corrente - obj.Anno_Precedente) / obj.Anno_Precedente * 100) : 0
+                        });
+                    });
+
+                    // Aggiungi dati vendite
+                    const venditeData = parsedData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+                    venditeData.forEach(vendita => {
+                        allVenditeData.push({
+                            ...vendita,
+                            agente: agentInfo.nome,
+                            codiceAgente: agentInfo.codice,
+                            regione: agentInfo.regione
+                        });
+                    });
+
+                    // Aggiungi dati categorie
+                    const categoriesData = parsedData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
+                    categoriesData.forEach(cat => {
+                        allCategoriesData.push({
+                            ...cat,
+                            agente: agentInfo.nome,
+                            codiceAgente: agentInfo.codice,
+                            regione: agentInfo.regione
+                        });
+                    });
+                });
+
+                // Calcola ranking performance
+                allAgentsData.sort((a, b) => b.performance - a.performance);
+                allAgentsData.forEach((agent, index) => {
+                    agent.rank = index + 1;
+                });
+
+                updateLoadingProgress(95, `Finalizzazione dashboard per ${allAgentsData.length} agenti`);
+                updateLoadingText('Rendering dashboard...');
+                
+                // Nascondi loading e mostra contenuto
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('main-content').style.display = 'block';
+                    document.getElementById('download-buttons').style.display = 'flex';
+                    
+                    updateStatusIndicator('live', `${foundAgents.length} agenti online`);
+                    
+                    // Inizializza dashboard
+                    updateAllData();
+                    createCharts();
+                    updateLoadingProgress(100, 'Dashboard pronta!');
+                }, 500);
+                
+            } catch (error) {
+                console.error('Errore nel caricamento degli agenti:', error);
+                updateLoadingText('Errore nel caricamento: ' + error.message);
+                updateStatusIndicator('error', 'Errore di caricamento');
+                
+                // Mostra messaggio di errore user-friendly
+                setTimeout(() => {
+                    document.getElementById('loading-text').innerHTML = `
+                        <div class="text-red-600 font-bold">⚠️ Errore di Caricamento</div>
+                        <div class="text-gray-600 text-sm mt-2">
+                            ${error.message}<br>
+                            <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                Riprova
+                            </button>
+                        </div>
+                    `;
+                }, 1000);
+            }
+        }
+
+        // Calcola totali aziendali
+        function calculateTotals() {
+            if (allAgentsData.length === 0) {
+                return { fatturato2025: 0, fatturato2024: 0, obiettivo: 0, clienti: 0, agenti: 0, regioni: 0, crescita: 0, performance: 0 };
+            }
+
+            const totals = allAgentsData.reduce((acc, agent) => {
+                acc.fatturato2025 += agent.Anno_Corrente || 0;
+                acc.fatturato2024 += agent.Anno_Precedente || 0;
+                acc.obiettivo += agent.Obiettivo || 0;
+                acc.clienti += agent.Clienti_Anno_Corrente || 0;
+                return acc;
+            }, {
+                fatturato2025: 0,
+                fatturato2024: 0,
+                obiettivo: 0,
+                clienti: 0,
+                agenti: allAgentsData.length,
+                regioni: [...new Set(allAgentsData.map(a => a.regione))].length
+            });
+
+            totals.crescita = totals.fatturato2024 > 0 ? ((totals.fatturato2025 - totals.fatturato2024) / totals.fatturato2024 * 100) : 0;
+            totals.performance = totals.obiettivo > 0 ? Math.round((totals.fatturato2025 / totals.obiettivo) * 100) : 0;
+            
+            return totals;
+        }
+
+        // Gestione tabs
+        function setActiveTab(tab) {
+            activeTab = tab;
+            
+            const overviewTab = document.getElementById('overview-tab');
+            const agentsTab = document.getElementById('agents-tab');
+            const overviewContent = document.getElementById('overview-content');
+            const agentsContent = document.getElementById('agents-content');
+
+            if (tab === 'overview') {
+                overviewTab.className = "group relative px-8 py-4 rounded-2xl font-bold transition-all duration-300 bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-white transform scale-105";
+                agentsTab.className = "group relative px-8 py-4 rounded-2xl font-bold transition-all duration-300 bg-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 text-gray-700 border-2 border-gray-200 hover:border-blue-300";
+                overviewContent.classList.remove('hidden');
+                agentsContent.classList.add('hidden');
+                
+                overviewTab.innerHTML = `
+                    <div class="absolute inset-0 bg-white rounded-2xl opacity-20"></div>
+                    <div class="relative flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        <span>Panoramica Aziendale</span>
+                        <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    </div>
+                `;
+                agentsTab.innerHTML = `
+                    <div class="relative flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        <span>Dettaglio Agenti</span>
+                    </div>
+                `;
+            } else {
+                agentsTab.className = "group relative px-8 py-4 rounded-2xl font-bold transition-all duration-300 bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-white transform scale-105";
+                overviewTab.className = "group relative px-8 py-4 rounded-2xl font-bold transition-all duration-300 bg-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 text-gray-700 border-2 border-gray-200 hover:border-blue-300";
+                agentsContent.classList.remove('hidden');
+                overviewContent.classList.add('hidden');
+                
+                agentsTab.innerHTML = `
+                    <div class="absolute inset-0 bg-white rounded-2xl opacity-20"></div>
+                    <div class="relative flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        <span>Dettaglio Agenti</span>
+                        <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    </div>
+                `;
+                overviewTab.innerHTML = `
+                    <div class="relative flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        <span>Panoramica Aziendale</span>
+                    </div>
+                `;
+                
+                renderAgents();
+            }
+        }
+
+        // Renderizza KPI cards
+        function renderKPICards() {
+            const totals = calculateTotals();
+            const container = document.getElementById('kpi-cards');
+            
+            container.innerHTML = `
+                <!-- Fatturato Totale -->
+                <div class="transform transition-all duration-700 delay-100 translate-y-0 opacity-100 scale-100">
+                    <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 h-full shadow-lg">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 rounded-xl bg-blue-100">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 text-sm font-medium">Fatturato 2025</p>
+                        </div>
+                        <p class="text-3xl font-black text-gray-900 mb-2">${formatCompactCurrency(totals.fatturato2025)}</p>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-600 text-sm font-bold">${totals.crescita >= 0 ? '+' : ''}${totals.crescita.toFixed(1)}%</span>
+                            <span class="text-gray-500 text-sm">vs 2024</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Obiettivo -->
+                <div class="transform transition-all duration-700 delay-200 translate-y-0 opacity-100 scale-100">
+                    <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 h-full shadow-lg">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 rounded-xl bg-emerald-100">
+                                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 text-sm font-medium">Performance</p>
+                        </div>
+                        <p class="text-3xl font-black text-gray-900 mb-2">${totals.performance}%</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="progress-fill transition-all duration-1500" style="width: ${Math.min(totals.performance, 100)}%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clienti Attivi -->
+                <div class="transform transition-all duration-700 delay-300 translate-y-0 opacity-100 scale-100">
+                    <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 h-full shadow-lg">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 rounded-xl bg-purple-100">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 text-sm font-medium">Clienti Attivi</p>
+                        </div>
+                        <p class="text-3xl font-black text-gray-900 mb-2">${totals.clienti}</p>
+                        <p class="text-gray-500 text-sm">Totale portafoglio</p>
+                    </div>
+                </div>
+
+                <!-- Agenti -->
+                <div class="transform transition-all duration-700 delay-400 translate-y-0 opacity-100 scale-100">
+                    <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 h-full shadow-lg">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 rounded-xl bg-orange-100">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 text-sm font-medium">Agenti</p>
+                        </div>
+                        <p class="text-3xl font-black text-gray-900 mb-2">${totals.agenti}</p>
+                        <p class="text-gray-500 text-sm">Rete vendita</p>
+                    </div>
+                </div>
+
+                <!-- Regioni -->
+                <div class="transform transition-all duration-700 delay-500 translate-y-0 opacity-100 scale-100">
+                    <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 h-full shadow-lg">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 rounded-xl bg-cyan-100">
+                                <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray
