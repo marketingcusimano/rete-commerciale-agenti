@@ -174,22 +174,6 @@
                                         <span class="text-sm font-bold" id="status-text">Dati Live da GitHub</span>
                                     </div>
                                 </div>
-
-                                <!-- Download Buttons -->
-                                <div class="flex justify-center gap-4 mb-6">
-                                    <button id="downloadPDF" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-1H8v1a1 1 0 11-2 0v-3a1 1 0 011-1h6z" clip-rule="evenodd"></path>
-                                        </svg>
-                                        Scarica PDF
-                                    </button>
-                                    <button id="downloadExcel" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zm10-4a1 1 0 011-1h3a1 1 0 110 2h-3a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                                        </svg>
-                                        Scarica Excel
-                                    </button>
-                                </div>
                             </div>
                             
                             <!-- Navigation Tabs -->
@@ -365,8 +349,13 @@
     </div>
 
     <script>
-        // URL del CSV dell'agente CARABOT
-        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
+        // URL configurabile del CSV dell'agente
+        let CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/631.00263_G2G-TRADE-CONSULTING-SRL.csv';
+        
+        // Funzione per configurare URL del CSV
+        function setCSVUrl(url) {
+            CSV_URL = url;
+        }
         
         // Dati globali
         let agentData = null;
@@ -443,7 +432,7 @@
         // Carica dati del singolo agente
         async function loadAgentData() {
             try {
-                updateLoadingText('Caricamento dati CARABOT NATALINO...');
+                updateLoadingText('Caricamento dati agente G2G...');
                 const response = await fetch(CSV_URL);
                 
                 if (!response.ok) {
@@ -456,10 +445,10 @@
                 // Estrai info agente dai commenti
                 const lines = csvText.split('\n');
                 let agentInfo = {
-                    codice: '631.00238',
-                    nome: 'CARABOT NATALINO',
-                    regione: 'Lazio',
-                    province: ['LT', 'RM']
+                    codice: '631.00263',
+                    nome: 'G2G TRADE CONSULTING SRL',
+                    regione: 'Marche',
+                    province: ['AN', 'PU']
                 };
                 
                 lines.forEach(line => {
@@ -470,6 +459,24 @@
                         agentInfo.nome = line.split(':')[1]?.trim() || agentInfo.nome;
                     }
                 });
+
+                // Determina regione e province dai dati delle province
+                const provinceData = parsedData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
+                if (provinceData.length > 0) {
+                    const provinces = provinceData.map(p => p.Provincia);
+                    agentInfo.province = provinces;
+                    
+                    // Determina regione basata sulle province
+                    if (provinces.some(p => ['LT', 'RM', 'FR'].includes(p))) {
+                        agentInfo.regione = 'Lazio';
+                    } else if (provinces.some(p => ['AN', 'PU', 'MC', 'FM', 'AP'].includes(p))) {
+                        agentInfo.regione = 'Marche';
+                    } else if (provinces.some(p => ['CR', 'LO', 'PC', 'MI', 'BG'].includes(p))) {
+                        agentInfo.regione = 'Lombardia';
+                    } else {
+                        agentInfo.regione = 'Altro';
+                    }
+                }
 
                 // Filtra i diversi tipi di dati
                 const objettiviData = parsedData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
@@ -1296,7 +1303,7 @@
             document.getElementById('total-fatturato').textContent = formatCompactCurrency(totals.fatturato2025);
             document.getElementById('performance-media').textContent = totals.performance + '%';
             document.getElementById('clienti-totali').textContent = totals.clienti.toString();
-            document.getElementById('regioni-attive').textContent = '2';
+            document.getElementById('regioni-attive').textContent = agentData?.province?.length || '2';
             document.getElementById('agenti-count').textContent = '1 Agente Attivo';
             
             // Renderizza tutti i componenti
@@ -1306,206 +1313,12 @@
             renderCategories();
         }
 
-        // Funzioni per i download
-        async function generatePDF() {
-            const button = document.getElementById('downloadPDF');
-            const originalText = button.innerHTML;
-            
-            button.innerHTML = `
-                <svg class="w-5 h-5 animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
-                </svg>
-                Generando PDF...
-            `;
-            button.disabled = true;
-
-            try {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                let yPosition = 20;
-                
-                // Header
-                pdf.setFontSize(24);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(30, 41, 59);
-                pdf.text('DASHBOARD DIREZIONALE', pageWidth / 2, yPosition, { align: 'center' });
-                
-                yPosition += 12;
-                pdf.setFontSize(16);
-                pdf.setTextColor(59, 130, 246);
-                pdf.text('Cotto Cusimano • Controllo Rete Vendita', pageWidth / 2, yPosition, { align: 'center' });
-                
-                yPosition += 15;
-                
-                const totals = calculateTotals();
-                
-                // Metriche principali
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(30, 41, 59);
-                pdf.text('📊 PERFORMANCE AGENTE', 20, yPosition);
-                yPosition += 12;
-                
-                pdf.setFillColor(248, 250, 252);
-                pdf.rect(20, yPosition - 5, pageWidth - 40, 30, 'F');
-                
-                pdf.setFontSize(12);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(30, 41, 59);
-                
-                pdf.text(`AGENTE: ${agentData?.nome || 'CARABOT NATALINO'}`, 25, yPosition + 5);
-                pdf.text(`CODICE: ${agentData?.codice || '631.00238'}`, 25, yPosition + 12);
-                pdf.text(`FATTURATO: ${formatCurrency(totals.fatturato2025)}`, 25, yPosition + 19);
-                
-                pdf.text(`PERFORMANCE: ${totals.performance}%`, 120, yPosition + 5);
-                pdf.text(`CRESCITA: +${totals.crescita.toFixed(1)}%`, 120, yPosition + 12);
-                pdf.text(`CLIENTI: ${totals.clienti}`, 120, yPosition + 19);
-                
-                // Footer
-                pdf.setFontSize(8);
-                pdf.setTextColor(148, 163, 184);
-                pdf.text('Dashboard Direzionale - Cotto Cusimano', pageWidth / 2, pageHeight - 10, { align: 'center' });
-                
-                const now = new Date();
-                const fileName = `Dashboard_Direzionale_${now.toISOString().slice(0, 10)}.pdf`;
-                pdf.save(fileName);
-                
-            } catch (error) {
-                console.error('Errore nella generazione del PDF:', error);
-                alert('Errore nella generazione del PDF. Riprova.');
-            } finally {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        }
-
-        async function generateExcel() {
-            const button = document.getElementById('downloadExcel');
-            const originalText = button.innerHTML;
-            
-            button.innerHTML = `
-                <svg class="w-5 h-5 animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
-                </svg>
-                Generando Excel...
-            `;
-            button.disabled = true;
-
-            try {
-                const wb = XLSX.utils.book_new();
-                
-                // Foglio 1: Riepilogo Aziendale
-                const totals = calculateTotals();
-                const summaryData = [
-                    ['DASHBOARD DIREZIONALE - COTTO CUSIMANO', ''],
-                    ['Data Generazione', new Date().toLocaleString('it-IT')],
-                    ['Periodo', 'Gennaio - Agosto 2025'],
-                    ['', ''],
-                    ['INFORMAZIONI AGENTE', ''],
-                    ['Codice', agentData?.codice || '631.00238'],
-                    ['Nome', agentData?.nome || 'CARABOT NATALINO'],
-                    ['Regione', agentData?.regione || 'Lazio'],
-                    ['Province', agentData?.province?.join(', ') || 'LT, RM'],
-                    ['', ''],
-                    ['METRICHE PRINCIPALI', ''],
-                    ['Fatturato 2025', totals.fatturato2025],
-                    ['Fatturato 2024', totals.fatturato2024],
-                    ['Crescita %', totals.crescita.toFixed(2)],
-                    ['Performance %', totals.performance],
-                    ['Clienti Attivi', totals.clienti],
-                    ['Obiettivo', totals.obiettivo]
-                ];
-                
-                const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
-                XLSX.utils.book_append_sheet(wb, summaryWS, 'Riepilogo Agente');
-                
-                // Foglio 2: Dettaglio Vendite
-                const salesData = [
-                    ['CLIENTE', 'PROVINCIA', 'CATEGORIA', 'FATTURATO']
-                ];
-                
-                allVenditeData.forEach(vendita => {
-                    salesData.push([
-                        vendita.Ragione_Sociale_Cliente,
-                        vendita.Provincia,
-                        vendita.Categoria_Articoli,
-                        parseFloat(vendita.Fatturato) || 0
-                    ]);
-                });
-                
-                const salesWS = XLSX.utils.aoa_to_sheet(salesData);
-                XLSX.utils.book_append_sheet(wb, salesWS, 'Dettaglio Vendite');
-
-                // Foglio 3: Performance per Categoria
-                const categoriesExcelData = [
-                    ['CATEGORIA', 'FATTURATO', 'CLIENTI_LT', 'CLIENTI_RM', 'TOTALE_CLIENTI']
-                ];
-                
-                allCategoriesData
-                    .filter(cat => parseFloat(cat.Importo_Totale) > 0)
-                    .sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale))
-                    .forEach(cat => {
-                        const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
-                        const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
-                        categoriesExcelData.push([
-                            cat.Categoria,
-                            parseFloat(cat.Importo_Totale),
-                            clientiLT,
-                            clientiRM,
-                            clientiLT + clientiRM
-                        ]);
-                    });
-                
-                const categoriesExcelWS = XLSX.utils.aoa_to_sheet(categoriesExcelData);
-                XLSX.utils.book_append_sheet(wb, categoriesExcelWS, 'Performance Categorie');
-
-                // Foglio 4: Distribuzione Province
-                const provinceExcelData = [
-                    ['PROVINCIA', 'NOME', 'CLIENTI_SERVITI', 'FATTURATO', 'MEDIA_PER_CLIENTE']
-                ];
-                
-                allProvincesData.forEach(prov => {
-                    const clients = parseInt(prov.Clienti_Serviti) || 0;
-                    const revenue = parseFloat(prov.Fatturato) || 0;
-                    const avgPerClient = clients > 0 ? revenue / clients : 0;
-                    const provinceName = prov.Provincia === 'LT' ? 'Latina' : 
-                                       prov.Provincia === 'RM' ? 'Roma' : 
-                                       prov.Provincia;
-                    
-                    provinceExcelData.push([
-                        prov.Provincia,
-                        provinceName,
-                        clients,
-                        revenue,
-                        avgPerClient
-                    ]);
-                });
-                
-                const provinceExcelWS = XLSX.utils.aoa_to_sheet(provinceExcelData);
-                XLSX.utils.book_append_sheet(wb, provinceExcelWS, 'Province');
-                
-                const now = new Date();
-                const fileName = `Dashboard_Excel_${now.toISOString().slice(0, 10)}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-                
-            } catch (error) {
-                console.error('Errore nella generazione del file Excel:', error);
-                alert('Errore nella generazione del file Excel. Riprova.');
-            } finally {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        }
-
+        // Funzioni per i download (rimosse - placeholder per future funzionalità)
+        // Le funzioni PDF ed Excel sono state rimosse per semplificare la dashboard
+        
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
             loadAllData();
-            
-            document.getElementById('downloadPDF').addEventListener('click', generatePDF);
-            document.getElementById('downloadExcel').addEventListener('click', generateExcel);
         });
     </script>
 </body>
