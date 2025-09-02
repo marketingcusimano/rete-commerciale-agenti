@@ -163,9 +163,9 @@
                                     </div>
                                     <div class="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl border border-purple-200">
                                         <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                         </svg>
-                                        <span class="text-sm font-bold text-purple-700" id="agenti-count">4 Agenti Operativi</span>
+                                        <span class="text-sm font-bold text-purple-700" id="agenti-count">1 Agente Attivo</span>
                                     </div>
                                     <div class="flex items-center gap-3 px-4 py-2 status-live rounded-xl">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -226,20 +226,20 @@
                             <!-- Quick Stats -->
                             <div class="grid grid-cols-2 gap-4" id="quick-stats">
                                 <div class="text-center p-4 bg-gradient-to-br from-emerald-50 to-green-100 rounded-xl border border-emerald-200">
-                                    <div class="text-2xl font-black text-emerald-700" id="total-fatturato">€203k</div>
+                                    <div class="text-2xl font-black text-emerald-700" id="total-fatturato">€68k</div>
                                     <div class="text-xs font-semibold text-emerald-600">Fatturato Totale</div>
                                 </div>
                                 <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-                                    <div class="text-2xl font-black text-blue-700" id="performance-media">75%</div>
-                                    <div class="text-xs font-semibold text-blue-600">Performance Media</div>
+                                    <div class="text-2xl font-black text-blue-700" id="performance-media">74%</div>
+                                    <div class="text-xs font-semibold text-blue-600">Performance</div>
                                 </div>
                                 <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
-                                    <div class="text-2xl font-black text-purple-700" id="clienti-totali">45</div>
+                                    <div class="text-2xl font-black text-purple-700" id="clienti-totali">20</div>
                                     <div class="text-xs font-semibold text-purple-600">Clienti Totali</div>
                                 </div>
                                 <div class="text-center p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl border border-indigo-200">
-                                    <div class="text-2xl font-black text-indigo-700" id="regioni-attive">3</div>
-                                    <div class="text-xs font-semibold text-indigo-600">Regioni Attive</div>
+                                    <div class="text-2xl font-black text-indigo-700" id="regioni-attive">2</div>
+                                    <div class="text-xs font-semibold text-indigo-600">Province</div>
                                 </div>
                             </div>
                         </div>
@@ -268,14 +268,14 @@
                             </div>
                         </div>
                         
-                        <!-- Tabella Regioni -->
+                        <!-- Tabella Province -->
                         <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-200 shadow-lg">
-                            <h3 class="text-xl font-bold text-gray-900 mb-6">Dettaglio per Regione</h3>
+                            <h3 class="text-xl font-bold text-gray-900 mb-6">Dettaglio per Provincia</h3>
                             <div class="overflow-x-auto">
                                 <table class="w-full">
                                     <thead>
                                         <tr class="border-b border-gray-300">
-                                            <th class="text-left py-4 px-4 text-sm font-bold text-gray-700">Regione</th>
+                                            <th class="text-left py-4 px-4 text-sm font-bold text-gray-700">Provincia</th>
                                             <th class="text-center py-4 px-4 text-sm font-bold text-gray-700">Agenti</th>
                                             <th class="text-right py-4 px-4 text-sm font-bold text-gray-700">Fatturato 2025</th>
                                             <th class="text-center py-4 px-4 text-sm font-bold text-gray-700">vs 2024</th>
@@ -347,13 +347,13 @@
                                     </div>
                                     <div>
                                         <h4 class="text-2xl font-black text-gray-900">Performance Board</h4>
-                                        <p class="text-gray-600 font-medium" id="agents-board-subtitle">4 agenti • Classifica per risultati</p>
+                                        <p class="text-gray-600 font-medium" id="agents-board-subtitle">1 agente • CARABOT NATALINO</p>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="p-8">
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="agents-grid">
+                                <div class="grid grid-cols-1 gap-6" id="agents-grid">
                                     <!-- Agenti popolati via JavaScript -->
                                 </div>
                             </div>
@@ -365,13 +365,14 @@
     </div>
 
     <script>
-        // URL del CSV dell'agente (solo CARABOT)
+        // URL del CSV dell'agente CARABOT
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
         
         // Dati globali
-        let allAgentsData = [];
+        let agentData = null;
         let allVenditeData = [];
         let allCategoriesData = [];
+        let allProvincesData = [];
         let activeTab = 'overview';
         let performanceChart = null;
         let revenueChart = null;
@@ -397,7 +398,7 @@
             document.getElementById('loading-text').textContent = text;
         }
 
-        // Parser CSV personalizzato (stesso del file originale)
+        // Parser CSV personalizzato
         function parseCSV(csvText) {
             const lines = csvText.trim().split('\n');
             const data = [];
@@ -439,11 +440,11 @@
             return data;
         }
 
-        // Carica dati di un singolo agente
-        async function loadAgentData(agentKey, csvUrl) {
+        // Carica dati del singolo agente
+        async function loadAgentData() {
             try {
-                updateLoadingText(`Caricamento dati ${agentKey}...`);
-                const response = await fetch(csvUrl);
+                updateLoadingText('Caricamento dati CARABOT NATALINO...');
+                const response = await fetch(CSV_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -455,105 +456,54 @@
                 // Estrai info agente dai commenti
                 const lines = csvText.split('\n');
                 let agentInfo = {
-                    codice: '',
-                    nome: '',
-                    regione: '',
-                    province: []
+                    codice: '631.00238',
+                    nome: 'CARABOT NATALINO',
+                    regione: 'Lazio',
+                    province: ['LT', 'RM']
                 };
                 
                 lines.forEach(line => {
                     if (line.includes('Codice Agente:')) {
-                        agentInfo.codice = line.split(':')[1]?.trim() || '';
+                        agentInfo.codice = line.split(':')[1]?.trim() || agentInfo.codice;
                     }
                     if (line.includes('Ragione Sociale:')) {
-                        agentInfo.nome = line.split(':')[1]?.trim() || '';
+                        agentInfo.nome = line.split(':')[1]?.trim() || agentInfo.nome;
                     }
                 });
 
-                // Determina regione e province dai dati
-                const provinceData = parsedData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
-                agentInfo.province = provinceData.map(p => p.Provincia);
-                
-                if (agentInfo.province.includes('LT') || agentInfo.province.includes('RM') || agentInfo.province.includes('FR')) {
-                    agentInfo.regione = 'Lazio';
-                } else if (agentInfo.province.includes('AN') || agentInfo.province.includes('PU')) {
-                    agentInfo.regione = 'Marche';
-                } else if (agentInfo.province.includes('CR') || agentInfo.province.includes('LO') || agentInfo.province.includes('PC')) {
-                    agentInfo.regione = 'Lombardia';
-                } else {
-                    agentInfo.regione = 'Altro';
+                // Filtra i diversi tipi di dati
+                const objettiviData = parsedData.filter(item => item.Tipo_Dato === 'OBIETTIVI');
+                allVenditeData = parsedData.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
+                allCategoriesData = parsedData.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
+                allProvincesData = parsedData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
+
+                // Prendi i dati generali dell'agente
+                const generalData = objettiviData.find(obj => obj.Provincia === 'Generale');
+                if (generalData) {
+                    agentData = {
+                        ...agentInfo,
+                        ...generalData,
+                        performance: generalData.Obiettivo > 0 ? Math.round((generalData.Anno_Corrente / generalData.Obiettivo) * 100) : 0,
+                        crescita: generalData.Anno_Precedente > 0 ? ((generalData.Anno_Corrente - generalData.Anno_Precedente) / generalData.Anno_Precedente * 100) : 0,
+                        rank: 1
+                    };
                 }
 
-                return {
-                    agentInfo,
-                    data: parsedData
-                };
+                return parsedData;
                 
             } catch (error) {
-                console.error(`Errore caricamento ${agentKey}:`, error);
-                return null;
+                console.error('Errore caricamento dati:', error);
+                throw error;
             }
         }
 
-        // Carica tutti i dati degli agenti
+        // Carica tutti i dati
         async function loadAllData() {
             try {
                 updateLoadingText('Inizializzazione sistema...');
-                allAgentsData = [];
-                allVenditeData = [];
-                allCategoriesData = [];
-
-                const promises = Object.entries(CSV_URLS).map(([key, url]) => 
-                    loadAgentData(key, url)
-                );
-
-                const results = await Promise.all(promises);
                 
-                results.forEach(result => {
-                    if (result) {
-                        const { agentInfo, data } = result;
-                        
-                        // Aggiungi dati obiettivi dell'agente
-                        const objettiviData = data.filter(item => item.Tipo_Dato === 'OBIETTIVI');
-                        objettiviData.forEach(obj => {
-                            allAgentsData.push({
-                                ...agentInfo,
-                                ...obj,
-                                performance: obj.Obiettivo > 0 ? Math.round((obj.Anno_Corrente / obj.Obiettivo) * 100) : 0,
-                                crescita: obj.Anno_Precedente > 0 ? ((obj.Anno_Corrente - obj.Anno_Precedente) / obj.Anno_Precedente * 100) : 0
-                            });
-                        });
-
-                        // Aggiungi dati vendite
-                        const venditeData = data.filter(item => item.Tipo_Dato === 'VENDITE_CLIENTE');
-                        venditeData.forEach(vendita => {
-                            allVenditeData.push({
-                                ...vendita,
-                                agente: agentInfo.nome,
-                                codiceAgente: agentInfo.codice,
-                                regione: agentInfo.regione
-                            });
-                        });
-
-                        // Aggiungi dati categorie
-                        const categoriesData = data.filter(item => item.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-                        categoriesData.forEach(cat => {
-                            allCategoriesData.push({
-                                ...cat,
-                                agente: agentInfo.nome,
-                                codiceAgente: agentInfo.codice,
-                                regione: agentInfo.regione
-                            });
-                        });
-                    }
-                });
-
-                // Calcola ranking performance
-                allAgentsData.sort((a, b) => b.performance - a.performance);
-                allAgentsData.forEach((agent, index) => {
-                    agent.rank = index + 1;
-                });
-
+                await loadAgentData();
+                
                 updateLoadingText('Rendering dashboard...');
                 
                 // Nascondi loading e mostra contenuto
@@ -572,27 +522,29 @@
             }
         }
 
-        // Calcola totali aziendali
+        // Calcola totali (basati su singolo agente)
         function calculateTotals() {
-            const totals = allAgentsData.reduce((acc, agent) => {
-                acc.fatturato2025 += agent.Anno_Corrente || 0;
-                acc.fatturato2024 += agent.Anno_Precedente || 0;
-                acc.obiettivo += agent.Obiettivo || 0;
-                acc.clienti += agent.Clienti_Anno_Corrente || 0;
-                return acc;
-            }, {
+            if (!agentData) return {
                 fatturato2025: 0,
                 fatturato2024: 0,
                 obiettivo: 0,
                 clienti: 0,
-                agenti: allAgentsData.length,
-                regioni: [...new Set(allAgentsData.map(a => a.regione))].length
-            });
+                agenti: 1,
+                regioni: 1,
+                crescita: 0,
+                performance: 0
+            };
 
-            totals.crescita = totals.fatturato2024 > 0 ? ((totals.fatturato2025 - totals.fatturato2024) / totals.fatturato2024 * 100) : 0;
-            totals.performance = totals.obiettivo > 0 ? Math.round((totals.fatturato2025 / totals.obiettivo) * 100) : 0;
-            
-            return totals;
+            return {
+                fatturato2025: agentData.Anno_Corrente || 0,
+                fatturato2024: agentData.Anno_Precedente || 0,
+                obiettivo: agentData.Obiettivo || 0,
+                clienti: agentData.Clienti_Anno_Corrente || 0,
+                agenti: 1,
+                regioni: 2,
+                crescita: agentData.crescita || 0,
+                performance: agentData.performance || 0
+            };
         }
 
         // Gestione tabs
@@ -716,23 +668,23 @@
                     </div>
                 </div>
 
-                <!-- Agenti -->
+                <!-- Obiettivo -->
                 <div class="transform transition-all duration-700 delay-400 translate-y-0 opacity-100 scale-100">
                     <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 h-full shadow-lg">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="p-2 rounded-xl bg-orange-100">
                                 <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
                                 </svg>
                             </div>
-                            <p class="text-gray-600 text-sm font-medium">Agenti</p>
+                            <p class="text-gray-600 text-sm font-medium">Obiettivo</p>
                         </div>
-                        <p class="text-3xl font-black text-gray-900 mb-2">${totals.agenti}</p>
-                        <p class="text-gray-500 text-sm">Rete vendita</p>
+                        <p class="text-3xl font-black text-gray-900 mb-2">${formatCompactCurrency(totals.obiettivo)}</p>
+                        <p class="text-gray-500 text-sm">Target 2025</p>
                     </div>
                 </div>
 
-                <!-- Regioni -->
+                <!-- Province -->
                 <div class="transform transition-all duration-700 delay-500 translate-y-0 opacity-100 scale-100">
                     <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 h-full shadow-lg">
                         <div class="flex items-center gap-3 mb-4">
@@ -742,16 +694,16 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
                             </div>
-                            <p class="text-gray-600 text-sm font-medium">Regioni</p>
+                            <p class="text-gray-600 text-sm font-medium">Province</p>
                         </div>
                         <p class="text-3xl font-black text-gray-900 mb-2">${totals.regioni}</p>
-                        <p class="text-gray-500 text-sm">Copertura territorio</p>
+                        <p class="text-gray-500 text-sm">LT • RM</p>
                     </div>
                 </div>
             `;
         }
 
-        // Renderizza tabella regioni (basata su province dell'agente)
+        // Renderizza tabella province
         function renderRegions() {
             const tbody = document.getElementById('regioni-table');
             tbody.innerHTML = '';
@@ -821,7 +773,7 @@
                 });
         }
 
-        // Renderizza top clienti (dal singolo agente)
+        // Renderizza top clienti
         function renderTopClienti() {
             const clientsMap = new Map();
             
@@ -946,7 +898,7 @@
             const categoriesArray = Array.from(categoriesMap.values())
                 .filter(cat => cat.importo > 0)
                 .sort((a, b) => b.importo - a.importo)
-                .slice(0, 8); // Top 8 categorie
+                .slice(0, 8);
             
             const colors = ['#3b82f6', '#8b5cf6', '#06d6a0', '#ffd166', '#f72585', '#4cc9f0', '#ef4444', '#10b981'];
             
@@ -1176,169 +1128,164 @@
             });
         }
 
-        // Renderizza sezione agenti
+        // Renderizza sezione agenti (singolo agente)
         function renderAgents() {
             const grid = document.getElementById('agents-grid');
             grid.innerHTML = '';
             
-            document.getElementById('agents-board-subtitle').textContent = `${allAgentsData.length} agenti • Classifica per risultati`;
+            if (!agentData) {
+                grid.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        Nessun dato agente disponibile
+                    </div>
+                `;
+                return;
+            }
             
-            allAgentsData.forEach(agente => {
-                const div = document.createElement('div');
-                div.className = 'group relative overflow-hidden rounded-2xl border transition-all duration-300 bg-white hover:bg-gradient-to-br hover:from-gray-50 hover:to-blue-50 border-gray-200 hover:border-blue-300 cursor-pointer hover:scale-105';
-                
-                div.innerHTML = `
-                    <div class="relative p-6 pb-4">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="relative">
-                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-black text-2xl transition-all duration-300 ${
-                                    agente.rank === 1 ? 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600' :
-                                    agente.rank === 2 ? 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500' :
-                                    agente.rank === 3 ? 'bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600' :
-                                    'bg-gradient-to-br from-slate-400 via-slate-500 to-slate-600'
-                                }">
-                                    ${agente.rank}
-                                </div>
-                                ${agente.rank <= 3 ? `
-                                    <div class="absolute -top-2 -right-2">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center ${
-                                            agente.rank === 1 ? 'bg-yellow-400' :
-                                            agente.rank === 2 ? 'bg-gray-300' :
-                                            'bg-amber-400'
-                                        }">
-                                            <svg class="w-5 h-5 ${
-                                                agente.rank === 1 ? 'text-yellow-700' :
-                                                agente.rank === 2 ? 'text-gray-600' :
-                                                'text-amber-700'
-                                            }" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clip-rule="evenodd"></path>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                ` : ''}
+            document.getElementById('agents-board-subtitle').textContent = `1 agente • ${agentData.nome}`;
+            
+            // Crea card per il singolo agente
+            const agente = agentData;
+            const div = document.createElement('div');
+            div.className = 'group relative overflow-hidden rounded-2xl border transition-all duration-300 bg-white hover:bg-gradient-to-br hover:from-gray-50 hover:to-blue-50 border-gray-200 hover:border-blue-300 cursor-pointer hover:scale-105';
+            
+            div.innerHTML = `
+                <div class="relative p-6 pb-4">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="relative">
+                            <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-black text-2xl transition-all duration-300 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700">
+                                1
                             </div>
-                            
-                            <div class="text-right">
-                                <div class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold border ${
-                                    agente.performance >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                                    agente.performance >= 60 ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                                    'bg-red-50 text-red-700 border-red-200'
-                                }">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <div class="absolute -top-2 -right-2">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center bg-green-400">
+                                    <svg class="w-5 h-5 text-green-700" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                     </svg>
-                                    ${agente.performance}%
                                 </div>
-                                ${agente.rank === 1 ? `
-                                    <div class="mt-3">
-                                        <div class="inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-gradient-to-r from-yellow-50 to-amber-50 text-amber-800 rounded-xl font-bold border border-amber-200">
-                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5zM6 12a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            TOP PERFORMER
-                                        </div>
-                                    </div>
-                                ` : ''}
                             </div>
                         </div>
                         
-                        <div class="mb-4">
-                            <h5 class="text-xl font-black text-gray-900 mb-2">${agente.nome}</h5>
-                            <div class="flex items-center gap-3 text-sm flex-wrap">
-                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg font-semibold text-xs">
-                                    ${agente.codice}
-                                </span>
-                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg font-semibold text-xs flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                    </svg>
-                                    ${agente.regione}
-                                </span>
-                                <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg font-semibold text-xs">
-                                    ${agente.province.join(', ')}
-                                </span>
+                        <div class="text-right">
+                            <div class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold border ${
+                                agente.performance >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                agente.performance >= 60 ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                'bg-red-50 text-red-700 border-red-200'
+                            }">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                ${agente.performance}%
                             </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="text-sm font-bold text-gray-700 flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            <div class="mt-3">
+                                <div class="inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-800 rounded-xl font-bold border border-blue-200">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5zM6 12a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clip-rule="evenodd"></path>
                                     </svg>
-                                    Progresso Obiettivo
-                                </span>
-                                <span class="text-sm font-black text-gray-900 px-2 py-1 bg-gray-100 rounded-lg">
-                                    ${agente.performance}%
-                                </span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                                <div class="h-full rounded-full transition-all duration-1000 ${
-                                    agente.performance >= 80 ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' :
-                                    agente.performance >= 60 ? 'bg-gradient-to-r from-amber-400 to-amber-500' :
-                                    'bg-gradient-to-r from-red-400 to-red-500'
-                                }" style="width: ${Math.min(agente.performance, 100)}%"></div>
+                                    AGENTE ATTIVO
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="px-6 pb-6">
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200">
-                                <div class="flex items-center justify-center mb-2">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-lg font-black text-blue-800">
-                                    ${formatCompactCurrency(agente.Anno_Corrente)}
-                                </div>
-                                <div class="text-xs font-bold text-blue-600 mt-1">Fatturato 2025</div>
-                                <div class="text-xs text-emerald-600 font-bold mt-1 flex items-center justify-center gap-1">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    ${agente.Anno_Precedente > 0 
-                                        ? `+${agente.crescita.toFixed(1)}%`
-                                        : 'Nuovo'
-                                    }
-                                </div>
+                    <div class="mb-4">
+                        <h5 class="text-xl font-black text-gray-900 mb-2">${agente.nome}</h5>
+                        <div class="flex items-center gap-3 text-sm flex-wrap">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg font-semibold text-xs">
+                                ${agente.codice}
+                            </span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg font-semibold text-xs flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                </svg>
+                                ${agente.regione}
+                            </span>
+                            <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg font-semibold text-xs">
+                                ${agente.province.join(', ')}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Progresso Obiettivo
+                            </span>
+                            <span class="text-sm font-black text-gray-900 px-2 py-1 bg-gray-100 rounded-lg">
+                                ${agente.performance}%
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-1000 ${
+                                agente.performance >= 80 ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' :
+                                agente.performance >= 60 ? 'bg-gradient-to-r from-amber-400 to-amber-500' :
+                                'bg-gradient-to-r from-red-400 to-red-500'
+                            }" style="width: ${Math.min(agente.performance, 100)}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="px-6 pb-6">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200">
+                            <div class="flex items-center justify-center mb-2">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
                             </div>
-                            
-                            <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200">
-                                <div class="flex items-center justify-center mb-2">
-                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-lg font-black text-purple-800">${agente.Clienti_Anno_Corrente}</div>
-                                <div class="text-xs font-bold text-purple-600 mt-1">Clienti Attivi</div>
-                                <div class="text-xs text-purple-600 font-bold mt-1 flex items-center justify-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    ${agente.Obiettivo_Clienti > 0 ? Math.round((agente.Clienti_Anno_Corrente / agente.Obiettivo_Clienti) * 100) : 0}% target
-                                </div>
+                            <div class="text-lg font-black text-blue-800">
+                                ${formatCompactCurrency(agente.Anno_Corrente)}
                             </div>
-                            
-                            <div class="text-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
-                                <div class="flex items-center justify-center mb-2">
-                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-lg font-black text-gray-800">#${agente.rank}</div>
-                                <div class="text-xs font-bold text-gray-600 mt-1">Posizione</div>
-                                <div class="text-xs text-gray-600 font-bold mt-1">
-                                    su ${allAgentsData.length}
-                                </div>
+                            <div class="text-xs font-bold text-blue-600 mt-1">Fatturato 2025</div>
+                            <div class="text-xs text-emerald-600 font-bold mt-1 flex items-center justify-center gap-1">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                ${agente.Anno_Precedente > 0 
+                                    ? `+${agente.crescita.toFixed(1)}%`
+                                    : 'Nuovo'
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200">
+                            <div class="flex items-center justify-center mb-2">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-lg font-black text-purple-800">${agente.Clienti_Anno_Corrente}</div>
+                            <div class="text-xs font-bold text-purple-600 mt-1">Clienti Attivi</div>
+                            <div class="text-xs text-purple-600 font-bold mt-1 flex items-center justify-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                ${agente.Obiettivo_Clienti > 0 ? Math.round((agente.Clienti_Anno_Corrente / agente.Obiettivo_Clienti) * 100) : 0}% target
+                            </div>
+                        </div>
+                        
+                        <div class="text-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
+                            <div class="flex items-center justify-center mb-2">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-lg font-black text-gray-800">${formatCurrency(agente.Obiettivo || 0)}</div>
+                            <div class="text-xs font-bold text-gray-600 mt-1">Obiettivo</div>
+                            <div class="text-xs text-gray-600 font-bold mt-1">
+                                Anno 2025
                             </div>
                         </div>
                     </div>
-                `;
-                
-                grid.appendChild(div);
-            });
+                </div>
+            `;
+            
+            grid.appendChild(div);
         }
 
         // Aggiorna tutti i dati della dashboard
@@ -1349,8 +1296,8 @@
             document.getElementById('total-fatturato').textContent = formatCompactCurrency(totals.fatturato2025);
             document.getElementById('performance-media').textContent = totals.performance + '%';
             document.getElementById('clienti-totali').textContent = totals.clienti.toString();
-            document.getElementById('regioni-attive').textContent = totals.regioni.toString();
-            document.getElementById('agenti-count').textContent = totals.agenti + ' Agenti Operativi';
+            document.getElementById('regioni-attive').textContent = '2';
+            document.getElementById('agenti-count').textContent = '1 Agente Attivo';
             
             // Renderizza tutti i componenti
             renderKPICards();
@@ -1399,7 +1346,7 @@
                 pdf.setFontSize(16);
                 pdf.setFont("helvetica", "bold");
                 pdf.setTextColor(30, 41, 59);
-                pdf.text('📊 PERFORMANCE AZIENDALE', 20, yPosition);
+                pdf.text('📊 PERFORMANCE AGENTE', 20, yPosition);
                 yPosition += 12;
                 
                 pdf.setFillColor(248, 250, 252);
@@ -1409,64 +1356,13 @@
                 pdf.setFont("helvetica", "bold");
                 pdf.setTextColor(30, 41, 59);
                 
-                pdf.text(`FATTURATO TOTALE: ${formatCurrency(totals.fatturato2025)}`, 25, yPosition + 5);
-                pdf.text(`PERFORMANCE MEDIA: ${totals.performance}%`, 25, yPosition + 12);
-                pdf.text(`CRESCITA: +${totals.crescita.toFixed(1)}%`, 25, yPosition + 19);
+                pdf.text(`AGENTE: ${agentData?.nome || 'CARABOT NATALINO'}`, 25, yPosition + 5);
+                pdf.text(`CODICE: ${agentData?.codice || '631.00238'}`, 25, yPosition + 12);
+                pdf.text(`FATTURATO: ${formatCurrency(totals.fatturato2025)}`, 25, yPosition + 19);
                 
-                pdf.text(`CLIENTI ATTIVI: ${totals.clienti}`, 120, yPosition + 5);
-                pdf.text(`AGENTI OPERATIVI: ${totals.agenti}`, 120, yPosition + 12);
-                pdf.text(`REGIONI COPERTE: ${totals.regioni}`, 120, yPosition + 19);
-                
-                yPosition += 40;
-                
-                // Ranking agenti
-                pdf.setFontSize(16);
-                pdf.setFont("helvetica", "bold");
-                pdf.text('🏆 RANKING AGENTI', 20, yPosition);
-                yPosition += 12;
-                
-                pdf.setFontSize(10);
-                pdf.setFont("helvetica", "bold");
-                pdf.setTextColor(55, 65, 81);
-                pdf.text('POS', 25, yPosition);
-                pdf.text('AGENTE', 45, yPosition);
-                pdf.text('REGIONE', 120, yPosition);
-                pdf.text('FATTURATO', 150, yPosition);
-                pdf.text('PERF%', 180, yPosition);
-                
-                yPosition += 6;
-                
-                pdf.setFont("helvetica", "normal");
-                pdf.setFontSize(9);
-                
-                allAgentsData.slice(0, 10).forEach((agent, index) => {
-                    if (yPosition > pageHeight - 30) {
-                        pdf.addPage();
-                        yPosition = 20;
-                    }
-                    
-                    if (index < 3) {
-                        pdf.setTextColor(index === 0 ? 255 : index === 1 ? 158 : 205, 
-                                        index === 0 ? 193 : index === 1 ? 158 : 127, 
-                                        index === 0 ? 7 : index === 1 ? 158 : 50);
-                    } else {
-                        pdf.setTextColor(100, 116, 139);
-                    }
-                    
-                    pdf.setFont("helvetica", "bold");
-                    pdf.text(`${index + 1}°`, 25, yPosition);
-                    
-                    pdf.setFont("helvetica", "normal");
-                    pdf.setTextColor(30, 41, 59);
-                    
-                    const shortName = agent.nome.length > 20 ? agent.nome.substring(0, 17) + '...' : agent.nome;
-                    pdf.text(shortName, 45, yPosition);
-                    pdf.text(agent.regione, 120, yPosition);
-                    pdf.text(`${formatCompactCurrency(agent.Anno_Corrente)}`, 150, yPosition);
-                    pdf.text(`${agent.performance}%`, 180, yPosition);
-                    
-                    yPosition += 5;
-                });
+                pdf.text(`PERFORMANCE: ${totals.performance}%`, 120, yPosition + 5);
+                pdf.text(`CRESCITA: +${totals.crescita.toFixed(1)}%`, 120, yPosition + 12);
+                pdf.text(`CLIENTI: ${totals.clienti}`, 120, yPosition + 19);
                 
                 // Footer
                 pdf.setFontSize(8);
@@ -1508,53 +1404,31 @@
                     ['Data Generazione', new Date().toLocaleString('it-IT')],
                     ['Periodo', 'Gennaio - Agosto 2025'],
                     ['', ''],
+                    ['INFORMAZIONI AGENTE', ''],
+                    ['Codice', agentData?.codice || '631.00238'],
+                    ['Nome', agentData?.nome || 'CARABOT NATALINO'],
+                    ['Regione', agentData?.regione || 'Lazio'],
+                    ['Province', agentData?.province?.join(', ') || 'LT, RM'],
+                    ['', ''],
                     ['METRICHE PRINCIPALI', ''],
-                    ['Fatturato Totale 2025', totals.fatturato2025],
-                    ['Fatturato Totale 2024', totals.fatturato2024],
+                    ['Fatturato 2025', totals.fatturato2025],
+                    ['Fatturato 2024', totals.fatturato2024],
                     ['Crescita %', totals.crescita.toFixed(2)],
-                    ['Performance Media %', totals.performance],
+                    ['Performance %', totals.performance],
                     ['Clienti Attivi', totals.clienti],
-                    ['Agenti Operativi', totals.agenti],
-                    ['Regioni Coperte', totals.regioni]
+                    ['Obiettivo', totals.obiettivo]
                 ];
                 
                 const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
-                XLSX.utils.book_append_sheet(wb, summaryWS, 'Riepilogo Aziendale');
+                XLSX.utils.book_append_sheet(wb, summaryWS, 'Riepilogo Agente');
                 
-                // Foglio 2: Performance Agenti
-                const agentsData = [
-                    ['POSIZIONE', 'CODICE', 'NOME', 'REGIONE', 'PROVINCE', 'FATTURATO_2025', 'FATTURATO_2024', 'OBIETTIVO', 'PERFORMANCE_%', 'CLIENTI_2025', 'OBIETTIVO_CLIENTI']
-                ];
-                
-                allAgentsData.forEach(agent => {
-                    agentsData.push([
-                        agent.rank,
-                        agent.codice,
-                        agent.nome,
-                        agent.regione,
-                        agent.province.join(', '),
-                        agent.Anno_Corrente || 0,
-                        agent.Anno_Precedente || 0,
-                        agent.Obiettivo || 0,
-                        agent.performance,
-                        agent.Clienti_Anno_Corrente || 0,
-                        agent.Obiettivo_Clienti || 0
-                    ]);
-                });
-                
-                const agentsWS = XLSX.utils.aoa_to_sheet(agentsData);
-                XLSX.utils.book_append_sheet(wb, agentsWS, 'Performance Agenti');
-                
-                // Foglio 3: Dettaglio Vendite
+                // Foglio 2: Dettaglio Vendite
                 const salesData = [
-                    ['AGENTE', 'CODICE_AGENTE', 'REGIONE', 'CLIENTE', 'PROVINCIA', 'CATEGORIA', 'FATTURATO']
+                    ['CLIENTE', 'PROVINCIA', 'CATEGORIA', 'FATTURATO']
                 ];
                 
                 allVenditeData.forEach(vendita => {
                     salesData.push([
-                        vendita.agente,
-                        vendita.codiceAgente,
-                        vendita.regione,
                         vendita.Ragione_Sociale_Cliente,
                         vendita.Provincia,
                         vendita.Categoria_Articoli,
@@ -1564,6 +1438,54 @@
                 
                 const salesWS = XLSX.utils.aoa_to_sheet(salesData);
                 XLSX.utils.book_append_sheet(wb, salesWS, 'Dettaglio Vendite');
+
+                // Foglio 3: Performance per Categoria
+                const categoriesExcelData = [
+                    ['CATEGORIA', 'FATTURATO', 'CLIENTI_LT', 'CLIENTI_RM', 'TOTALE_CLIENTI']
+                ];
+                
+                allCategoriesData
+                    .filter(cat => parseFloat(cat.Importo_Totale) > 0)
+                    .sort((a, b) => parseFloat(b.Importo_Totale) - parseFloat(a.Importo_Totale))
+                    .forEach(cat => {
+                        const clientiLT = parseInt(cat.Clienti_Prov_1) || 0;
+                        const clientiRM = parseInt(cat.Clienti_Prov_2) || 0;
+                        categoriesExcelData.push([
+                            cat.Categoria,
+                            parseFloat(cat.Importo_Totale),
+                            clientiLT,
+                            clientiRM,
+                            clientiLT + clientiRM
+                        ]);
+                    });
+                
+                const categoriesExcelWS = XLSX.utils.aoa_to_sheet(categoriesExcelData);
+                XLSX.utils.book_append_sheet(wb, categoriesExcelWS, 'Performance Categorie');
+
+                // Foglio 4: Distribuzione Province
+                const provinceExcelData = [
+                    ['PROVINCIA', 'NOME', 'CLIENTI_SERVITI', 'FATTURATO', 'MEDIA_PER_CLIENTE']
+                ];
+                
+                allProvincesData.forEach(prov => {
+                    const clients = parseInt(prov.Clienti_Serviti) || 0;
+                    const revenue = parseFloat(prov.Fatturato) || 0;
+                    const avgPerClient = clients > 0 ? revenue / clients : 0;
+                    const provinceName = prov.Provincia === 'LT' ? 'Latina' : 
+                                       prov.Provincia === 'RM' ? 'Roma' : 
+                                       prov.Provincia;
+                    
+                    provinceExcelData.push([
+                        prov.Provincia,
+                        provinceName,
+                        clients,
+                        revenue,
+                        avgPerClient
+                    ]);
+                });
+                
+                const provinceExcelWS = XLSX.utils.aoa_to_sheet(provinceExcelData);
+                XLSX.utils.book_append_sheet(wb, provinceExcelWS, 'Province');
                 
                 const now = new Date();
                 const fileName = `Dashboard_Excel_${now.toISOString().slice(0, 10)}.xlsx`;
