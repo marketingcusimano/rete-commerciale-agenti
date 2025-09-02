@@ -100,16 +100,28 @@
             height: 400px;
         }
 
-        /* Status indicators */
-        .status-live {
-            background: linear-gradient(135deg, #10b981, #059669);
+        /* Stili per selettore agenti */
+        .agent-selector-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #4f46e5);
             color: white;
-            animation: pulse 2s infinite;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
         }
         
-        .status-loading {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
+        .agent-selector-btn.inactive {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .agent-selector-btn.inactive:hover {
+            background: #f8fafc;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+        }
+        
+        .agent-selector-btn {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -173,6 +185,39 @@
                                         </svg>
                                         <span class="text-sm font-bold" id="status-text">Dati Live da GitHub</span>
                                     </div>
+                                </div>
+
+                                <!-- Selettore Agenti -->
+                                <div class="flex justify-center gap-4 mb-6">
+                                    <button
+                                        onclick="switchAgent('CARABOT')"
+                                        data-agent="CARABOT"
+                                        class="agent-selector-btn inactive flex items-center gap-3 px-6 py-3 bg-white hover:bg-blue-50 text-gray-700 border-2 border-gray-200 hover:border-blue-300 rounded-xl font-bold transition-all duration-300"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <div class="text-left">
+                                            <div class="text-sm font-bold">CARABOT NATALINO</div>
+                                            <div class="text-xs text-gray-500">Lazio • LT, RM</div>
+                                        </div>
+                                    </button>
+                                    
+                                    <button
+                                        onclick="switchAgent('G2G')"
+                                        data-agent="G2G"
+                                        class="agent-selector-btn active flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-bold transition-all duration-300 transform scale-105"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <div class="text-left">
+                                            <div class="text-sm font-bold">G2G TRADE CONSULTING</div>
+                                            <div class="text-xs opacity-90">Marche • AN, PU</div>
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
                             
@@ -349,12 +394,59 @@
     </div>
 
     <script>
-        // URL configurabile del CSV dell'agente
-        let CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/631.00263_G2G-TRADE-CONSULTING-SRL.csv';
+        // Configurazione agenti disponibili
+        const AVAILABLE_AGENTS = {
+            'CARABOT': {
+                url: 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv',
+                nome: 'CARABOT NATALINO',
+                codice: '631.00238',
+                regione: 'Lazio',
+                province: ['LT', 'RM']
+            },
+            'G2G': {
+                url: 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/631.00263_G2G-TRADE-CONSULTING-SRL.csv',
+                nome: 'G2G TRADE CONSULTING SRL',
+                codice: '631.00263',
+                regione: 'Marche',
+                province: ['AN', 'PU']
+            }
+        };
         
-        // Funzione per configurare URL del CSV
-        function setCSVUrl(url) {
-            CSV_URL = url;
+        // Agente attualmente selezionato
+        let currentAgent = 'G2G';
+        let CSV_URL = AVAILABLE_AGENTS[currentAgent].url;
+        
+        // Funzione per cambiare agente
+        function switchAgent(agentKey) {
+            if (AVAILABLE_AGENTS[agentKey]) {
+                currentAgent = agentKey;
+                CSV_URL = AVAILABLE_AGENTS[agentKey].url;
+                
+                // Mostra loading
+                document.getElementById('loading-screen').style.display = 'flex';
+                document.getElementById('main-content').style.display = 'none';
+                
+                // Ricarica dati
+                loadAllData();
+                
+                // Aggiorna UI selettore
+                updateAgentSelector();
+            }
+        }
+        
+        // Funzione per aggiornare UI del selettore agenti
+        function updateAgentSelector() {
+            const buttons = document.querySelectorAll('.agent-selector-btn');
+            buttons.forEach(btn => {
+                const agentKey = btn.dataset.agent;
+                if (agentKey === currentAgent) {
+                    btn.classList.add('active');
+                    btn.classList.remove('inactive');
+                } else {
+                    btn.classList.remove('active');
+                    btn.classList.add('inactive');
+                }
+            });
         }
         
         // Dati globali
@@ -432,7 +524,7 @@
         // Carica dati del singolo agente
         async function loadAgentData() {
             try {
-                updateLoadingText('Caricamento dati agente G2G...');
+                updateLoadingText(`Caricamento dati ${AVAILABLE_AGENTS[currentAgent].nome}...`);
                 const response = await fetch(CSV_URL);
                 
                 if (!response.ok) {
@@ -442,14 +534,9 @@
                 const csvText = await response.text();
                 const parsedData = parseCSV(csvText);
                 
-                // Estrai info agente dai commenti
+                // Estrai info agente dai commenti e dai dati esistenti
                 const lines = csvText.split('\n');
-                let agentInfo = {
-                    codice: '631.00263',
-                    nome: 'G2G TRADE CONSULTING SRL',
-                    regione: 'Marche',
-                    province: ['AN', 'PU']
-                };
+                let agentInfo = AVAILABLE_AGENTS[currentAgent]; // Usa dati predefiniti come fallback
                 
                 lines.forEach(line => {
                     if (line.includes('Codice Agente:')) {
@@ -460,7 +547,7 @@
                     }
                 });
 
-                // Determina regione e province dai dati delle province
+                // Aggiorna province e regione dai dati effettivi se disponibili
                 const provinceData = parsedData.filter(item => item.Tipo_Dato === 'CLIENTI_PROVINCIA');
                 if (provinceData.length > 0) {
                     const provinces = provinceData.map(p => p.Provincia);
@@ -1319,6 +1406,7 @@
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
             loadAllData();
+            updateAgentSelector();
         });
     </script>
 </body>
