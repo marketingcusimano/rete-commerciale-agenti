@@ -1421,7 +1421,7 @@
             return { change, percentage };
         }
 
-        // Funzione per parsificare il CSV
+        // Funzione per parsificare il CSV con numeri italiani
         function parseCSV(csvText) {
             const lines = csvText.trim().split('\n');
             const data = [];
@@ -1438,17 +1438,49 @@
                 }
                 
                 if (currentHeaders && line) {
-                    const values = line.split(',').map(v => v.trim());
+                    // Parse CSV con virgolette
+                    const values = [];
+                    let current = '';
+                    let inQuotes = false;
+                    
+                    for (let j = 0; j < line.length; j++) {
+                        const char = line[j];
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            values.push(current.trim());
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+                    values.push(current.trim());
+                    
                     if (values.length >= currentHeaders.length) {
                         const row = {};
                         
                         currentHeaders.forEach((header, index) => {
                             let value = values[index] || '';
+                            value = value.replace(/"/g, ''); // Rimuovi virgolette
                             
+                            // Converti numeri italiani (con virgola) in formato internazionale
                             if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Percentuale_Obiettivo', 
                                 'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Obiettivo_Clienti', 
                                 'Percentuale_Obiettivo_Clienti', 'Fatturato', 'Clienti_Serviti', 'Importo_Totale',
                                 'Clienti_Prov_1', 'Clienti_Prov_2', 'Importo', 'Valore'].includes(header)) {
+                                
+                                // Rimuovi caratteri non numerici tranne punto e virgola
+                                value = value.replace(/[^0-9.,]/g, '');
+                                
+                                // Converti formato italiano (virgola decimale) in formato internazionale
+                                if (value.includes('.') && value.includes(',')) {
+                                    // Formato: 123.456,78 -> 123456.78
+                                    value = value.replace(/\./g, '').replace(',', '.');
+                                } else if (value.includes(',')) {
+                                    // Formato: 123,78 -> 123.78
+                                    value = value.replace(',', '.');
+                                }
+                                
                                 value = parseFloat(value) || 0;
                             }
                             
