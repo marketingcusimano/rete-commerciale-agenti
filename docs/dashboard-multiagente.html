@@ -229,33 +229,216 @@
         .region-filter {
             margin-top: 16px;
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
             justify-content: center;
         }
 
-        .region-btn {
-            padding: 8px 16px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 500;
-            font-size: 0.875rem;
+        .region-selector {
+            position: relative;
+        }
+
+        .region-selector-btn {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 12px 20px;
             cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 240px;
+            font-family: inherit;
+        }
+
+        .region-selector-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .region-selector-btn.active {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+        }
+
+        .region-selector-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .region-selector-main {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        #selectedRegionText {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.875rem;
+        }
+
+        #selectedRegionSubtext {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 1px;
+        }
+
+        .chevron-icon {
+            width: 16px;
+            height: 16px;
+            stroke: #64748b;
+            transition: transform 0.2s ease;
+        }
+
+        .region-selector-btn.active .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Region Popup */
+        .region-popup {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(40px);
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 320px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-50%) translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .region-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .region-popup-content {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            background: rgba(248, 250, 252, 0.8);
+        }
+
+        .popup-header h3 {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+
+        .popup-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 8px;
             transition: all 0.2s ease;
         }
 
-        .region-btn.active {
-            background: #6366f1;
-            color: white;
+        .popup-close:hover {
+            background: #f1f5f9;
         }
 
-        .region-btn:not(.active) {
-            background: #e5e7eb;
-            color: #4b5563;
+        .popup-close svg {
+            width: 16px;
+            height: 16px;
+            stroke: #64748b;
         }
 
-        .region-btn:not(.active):hover {
-            background: #d1d5db;
+        .region-options {
+            padding: 8px;
+        }
+
+        .region-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .region-option:hover {
+            background: rgba(59, 130, 246, 0.05);
+            border-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .region-option.selected {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+        }
+
+        .region-option-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .region-option-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: #2563eb;
+        }
+
+        .region-option-content {
+            flex: 1;
+        }
+
+        .region-option-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.875rem;
+            margin-bottom: 2px;
+        }
+
+        .region-option-subtitle {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .region-option-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .region-option.selected .region-option-check {
+            opacity: 1;
+        }
+
+        .region-option-check svg {
+            width: 12px;
+            height: 12px;
+            stroke: white;
+            stroke-width: 2.5;
         }
 
         /* KPI Grid */
@@ -810,8 +993,6 @@
             .header-info { flex-direction: column; gap: 12px; }
             .nav-tabs { justify-content: stretch; }
             .tab { flex: 1; justify-content: center; }
-            .region-filter { justify-content: stretch; }
-            .region-btn { flex: 1; }
             .agents-layout { grid-template-columns: 1fr; }
             .agents-sidebar { position: static; }
             .detail-agent-info { flex-direction: column; text-align: center; }
@@ -866,11 +1047,73 @@
                     </button>
                 </div>
 
-                <!-- Region Filter -->
+                <!-- Region Filter Popup -->
                 <div class="region-filter">
-                    <button class="region-btn active" data-region="all">Tutte le Regioni</button>
-                    <button class="region-btn" data-region="Lazio">Lazio</button>
-                    <button class="region-btn" data-region="Marche">Marche</button>
+                    <div class="region-selector">
+                        <button class="region-selector-btn" id="regionSelectorBtn">
+                            <div class="region-selector-content">
+                                <div class="region-selector-main">
+                                    <span id="selectedRegionText">Tutte le Regioni</span>
+                                    <span id="selectedRegionSubtext">Panoramica completa della rete vendita</span>
+                                </div>
+                                <svg class="chevron-icon">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                            </div>
+                        </button>
+                        
+                        <!-- Region Popup -->
+                        <div class="region-popup" id="regionPopup">
+                            <div class="region-popup-content">
+                                <div class="popup-header">
+                                    <h3>Seleziona Regione</h3>
+                                    <button class="popup-close" id="popupClose">
+                                        <svg><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                </div>
+                                <div class="region-options">
+                                    <div class="region-option selected" data-region="all">
+                                        <div class="region-option-icon">
+                                            <svg><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        </div>
+                                        <div class="region-option-content">
+                                            <div class="region-option-title">Tutte le Regioni</div>
+                                            <div class="region-option-subtitle">Panoramica completa della rete vendita</div>
+                                        </div>
+                                        <div class="region-option-check">
+                                            <svg><polyline points="20,6 9,17 4,12"></polyline></svg>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="region-option" data-region="Lazio">
+                                        <div class="region-option-icon">
+                                            <svg><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        </div>
+                                        <div class="region-option-content">
+                                            <div class="region-option-title">Lazio</div>
+                                            <div class="region-option-subtitle">2 agenti • Province: LT, RM, FR</div>
+                                        </div>
+                                        <div class="region-option-check">
+                                            <svg><polyline points="20,6 9,17 4,12"></polyline></svg>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="region-option" data-region="Marche">
+                                        <div class="region-option-icon">
+                                            <svg><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        </div>
+                                        <div class="region-option-content">
+                                            <div class="region-option-title">Marche</div>
+                                            <div class="region-option-subtitle">1 agente • Province: AN, PU</div>
+                                        </div>
+                                        <div class="region-option-check">
+                                            <svg><polyline points="20,6 9,17 4,12"></polyline></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -967,7 +1210,7 @@
         let selectedRegion = 'all';
         let charts = {};
 
-        // CSV URL
+        // CSV URL - carica automaticamente i dati da GitHub
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/main/docs/CARABOT.csv';
 
         // Utility functions
@@ -1088,13 +1331,72 @@
             }
         }
 
-        // Region filter
+        // Region popup management
+        function toggleRegionPopup() {
+            const popup = document.getElementById('regionPopup');
+            const btn = document.getElementById('regionSelectorBtn');
+            
+            if (popup.classList.contains('show')) {
+                closeRegionPopup();
+            } else {
+                popup.classList.add('show');
+                btn.classList.add('active');
+                
+                // Close on outside click
+                setTimeout(() => {
+                    document.addEventListener('click', handleOutsideClick);
+                }, 100);
+            }
+        }
+
+        function closeRegionPopup() {
+            const popup = document.getElementById('regionPopup');
+            const btn = document.getElementById('regionSelectorBtn');
+            
+            if (popup) popup.classList.remove('show');
+            if (btn) btn.classList.remove('active');
+            document.removeEventListener('click', handleOutsideClick);
+        }
+
+        function handleOutsideClick(event) {
+            const popup = document.getElementById('regionPopup');
+            const btn = document.getElementById('regionSelectorBtn');
+            
+            if (popup && btn && !popup.contains(event.target) && !btn.contains(event.target)) {
+                closeRegionPopup();
+            }
+        }
+
         function setRegion(region) {
             selectedRegion = region;
             
-            document.querySelectorAll('.region-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.region === region);
+            // Update popup options
+            document.querySelectorAll('.region-option').forEach(option => {
+                option.classList.toggle('selected', option.dataset.region === region);
             });
+            
+            // Update button text
+            const selectedText = document.getElementById('selectedRegionText');
+            const selectedSubtext = document.getElementById('selectedRegionSubtext');
+            
+            if (selectedText && selectedSubtext) {
+                switch(region) {
+                    case 'all':
+                        selectedText.textContent = 'Tutte le Regioni';
+                        selectedSubtext.textContent = 'Panoramica completa della rete vendita';
+                        break;
+                    case 'Lazio':
+                        selectedText.textContent = 'Lazio';
+                        selectedSubtext.textContent = '2 agenti • Province: LT, RM, FR';
+                        break;
+                    case 'Marche':
+                        selectedText.textContent = 'Marche';
+                        selectedSubtext.textContent = '1 agente • Province: AN, PU';
+                        break;
+                }
+            }
+            
+            closeRegionPopup();
             
             if (activeTab === 'overview') {
                 updateOverview();
@@ -1106,67 +1408,69 @@
             const container = document.getElementById('kpiCards');
             const totals = calculateTotals();
             
-            container.innerHTML = `
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon revenue">
-                            <svg><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline><polyline points="16,7 22,7 22,13"></polyline></svg>
+            if (container) {
+                container.innerHTML = `
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon revenue">
+                                <svg><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline><polyline points="16,7 22,7 22,13"></polyline></svg>
+                            </div>
+                            <p class="kpi-title">Fatturato 2025</p>
                         </div>
-                        <p class="kpi-title">Fatturato 2025</p>
-                    </div>
-                    <p class="kpi-value">${formatCurrency(totals.fatturato2025)}</p>
-                    <div class="kpi-change positive">
-                        <span>+${totals.crescita.toFixed(1)}%</span>
-                        <span>vs 2024</span>
-                    </div>
-                </div>
-                
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon performance">
-                            <svg><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                        <p class="kpi-value">${formatCurrency(totals.fatturato2025)}</p>
+                        <div class="kpi-change positive">
+                            <span>+${totals.crescita.toFixed(1)}%</span>
+                            <span>vs 2024</span>
                         </div>
-                        <p class="kpi-title">Performance</p>
                     </div>
-                    <p class="kpi-value">${totals.performance}%</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${totals.performance}%"></div>
-                    </div>
-                </div>
-                
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon clients">
-                            <svg><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon performance">
+                                <svg><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                            </div>
+                            <p class="kpi-title">Performance</p>
                         </div>
-                        <p class="kpi-title">Clienti Attivi</p>
-                    </div>
-                    <p class="kpi-value">${totals.clienti}</p>
-                    <p style="color: #64748b; font-size: 0.875rem;">Totale portafoglio</p>
-                </div>
-                
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon agents">
-                            <svg><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12h4v4h-4z"></path><path d="M14 12h4v4h-4z"></path><path d="M6 20h4v2h-4z"></path><path d="M14 20h4v2h-4z"></path><path d="M6 6h4v4h-4z"></path><path d="M14 6h4v4h-4z"></path></svg>
+                        <p class="kpi-value">${totals.performance}%</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${totals.performance}%"></div>
                         </div>
-                        <p class="kpi-title">Agenti</p>
                     </div>
-                    <p class="kpi-value">${totals.agenti}</p>
-                    <p style="color: #64748b; font-size: 0.875rem;">Rete vendita</p>
-                </div>
-                
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon regions">
-                            <svg><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon clients">
+                                <svg><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            </div>
+                            <p class="kpi-title">Clienti Attivi</p>
                         </div>
-                        <p class="kpi-title">Regioni</p>
+                        <p class="kpi-value">${totals.clienti}</p>
+                        <p style="color: #64748b; font-size: 0.875rem;">Totale portafoglio</p>
                     </div>
-                    <p class="kpi-value">${selectedRegion === 'all' ? 2 : 1}</p>
-                    <p style="color: #64748b; font-size: 0.875rem;">Copertura territorio</p>
-                </div>
-            `;
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon agents">
+                                <svg><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12h4v4h-4z"></path><path d="M14 12h4v4h-4z"></path><path d="M6 20h4v2h-4z"></path><path d="M14 20h4v2h-4z"></path><path d="M6 6h4v4h-4z"></path><path d="M14 6h4v4h-4z"></path></svg>
+                            </div>
+                            <p class="kpi-title">Agenti</p>
+                        </div>
+                        <p class="kpi-value">${totals.agenti}</p>
+                        <p style="color: #64748b; font-size: 0.875rem;">Rete vendita</p>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon regions">
+                                <svg><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            </div>
+                            <p class="kpi-title">Regioni</p>
+                        </div>
+                        <p class="kpi-value">${selectedRegion === 'all' ? 2 : 1}</p>
+                        <p style="color: #64748b; font-size: 0.875rem;">Copertura territorio</p>
+                    </div>
+                `;
+            }
         }
 
         function calculateTotals() {
@@ -1290,6 +1594,8 @@
         // Agents
         function updateAgentsList() {
             const container = document.getElementById('agentsList');
+            if (!container) return;
+            
             const sortedAgents = [...agentsData].sort((a, b) => b.performance - a.performance);
             
             container.innerHTML = sortedAgents.map(agent => `
@@ -1335,9 +1641,13 @@
 
             // Update sidebar stats
             const totals = calculateTotals();
-            document.getElementById('totalRevenue').textContent = formatCurrency(totals.fatturato2025);
-            document.getElementById('avgPerformance').textContent = `${totals.performance}%`;
-            document.getElementById('totalClients').textContent = totals.clienti;
+            const totalRevenueEl = document.getElementById('totalRevenue');
+            const avgPerformanceEl = document.getElementById('avgPerformance');
+            const totalClientsEl = document.getElementById('totalClients');
+            
+            if (totalRevenueEl) totalRevenueEl.textContent = formatCurrency(totals.fatturato2025);
+            if (avgPerformanceEl) avgPerformanceEl.textContent = `${totals.performance}%`;
+            if (totalClientsEl) totalClientsEl.textContent = totals.clienti;
         }
 
         function selectAgent(agentCode) {
@@ -1348,6 +1658,7 @@
 
         function updateAgentDetail() {
             const container = document.getElementById('agentDetail');
+            if (!container) return;
             
             if (!selectedAgent) {
                 container.innerHTML = `
@@ -1412,7 +1723,7 @@
                         <div class="kpi-card">
                             <div class="kpi-header">
                                 <div class="kpi-icon revenue">
-                                    <svg><polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline><polyline points="16,7 22,7 22,13"></polyline></svg>
+                                    <span style="font-size: 24px;">💰</span>
                                 </div>
                                 <p class="kpi-title">Fatturato 2025</p>
                             </div>
@@ -1426,7 +1737,7 @@
                         <div class="kpi-card">
                             <div class="kpi-header">
                                 <div class="kpi-icon performance">
-                                    <svg><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                                    <span style="font-size: 24px;">🎯</span>
                                 </div>
                                 <p class="kpi-title">Performance Obiettivo</p>
                             </div>
@@ -1439,7 +1750,7 @@
                         <div class="kpi-card">
                             <div class="kpi-header">
                                 <div class="kpi-icon clients">
-                                    <svg><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                    <span style="font-size: 24px;">👥</span>
                                 </div>
                                 <p class="kpi-title">Clienti</p>
                             </div>
@@ -1452,7 +1763,7 @@
                         <div class="kpi-card">
                             <div class="kpi-header">
                                 <div class="kpi-icon regions">
-                                    <svg><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    <span style="font-size: 24px;">🗺️</span>
                                 </div>
                                 <p class="kpi-title">Territory</p>
                             </div>
@@ -1472,10 +1783,10 @@
             createDistributionChart();
         }
 
-        // Data loading
+        // Data loading - caricamento automatico dal CSV GitHub
         async function loadData() {
             try {
-                console.log('Caricamento dati dal CSV GitHub...');
+                console.log('Caricamento automatico dati dal CSV GitHub...');
                 const response = await fetch(CSV_URL);
                 
                 if (!response.ok) {
@@ -1486,16 +1797,17 @@
                 currentData = parseCSV(csvText);
                 agentsData = generateAgentsData();
                 
-                console.log('Dati caricati con successo');
+                console.log('Dati caricati con successo dal CSV');
                 
+                // Nascondi loading e mostra dashboard
                 document.getElementById('loadingState').classList.add('hidden');
                 switchTab('overview');
                 
             } catch (error) {
-                console.error('Errore caricamento dati:', error);
+                console.error('Errore caricamento automatico:', error);
                 document.getElementById('loadingState').innerHTML = `
                     <div style="color: #dc2626; text-align: center;">
-                        ❌ Errore nel caricamento dei dati<br>
+                        Errore nel caricamento automatico dei dati<br>
                         <small>${error.message}</small>
                     </div>
                 `;
@@ -1509,7 +1821,7 @@
                 tab.addEventListener('click', () => switchTab(tab.dataset.tab));
             });
             
-            // Region popup - check if elements exist
+            // Region popup - controlli di sicurezza
             const regionBtn = document.getElementById('regionSelectorBtn');
             const popupClose = document.getElementById('popupClose');
             
@@ -1533,7 +1845,7 @@
                 }
             });
             
-            // Load data automatically
+            // Caricamento automatico dei dati all'avvio
             loadData();
         });
 
