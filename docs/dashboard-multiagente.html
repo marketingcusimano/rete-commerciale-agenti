@@ -13,6 +13,204 @@
             box-sizing: border-box;
         }
 
+        function createTrendChart() {
+            const ctx = document.getElementById('trend-chart').getContext('2d');
+            
+            if (charts.trend) charts.trend.destroy();
+            
+            // Calcola trend basato sui dati reali
+            const mesi = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Jul', 'Ago'];
+            const trend2025 = [];
+            const trend2024 = [];
+            
+            // Simula andamento mensile proporzionale al fatturato totale
+            let totaleFatturato2025 = 0;
+            let totaleFatturato2024 = 0;
+            
+            allAgentsData.forEach(agent => {
+                const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                if (generale) {
+                    totaleFatturato2025 += generale.Anno_Corrente || 0;
+                    totaleFatturato2024 += generale.Anno_Precedente || 0;
+                }
+            });
+            
+            // Genera trend progressivo
+            for (let i = 0; i < 8; i++) {
+                const progressione = (i + 1) / 8;
+                trend2025.push(totaleFatturato2025 * progressione);
+                trend2024.push(totaleFatturato2024 * progressione);
+            }
+
+            charts.trend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: mesi,
+                    datasets: [{
+                        label: '2025',
+                        data: trend2025,
+                        borderColor: '#1a1a1a',
+                        backgroundColor: 'rgba(26, 26, 26, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '2024',
+                        data: trend2024,
+                        borderColor: '#999',
+                        backgroundColor: 'rgba(153, 153, 153, 0.1)',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createAgentiRegioniChart(regioni) {
+            const ctx = document.getElementById('agenti-regioni-chart').getContext('2d');
+            
+            if (charts.agentiRegioni) charts.agentiRegioni.destroy();
+            
+            const sortedRegioni = regioni.sort((a, b) => b.agenti.size - a.agenti.size);
+            const colors = ['#1a1a1a', '#333', '#555', '#777', '#999', '#bbb', '#ccc', '#ddd'];
+
+            charts.agentiRegioni = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sortedRegioni.map(r => r.regione),
+                    datasets: [{
+                        data: sortedRegioni.map(r => r.agenti.size),
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createObiettiviChart() {
+            const ctx = document.getElementById('obiettivi-chart').getContext('2d');
+            
+            if (charts.obiettivi) charts.obiettivi.destroy();
+            
+            // Calcola performance vs obiettivi per agenti principali
+            const agentiConObiettivi = allAgentsData
+                .map(agent => {
+                    const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                    if (!generale) return null;
+                    
+                    const fatturato = generale.Anno_Corrente || 0;
+                    const obiettivo = generale.Obiettivo || 0;
+                    const performance = obiettivo > 0 ? (fatturato / obiettivo * 100) : 0;
+                    
+                    return {
+                        nome: agent.ragioneSociale.split(' ')[0],
+                        fatturato,
+                        obiettivo,
+                        performance
+                    };
+                })
+                .filter(a => a && a.obiettivo > 0)
+                .sort((a, b) => b.performance - a.performance)
+                .slice(0, 8);
+
+            charts.obiettivi = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agentiConObiettivi.map(a => a.nome),
+                    datasets: [{
+                        label: 'Fatturato Attuale',
+                        data: agentiConObiettivi.map(a => a.fatturato),
+                        backgroundColor: '#1a1a1a',
+                        borderRadius: 4
+                    }, {
+                        label: 'Obiettivo',
+                        data: agentiConObiettivi.map(a => a.obiettivo),
+                        backgroundColor: '#999',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            // Rimuovi classe active da tutti i tab
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            
+            // Aggiungi classe active al tab cliccato
+            event.target.closest('.tab').classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            if (tabName === 'regioni') {
+                updateRegioniTab();
+            }
+        }
+
+        function filterAgenti() {
+            createAgentiTable();
+            createFatturatoChart();
+        }
+
+        function filterRegioni() {
+            updateRegioniTab();
+        }
+
+        // Inizializzazione al caricamento della pagina
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard caricata, avvio automazione CSV...');
+            loadData();
+        });
+    </script>
+</body>
+</html>
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #fafafa;
@@ -626,16 +824,9 @@
     </div>
 
     <!-- Zapier Chatbot Integration -->
-    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-        <zapier-interfaces-chatbot-embed 
-            is-popup='false' 
-            chatbot-id='cmf7cw2ev002p1032fkvqlkup' 
-            height='600px' 
-            width='400px'>
-        </zapier-interfaces-chatbot-embed>
-    </div>
-
     <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
+    <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmf7cw2ev002p1032fkvqlkup'></zapier-interfaces-chatbot-embed>
+
     <script>
         // URL del CSV concatenato con tutti gli agenti
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-2025-09-05.csv';
@@ -667,11 +858,11 @@
             'ALB': 'Albania'
         };
 
-        // Funzioni di utilità
+        // Funzioni di utilità - MIGLIAIA CORRETTE
         function formatNumber(num) {
             if (typeof num !== 'number') return '0';
             if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(0) + 'k';
+            if (num >= 1000) return Math.round(num / 1000) + 'k';
             return Math.round(num).toLocaleString('it-IT');
         }
 
@@ -1260,7 +1451,7 @@
                         </div>
                     </div>
                     <div class="main-value">${totaleAgentiRegioni.size}</div>
-                    <div class="comparison">Media: ${(totaleFatturatoRegioni/totaleAgentiRegioni.size || 0).toFixed(0)}k per agente</div>
+                    <div class="comparison">Media: ${formatNumber(totaleFatturatoRegioni/totaleAgentiRegioni.size || 0)} per agente</div>
                 </div>
                 
                 <div class="metric-card">
@@ -1397,202 +1588,3 @@
                     }
                 }
             });
-        }
-
-        function createTrendChart() {
-            const ctx = document.getElementById('trend-chart').getContext('2d');
-            
-            if (charts.trend) charts.trend.destroy();
-            
-            // Calcola trend basato sui dati reali
-            const mesi = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Jul', 'Ago'];
-            const trend2025 = [];
-            const trend2024 = [];
-            
-            // Simula andamento mensile proporzionale al fatturato totale
-            let totaleFatturato2025 = 0;
-            let totaleFatturato2024 = 0;
-            
-            allAgentsData.forEach(agent => {
-                const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                if (generale) {
-                    totaleFatturato2025 += generale.Anno_Corrente || 0;
-                    totaleFatturato2024 += generale.Anno_Precedente || 0;
-                }
-            });
-            
-            // Genera trend progressivo
-            for (let i = 0; i < 8; i++) {
-                const progressione = (i + 1) / 8;
-                trend2025.push(totaleFatturato2025 * progressione);
-                trend2024.push(totaleFatturato2024 * progressione);
-            }
-
-            charts.trend = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: mesi,
-                    datasets: [{
-                        label: '2025',
-                        data: trend2025,
-                        borderColor: '#1a1a1a',
-                        backgroundColor: 'rgba(26, 26, 26, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }, {
-                        label: '2024',
-                        data: trend2024,
-                        borderColor: '#999',
-                        backgroundColor: 'rgba(153, 153, 153, 0.1)',
-                        tension: 0.4,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatCurrency(value);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createAgentiRegioniChart(regioni) {
-            const ctx = document.getElementById('agenti-regioni-chart').getContext('2d');
-            
-            if (charts.agentiRegioni) charts.agentiRegioni.destroy();
-            
-            const sortedRegioni = regioni.sort((a, b) => b.agenti.size - a.agenti.size);
-            const colors = ['#1a1a1a', '#333', '#555', '#777', '#999', '#bbb', '#ccc', '#ddd'];
-
-            charts.agentiRegioni = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: sortedRegioni.map(r => r.regione),
-                    datasets: [{
-                        data: sortedRegioni.map(r => r.agenti.size),
-                        backgroundColor: colors,
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
-        
-        function createObiettiviChart() {
-            const ctx = document.getElementById('obiettivi-chart').getContext('2d');
-            
-            if (charts.obiettivi) charts.obiettivi.destroy();
-            
-            // Calcola performance vs obiettivi per agenti principali
-            const agentiConObiettivi = allAgentsData
-                .map(agent => {
-                    const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    if (!generale) return null;
-                    
-                    const fatturato = generale.Anno_Corrente || 0;
-                    const obiettivo = generale.Obiettivo || 0;
-                    const performance = obiettivo > 0 ? (fatturato / obiettivo * 100) : 0;
-                    
-                    return {
-                        nome: agent.ragioneSociale.split(' ')[0],
-                        fatturato,
-                        obiettivo,
-                        performance
-                    };
-                })
-                .filter(a => a && a.obiettivo > 0)
-                .sort((a, b) => b.performance - a.performance)
-                .slice(0, 8);
-
-            charts.obiettivi = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: agentiConObiettivi.map(a => a.nome),
-                    datasets: [{
-                        label: 'Fatturato Attuale',
-                        data: agentiConObiettivi.map(a => a.fatturato),
-                        backgroundColor: '#1a1a1a',
-                        borderRadius: 4
-                    }, {
-                        label: 'Obiettivo',
-                        data: agentiConObiettivi.map(a => a.obiettivo),
-                        backgroundColor: '#999',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatCurrency(value);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function switchTab(tabName) {
-            // Rimuovi classe active da tutti i tab
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-            
-            // Aggiungi classe active al tab cliccato
-            event.target.closest('.tab').classList.add('active');
-            document.getElementById(tabName + '-tab').classList.add('active');
-            
-            if (tabName === 'regioni') {
-                updateRegioniTab();
-            }
-        }
-
-        function filterAgenti() {
-            createAgentiTable();
-            createFatturatoChart();
-        }
-
-        function filterRegioni() {
-            updateRegioniTab();
-        }
-
-        // Inizializzazione al caricamento della pagina
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard caricata, avvio automazione CSV...');
-            loadData();
-        });
-    </script>
-</body>
-</html>
