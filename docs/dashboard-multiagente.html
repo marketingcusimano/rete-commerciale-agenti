@@ -305,13 +305,6 @@
             color: #1a1a1a;
         }
 
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
         .status-active {
             background: #dcfce7;
             color: #166534;
@@ -728,49 +721,28 @@
                         } else if (line.startsWith('CLIENTI_PROVINCIA,')) {
                             const values = line.split(',').map(v => v.replace(/"/g, '').trim());
                             if (values.length >= 4) {
-                                let fatturato = values[3] || '0';
-                                if (fatturato.includes('.') && fatturato.includes(',')) {
-                                    fatturato = fatturato.replace(/\./g, '').replace(',', '.');
-                                } else if (fatturato.includes(',')) {
-                                    fatturato = fatturato.replace(',', '.');
-                                }
-                                
                                 agent.clientiProvincia.push({
                                     provincia: values[1] || '',
                                     clientiServiti: parseInt(values[2]) || 0,
-                                    fatturato: parseFloat(fatturato) || 0
+                                    fatturato: parseItalianNumber(values[3])
                                 });
                             }
                         } else if (line.startsWith('VENDITE_CLIENTE,')) {
                             const values = line.split(',').map(v => v.replace(/"/g, '').trim());
                             if (values.length >= 5) {
-                                let fatturato = values[4] || '0';
-                                if (fatturato.includes('.') && fatturato.includes(',')) {
-                                    fatturato = fatturato.replace(/\./g, '').replace(',', '.');
-                                } else if (fatturato.includes(',')) {
-                                    fatturato = fatturato.replace(',', '.');
-                                }
-                                
                                 agent.venditeClienti.push({
                                     provincia: values[1] || '',
                                     cliente: values[2] || '',
                                     categoria: values[3] || '',
-                                    fatturato: parseFloat(fatturato) || 0
+                                    fatturato: parseItalianNumber(values[4])
                                 });
                             }
                         } else if (line.startsWith('CATEGORIA_RIEPILOGO,')) {
                             const values = line.split(',').map(v => v.replace(/"/g, '').trim());
                             if (values.length >= 7) {
-                                let importo = values[2] || '0';
-                                if (importo.includes('.') && importo.includes(',')) {
-                                    importo = importo.replace(/\./g, '').replace(',', '.');
-                                } else if (importo.includes(',')) {
-                                    importo = importo.replace(',', '.');
-                                }
-                                
                                 agent.categorieRiepilogo.push({
                                     categoria: values[1] || '',
-                                    importoTotale: parseFloat(importo) || 0,
+                                    importoTotale: parseItalianNumber(values[2]),
                                     provincia1: values[3] || '',
                                     clientiProv1: parseInt(values[4]) || 0,
                                     provincia2: values[5] || '',
