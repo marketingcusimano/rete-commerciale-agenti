@@ -674,9 +674,9 @@
             if (value >= 1000000) {
                 return '€' + (value / 1000000).toFixed(1) + 'M';
             } else if (value >= 1000) {
-                return '€' + (value / 1000).toFixed(0) + 'k';
+                return '€' + Math.round(value / 1000) + 'k';
             }
-            return '€' + value.toLocaleString('it-IT');
+            return '€' + Math.round(value).toLocaleString('it-IT');
         }
 
         function parseCSVValue(value) {
