@@ -817,10 +817,10 @@
             }, 1000);
         }
 
-        // Load Data Function
+        // Load Data Function with enhanced debugging
         async function loadData() {
             try {
-                console.log('Caricamento dati da:', CSV_URL);
+                console.log('🔄 Inizio caricamento dati da:', CSV_URL);
                 const response = await fetch(CSV_URL);
                 
                 if (!response.ok) {
@@ -828,14 +828,23 @@
                 }
                 
                 const csvText = await response.text();
-                console.log('CSV caricato, parsing...');
+                console.log('✅ CSV caricato, dimensione:', csvText.length, 'caratteri');
+                console.log('📝 Prime 500 caratteri:', csvText.substring(0, 500));
                 
                 allAgentsData = parseCSV(csvText);
-                console.log('Agenti trovati:', allAgentsData.length);
+                console.log('👥 Agenti trovati:', allAgentsData.length);
+                
+                // Debug: show first agent structure
+                if (allAgentsData.length > 0) {
+                    console.log('🔍 Primo agente:', allAgentsData[0]);
+                }
                 
                 const agentsMetrics = allAgentsData
                     .map(calculateAgentMetrics)
                     .filter(m => m !== null);
+                
+                console.log('📊 Metriche calcolate per', agentsMetrics.length, 'agenti');
+                console.log('💰 Agenti attivi:', agentsMetrics.filter(a => a.isActive).length);
                 
                 // Update summary stats
                 const totalAgents = agentsMetrics.length;
@@ -848,36 +857,46 @@
                 const revenueGrowth = totalRevenue2024 > 0 ? 
                     ((totalRevenue - totalRevenue2024) / totalRevenue2024 * 100) : 0;
 
+                console.log('📈 Statistiche aggregate:');
+                console.log('- Fatturato totale 2025:', formatCurrency(totalRevenue));
+                console.log('- Fatturato totale 2024:', formatCurrency(totalRevenue2024));
+                console.log('- Crescita:', revenueGrowth.toFixed(1) + '%');
+                console.log('- Clienti totali:', totalClients);
+
                 // Update UI
                 document.getElementById('totalAgents').textContent = totalAgents;
                 document.getElementById('activeAgents').textContent = `${activeAgents} attivi`;
                 document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
                 document.getElementById('revenueGrowth').textContent = `${revenueGrowth >= 0 ? '+' : ''}${revenueGrowth.toFixed(1)}%`;
                 document.getElementById('avgPerformance').textContent = `${avgPerformance.toFixed(0)}%`;
-                document.getElementById('totalClients').textContent = totalClients;
+                document.getElementById('totalClients').textContent = formatNumber(totalClients);
 
                 // Create agent cards
                 const agentsGrid = document.getElementById('agentsGrid');
-                agentsGrid.innerHTML = agentsMetrics
-                    .sort((a, b) => b.fatturato2025 - a.fatturato2025)
-                    .map(createAgentCard)
-                    .join('');
+                const sortedAgents = agentsMetrics.sort((a, b) => b.fatturato2025 - a.fatturato2025);
+                
+                console.log('🎯 Top 3 agenti per fatturato:');
+                sortedAgents.slice(0, 3).forEach((agent, i) => {
+                    console.log(`${i + 1}. ${agent.nome}: ${formatCurrency(agent.fatturato2025)}`);
+                });
+                
+                agentsGrid.innerHTML = sortedAgents.map(createAgentCard).join('');
 
                 // Create top performers
                 const topPerformersContainer = document.getElementById('topPerformers');
                 topPerformersContainer.innerHTML = createTopPerformers(agentsMetrics);
 
-                console.log('Dashboard caricata con successo!');
+                console.log('🎉 Dashboard caricata con successo!');
                 
             } catch (error) {
-                console.error('Errore nel caricamento dei dati:', error);
+                console.error('❌ Errore nel caricamento dei dati:', error);
                 document.querySelector('.container').innerHTML = `
                     <div class="error">
                         <i class="fas fa-exclamation-triangle"></i>
                         <h3>Errore nel caricamento dei dati</h3>
                         <p>${error.message}</p>
                         <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;">
-                            Riprova
+                            <i class="fas fa-redo"></i> Riprova
                         </button>
                     </div>
                 `;
