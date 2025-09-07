@@ -590,6 +590,10 @@
             return '€' + value.toFixed(0);
         }
 
+        function formatNumber(num) {
+            return new Intl.NumberFormat('it-IT').format(num);
+        }
+
         function parseCSVValue(value) {
             if (!value || value === '') return 0;
             return parseFloat(value.replace(/"/g, '').replace(',', '.')) || 0;
