@@ -498,7 +498,30 @@
                 }
                 
                 if (currentHeaders && currentAgent && line && !line.startsWith('#')) {
-                    const values = line.split(',').map(v => v.trim());
+                    // PARSING CSV CORRETTO - gestisce virgolette e virgole nei numeri
+                    const values = [];
+                    let currentValue = '';
+                    let inQuotes = false;
+                    
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+                        
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                            currentValue += char;
+                        } else if (char === ',' && !inQuotes) {
+                            values.push(currentValue.trim());
+                            currentValue = '';
+                        } else {
+                            currentValue += char;
+                        }
+                    }
+                    
+                    // Aggiungi l'ultimo valore
+                    if (currentValue) {
+                        values.push(currentValue.trim());
+                    }
+                    
                     if (values.length >= currentHeaders.length) {
                         const row = {};
                         currentHeaders.forEach((header, index) => {
