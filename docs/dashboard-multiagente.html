@@ -28,7 +28,6 @@
             padding: 2rem;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -49,7 +48,6 @@
             opacity: 0.9;
         }
 
-        /* Navigation */
         .nav-tabs {
             display: flex;
             gap: 8px;
@@ -88,7 +86,6 @@
             color: #475569;
         }
 
-        /* Content Sections */
         .tab-content {
             display: none;
         }
@@ -97,7 +94,6 @@
             display: block;
         }
 
-        /* Cards Grid */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -119,13 +115,6 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             border-color: #667eea;
-        }
-
-        .metric-card-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1rem;
         }
 
         .metric-icon {
@@ -174,7 +163,6 @@
             color: #ef4444;
         }
 
-        /* Agent Cards */
         .agents-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -265,6 +253,7 @@
             display: flex;
             gap: 8px;
             margin-top: 1rem;
+            flex-wrap: wrap;
         }
 
         .province-tag {
@@ -276,37 +265,43 @@
             font-weight: 500;
         }
 
-        /* Charts Section */
-        .chart-section {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .chart-header {
+        .loading {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            margin-bottom: 2rem;
+            height: 200px;
+            font-size: 1.1rem;
+            color: #64748b;
         }
 
-        .chart-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .loading i {
+            margin-right: 12px;
+            animation: spin 1s linear infinite;
         }
 
-        .chart-container {
-            position: relative;
-            height: 400px;
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        /* Filters */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
         .filters {
             display: flex;
             gap: 1rem;
@@ -342,82 +337,6 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        /* Loading */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-            font-size: 1.1rem;
-            color: #64748b;
-        }
-
-        .loading i {
-            margin-right: 12px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Region Cards */
-        .regions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .region-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .region-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .region-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .region-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .region-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .region-stat {
-            text-align: center;
-        }
-
-        .region-stat-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        .region-stat-label {
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -435,20 +354,9 @@
                 flex-direction: column;
             }
 
-            .nav-tab {
-                text-align: center;
-            }
-
             .cards-grid,
-            .agents-grid,
-            .regions-grid {
+            .agents-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .chart-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
             }
 
             .filters {
@@ -459,95 +367,15 @@
                 min-width: 100%;
             }
         }
-
-        /* Success/Error states */
-        .alert {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .alert-success {
-            background: #ecfdf5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-        }
-
-        .alert-error {
-            background: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        /* Details Panel */
-        .details-panel {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 2rem;
-            margin-top: 2rem;
-            display: none;
-        }
-
-        .details-panel.show {
-            display: block;
-        }
-
-        .details-header {
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .details-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .details-subtitle {
-            color: #64748b;
-            margin-top: 0.5rem;
-        }
-
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-        }
-
-        .details-section h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 1rem;
-        }
-
-        .details-list {
-            list-style: none;
-        }
-
-        .details-list li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .details-list li:last-child {
-            border-bottom: none;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1><i class="fas fa-chart-line"></i> Dashboard Commerciale</h1>
             <p>Analisi performance rete vendita - Dati aggiornati automaticamente</p>
         </div>
 
-        <!-- Navigation -->
         <div class="nav-tabs">
             <button class="nav-tab active" data-tab="agenti">
                 <i class="fas fa-users"></i>
@@ -557,29 +385,18 @@
                 <i class="fas fa-map-marked-alt"></i>
                 Regioni
             </button>
-            <button class="nav-tab" data-tab="analytics">
-                <i class="fas fa-chart-bar"></i>
-                Analytics
-            </button>
         </div>
 
-        <!-- Loading State -->
         <div id="loading" class="loading">
             <i class="fas fa-spinner"></i>
             Caricamento dati in corso...
         </div>
 
-        <!-- Error State -->
         <div id="error" style="display: none;"></div>
 
-        <!-- Agenti Tab -->
         <div id="agenti-tab" class="tab-content active">
-            <!-- Summary Cards -->
-            <div class="cards-grid" id="summary-cards">
-                <!-- Cards will be generated dynamically -->
-            </div>
+            <div class="cards-grid" id="summary-cards"></div>
 
-            <!-- Filters -->
             <div class="filters">
                 <div class="filter-group">
                     <label class="filter-label">Filtro per provincia</label>
@@ -597,92 +414,45 @@
                 </div>
             </div>
 
-            <!-- Agents Grid -->
-            <div class="agents-grid" id="agents-grid">
-                <!-- Agent cards will be generated dynamically -->
-            </div>
-
-            <!-- Agent Details Panel -->
-            <div class="details-panel" id="agent-details">
-                <!-- Details will be populated dynamically -->
-            </div>
+            <div class="agents-grid" id="agents-grid"></div>
         </div>
 
-        <!-- Regioni Tab -->
         <div id="regioni-tab" class="tab-content">
-            <!-- Chart Section -->
-            <div class="chart-section">
-                <div class="chart-header">
-                    <h2 class="chart-title">
-                        <i class="fas fa-chart-pie"></i>
-                        Distribuzione fatturato per regione
-                    </h2>
-                </div>
-                <div class="chart-container">
-                    <canvas id="regions-chart"></canvas>
-                </div>
-            </div>
-
-            <!-- Regions Grid -->
-            <div class="regions-grid" id="regions-grid">
-                <!-- Region cards will be generated dynamically -->
-            </div>
-        </div>
-
-        <!-- Analytics Tab -->
-        <div id="analytics-tab" class="tab-content">
-            <!-- Performance Chart -->
-            <div class="chart-section">
-                <div class="chart-header">
-                    <h2 class="chart-title">
-                        <i class="fas fa-line-chart"></i>
-                        Performance confronto anni
-                    </h2>
-                </div>
-                <div class="chart-container">
-                    <canvas id="performance-chart"></canvas>
-                </div>
-            </div>
-
-            <!-- Categories Chart -->
-            <div class="chart-section">
-                <div class="chart-header">
-                    <h2 class="chart-title">
-                        <i class="fas fa-tags"></i>
-                        Top categorie prodotto
-                    </h2>
-                </div>
-                <div class="chart-container">
-                    <canvas id="categories-chart"></canvas>
-                </div>
-            </div>
+            <h2>Sezione Regioni in sviluppo</h2>
         </div>
     </div>
 
     <script>
-        // Global variables
+        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-2025-09-05.csv';
+        
         let allData = [];
         let currentData = [];
-        let charts = {};
 
-        // Configuration
-        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-2025-09-05.csv';
+        // FUNZIONI CORRETTE PER IL PARSING
+        function parseCSVValue(value) {
+            if (!value || value === '' || value === '0' || value === '0,00') return 0;
+            
+            // Rimuovi virgolette
+            let cleaned = value.toString().replace(/"/g, '');
+            
+            // Gestione formato italiano: punto = separatore migliaia, virgola = decimale
+            // Esempio: "31.318,46" diventa 31318.46
+            cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+            
+            const parsed = parseFloat(cleaned);
+            return isNaN(parsed) ? 0 : parsed;
+        }
 
-        // Utility functions
         function formatCurrency(value) {
             if (value === 0) return '€0';
+            
             if (value >= 1000000) {
                 return '€' + (value / 1000000).toFixed(1) + 'M';
             } else if (value >= 1000) {
                 return '€' + Math.round(value / 1000) + 'k';
             }
+            
             return '€' + Math.round(value).toLocaleString('it-IT');
-        }
-
-        function parseCSVValue(value) {
-            if (!value || value === '') return 0;
-            // Handle Italian number format (comma as decimal separator)
-            return parseFloat(value.replace('.', '').replace(',', '.')) || 0;
         }
 
         function parseCSV(csvText) {
@@ -693,50 +463,48 @@
             
             for (let line of lines) {
                 line = line.trim();
-                if (!line || line.startsWith('#')) {
-                    // Extract agent info from comments
+                
+                if (!line) continue;
+                
+                if (line.startsWith('# DATI STATISTICHE AGENTE')) {
+                    currentAgent = {
+                        code: '',
+                        name: '',
+                        period: '',
+                        objectives: [],
+                        provinces: [],
+                        sales: [],
+                        categories: [],
+                        breakdown: []
+                    };
+                    agents.push(currentAgent);
+                    continue;
+                }
+                
+                if (line.startsWith('#') && currentAgent) {
                     if (line.includes('Codice Agente:')) {
-                        const code = line.split(':')[1]?.trim();
-                        if (currentAgent) currentAgent.code = code;
+                        currentAgent.code = line.split(':')[1]?.trim() || '';
                     } else if (line.includes('Ragione Sociale:')) {
-                        const name = line.split(':')[1]?.trim();
-                        if (currentAgent) currentAgent.name = name;
+                        currentAgent.name = line.split(':')[1]?.trim() || '';
                     } else if (line.includes('Periodo:')) {
-                        const period = line.split(':')[1]?.trim();
-                        if (currentAgent) currentAgent.period = period;
-                    } else if (line.includes('# DATI STATISTICHE AGENTE')) {
-                        // Start new agent
-                        currentAgent = {
-                            code: '',
-                            name: '',
-                            period: '',
-                            objectives: [],
-                            provinces: [],
-                            sales: [],
-                            categories: [],
-                            breakdown: []
-                        };
-                        agents.push(currentAgent);
+                        currentAgent.period = line.split(':')[1]?.trim() || '';
                     }
                     continue;
                 }
                 
-                // Check if it's a header line
                 if (line.includes('Tipo_Dato')) {
                     currentHeaders = line.split(',').map(h => h.trim());
                     continue;
                 }
                 
-                // Process data lines
-                if (currentHeaders && currentAgent && line) {
-                    const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+                if (currentHeaders && currentAgent && line && !line.startsWith('#')) {
+                    const values = line.split(',').map(v => v.trim());
                     if (values.length >= currentHeaders.length) {
                         const row = {};
                         currentHeaders.forEach((header, index) => {
                             row[header] = values[index] || '';
                         });
                         
-                        // Categorize data by type
                         switch (row.Tipo_Dato) {
                             case 'OBIETTIVI':
                                 currentAgent.objectives.push(row);
@@ -761,7 +529,6 @@
             return agents.filter(agent => agent.code && agent.name);
         }
 
-        // Calculate agent metrics
         function calculateAgentMetrics(agent) {
             const general = agent.objectives.find(obj => obj.Provincia === 'Generale');
             if (!general) return null;
@@ -777,10 +544,11 @@
             const clientsChange = previousClients > 0 ? 
                 ((currentClients - previousClients) / previousClients * 100) : 0;
 
-            // Get provinces
-            const provinces = [...new Set(agent.provinces.map(p => p.Provincia).filter(p => p))];
+            const provinces = [...new Set(agent.provinces
+                .map(p => p.Provincia)
+                .filter(p => p && p !== ''))]
+                .filter(p => p.length <= 3); // Solo sigle province
 
-            // Check if agent is active (has current revenue or clients)
             const isActive = currentRevenue > 0 || currentClients > 0;
 
             return {
@@ -800,13 +568,22 @@
             };
         }
 
-        // Create summary cards
         function createSummaryCards(data) {
-            const totalRevenue = data.reduce((sum, agent) => sum + agent.currentRevenue, 0);
+            console.log('Creating summary cards with data:', data);
+            
+            const totalRevenue = data.reduce((sum, agent) => {
+                console.log(`Agent ${agent.name}: ${agent.currentRevenue}`);
+                return sum + agent.currentRevenue;
+            }, 0);
+            
+            const totalPreviousRevenue = data.reduce((sum, agent) => sum + agent.previousRevenue, 0);
             const totalClients = data.reduce((sum, agent) => sum + agent.currentClients, 0);
             const activeAgents = data.filter(agent => agent.isActive).length;
-            const avgRevenueChange = data.length > 0 ? 
-                data.reduce((sum, agent) => sum + agent.revenueChange, 0) / data.length : 0;
+            
+            const totalRevenueChange = totalPreviousRevenue > 0 ? 
+                ((totalRevenue - totalPreviousRevenue) / totalPreviousRevenue * 100) : 0;
+
+            console.log(`Total Revenue: ${totalRevenue}, Previous: ${totalPreviousRevenue}, Change: ${totalRevenueChange}%`);
 
             return `
                 <div class="metric-card">
@@ -815,9 +592,9 @@
                     </div>
                     <div class="metric-value">${formatCurrency(totalRevenue)}</div>
                     <div class="metric-label">Fatturato totale 2025</div>
-                    <div class="metric-change ${avgRevenueChange >= 0 ? 'change-positive' : 'change-negative'}">
-                        <i class="fas fa-arrow-${avgRevenueChange >= 0 ? 'up' : 'down'}"></i>
-                        ${avgRevenueChange >= 0 ? '+' : ''}${avgRevenueChange.toFixed(1)}% vs 2024
+                    <div class="metric-change ${totalRevenueChange >= 0 ? 'change-positive' : 'change-negative'}">
+                        <i class="fas fa-arrow-${totalRevenueChange >= 0 ? 'up' : 'down'}"></i>
+                        ${totalRevenueChange >= 0 ? '+' : ''}${totalRevenueChange.toFixed(1)}% vs 2024
                     </div>
                 </div>
 
@@ -859,10 +636,9 @@
             `;
         }
 
-        // Create agent card
         function createAgentCard(agent) {
             return `
-                <div class="agent-card" data-agent="${agent.code}" onclick="showAgentDetails('${agent.code}')">
+                <div class="agent-card" data-agent="${agent.code}">
                     <div class="agent-header">
                         <div class="agent-info">
                             <h3>${agent.name}</h3>
@@ -896,118 +672,6 @@
             `;
         }
 
-        // Show agent details
-        function showAgentDetails(agentCode) {
-            const agent = currentData.find(a => a.code === agentCode);
-            if (!agent) return;
-
-            const detailsPanel = document.getElementById('agent-details');
-            const agentData = agent.agent;
-
-            // Clear previous selection
-            document.querySelectorAll('.agent-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-
-            // Select current card
-            document.querySelector(`[data-agent="${agentCode}"]`).classList.add('selected');
-
-            detailsPanel.innerHTML = `
-                <div class="details-header">
-                    <div class="details-title">${agent.name}</div>
-                    <div class="details-subtitle">Codice: ${agent.code} | Periodo: ${agent.period}</div>
-                </div>
-
-                <div class="details-grid">
-                    <div class="details-section">
-                        <h4><i class="fas fa-chart-line"></i> Performance Finanziaria</h4>
-                        <ul class="details-list">
-                            <li>
-                                <span>Fatturato 2025</span>
-                                <strong>${formatCurrency(agent.currentRevenue)}</strong>
-                            </li>
-                            <li>
-                                <span>Fatturato 2024</span>
-                                <strong>${formatCurrency(agent.previousRevenue)}</strong>
-                            </li>
-                            <li>
-                                <span>Crescita</span>
-                                <strong class="${agent.revenueChange >= 0 ? 'change-positive' : 'change-negative'}">
-                                    ${agent.revenueChange >= 0 ? '+' : ''}${agent.revenueChange.toFixed(1)}%
-                                </strong>
-                            </li>
-                            ${agent.target > 0 ? `
-                            <li>
-                                <span>Obiettivo 2025</span>
-                                <strong>${formatCurrency(agent.target)}</strong>
-                            </li>
-                            <li>
-                                <span>% Obiettivo</span>
-                                <strong>${Math.round((agent.currentRevenue / agent.target) * 100)}%</strong>
-                            </li>
-                            ` : ''}
-                        </ul>
-                    </div>
-
-                    <div class="details-section">
-                        <h4><i class="fas fa-users"></i> Clienti</h4>
-                        <ul class="details-list">
-                            <li>
-                                <span>Clienti attivi 2025</span>
-                                <strong>${agent.currentClients}</strong>
-                            </li>
-                            <li>
-                                <span>Clienti 2024</span>
-                                <strong>${agent.previousClients}</strong>
-                            </li>
-                            <li>
-                                <span>Crescita clienti</span>
-                                <strong class="${agent.clientsChange >= 0 ? 'change-positive' : 'change-negative'}">
-                                    ${agent.clientsChange >= 0 ? '+' : ''}${agent.clientsChange.toFixed(1)}%
-                                </strong>
-                            </li>
-                            <li>
-                                <span>Fatturato medio</span>
-                                <strong>${formatCurrency(agent.currentRevenue / Math.max(agent.currentClients, 1))}</strong>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="details-section">
-                        <h4><i class="fas fa-map-marker-alt"></i> Territori</h4>
-                        <ul class="details-list">
-                            ${agentData.provinces.map(prov => `
-                                <li>
-                                    <span>${prov.Provincia || 'N/A'}</span>
-                                    <strong>${parseInt(prov.Clienti_Serviti) || 0} clienti</strong>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-
-                    <div class="details-section">
-                        <h4><i class="fas fa-chart-pie"></i> Top Categorie</h4>
-                        <ul class="details-list">
-                            ${agentData.categories
-                                .filter(cat => parseCSVValue(cat.Importo_Totale) > 0)
-                                .sort((a, b) => parseCSVValue(b.Importo_Totale) - parseCSVValue(a.Importo_Totale))
-                                .slice(0, 5)
-                                .map(cat => `
-                                    <li>
-                                        <span>${cat.Categoria}</span>
-                                        <strong>${formatCurrency(parseCSVValue(cat.Importo_Totale))}</strong>
-                                    </li>
-                                `).join('')}
-                        </ul>
-                    </div>
-                </div>
-            `;
-
-            detailsPanel.classList.add('show');
-            detailsPanel.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Filter agents
         function filterAgents() {
             const provinceFilter = document.getElementById('province-filter').value;
             const statusFilter = document.getElementById('status-filter').value;
@@ -1028,319 +692,39 @@
             updateAgentsDisplay();
         }
 
-        // Update agents display
         function updateAgentsDisplay() {
             document.getElementById('summary-cards').innerHTML = createSummaryCards(currentData);
             document.getElementById('agents-grid').innerHTML = 
                 currentData.map(agent => createAgentCard(agent)).join('');
         }
 
-        // Create regions analysis
-        function createRegionsAnalysis() {
-            const regionData = new Map();
-
-            allData.forEach(agent => {
-                agent.provinces.forEach(prov => {
-                    const province = prov.Provincia;
-                    if (!province) return;
-
-                    if (!regionData.has(province)) {
-                        regionData.set(province, {
-                            name: province,
-                            agents: 0,
-                            totalRevenue: 0,
-                            totalClients: 0
-                        });
-                    }
-
-                    const region = regionData.get(province);
-                    region.agents++;
-                    region.totalRevenue += parseCSVValue(prov.Fatturato);
-                    region.totalClients += parseInt(prov.Clienti_Serviti) || 0;
-                });
-            });
-
-            return Array.from(regionData.values()).sort((a, b) => b.totalRevenue - a.totalRevenue);
-        }
-
-        // Create regions cards
-        function createRegionsCards(regions) {
-            return regions.map(region => `
-                <div class="region-card">
-                    <div class="region-header">
-                        <h3 class="region-name">${region.name}</h3>
-                        <div class="status-badge status-active">${region.agents} agenti</div>
-                    </div>
-                    <div class="region-stats">
-                        <div class="region-stat">
-                            <div class="region-stat-value">${formatCurrency(region.totalRevenue)}</div>
-                            <div class="region-stat-label">Fatturato</div>
-                        </div>
-                        <div class="region-stat">
-                            <div class="region-stat-value">${region.totalClients}</div>
-                            <div class="region-stat-label">Clienti</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Create charts
-        function createRegionsChart(regions) {
-            const ctx = document.getElementById('regions-chart').getContext('2d');
-            
-            if (charts.regions) {
-                charts.regions.destroy();
-            }
-
-            charts.regions = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: regions.map(r => r.name),
-                    datasets: [{
-                        data: regions.map(r => r.totalRevenue),
-                        backgroundColor: [
-                            '#667eea', '#764ba2', '#f093fb', '#f5576c',
-                            '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                font: {
-                                    family: 'Inter',
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const region = regions[context.dataIndex];
-                                    return [
-                                        `${context.label}: ${formatCurrency(context.raw)}`,
-                                        `${region.totalClients} clienti`,
-                                        `${region.agents} agenti`
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createPerformanceChart() {
-            const ctx = document.getElementById('performance-chart').getContext('2d');
-            
-            if (charts.performance) {
-                charts.performance.destroy();
-            }
-
-            const performanceData = allData.filter(agent => agent.isActive).map(agent => ({
-                name: agent.name.split(' ')[0], // First name only for readability
-                current: agent.currentRevenue,
-                previous: agent.previousRevenue
-            }));
-
-            charts.performance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: performanceData.map(d => d.name),
-                    datasets: [
-                        {
-                            label: '2024',
-                            data: performanceData.map(d => d.previous),
-                            backgroundColor: 'rgba(102, 126, 234, 0.6)',
-                            borderColor: '#667eea',
-                            borderWidth: 1
-                        },
-                        {
-                            label: '2025',
-                            data: performanceData.map(d => d.current),
-                            backgroundColor: 'rgba(118, 75, 162, 0.6)',
-                            borderColor: '#764ba2',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    family: 'Inter',
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatCurrency(value);
-                                },
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                }
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createCategoriesChart() {
-            const ctx = document.getElementById('categories-chart').getContext('2d');
-            
-            if (charts.categories) {
-                charts.categories.destroy();
-            }
-
-            // Aggregate categories across all agents
-            const categoriesMap = new Map();
-            
-            allData.forEach(agent => {
-                agent.agent.categories.forEach(cat => {
-                    const categoryName = cat.Categoria;
-                    const amount = parseCSVValue(cat.Importo_Totale);
-                    
-                    if (amount > 0) {
-                        categoriesMap.set(categoryName, (categoriesMap.get(categoryName) || 0) + amount);
-                    }
-                });
-            });
-
-            const categories = Array.from(categoriesMap.entries())
-                .map(([name, amount]) => ({ name, amount }))
-                .sort((a, b) => b.amount - a.amount)
-                .slice(0, 10); // Top 10
-
-            charts.categories = new Chart(ctx, {
-                type: 'horizontalBar',
-                data: {
-                    labels: categories.map(c => c.name.replace(/_/g, ' ')),
-                    datasets: [{
-                        data: categories.map(c => c.amount),
-                        backgroundColor: '#667eea',
-                        borderColor: '#764ba2',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${formatCurrency(context.raw)}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatCurrency(value);
-                                },
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                }
-                            }
-                        },
-                        y: {
-                            ticks: {
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
         // Tab navigation
         function switchTab(tabName) {
-            // Update nav tabs
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
 
-            // Update content
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
             document.getElementById(`${tabName}-tab`).classList.add('active');
-
-            // Load tab-specific content
-            if (tabName === 'regioni') {
-                const regions = createRegionsAnalysis();
-                document.getElementById('regions-grid').innerHTML = createRegionsCards(regions);
-                createRegionsChart(regions);
-            } else if (tabName === 'analytics') {
-                createPerformanceChart();
-                createCategoriesChart();
-            }
         }
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Tab navigation
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     switchTab(tab.dataset.tab);
                 });
             });
 
-            // Filters
             document.getElementById('province-filter').addEventListener('change', filterAgents);
             document.getElementById('status-filter').addEventListener('change', filterAgents);
 
-            // Load data
             loadData();
         });
 
-        // Load and process data
         async function loadData() {
             try {
                 document.getElementById('loading').style.display = 'flex';
@@ -1352,10 +736,15 @@
                 }
 
                 const csvText = await response.text();
-                const agents = parseCSV(csvText);
+                console.log('CSV loaded, first 500 chars:', csvText.substring(0, 500));
                 
-                // Calculate metrics for each agent
+                const agents = parseCSV(csvText);
+                console.log('Parsed agents:', agents.length);
+                
                 allData = agents.map(calculateAgentMetrics).filter(agent => agent !== null);
+                console.log('Calculated metrics for agents:', allData.length);
+                console.log('Sample agent data:', allData[0]);
+                
                 currentData = [...allData];
 
                 // Populate province filter
@@ -1368,13 +757,9 @@
                     provinceSelect.appendChild(option);
                 });
 
-                // Update display
                 updateAgentsDisplay();
-
-                // Hide loading
                 document.getElementById('loading').style.display = 'none';
 
-                // Show success message
                 const successAlert = document.createElement('div');
                 successAlert.className = 'alert alert-success';
                 successAlert.innerHTML = `
