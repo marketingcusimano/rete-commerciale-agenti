@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Rete Commerciale</title>
+    <title>Dashboard Rete Commerciale - Automazione CSV</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
@@ -156,7 +156,7 @@
 
         .card-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 16px;
         }
@@ -175,7 +175,6 @@
             border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
-            margin-left: auto;
         }
 
         .trend-positive {
@@ -306,15 +305,6 @@
             color: #1a1a1a;
         }
 
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-            color: #666;
-            font-size: 14px;
-        }
-
         .status-badge {
             padding: 4px 8px;
             border-radius: 6px;
@@ -340,19 +330,32 @@
             font-weight: 500;
             background: #f0f0f0;
             color: #666;
+            margin-right: 4px;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px;
+        .loading {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
             color: #666;
+            font-size: 14px;
+            gap: 12px;
         }
 
-        .empty-state .icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 16px;
-            opacity: 0.5;
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a1a1a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
@@ -398,18 +401,18 @@
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M9 11H7v8h2v-8zm4-4h-2v12h2V7zm4-4h-2v16h2V3z"/>
                 </svg>
-                Analisi Performance e Territorio - Aggiornato automaticamente
+                <span id="dataStatus">Caricamento automatico dal CSV...</span>
             </div>
         </div>
 
         <div class="tabs">
-            <div class="tab active" data-tab="agenti">
+            <div class="tab active" onclick="switchTab('agenti')">
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
                 Agenti
             </div>
-            <div class="tab" data-tab="regioni">
+            <div class="tab" onclick="switchTab('regioni')">
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                 </svg>
@@ -423,30 +426,31 @@
                 <div class="filters-row">
                     <div class="filter-group">
                         <label class="filter-label">Agente</label>
-                        <select id="agentSelect">
+                        <select id="agentSelect" onchange="filterAgenti()">
                             <option value="all">Tutti gli Agenti</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label">Periodo</label>
-                        <select id="periodSelect">
-                            <option value="2025">Anno 2025</option>
-                            <option value="2024">Anno 2024</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
                         <label class="filter-label">Status</label>
-                        <select id="statusSelect">
+                        <select id="statusSelect" onchange="filterAgenti()">
                             <option value="all">Tutti</option>
                             <option value="active">Attivi</option>
                             <option value="inactive">Inattivi</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Periodo</label>
+                        <select id="periodSelect" onchange="filterAgenti()">
+                            <option value="2025">Anno 2025</option>
+                            <option value="2024">Anno 2024</option>
                         </select>
                     </div>
                 </div>
             </div>
 
             <div id="agenti-loading" class="loading">
-                Caricamento dati agenti...
+                <div class="loading-spinner"></div>
+                <span>Caricamento dati agenti dal CSV...</span>
             </div>
 
             <div id="agenti-content" style="display: none;">
@@ -458,203 +462,6 @@
                     <div class="chart-container">
                         <div class="chart-title">
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            Concentrazione
-                        </div>
-                    </div>
-                    <div class="main-value">${Math.round((topRegione?.fatturato / totaleFatturatoRegioni * 100) || 0)}%</div>
-                    <div class="comparison">del fatturato totale</div>
-                </div>
-            `;
-
-            // Crea tabella regioni
-            createRegioniTable(regioni);
-            
-            // Crea grafici territoriali
-            createTerritorioChart(regioni);
-            createTrendChart();
-        }
-
-        function createRegioniTable(regioni) {
-            const tbody = document.getElementById('regioni-tbody');
-            tbody.innerHTML = '';
-            
-            // Aggrega dati per provincia
-            const provinceData = new Map();
-            
-            allAgentsData.forEach(agent => {
-                agent.clientiProvincia.forEach(prov => {
-                    if (prov.provincia && prov.provincia !== '') {
-                        if (!provinceData.has(prov.provincia)) {
-                            provinceData.set(prov.provincia, {
-                                provincia: prov.provincia,
-                                regione: provinceRegioni[prov.provincia] || 'N/A',
-                                agenti: new Set(),
-                                fatturato: 0,
-                                clienti: 0
-                            });
-                        }
-                        
-                        const provData = provinceData.get(prov.provincia);
-                        provData.agenti.add(agent.codice);
-                        provData.fatturato += prov.fatturato;
-                        provData.clienti += prov.clientiServiti;
-                    }
-                });
-            });
-
-            const province = Array.from(provinceData.values())
-                .sort((a, b) => b.fatturato - a.fatturato);
-
-            const totaleFatturato = province.reduce((sum, p) => sum + p.fatturato, 0);
-
-            province.forEach(prov => {
-                const concentrazione = totaleFatturato > 0 ? (prov.fatturato / totaleFatturato * 100) : 0;
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${prov.provincia}</strong></td>
-                    <td>${prov.regione}</td>
-                    <td>${prov.agenti.size}</td>
-                    <td><strong>${formatCurrency(prov.fatturato)}</strong></td>
-                    <td>${prov.clienti}</td>
-                    <td>
-                        <span class="trend-badge trend-positive">
-                            ${concentrazione.toFixed(1)}%
-                        </span>
-                    </td>
-                    <td>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${concentrazione}%"></div>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function createTerritorioChart(regioni) {
-            const ctx = document.getElementById('territorio-chart').getContext('2d');
-            
-            if (charts.territorio) charts.territorio.destroy();
-            
-            const sortedRegioni = regioni.sort((a, b) => b.fatturato - a.fatturato);
-
-            charts.territorio = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: sortedRegioni.map(r => r.regione),
-                    datasets: [{
-                        label: 'Fatturato',
-                        data: sortedRegioni.map(r => r.fatturato),
-                        backgroundColor: '#1a1a1a',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatCurrency(value);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createTrendChart() {
-            const ctx = document.getElementById('trend-chart').getContext('2d');
-            
-            if (charts.trend) charts.trend.destroy();
-            
-            // Calcola trend mensile simulato (dati di esempio)
-            const mesi = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Jul', 'Ago'];
-            const trend2025 = [12000, 18000, 25000, 32000, 45000, 58000, 72000, 85000];
-            const trend2024 = [10000, 15000, 22000, 28000, 38000, 48000, 62000, 75000];
-
-            charts.trend = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: mesi,
-                    datasets: [{
-                        label: '2025',
-                        data: trend2025,
-                        borderColor: '#1a1a1a',
-                        backgroundColor: 'rgba(26, 26, 26, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }, {
-                        label: '2024',
-                        data: trend2024,
-                        borderColor: '#999',
-                        backgroundColor: 'rgba(153, 153, 153, 0.1)',
-                        tension: 0.4,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatCurrency(value);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            // Tab switching
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remove active class from all tabs
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-                    
-                    // Add active class to clicked tab
-                    tab.classList.add('active');
-                    const tabName = tab.dataset.tab;
-                    document.getElementById(tabName + '-tab').classList.add('active');
-                });
-            });
-
-            // Filter event listeners
-            document.getElementById('agentSelect').addEventListener('change', updateAgentiTab);
-            document.getElementById('statusSelect').addEventListener('change', updateAgentiTab);
-            document.getElementById('regionSelect').addEventListener('change', updateRegioniTab);
-            document.getElementById('provinciaSelect').addEventListener('change', updateRegioniTab);
-
-            // Load data
-            loadData();
-        });
-    </script>
-</body>
-</html> class="icon" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.25l1.41-1.41L15.5 14.5 13 17l-3.5-3.5L4 19l1.41 1.41L9 16.83l3.5 3.5 3.09-3.09z"/>
                             </svg>
                             Performance Fatturato
@@ -686,7 +493,7 @@
                         </div>
                     </div>
                     <div class="table-wrapper">
-                        <table id="agenti-table">
+                        <table>
                             <thead>
                                 <tr>
                                     <th>Codice</th>
@@ -714,29 +521,30 @@
                 <div class="filters-row">
                     <div class="filter-group">
                         <label class="filter-label">Regione</label>
-                        <select id="regionSelect">
+                        <select id="regionSelect" onchange="filterRegioni()">
                             <option value="all">Tutte le Regioni</option>
                         </select>
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Provincia</label>
-                        <select id="provinciaSelect">
+                        <select id="provinciaSelect" onchange="filterRegioni()">
                             <option value="all">Tutte le Province</option>
                         </select>
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Metrica</label>
-                        <select id="metricSelect">
+                        <select id="metricSelect" onchange="filterRegioni()">
                             <option value="fatturato">Fatturato</option>
                             <option value="clienti">Clienti</option>
-                            <option value="crescita">Crescita</option>
+                            <option value="agenti">Agenti</option>
                         </select>
                     </div>
                 </div>
             </div>
 
             <div id="regioni-loading" class="loading">
-                Caricamento dati territoriali...
+                <div class="loading-spinner"></div>
+                <span>Elaborazione dati territoriali...</span>
             </div>
 
             <div id="regioni-content" style="display: none;">
@@ -749,67 +557,67 @@
                         <div class="chart-title">
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                            </svg>
-                            Distribuzione Territoriale
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="territorio-chart"></canvas>
-                        </div>
+                        </svg>
+                        Distribuzione Territoriale
                     </div>
-                    <div class="chart-container">
-                        <div class="chart-title">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L3.5 16.99z"/>
-                            </svg>
-                            Trend Performance
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="trend-chart"></canvas>
-                        </div>
+                    <div class="chart-wrapper">
+                        <canvas id="territorio-chart"></canvas>
                     </div>
                 </div>
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L3.5 16.99z"/>
+                        </svg>
+                        Trend Performance
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                </div>
+            </div>
 
-                <div class="table-container">
-                    <div class="table-header">
-                        <div class="table-title">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                            </svg>
-                            Performance per Provincia
-                        </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        Performance per Provincia
                     </div>
-                    <div class="table-wrapper">
-                        <table id="regioni-table">
-                            <thead>
-                                <tr>
-                                    <th>Provincia</th>
-                                    <th>Regione</th>
-                                    <th>Agenti Attivi</th>
-                                    <th>Fatturato Totale</th>
-                                    <th>Clienti Serviti</th>
-                                    <th>Crescita %</th>
-                                    <th>Concentrazione</th>
-                                </tr>
-                            </thead>
-                            <tbody id="regioni-tbody">
-                                <!-- Righe generate dinamicamente -->
-                            </tbody>
-                        </table>
-                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Provincia</th>
+                                <th>Regione</th>
+                                <th>Agenti Attivi</th>
+                                <th>Fatturato Totale</th>
+                                <th>Clienti Serviti</th>
+                                <th>Crescita %</th>
+                                <th>Concentrazione</th>
+                            </tr>
+                        </thead>
+                        <tbody id="regioni-tbody">
+                            <!-- Righe generate dinamicamente -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // URL del CSV
+        // URL del CSV concatenato con tutti gli agenti
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-2025-09-05.csv';
         
         let allAgentsData = [];
+        let allRawData = [];
         let filteredData = [];
         let charts = {};
 
-        // Mappatura province-regioni
+        // Mappatura province-regioni (estesa)
         const provinceRegioni = {
             'FR': 'Lazio',
             'LT': 'Lazio', 
@@ -849,12 +657,12 @@
             return ((current - previous) / previous * 100);
         }
 
-        // Parsing dei dati CSV migliorato
-        function parseAgentData(csvText) {
+        // Parsing CSV con la stessa logica del file originale
+        function parseAgentsFromCSV(csvText) {
             const agents = [];
             const sections = csvText.split('# DATI STATISTICHE AGENTE');
             
-            console.log('Sezioni CSV trovate:', sections.length);
+            console.log(`Trovate ${sections.length - 1} sezioni agenti nel CSV`);
             
             for (let i = 1; i < sections.length; i++) {
                 const section = sections[i];
@@ -871,7 +679,7 @@
                     ripartizione: []
                 };
                 
-                // Estrai metadata agente con regex più robusto
+                // Estrai metadata agente dai commenti
                 for (const line of lines) {
                     if (line.includes('Codice Agente:')) {
                         agent.codice = line.split(':')[1]?.trim() || '';
@@ -882,51 +690,91 @@
                     }
                 }
                 
-                // Parsa le righe dati con parsing più robusto
+                // Parsa le righe dati con gestione robusta dei numeri
+                let currentHeaders = null;
+                
                 for (const line of lines) {
                     try {
-                        if (line.startsWith('OBIETTIVI,')) {
-                            const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
-                            if (parts.length >= 8) {
-                                agent.obiettivi.push({
-                                    provincia: parts[1] || '',
-                                    annoPrecedente: parseFloat(parts[2]?.replace('.', '').replace(',', '.')) || 0,
-                                    annoCorrente: parseFloat(parts[3]?.replace('.', '').replace(',', '.')) || 0,
-                                    obiettivo: parseFloat(parts[4]?.replace('.', '').replace(',', '.')) || 0,
-                                    clientiAnnoPrecedente: parseInt(parts[6]) || 0,
-                                    clientiAnnoCorrente: parseInt(parts[7]) || 0,
-                                    obiettivoClienti: parseInt(parts[8]) || 0
+                        // Identifica headers delle sezioni
+                        if (line.includes('Tipo_Dato')) {
+                            currentHeaders = line.split(',').map(h => h.trim());
+                            continue;
+                        }
+                        
+                        // Parsa i dati se abbiamo headers
+                        if (currentHeaders && line.startsWith('OBIETTIVI,')) {
+                            const values = line.split(',').map(v => v.replace(/"/g, '').trim());
+                            if (values.length >= currentHeaders.length) {
+                                const row = {};
+                                currentHeaders.forEach((header, index) => {
+                                    let value = values[index] || '';
+                                    
+                                    // Converti numeri con gestione formato italiano
+                                    if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 
+                                         'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Obiettivo_Clienti'].includes(header)) {
+                                        // Gestisce formati come "67.611,27" -> 67611.27
+                                        if (value.includes('.') && value.includes(',')) {
+                                            value = value.replace(/\./g, '').replace(',', '.');
+                                        } else if (value.includes(',')) {
+                                            value = value.replace(',', '.');
+                                        }
+                                        value = parseFloat(value) || 0;
+                                    }
+                                    
+                                    row[header] = value;
                                 });
+                                agent.obiettivi.push(row);
                             }
                         } else if (line.startsWith('CLIENTI_PROVINCIA,')) {
-                            const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
-                            if (parts.length >= 4) {
+                            const values = line.split(',').map(v => v.replace(/"/g, '').trim());
+                            if (values.length >= 4) {
+                                let fatturato = values[3] || '0';
+                                if (fatturato.includes('.') && fatturato.includes(',')) {
+                                    fatturato = fatturato.replace(/\./g, '').replace(',', '.');
+                                } else if (fatturato.includes(',')) {
+                                    fatturato = fatturato.replace(',', '.');
+                                }
+                                
                                 agent.clientiProvincia.push({
-                                    provincia: parts[1] || '',
-                                    clientiServiti: parseInt(parts[2]) || 0,
-                                    fatturato: parseFloat(parts[3]?.replace('.', '').replace(',', '.')) || 0
+                                    provincia: values[1] || '',
+                                    clientiServiti: parseInt(values[2]) || 0,
+                                    fatturato: parseFloat(fatturato) || 0
                                 });
                             }
                         } else if (line.startsWith('VENDITE_CLIENTE,')) {
-                            const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
-                            if (parts.length >= 5) {
+                            const values = line.split(',').map(v => v.replace(/"/g, '').trim());
+                            if (values.length >= 5) {
+                                let fatturato = values[4] || '0';
+                                if (fatturato.includes('.') && fatturato.includes(',')) {
+                                    fatturato = fatturato.replace(/\./g, '').replace(',', '.');
+                                } else if (fatturato.includes(',')) {
+                                    fatturato = fatturato.replace(',', '.');
+                                }
+                                
                                 agent.venditeClienti.push({
-                                    provincia: parts[1] || '',
-                                    cliente: parts[2] || '',
-                                    categoria: parts[3] || '',
-                                    fatturato: parseFloat(parts[4]?.replace('.', '').replace(',', '.')) || 0
+                                    provincia: values[1] || '',
+                                    cliente: values[2] || '',
+                                    categoria: values[3] || '',
+                                    fatturato: parseFloat(fatturato) || 0
                                 });
                             }
                         } else if (line.startsWith('CATEGORIA_RIEPILOGO,')) {
-                            const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
-                            if (parts.length >= 7) {
+                            const values = line.split(',').map(v => v.replace(/"/g, '').trim());
+                            if (values.length >= 7) {
+                                let importo = values[2] || '0';
+                                if (importo.includes('.') && importo.includes(',')) {
+                                    importo = importo.replace(/\./g, '').replace(',', '.');
+                                } else if (importo.includes(',')) {
+                                    importo = importo.replace(',', '.');
+                                }
+                                
                                 agent.categorieRiepilogo.push({
-                                    categoria: parts[1] || '',
-                                    importoTotale: parseFloat(parts[2]?.replace('.', '').replace(',', '.')) || 0,
-                                    provincia1: parts[3] || '',
-                                    clientiProv1: parseInt(parts[4]) || 0,
-                                    provincia2: parts[5] || '',
-                                    clientiProv2: parseInt(parts[6]) || 0
+                                    categoria: values[1] || '',
+                                    importoTotale: parseFloat(importo) || 0,
+                                    provincia1: values[3] || '',
+                                    clientiProv1: parseInt(values[4]) || 0,
+                                    provincia2: values[5] || '',
+                                    clientiProv2: parseInt(values[6]) || 0
                                 });
                             }
                         }
@@ -938,37 +786,64 @@
                 // Aggiungi solo agenti con dati validi
                 if (agent.codice && (agent.obiettivi.length > 0 || agent.clientiProvincia.length > 0)) {
                     agents.push(agent);
-                    console.log('Agente aggiunto:', agent.codice, agent.ragioneSociale);
+                    console.log(`Agente aggiunto: ${agent.codice} - ${agent.ragioneSociale}`);
                 }
             }
             
-            console.log('Agenti parsati totali:', agents.length);
+            console.log(`Totale agenti parsati: ${agents.length}`);
             return agents;
         }
 
         // Caricamento e inizializzazione
         async function loadData() {
             try {
+                document.getElementById('dataStatus').textContent = 'Connessione al CSV...';
+                
                 const response = await fetch(CSV_URL);
-                if (!response.ok) throw new Error('Errore caricamento dati');
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
                 
                 const csvText = await response.text();
-                allAgentsData = parseAgentData(csvText);
+                console.log(`CSV caricato: ${csvText.length} caratteri`);
                 
-                console.log('Agenti caricati:', allAgentsData.length);
+                document.getElementById('dataStatus').textContent = 'Parsing dati agenti...';
                 
+                allAgentsData = parseAgentsFromCSV(csvText);
+                
+                if (allAgentsData.length === 0) {
+                    throw new Error('Nessun agente trovato nel CSV');
+                }
+                
+                document.getElementById('dataStatus').innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    ${allAgentsData.length} agenti caricati automaticamente
+                `;
+                
+                // Inizializza filtri e dashboard
                 initializeFilters();
                 updateAgentiTab();
                 updateRegioniTab();
                 
             } catch (error) {
-                console.error('Errore:', error);
+                console.error('Errore caricamento:', error);
+                document.getElementById('dataStatus').innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Errore: ${error.message}
+                `;
+                
+                // Nascondi loading e mostra messaggio di errore
                 document.getElementById('agenti-loading').innerHTML = `
                     <div style="color: #dc2626; text-align: center;">
                         <svg class="icon" style="width: 24px; height: 24px; margin-bottom: 8px;" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
-                        <br>Errore nel caricamento dei dati
+                        <div>Impossibile caricare i dati dal CSV</div>
+                        <div style="font-size: 12px; margin-top: 8px; color: #666;">${error.message}</div>
                     </div>
                 `;
             }
@@ -1031,12 +906,12 @@
             let agentiAttivi = 0;
             
             allAgentsData.forEach(agent => {
-                const generale = agent.obiettivi.find(o => o.provincia === 'Generale');
+                const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
                 if (generale) {
-                    totaleFatturato2025 += generale.annoCorrente;
-                    totaleFatturato2024 += generale.annoPrecedente;
-                    totaleClienti += generale.clientiAnnoCorrente;
-                    if (generale.annoCorrente > 0) agentiAttivi++;
+                    totaleFatturato2025 += generale.Anno_Corrente || 0;
+                    totaleFatturato2024 += generale.Anno_Precedente || 0;
+                    totaleClienti += generale.Clienti_Anno_Corrente || 0;
+                    if ((generale.Anno_Corrente || 0) > 0) agentiAttivi++;
                 }
             });
 
@@ -1120,24 +995,38 @@
             const tbody = document.getElementById('agenti-tbody');
             tbody.innerHTML = '';
             
-            allAgentsData.forEach(agent => {
-                const generale = agent.obiettivi.find(o => o.provincia === 'Generale');
+            const selectedAgent = document.getElementById('agentSelect').value;
+            const selectedStatus = document.getElementById('statusSelect').value;
+            
+            let agentsToShow = allAgentsData;
+            
+            // Filtra per agente selezionato
+            if (selectedAgent !== 'all') {
+                agentsToShow = agentsToShow.filter(agent => agent.codice === selectedAgent);
+            }
+            
+            agentsToShow.forEach(agent => {
+                const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
                 if (!generale) return;
                 
-                const fatturato2025 = generale.annoCorrente;
-                const fatturato2024 = generale.annoPrecedente;
+                const fatturato2025 = generale.Anno_Corrente || 0;
+                const fatturato2024 = generale.Anno_Precedente || 0;
                 const crescita = calculateGrowth(fatturato2025, fatturato2024);
-                const clienti = generale.clientiAnnoCorrente;
+                const clienti = generale.Clienti_Anno_Corrente || 0;
                 
                 const province = agent.clientiProvincia.map(p => p.provincia).filter(p => p).join(', ');
                 const isActive = fatturato2025 > 0;
+                
+                // Filtra per status se selezionato
+                if (selectedStatus === 'active' && !isActive) return;
+                if (selectedStatus === 'inactive' && isActive) return;
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><strong>${agent.codice}</strong></td>
                     <td>${agent.ragioneSociale}</td>
                     <td>
-                        ${province.split(', ').map(p => `<span class="province-tag">${p}</span>`).join(' ')}
+                        ${province.split(', ').map(p => `<span class="province-tag">${p}</span>`).join('')}
                     </td>
                     <td><strong>${formatCurrency(fatturato2025)}</strong></td>
                     <td>${formatCurrency(fatturato2024)}</td>
@@ -1164,11 +1053,11 @@
             
             const topAgenti = allAgentsData
                 .map(agent => {
-                    const generale = agent.obiettivi.find(o => o.provincia === 'Generale');
+                    const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
                     return {
                         nome: agent.ragioneSociale.split(' ')[0],
-                        fatturato2025: generale?.annoCorrente || 0,
-                        fatturato2024: generale?.annoPrecedente || 0
+                        fatturato2025: generale?.Anno_Corrente || 0,
+                        fatturato2024: generale?.Anno_Precedente || 0
                     };
                 })
                 .filter(a => a.fatturato2025 > 0)
@@ -1239,7 +1128,7 @@
             charts.categorie = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: topCategorie.map(c => c[0].replace('_', ' ')),
+                    labels: topCategorie.map(c => c[0].replace(/_/g, ' ')),
                     datasets: [{
                         data: topCategorie.map(c => c[1]),
                         backgroundColor: colors,
@@ -1316,4 +1205,258 @@
                 <div class="metric-card">
                     <div class="card-header">
                         <div class="card-title">
-                            <svg
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                            </svg>
+                            Top Regione
+                        </div>
+                    </div>
+                    <div class="main-value">${topRegione?.regione || 'N/A'}</div>
+                    <div class="comparison">${formatCurrency(topRegione?.fatturato || 0)}</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                            </svg>
+                            Fatturato Territoriale
+                        </div>
+                    </div>
+                    <div class="main-value">${formatCurrency(totaleFatturatoRegioni)}</div>
+                    <div class="comparison">${totaleClientiRegioni} clienti totali</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            Concentrazione
+                        </div>
+                    </div>
+                    <div class="main-value">${Math.round((topRegione?.fatturato / totaleFatturatoRegioni * 100) || 0)}%</div>
+                    <div class="comparison">del fatturato totale</div>
+                </div>
+            `;
+
+            // Crea tabella regioni
+            createRegioniTable(regioni);
+            
+            // Crea grafici territoriali
+            createTerritorioChart(regioni);
+            createTrendChart();
+        }
+
+        function createRegioniTable(regioni) {
+            const tbody = document.getElementById('regioni-tbody');
+            tbody.innerHTML = '';
+            
+            // Aggrega dati per provincia
+            const provinceData = new Map();
+            
+            allAgentsData.forEach(agent => {
+                agent.clientiProvincia.forEach(prov => {
+                    if (prov.provincia && prov.provincia !== '') {
+                        if (!provinceData.has(prov.provincia)) {
+                            provinceData.set(prov.provincia, {
+                                provincia: prov.provincia,
+                                regione: provinceRegioni[prov.provincia] || 'N/A',
+                                agenti: new Set(),
+                                fatturato: 0,
+                                clienti: 0,
+                                fatturato2024: 0
+                            });
+                        }
+                        
+                        const provData = provinceData.get(prov.provincia);
+                        provData.agenti.add(agent.codice);
+                        provData.fatturato += prov.fatturato;
+                        provData.clienti += prov.clientiServiti;
+                        
+                        // Calcola fatturato 2024 per la crescita
+                        const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                        if (generale) {
+                            provData.fatturato2024 += (generale.Anno_Precedente || 0) * (prov.fatturato / (generale.Anno_Corrente || 1));
+                        }
+                    }
+                });
+            });
+
+            const province = Array.from(provinceData.values())
+                .sort((a, b) => b.fatturato - a.fatturato);
+
+            const totaleFatturato = province.reduce((sum, p) => sum + p.fatturato, 0);
+
+            province.forEach(prov => {
+                const concentrazione = totaleFatturato > 0 ? (prov.fatturato / totaleFatturato * 100) : 0;
+                const crescita = calculateGrowth(prov.fatturato, prov.fatturato2024);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${prov.provincia}</strong></td>
+                    <td>${prov.regione}</td>
+                    <td>${prov.agenti.size}</td>
+                    <td><strong>${formatCurrency(prov.fatturato)}</strong></td>
+                    <td>${prov.clienti}</td>
+                    <td>
+                        <span class="trend-badge ${crescita >= 0 ? 'trend-positive' : 'trend-negative'}">
+                            ${crescita >= 0 ? '+' : ''}${crescita.toFixed(1)}%
+                        </span>
+                    </td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${concentrazione}%"></div>
+                        </div>
+                        <div style="text-align: center; font-size: 12px; margin-top: 4px;">${concentrazione.toFixed(1)}%</div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function createTerritorioChart(regioni) {
+            const ctx = document.getElementById('territorio-chart').getContext('2d');
+            
+            if (charts.territorio) charts.territorio.destroy();
+            
+            const sortedRegioni = regioni.sort((a, b) => b.fatturato - a.fatturato);
+
+            charts.territorio = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedRegioni.map(r => r.regione),
+                    datasets: [{
+                        label: 'Fatturato',
+                        data: sortedRegioni.map(r => r.fatturato),
+                        backgroundColor: '#1a1a1a',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createTrendChart() {
+            const ctx = document.getElementById('trend-chart').getContext('2d');
+            
+            if (charts.trend) charts.trend.destroy();
+            
+            // Calcola trend basato sui dati reali
+            const mesi = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Jul', 'Ago'];
+            const trend2025 = [];
+            const trend2024 = [];
+            
+            // Simula andamento mensile proporzionale al fatturato totale
+            let totaleFatturato2025 = 0;
+            let totaleFatturato2024 = 0;
+            
+            allAgentsData.forEach(agent => {
+                const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                if (generale) {
+                    totaleFatturato2025 += generale.Anno_Corrente || 0;
+                    totaleFatturato2024 += generale.Anno_Precedente || 0;
+                }
+            });
+            
+            // Genera trend progressivo
+            for (let i = 0; i < 8; i++) {
+                const progressione = (i + 1) / 8;
+                trend2025.push(totaleFatturato2025 * progressione);
+                trend2024.push(totaleFatturato2024 * progressione);
+            }
+
+            charts.trend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: mesi,
+                    datasets: [{
+                        label: '2025',
+                        data: trend2025,
+                        borderColor: '#1a1a1a',
+                        backgroundColor: 'rgba(26, 26, 26, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '2024',
+                        data: trend2024,
+                        borderColor: '#999',
+                        backgroundColor: 'rgba(153, 153, 153, 0.1)',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            // Rimuovi classe active da tutti i tab
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            
+            // Aggiungi classe active al tab cliccato
+            event.target.closest('.tab').classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            if (tabName === 'regioni') {
+                updateRegioniTab();
+            }
+        }
+
+        function filterAgenti() {
+            createAgentiTable();
+            createFatturatoChart();
+        }
+
+        function filterRegioni() {
+            updateRegioniTab();
+        }
+
+        // Inizializzazione al caricamento della pagina
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard caricata, avvio automazione CSV...');
+            loadData();
+        });
+    </script>
+</body>
+</html>
