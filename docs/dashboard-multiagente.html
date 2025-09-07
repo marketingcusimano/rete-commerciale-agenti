@@ -753,25 +753,53 @@
                 document.getElementById('loading').style.display = 'flex';
                 document.getElementById('error').style.display = 'none';
 
+                console.log('=== INIZIO CARICAMENTO DATI ===');
+                
                 const response = await fetch(CSV_URL);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const csvText = await response.text();
-                console.log('CSV loaded, first 500 chars:', csvText.substring(0, 500));
+                console.log('CSV caricato, lunghezza:', csvText.length);
+                console.log('Prime 1000 righe:', csvText.substring(0, 1000));
                 
                 const agents = parseCSV(csvText);
-                console.log('Parsed agents:', agents.length);
+                console.log('=== RISULTATO PARSING ===');
+                console.log('Agenti trovati:', agents.length);
+                
+                agents.forEach((agent, index) => {
+                    console.log(`Agente ${index + 1}:`, {
+                        code: agent.code,
+                        name: agent.name,
+                        objectives: agent.objectives.length,
+                        provinces: agent.provinces.length
+                    });
+                    
+                    if (agent.objectives.length > 0) {
+                        console.log('  Primi obiettivi:', agent.objectives.slice(0, 2));
+                    }
+                });
                 
                 allData = agents.map(calculateAgentMetrics).filter(agent => agent !== null);
-                console.log('Calculated metrics for agents:', allData.length);
-                console.log('Sample agent data:', allData[0]);
+                console.log('=== METRICHE CALCOLATE ===');
+                console.log('Agenti con metriche:', allData.length);
+                
+                allData.forEach((agent, index) => {
+                    console.log(`Metriche agente ${index + 1}:`, {
+                        name: agent.name,
+                        currentRevenue: agent.currentRevenue,
+                        previousRevenue: agent.previousRevenue,
+                        isActive: agent.isActive
+                    });
+                });
                 
                 currentData = [...allData];
 
                 // Populate province filter
                 const allProvinces = [...new Set(allData.flatMap(agent => agent.provinces))].sort();
+                console.log('Province trovate:', allProvinces);
+                
                 const provinceSelect = document.getElementById('province-filter');
                 allProvinces.forEach(province => {
                     const option = document.createElement('option');
@@ -787,7 +815,7 @@
                 successAlert.className = 'alert alert-success';
                 successAlert.innerHTML = `
                     <i class="fas fa-check-circle"></i>
-                    Dati caricati con successo: ${allData.length} agenti processati
+                    Dati caricati: ${allData.length} agenti processati
                 `;
                 document.querySelector('.container').insertBefore(successAlert, document.querySelector('.nav-tabs'));
                 
