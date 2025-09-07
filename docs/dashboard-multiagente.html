@@ -305,6 +305,13 @@
             color: #1a1a1a;
         }
 
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
         .status-active {
             background: #dcfce7;
             color: #166534;
@@ -961,6 +968,141 @@
             // Crea grafici
             createFatturatoChart();
             createCategorieChart();
+            createObiettiviChart();
+            createClientiChart();
+        }
+
+        function createObiettiviChart() {
+            const ctx = document.getElementById('obiettivi-chart').getContext('2d');
+            
+            if (charts.obiettivi) charts.obiettivi.destroy();
+            
+            const agentiConObiettivi = allAgentsData
+                .map(agent => {
+                    const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                    return {
+                        nome: agent.ragioneSociale.split(' ')[0],
+                        fatturato: generale?.Anno_Corrente || 0,
+                        obiettivo: generale?.Obiettivo || 0,
+                        percentuale: generale?.Obiettivo > 0 ? ((generale?.Anno_Corrente || 0) / generale.Obiettivo * 100) : 0
+                    };
+                })
+                .filter(a => a.obiettivo > 0)
+                .sort((a, b) => b.percentuale - a.percentuale)
+                .slice(0, 8);
+
+            charts.obiettivi = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agentiConObiettivi.map(a => a.nome),
+                    datasets: [{
+                        label: 'Raggiunto',
+                        data: agentiConObiettivi.map(a => a.fatturato),
+                        backgroundColor: '#22c55e',
+                        borderRadius: 4
+                    }, {
+                        label: 'Obiettivo',
+                        data: agentiConObiettivi.map(a => a.obiettivo),
+                        backgroundColor: '#e5e7eb',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const index = context.dataIndex;
+                                    const percentuale = agentiConObiettivi[index].percentuale;
+                                    return `Raggiunto: ${percentuale.toFixed(1)}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createClientiChart() {
+            const ctx = document.getElementById('clienti-chart').getContext('2d');
+            
+            if (charts.clienti) charts.clienti.destroy();
+            
+            const distribuzioneClienti = allAgentsData
+                .map(agent => {
+                    const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                    const clienti = generale?.Clienti_Anno_Corrente || 0;
+                    return {
+                        nome: agent.ragioneSociale.split(' ')[0],
+                        clienti: clienti,
+                        fatturato: generale?.Anno_Corrente || 0
+                    };
+                })
+                .filter(a => a.clienti > 0)
+                .sort((a, b) => b.clienti - a.clienti)
+                .slice(0, 10);
+
+            const colors = distribuzioneClienti.map((_, index) => {
+                const hue = (index * 137.5) % 360; // Golden angle per colori distribuiti
+                return `hsl(${hue}, 70%, 50%)`;
+            });
+
+            charts.clienti = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: distribuzioneClienti.map(a => a.nome),
+                    datasets: [{
+                        data: distribuzioneClienti.map(a => a.clienti),
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '50%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    const agente = distribuzioneClienti[index];
+                                    const mediaFatturato = agente.fatturato / agente.clienti;
+                                    return [
+                                        `Clienti: ${context.parsed}`,
+                                        `Media: ${formatCurrency(mediaFatturato)}`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function createAgentiTable() {
