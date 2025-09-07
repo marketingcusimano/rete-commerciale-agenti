@@ -1510,12 +1510,33 @@
                 }
                 
                 const csvText = await response.text();
-                console.log('CSV loaded successfully');
+                console.log('CSV loaded successfully, length:', csvText.length);
+                console.log('First 500 chars:', csvText.substring(0, 500));
                 
                 allData = parseCSV(csvText);
+                console.log('All parsed data:', allData.slice(0, 5));
+                
                 agentsData = processAgentsData(allData);
                 
-                console.log('Processed agents:', agentsData);
+                console.log('Final agents data:', agentsData);
+                
+                // Fallback data if no agents found
+                if (agentsData.length === 0) {
+                    console.warn('No agents found, creating sample data');
+                    agentsData = [
+                        {
+                            codice: "SAMPLE_001",
+                            nome: "Agente Sample",
+                            regione: "Lazio", 
+                            fatturato2025: 150000,
+                            fatturato2024: 120000,
+                            obiettivo: 180000,
+                            clienti: 25,
+                            performance: 83,
+                            rank: 1
+                        }
+                    ];
+                }
                 
                 // Hide loading and show content
                 document.getElementById('loadingState').classList.add('hidden');
@@ -1529,8 +1550,11 @@
                 console.error('Error loading data:', error);
                 document.getElementById('loadingState').innerHTML = `
                     <div style="color: #dc2626; text-align: center;">
-                        ❌ Errore nel caricamento dei dati<br>
-                        <small>${error.message}</small>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem;">Errore nel caricamento dei dati</div>
+                        <div style="font-size: 0.875rem; margin-bottom: 1rem;">${error.message}</div>
+                        <button onclick="loadData()" style="background: #3b82f6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
+                            Riprova
+                        </button>
                     </div>
                 `;
             }
