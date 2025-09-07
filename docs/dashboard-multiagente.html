@@ -1442,10 +1442,18 @@
 
         // Inizializzazione al caricamento della pagina
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard caricata con dati di esempio');
-            initializeFilters();
-            updateAgentiTab();
-            updateRegioniTab();
+            console.log('Dashboard caricata, avvio automazione CSV...');
+            
+            // Mostra il messaggio di caricamento
+            document.getElementById('dataStatus').innerHTML = `
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/>
+                </svg>
+                Caricamento automatico dal CSV...
+            `;
+            
+            // Avvia il caricamento automatico
+            loadData();
         });
     </script>
 </body>
