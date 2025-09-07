@@ -1,1242 +1,791 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Rete Commerciale Agenti</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: #f8fafc;
-            min-height: 100vh;
-            color: #1e293b;
-        }
-
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 32px;
-            width: 100%;
-        }
-
-        .header {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 32px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 8px;
-        }
-
-        .header .subtitle {
-            color: #64748b;
-            font-size: 1rem;
-            margin-bottom: 16px;
-        }
-
-        /* Tab Navigation */
-        .tab-navigation {
-            display: flex;
-            gap: 8px;
-            background: #f1f5f9;
-            padding: 8px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            padding: 12px 20px;
-            border: none;
-            background: transparent;
-            color: #64748b;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            min-width: 100px;
-        }
-
-        .tab-btn:hover {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-        }
-
-        .tab-btn.active {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Agent Selector */
-        .agent-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .agent-selector {
-            position: relative;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-        }
-
-        .agent-selector select {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 12px 40px 12px 16px;
-            border: none;
-            background: transparent;
-            color: #1e293b;
-            cursor: pointer;
-            min-width: 250px;
-            outline: none;
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #dcfce7;
-            color: #166534;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-
-        .metric-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s ease;
-        }
-
-        .metric-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border-color: #cbd5e1;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-
-        .card-title {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #64748b;
-            line-height: 1.4;
-        }
-
-        .trend-badge {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 12px;
-        }
-
-        .trend-positive {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .trend-negative {
-            background: #fef2f2;
-            color: #dc2626;
-        }
-
-        .main-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 8px;
-        }
-
-        .comparison {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            font-size: 0.85rem;
-        }
-
-        .prev-value {
-            color: #64748b;
-        }
-
-        .chart-section {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            margin: 32px 0;
-            border: 1px solid #e2e8f0;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .section-header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-            color: #64748b;
-            font-size: 1rem;
-        }
-
-        /* Region Overview Styles */
-        .region-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-
-        .region-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s ease;
-        }
-
-        .region-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-color: #cbd5e1;
-        }
-
-        .region-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 12px;
-        }
-
-        .region-stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #3b82f6;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        .agents-list {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #f1f5f9;
-        }
-
-        .agent-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            font-size: 0.85rem;
-        }
-
-        .agent-name {
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .agent-revenue {
-            font-weight: 600;
-            color: #6366f1;
-        }
-
-        /* Summary Stats */
-        .summary-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .summary-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .summary-number {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .summary-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        /* Top Agents Table */
-        .top-agents-table {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-        }
-
-        .top-agents-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .top-agents-table th,
-        .top-agents-table td {
-            padding: 16px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .top-agents-table th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #374151;
-            font-size: 0.9rem;
-        }
-
-        .top-agents-table td {
-            font-size: 0.9rem;
-            color: #1e293b;
-        }
-
-        .agent-rank {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #3b82f6;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .progress-section {
-            margin-top: 16px;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .progress-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #475569;
-        }
-
-        .progress-percentage {
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        .progress-bar {
-            background: #f1f5f9;
-            border-radius: 8px;
-            height: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 8px;
-            transition: width 0.6s ease;
-        }
-
-        .progress-green {
-            background: #22c55e;
-        }
-
-        .progress-blue {
-            background: #3b82f6;
-        }
-
-        .progress-details {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .dashboard-container {
-                padding: 16px;
-            }
-            
-            .header {
-                padding: 24px 20px;
-            }
-
-            .header h1 {
-                font-size: 1.75rem;
-            }
-
-            .tab-navigation {
-                gap: 4px;
-            }
-
-            .tab-btn {
-                padding: 10px 16px;
-                font-size: 0.85rem;
-                min-width: 80px;
-            }
-
-            .agent-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .agent-selector select {
-                min-width: 100%;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .main-value {
-                font-size: 1.75rem;
-            }
-
-            .chart-section {
-                padding: 20px;
-                margin: 20px 0;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="header">
-            <h1>Dashboard Rete Commerciale Agenti</h1>
-            <div class="subtitle">Performance Vendite 2025 - Panoramica Multiagente</div>
-            <div class="status-indicator">
-                <span>●</span>
-                <span>Dati aggiornati dal CSV concatenato</span>
-            </div>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="tab-navigation">
-            <button class="tab-btn active" onclick="switchTab('agents')">📊 Agenti</button>
-            <button class="tab-btn" onclick="switchTab('regions')">🗺️ Regioni</button>
-        </div>
-
-        <!-- Loading -->
-        <div id="loadingMessage" class="loading">
-            Caricamento dati in corso...
-        </div>
-
-        <!-- Agents Tab -->
-        <div id="agentsTab" class="tab-content active">
-            <div class="agent-controls">
-                <div class="section-title">SELEZIONE AGENTE</div>
-                <div class="agent-selector">
-                    <select id="agentSelect">
-                        <option value="">Seleziona un agente...</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="agentDashboard" style="display: none;">
-                <!-- SEZIONE 1: METRICHE PRINCIPALI -->
-                <div class="cards-grid" id="agentMetrics">
-                    <!-- Cards generate dinamicamente -->
-                </div>
-
-                <!-- SEZIONE 2: CLIENTI SERVITI PER PROVINCIA -->
-                <div class="chart-section">
-                    <div class="section-header">
-                        <h2>CLIENTI SERVITI PER PROVINCIA</h2>
-                    </div>
-                    <div id="agentProvinces">
-                        <!-- Province cards -->
-                    </div>
-                </div>
-
-                <!-- SEZIONE 3: TOP CLIENTI -->
-                <div class="chart-section">
-                    <div class="section-header">
-                        <h2>TOP CLIENTI PER FATTURATO</h2>
-                    </div>
-                    <div id="agentClients">
-                        <!-- Clienti table -->
-                    </div>
-                </div>
-
-                <!-- SEZIONE 4: CATEGORIE PRODOTTO -->
-                <div class="chart-section">
-                    <div class="section-header">
-                        <h2>PERFORMANCE PER CATEGORIA PRODOTTO</h2>
-                    </div>
-                    <div id="agentCategories">
-                        <!-- Categorie grid -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Regions Tab -->
-        <div id="regionsTab" class="tab-content">
-            <!-- Summary Stats -->
-            <div class="summary-stats" id="summaryStats">
-                <!-- Summary cards -->
-            </div>
-
-            <!-- Regions Grid -->
-            <div class="region-grid" id="regionsGrid">
-                <!-- Region cards -->
-            </div>
-
-            <!-- Top Agents -->
-            <div class="chart-section">
-                <div class="section-header">
-                    <h2>TOP AGENTI PER PERFORMANCE</h2>
-                </div>
-                <div class="top-agents-table" id="topAgentsTable">
-                    <!-- Top agents table -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // URL del CSV concatenato
-        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-2025-09-05.csv';
-        
-        let allAgentsData = [];
-        let currentAgent = null;
-
-        function formatNumber(num) {
-            return new Intl.NumberFormat('it-IT', {
-                style: 'decimal',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(num);
-        }
-
-        function formatCurrency(num) {
-            if (num >= 1000) {
-                return '€' + Math.round(num / 1000) + 'k';
-            }
-            return '€' + formatNumber(num);
-        }
-
-        function parseCSVValue(value) {
-            if (!value || value === '') return 0;
-            // Rimuovi virgole e converti in numero
-            return parseFloat(value.replace(/[",]/g, '.').replace(/[^\d.-]/g, '')) || 0;
-        }
-
-        // Funzione per parsificare il CSV concatenato
-        function parseCSV(csvText) {
-            const lines = csvText.trim().split('\n');
-            const agents = [];
-            let currentAgent = null;
-            let currentHeaders = null;
-            
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                
-                // Salta righe vuote
-                if (!line) continue;
-                
-                // Nuovo agente
-                if (line.includes('# Codice Agente:')) {
-                    if (currentAgent) {
-                        agents.push(currentAgent);
-                    }
-                    currentAgent = {
-                        codice: line.split(':')[1]?.trim(),
-                        nome: '',
-                        periodo: '',
-                        data: []
-                    };
-                    continue;
-                }
-                
-                // Nome agente
-                if (line.includes('# Ragione Sociale:')) {
-                    if (currentAgent) {
-                        currentAgent.nome = line.split(':')[1]?.trim();
-                    }
-                    continue;
-                }
-                
-                // Periodo
-                if (line.includes('# Periodo:')) {
-                    if (currentAgent) {
-                        currentAgent.periodo = line.split(':')[1]?.trim();
-                    }
-                    continue;
-                }
-                
-                // Header CSV
-                if (line.includes('Tipo_Dato')) {
-                    currentHeaders = line.split(',').map(h => h.trim());
-                    continue;
-                }
-                
-                // Dati CSV
-                if (currentHeaders && line && !line.startsWith('#') && !line.startsWith('##')) {
-                    const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-                    if (values.length >= currentHeaders.length && currentAgent) {
-                        const row = {};
-                        currentHeaders.forEach((header, index) => {
-                            let value = values[index] || '';
-                            
-                            // Converti numeri
-                            if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Percentuale_Obiettivo', 
-                                'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Obiettivo_Clienti', 
-                                'Percentuale_Obiettivo_Clienti', 'Fatturato', 'Clienti_Serviti', 'Importo_Totale',
-                                'Clienti_Prov_1', 'Clienti_Prov_2', 'Importo', 'Valore'].includes(header)) {
-                                value = parseCSVValue(value);
-                            }
-                            
-                            row[header] = value;
-                        });
-                        
-                        currentAgent.data.push(row);
-                    }
-                }
-            }
-            
-            // Aggiungi ultimo agente
-            if (currentAgent) {
-                agents.push(currentAgent);
-            }
-            
-            return agents;
-        }
-
-        function switchTab(tabName) {
-            // Update tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            
-            if (tabName === 'regions') {
-                updateRegionsView();
-            }
-        }
-
-        function populateAgentSelector() {
-            const selector = document.getElementById('agentSelect');
-            selector.innerHTML = '<option value="">Seleziona un agente...</option>';
-            
-            allAgentsData.forEach(agent => {
-                if (agent.nome && agent.nome !== '') {
-                    const option = document.createElement('option');
-                    option.value = agent.codice;
-                    option.textContent = `${agent.nome} (${agent.codice})`;
-                    selector.appendChild(option);
-                }
-            });
-            
-            selector.addEventListener('change', function() {
-                if (this.value) {
-                    currentAgent = allAgentsData.find(a => a.codice === this.value);
-                    updateAgentDashboard();
-                } else {
-                    document.getElementById('agentDashboard').style.display = 'none';
-                }
-            });
-        }
-
-        function createFatturatoCard(data) {
-            const current = data.Anno_Corrente || 0;
-            const previous = data.Anno_Precedente || 0;
-            const change = current - previous;
-            const percentage = previous > 0 ? ((change / previous) * 100) : 0;
-            const isPositive = change >= 0;
-            
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Fatturato 2025</div>
-                        <div class="trend-badge ${isPositive ? 'trend-positive' : 'trend-negative'}">
-                            ${isPositive ? '↗' : '↘'} ${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${formatCurrency(current)}</div>
-                    <div class="comparison">
-                        <span class="prev-value">vs 2024: ${formatCurrency(previous)}</span>
-                    </div>
-                    ${data.Obiettivo > 0 ? `
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <span class="progress-label">● Obiettivo 2025</span>
-                                <span class="progress-percentage">${formatCurrency(data.Obiettivo)}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill progress-green" style="width: ${Math.min((current/data.Obiettivo)*100, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span>Mancano: ${formatCurrency(Math.max(0, data.Obiettivo - current))}</span>
-                                <span>${Math.round((current/data.Obiettivo)*100)}%</span>
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        function createClientiCard(data) {
-            const currentClients = data.Clienti_Anno_Corrente || 0;
-            const prevClients = data.Clienti_Anno_Precedente || 0;
-            const targetClients = data.Obiettivo_Clienti || 0;
-            const clientProgress = targetClients > 0 ? (currentClients / targetClients) * 100 : 0;
-            
-            return `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">Clienti Attivi</div>
-                        <div class="trend-badge ${clientProgress >= 50 ? 'trend-positive' : 'trend-negative'}">
-                            ${Math.round(clientProgress)}%
-                        </div>
-                    </div>
-                    <div class="main-value">${currentClients}</div>
-                    <div class="comparison">
-                        <span class="prev-value">vs 2024: ${prevClients}</span>
-                    </div>
-                    ${targetClients > 0 ? `
-                        <div class="progress-section">
-                            <div class="progress-header">
-                                <span class="progress-label">● Obiettivo Clienti</span>
-                                <span class="progress-percentage">${targetClients}</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill progress-blue" style="width: ${Math.min(clientProgress, 100)}%"></div>
-                            </div>
-                            <div class="progress-details">
-                                <span>Mancano: ${Math.max(0, targetClients - currentClients)}</span>
-                                <span>${Math.round(clientProgress)}%</span>
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        function updateAgentDashboard() {
-            if (!currentAgent) return;
-            
-            document.getElementById('agentDashboard').style.display = 'block';
-            
-            // Trova i dati obiettivi per l'agente
-            const objectivesData = currentAgent.data.filter(d => d.Tipo_Dato === 'OBIETTIVI');
-            const generalData = objectivesData.find(d => d.Provincia === 'Generale') || objectivesData[0];
-            
-            // Update metrics cards
-            const metricsContainer = document.getElementById('agentMetrics');
-            let html = '';
-            
-            if (generalData) {
-                html += createFatturatoCard(generalData);
-                html += createClientiCard(generalData);
-                
-                // Top Performance card
-                html += `
-                    <div class="metric-card">
-                        <div class="card-header">
-                            <div class="card-title">Performance</div>
-                            <div class="trend-badge trend-positive">
-                                ATTIVO
-                            </div>
-                        </div>
-                        <div class="main-value">${currentAgent.nome.split(' ')[0]}</div>
-                        <div class="comparison">
-                            <span class="prev-value">Codice: ${currentAgent.codice}</span>
-                        </div>
-                        <div class="progress-details">
-                            <span style="color: #64748b; font-size: 0.85rem;">${currentAgent.periodo || 'Periodo attivo'}</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            metricsContainer.innerHTML = html;
-            
-            // Update provinces
-            updateAgentProvinces();
-            
-            // Update clients
-            updateAgentClients();
-            
-            // Update categories
-            updateAgentCategories();
-        }
-
-        function updateAgentProvinces() {
-            if (!currentAgent) return;
-            
-            const provincesData = currentAgent.data.filter(d => d.Tipo_Dato === 'CLIENTI_PROVINCIA');
-            const container = document.getElementById('agentProvinces');
-            
-            if (provincesData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px;">Nessun dato province disponibile</div>';
-                return;
-            }
-
-            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">';
-            
-            provincesData.forEach(prov => {
-                const clients = parseInt(prov.Clienti_Serviti) || 0;
-                const revenue = parseCSVValue(prov.Fatturato) || 0;
-                const avgPerClient = clients > 0 ? revenue / clients : 0;
-                
-                if (clients > 0 || revenue > 0) {
-                    html += `
-                        <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0;">
-                            <div style="font-size: 1.1rem; font-weight: 600; color: #1e293b; margin-bottom: 12px;">
-                                ${prov.Provincia || 'N/A'}
-                            </div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6; margin-bottom: 8px;">
-                                ${clients}
-                            </div>
-                            <div style="font-size: 1rem; font-weight: 600; color: #1e293b; margin-bottom: 12px;">
-                                ${formatCurrency(revenue)}
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding-top: 12px; border-top: 1px solid #f1f5f9; font-size: 0.9rem; color: #64748b;">
-                                <span>Clienti serviti</span>
-                                <span style="font-weight: 600;">Media: ${formatCurrency(avgPerClient)}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        function updateAgentClients() {
-            if (!currentAgent) return;
-            
-            const clientsData = currentAgent.data.filter(d => d.Tipo_Dato === 'VENDITE_CLIENTE');
-            const container = document.getElementById('agentClients');
-            
-            if (clientsData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px;">Nessun dato clienti disponibile</div>';
-                return;
-            }
-
-            // Raggruppa per cliente
-            const clientsMap = new Map();
-            clientsData.forEach(sale => {
-                const clientName = sale.Ragione_Sociale_Cliente;
-                const revenue = parseCSVValue(sale.Fatturato) || 0;
-                const province = sale.Provincia;
-                
-                if (!clientsMap.has(clientName)) {
-                    clientsMap.set(clientName, {
-                        name: clientName,
-                        totalRevenue: 0,
-                        province: province
-                    });
-                }
-                
-                clientsMap.get(clientName).totalRevenue += revenue;
-            });
-            
-            // Converti in array e ordina
-            const topClients = Array.from(clientsMap.values())
-                .sort((a, b) => b.totalRevenue - a.totalRevenue)
-                .slice(0, 10);
-            
-            let html = `
-                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden;">
-                    <thead>
-                        <tr style="background: #f8fafc;">
-                            <th style="padding: 16px; text-align: left; font-weight: 600; color: #374151;">Pos.</th>
-                            <th style="padding: 16px; text-align: left; font-weight: 600; color: #374151;">Cliente</th>
-                            <th style="padding: 16px; text-align: left; font-weight: 600; color: #374151;">Provincia</th>
-                            <th style="padding: 16px; text-align: left; font-weight: 600; color: #374151;">Fatturato</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            topClients.forEach((client, index) => {
-                html += `
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 16px;"><strong>${index + 1}</strong></td>
-                        <td style="padding: 16px; max-width: 250px;">${client.name}</td>
-                        <td style="padding: 16px;">${client.province || 'N/A'}</td>
-                        <td style="padding: 16px; font-weight: 600; color: #3b82f6;">${formatCurrency(client.totalRevenue)}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-
-        function updateAgentCategories() {
-            if (!currentAgent) return;
-            
-            const categoriesData = currentAgent.data.filter(d => d.Tipo_Dato === 'CATEGORIA_RIEPILOGO');
-            const container = document.getElementById('agentCategories');
-            
-            if (categoriesData.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px;">Nessun dato categorie disponibile</div>';
-                return;
-            }
-
-            // Filtra solo categorie con importo > 0
-            const activeCategories = categoriesData.filter(cat => parseCSVValue(cat.Importo_Totale) > 0);
-            activeCategories.sort((a, b) => parseCSVValue(b.Importo_Totale) - parseCSVValue(a.Importo_Totale));
-            
-            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">';
-            
-            activeCategories.slice(0, 8).forEach(cat => {
-                const importo = parseCSVValue(cat.Importo_Totale);
-                const clientiProv1 = parseInt(cat.Clienti_Prov_1) || 0;
-                const clientiProv2 = parseInt(cat.Clienti_Prov_2) || 0;
-                const totalClienti = clientiProv1 + clientiProv2;
-                
-                html += `
-                    <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0;">
-                        <div style="font-size: 0.9rem; font-weight: 600; color: #3b82f6; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
-                            ${cat.Categoria.replace(/_/g, ' ')}
-                        </div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
-                            ${formatCurrency(importo)}
-                        </div>
-                        <div style="font-size: 0.8rem; color: #64748b;">
-                            ${totalClienti} clienti serviti
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        function updateRegionsView() {
-            updateSummaryStats();
-            updateRegionsGrid();
-            updateTopAgentsTable();
-        }
-
-        function updateSummaryStats() {
-            const container = document.getElementById('summaryStats');
-            
-            const totalAgents = allAgentsData.filter(a => a.nome && a.nome !== '').length;
-            let totalRevenue = 0;
-            let totalClients = 0;
-            let activeAgents = 0;
-            
-            allAgentsData.forEach(agent => {
-                const generalData = agent.data.find(d => d.Tipo_Dato === 'OBIETTIVI' && d.Provincia === 'Generale');
-                if (generalData) {
-                    totalRevenue += generalData.Anno_Corrente || 0;
-                    totalClients += generalData.Clienti_Anno_Corrente || 0;
-                    if (generalData.Anno_Corrente > 0) activeAgents++;
-                }
-            });
-            
-            container.innerHTML = `
-                <div class="summary-card">
-                    <div class="summary-number">${totalAgents}</div>
-                    <div class="summary-label">Agenti Totali</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number">${activeAgents}</div>
-                    <div class="summary-label">Agenti Attivi</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number">${formatCurrency(totalRevenue)}</div>
-                    <div class="summary-label">Fatturato Totale</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number">${totalClients}</div>
-                    <div class="summary-label">Clienti Serviti</div>
-                </div>
-            `;
-        }
-
-        function updateRegionsGrid() {
-            const container = document.getElementById('regionsGrid');
-            
-            // Raggruppa dati per regione (per ora uso le province)
-            const regionsMap = new Map();
-            
-            allAgentsData.forEach(agent => {
-                const provincesData = agent.data.filter(d => d.Tipo_Dato === 'CLIENTI_PROVINCIA');
-                
-                provincesData.forEach(prov => {
-                    const provincia = prov.Provincia;
-                    if (!provincia || provincia === '') return;
-                    
-                    if (!regionsMap.has(provincia)) {
-                        regionsMap.set(provincia, {
-                            name: provincia,
-                            agents: [],
-                            totalRevenue: 0,
-                            totalClients: 0
-                        });
-                    }
-                    
-                    const region = regionsMap.get(provincia);
-                    const revenue = parseCSVValue(prov.Fatturato) || 0;
-                    const clients = parseInt(prov.Clienti_Serviti) || 0;
-                    
-                    if (revenue > 0 || clients > 0) {
-                        region.agents.push({
-                            name: agent.nome,
-                            revenue: revenue,
-                            clients: clients
-                        });
-                        region.totalRevenue += revenue;
-                        region.totalClients += clients;
-                    }
-                });
-            });
-            
-            const regions = Array.from(regionsMap.values())
-                .filter(r => r.totalRevenue > 0 || r.totalClients > 0)
-                .sort((a, b) => b.totalRevenue - a.totalRevenue);
-            
-            let html = '';
-            
-            regions.forEach(region => {
-                html += `
-                    <div class="region-card">
-                        <div class="region-name">${region.name}</div>
-                        <div class="region-stats">
-                            <div>
-                                <div class="stat-value">${formatCurrency(region.totalRevenue)}</div>
-                                <div class="stat-label">Fatturato</div>
-                            </div>
-                            <div>
-                                <div class="stat-value">${region.totalClients}</div>
-                                <div class="stat-label">Clienti</div>
-                            </div>
-                        </div>
-                        <div class="agents-list">
-                            ${region.agents.slice(0, 3).map(agent => `
-                                <div class="agent-item">
-                                    <span class="agent-name">${agent.name.split(' ')[0]}</span>
-                                    <span class="agent-revenue">${formatCurrency(agent.revenue)}</span>
-                                </div>
-                            `).join('')}
-                            ${region.agents.length > 3 ? `<div style="text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 8px;">+${region.agents.length - 3} altri</div>` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function updateTopAgentsTable() {
-            const container = document.getElementById('topAgentsTable');
-            
-            // Calcola performance agenti
-            const agentsPerformance = [];
-            
-            allAgentsData.forEach(agent => {
-                const generalData = agent.data.find(d => d.Tipo_Dato === 'OBIETTIVI' && d.Provincia === 'Generale');
-                if (generalData && agent.nome) {
-                    const current = generalData.Anno_Corrente || 0;
-                    const target = generalData.Obiettivo || 0;
-                    const clients = generalData.Clienti_Anno_Corrente || 0;
-                    const targetProgress = target > 0 ? (current / target) * 100 : 0;
-                    
-                    agentsPerformance.push({
-                        nome: agent.nome,
-                        codice: agent.codice,
-                        fatturato: current,
-                        obiettivo: target,
-                        progressoPerc: targetProgress,
-                        clienti: clients
-                    });
-                }
-            });
-            
-            // Ordina per fatturato
-            agentsPerformance.sort((a, b) => b.fatturato - a.fatturato);
-            
-            let html = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Pos.</th>
-                            <th>Agente</th>
-                            <th>Fatturato 2025</th>
-                            <th>Obiettivo</th>
-                            <th>Progresso</th>
-                            <th>Clienti</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            agentsPerformance.slice(0, 10).forEach((agent, index) => {
-                html += `
-                    <tr>
-                        <td>
-                            <div class="agent-rank" style="background: ${index < 3 ? '#fbbf24' : '#3b82f6'}">
-                                ${index + 1}
-                            </div>
-                        </td>
-                        <td>
-                            <div style="font-weight: 600;">${agent.nome}</div>
-                            <div style="font-size: 0.8rem; color: #64748b;">${agent.codice}</div>
-                        </td>
-                        <td style="font-weight: 600; color: #3b82f6;">${formatCurrency(agent.fatturato)}</td>
-                        <td>${agent.obiettivo > 0 ? formatCurrency(agent.obiettivo) : '-'}</td>
-                        <td>
-                            ${agent.obiettivo > 0 ? `
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="background: #f1f5f9; border-radius: 8px; height: 6px; width: 60px; overflow: hidden;">
-                                        <div style="background: #22c55e; height: 100%; width: ${Math.min(agent.progressoPerc, 100)}%;"></div>
-                                    </div>
-                                    <span style="font-size: 0.8rem; font-weight: 600;">${Math.round(agent.progressoPerc)}%</span>
-                                </div>
-                            ` : '-'}
-                        </td>
-                        <td style="font-weight: 600;">${agent.clienti}</td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-
-        // Carica dati dal CSV
-        async function loadData() {
-            try {
-                console.log('Caricamento dati da:', CSV_URL);
-                const response = await fetch(CSV_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('CSV caricato, parsing...');
-                
-                allAgentsData = parseCSV(csvText);
-                console.log('Agenti caricati:', allAgentsData.length);
-                
-                document.getElementById('loadingMessage').style.display = 'none';
-                
-                // Popola selettore agenti
-                populateAgentSelector();
-                
-                // Aggiorna vista regioni
-                updateRegionsView();
-                
-            } catch (error) {
-                console.error('Errore nel caricamento dei dati:', error);
-                document.getElementById('loadingMessage').innerHTML = `
-                    <div style="color: #dc2626; text-align: center;">
-                        ❌ Errore nel caricamento dei dati<br>
-                        <small>${error.message}</small>
-                    </div>
-                `;
-            }
-        }
-
-        // Inizializza
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-        });
-
-        // Global function for tab switching
-        window.switchTab = switchTab;
-    </script>
-</body>
-</html>
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00120
+# Ragione Sociale: CINTI DOMENICO
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"67.611,27","31.318,46",,,602,8,,
+OBIETTIVI,FR,"67.611,27","31.318,46","120.000,00","27,%",16,8,20,40%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,FR,8,"33.082,42"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,FR,GINO MARIANI & C. S.N.C. - MANUFATTI IN CEMENTO,MATTONE PIENO,"4.032,00"
+VENDITE_CLIENTE,FR,GINO MARIANI & C. S.N.C. - MANUFATTI IN CEMENTO,REFRATTARI RETTIFICATI,"1.229,97"
+VENDITE_CLIENTE,FR,MARCONI SANDRO,MATTONE PIENO,"1.814,40"
+VENDITE_CLIENTE,FR,MARCONI SANDRO,PAVIMENTAZIONE POLIS,"416,40"
+VENDITE_CLIENTE,FR,MARCONI SANDRO,REFRATTARI,"379,47"
+VENDITE_CLIENTE,FR,MARCONI SANDRO,REFRATTARI RETTIFICATI,"409,99"
+VENDITE_CLIENTE,FR,EDILSTAR SRL,MATTONE PIENO,"1.166,40"
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL,MATTONE PIENO,"1.209,60"
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL,REFRATTARI,"816,45"
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL,REFRATTARI RETTIFICATI,"1.550,40"
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,CORRIM.COPRIM.,"2,40"
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,MATTONE PIENO,"907,21"
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,OUTLET,"1,50"
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,PAVIMENTAZIONE POLIS,"8.681,95"
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,MATTONE PIENO,"1.332,00"
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,PAVIMENTAZIONE POLIS,"1.278,72"
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,REFRATTARI,"111,21"
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,REFRATTARI RETTIFICATI,"1.550,40"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,FACCIAVISTA,"874,80"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,LINEA ARCHEO,"4,20"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,MATTONE PIENO,"273,60"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,PAVIMENTAZIONE POLIS,"432,73"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,REFRATTARI,"563,13"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,REFRATTARI RETTIFICATI,"1.695,88"
+VENDITE_CLIENTE,FR,EDILIZIA STIRPE 2014 SRL,PRODOTTI FORNO,"686,00"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"2,40",FR,1,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"874,80",FR,1,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"4,20",FR,1,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"10.735,21",FR,7,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"1,50",FR,1,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"10.809,80",FR,4,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"686,00",FR,1,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"1.870,26",FR,4,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"6.436,64",FR,5,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",FR,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,10.742,59,34
+RIPARTIZIONE,Altro,20.575,87,66
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00220
+# Ragione Sociale: TRAFIERI ANDREA
+# Periodo: 01/01/2025 - 05/01/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"2.024,02","0,00",,,3,0,,
+OBIETTIVI,VT,"2.024,02","0,00","25.000,00",0%,1,0,10,0%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,VT,,"0,00"
+CLIENTI_PROVINCIA,RM,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",VT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00222
+# Ragione Sociale: SARTINI GABRIELE
+# Periodo: 01/01/2024 - 16/06/2024
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"5.485,77","0,00",,,112,1,,
+OBIETTIVI,,"0,00","0,00","0,00",999%,0,1,0,999%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,,1,"30.659,89"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,,,COPERTURE,"12,05"
+VENDITE_CLIENTE,,,CORRIM.COPRIM.,"178,85"
+VENDITE_CLIENTE,,,COTTO A MANO ANTICHE TERRE,"288,00"
+VENDITE_CLIENTE,,,FACCIAVISTA,"2.366,14"
+VENDITE_CLIENTE,,,GANCI E ACCESSO,"24,00"
+VENDITE_CLIENTE,,,LINEA ARCHEO,"1.185,84"
+VENDITE_CLIENTE,,,PAVIMENTAZIONE POLIS,"902,30"
+VENDITE_CLIENTE,,,PIASTRELLE,"1.241,86"
+VENDITE_CLIENTE,,,PRODOTTI FORNO,"22.804,60"
+VENDITE_CLIENTE,,,REFRATTARI,"426,42"
+VENDITE_CLIENTE,,,REFRATTARI RETTIFICATI,"1.229,83"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"12,05",LT,1,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"178,85",LT,1,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"288,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"2.366,14",LT,1,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"24,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"1.185,84",LT,1,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"902,30",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"1.241,86",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"22.804,60",LT,1,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"426,42",LT,1,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"1.229,83",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00231
+# Ragione Sociale: ERRE RAPPRESENTANZE SNC
+# Periodo: 01/01/2024 - 16/06/2024
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"5.708,77","0,00",,,151,0,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CA,,"0,00"
+CLIENTI_PROVINCIA,OT,,"0,00"
+CLIENTI_PROVINCIA,NU,,"0,00"
+CLIENTI_PROVINCIA,SU,,"0,00"
+CLIENTI_PROVINCIA,OR,,"0,00"
+CLIENTI_PROVINCIA,SS,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",CA,0,OT,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00238
+# Ragione Sociale: CARABOT NATALINO
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"80.238,72","90.159,79",,,354,20,,
+OBIETTIVI,LT,"79.029,16","82.389,23","155.000,00","38,%",23,18,35,"51,%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,LT,18,"60.437,22"
+CLIENTI_PROVINCIA,RM,2,"7.770,56"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,LT,EDILIZIA SETINA S.R.L.,MATTONE PIENO,"1.512,00"
+VENDITE_CLIENTE,LT,EDILIZIA SETINA S.R.L.,PAVIMENTAZIONE POLIS,"1.665,62"
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,FACCIAVISTA,"583,78"
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,LINEA ARCHEO,"743,00"
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,MATTONE PIENO,"151,20"
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,PAVIMENTAZIONE POLIS,"416,40"
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,COPERTURE,"3,36"
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,LINEA ARCHEO,"1,74"
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,MATTONE PIENO,"3.110,40"
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,PAVIMENTAZIONE POLIS,"1.382,40"
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL,MATTONE PIENO,"3.693,60"
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL,OUTLET,"0,01"
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL,PIASTRELLE,"1.240,95"
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,CORRIM.COPRIM.,"73,26"
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,MATTONE PIENO,"7.776,00"
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,PAVIMENTAZIONE POLIS,"8,67"
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,REFRATTARI RETTIFICATI,"1.281,60"
+VENDITE_CLIENTE,LT,STENI SRL,MATTONE PIENO,"547,20"
+VENDITE_CLIENTE,LT,STENI SRL,PAVIMENTAZIONE POLIS,"984,96"
+VENDITE_CLIENTE,RM,DOVAL SRL,REFRATTARI,"1.019,82"
+VENDITE_CLIENTE,LT,ROSANCOS SRL,MATTONE PIENO,"1.528,80"
+VENDITE_CLIENTE,LT,ROSANCOS SRL,PAVIMENTAZIONE POLIS,"604,80"
+VENDITE_CLIENTE,LT,EDILCERAMICA SAS DI VEGLIA CRISTIAN & C.,MATTONE PIENO,"1.440,00"
+VENDITE_CLIENTE,LT,D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS,MATTONE PIENO,"3.744,00"
+VENDITE_CLIENTE,LT,D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS,PAVIMENTAZIONE POLIS,"832,81"
+VENDITE_CLIENTE,LT,DIMED SRL,MATTONE PIENO,"1.326,96"
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,MATTONE PIENO,"1.209,60"
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,REFRATTARI,"900,83"
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,REFRATTARI RETTIFICATI,"1.935,58"
+VENDITE_CLIENTE,LT,EDILIM SRL,MATTONE PIENO,"1.370,88"
+VENDITE_CLIENTE,LT,EDILIM SRL,PAVIMENTAZIONE POLIS,"984,96"
+VENDITE_CLIENTE,LT,EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC,MATTONE PIENO,"3.456,00"
+VENDITE_CLIENTE,LT,EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC,PAVIMENTAZIONE POLIS,"2.230,80"
+VENDITE_CLIENTE,LT,L'EMPORIO DI IOZZI SONIA,MATTONE PIENO,"957,60"
+VENDITE_CLIENTE,LT,L'EMPORIO DI IOZZI SONIA,PAVIMENTAZIONE POLIS,"984,96"
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS,MATTONE PIENO,"864,00"
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS,REFRATTARI,"379,47"
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS,REFRATTARI RETTIFICATI,"819,98"
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL,PAVIMENTAZIONE POLIS,"2.695,68"
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL,REFRATTARI,"640,35"
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL,REFRATTARI RETTIFICATI,"460,34"
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL,PAVIMENTAZIONE POLIS,"933,12"
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL,REFRATTARI,"1.969,92"
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL,REFRATTARI RETTIFICATI,"870,33"
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL,LINEA ARCHEO,"1,94"
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL,MATTONE PIENO,"5.150,40"
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL,PAVIMENTAZIONE POLIS,"1.598,40"
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL,FACCIAVISTA,"1.007,62"
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL,MATTONE PIENO,"720,00"
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL,PAVIMENTAZIONE POLIS,"362,88"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"3,36",LT,1,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"73,26",LT,1,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"1.591,40",LT,2,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"746,68",LT,2,RM,1
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"38.558,64",LT,16,RM,1
+CATEGORIA_RIEPILOGO,OUTLET,"0,01",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"15.686,46",LT,13,RM,1
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"1.240,95",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"4.910,39",LT,4,RM,1
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"5.367,83",LT,5,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,54.909,62,61
+RIPARTIZIONE,Altro,35.250,17,39
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,6820778.00
+TOTALE,Fatturato_LT,6043722.00
+TOTALE,Fatturato_RM,777056.00
+TOTALE,Clienti_Totali,20
+TOTALE,Clienti_LT,18
+TOTALE,Clienti_RM,2
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00247
+# Ragione Sociale: LUCIANI LEONARDO
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","0,00",,,102,0,,
+OBIETTIVI,,"0,00","0,00","0,00",999%,0,0,0,999%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00248
+# Ragione Sociale: GALLO D.
+# Periodo: 01/01/2023 - 30/07/2023
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"2.123,39","3.382,03",,,1,1,,
+OBIETTIVI,,"0,00","3.382,03","0,00",999%,0,1,0,999%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,,1,"33.412,37"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,,,CORRIM.COPRIM.,"512,65"
+VENDITE_CLIENTE,,,FACCIAVISTA,"9.156,00"
+VENDITE_CLIENTE,,,GANCI E ACCESSO,"417,20"
+VENDITE_CLIENTE,,,OUTLET,"420,00"
+VENDITE_CLIENTE,,,PIASTRELLE,"700,80"
+VENDITE_CLIENTE,,,PRODOTTI FORNO,"21.281,06"
+VENDITE_CLIENTE,,,REFRATTARI,"924,66"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"1.025,30",LT,2,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"18.312,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"834,40",LT,2,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"840,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"1.401,60",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"42.562,12",LT,2,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"1.849,32",LT,2,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,3.382,03,100
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00263
+# Ragione Sociale: G 2 G SRL
+# Periodo: 01/01/2025 - 08/06/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"71.453,02","99.976,78",,,135,12,,
+OBIETTIVI,AN,"37.799,09","61.385,27","90.000,00","54,%",6,6,15,40%
+OBIETTIVI,PU,"33.653,93","22.704,27","90.000,00","25,%",6,4,15,"26,%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AN,6,"49.079,42"
+CLIENTI_PROVINCIA,PU,4,"22.685,71"
+CLIENTI_PROVINCIA,ALB,2,"21.579,08"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,COPERTURE,"5.500,00"
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,MATTONE PIENO,"3.600,96"
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,PIASTRELLE,"2.526,39"
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COPERTURE,"4.070,00"
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,"0,08"
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,FACCIAVISTA,"0,88"
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,PIASTRELLE,"4,65"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COPERTURE,"8.932,00"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COTTO A MANO ANTICHE TERRE,"12,32"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,MATTONE PIENO,"1.305,60"
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,COPERTURE,"4.356,00"
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,MATTONE PIENO,"691,20"
+VENDITE_CLIENTE,PU,EDIL PIEFFE SRL,MATTONE PIENO,"7.286,40"
+VENDITE_CLIENTE,AN,GIACCHE' SRL,MATTONE PIENO,"15.033,60"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COPERTURE,"4.404,69"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COTTO A MANO ANTICHE TERRE,"4,25"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,MATTONE PIENO,"729,60"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,PIASTRELLE,"5,32"
+VENDITE_CLIENTE,ALB,KONI ARJAN,COPERTURE,"11.622,48"
+VENDITE_CLIENTE,ALB,KONI ARJAN,MATTONE PIENO,"252,00"
+VENDITE_CLIENTE,ALB,KONI ARJAN,OUTLET,"2.531,50"
+VENDITE_CLIENTE,ALB,KONI ARJAN,PIASTRELLE,"745,71"
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI,"347,95"
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI RETTIFICATI,"387,60"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COPERTURE,"3.875,36"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,"6,97"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,LINEA ARCHEO,"546,52"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,MATTONE PIENO,"4.620,00"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,PIASTRELLE,"7,81"
+VENDITE_CLIENTE,AN,NUOVA COMES SRL,MATTONE PIENO,"3.365,68"
+VENDITE_CLIENTE,ALB,KONI ARJAN,FACCIAVISTA,"5.691,84"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"42.760,53",AN,4,PU,2
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"23,62",AN,2,PU,2
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"5.692,72",AN,0,PU,1
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"546,52",AN,1,PU,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"36.885,04",AN,5,PU,3
+CATEGORIA_RIEPILOGO,OUTLET,"2.531,50",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"3.289,88",AN,2,PU,2
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"347,95",AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"387,60",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",AN,0,PU,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,82.583,17,83
+RIPARTIZIONE,Altro,17.393,61,17
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00263
+# Ragione Sociale: G2G TRADE CONSULTING SRL
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"100.612,29","132.483,77",,,183,14,,
+OBIETTIVI,AN,"56.773,08","75.247,30","90.000,00","70,%",7,7,15,"46,%"
+OBIETTIVI,PU,"43.839,21","28.424,27","90.000,00","31,%",7,5,15,"33,%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AN,7,"63.306,02"
+CLIENTI_PROVINCIA,PU,5,"28.405,71"
+CLIENTI_PROVINCIA,ALB,2,"47.726,28"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,COPERTURE,"8.230,00"
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,MATTONE PIENO,"5.396,16"
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,PIASTRELLE,"2.526,39"
+VENDITE_CLIENTE,AN,EDILMUSONE SRL,COPERTURE,"2.415,00"
+VENDITE_CLIENTE,AN,EDILMUSONE SRL,MATTONE PIENO,"1.987,20"
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COPERTURE,"4.070,00"
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,"0,08"
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,FACCIAVISTA,"0,88"
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,PIASTRELLE,"4,65"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COPERTURE,"8.932,00"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COTTO A MANO ANTICHE TERRE,"12,32"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,MATTONE PIENO,"1.305,60"
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,COPERTURE,"4.356,00"
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,MATTONE PIENO,"691,20"
+VENDITE_CLIENTE,PU,EDIL PIEFFE SRL,MATTONE PIENO,"7.286,40"
+VENDITE_CLIENTE,PU,RI.M.EDIL SRL,COPERTURE,"5.720,00"
+VENDITE_CLIENTE,AN,GIACCHE' SRL,FACCIAVISTA,"1.670,40"
+VENDITE_CLIENTE,AN,GIACCHE' SRL,MATTONE PIENO,"18.662,40"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COPERTURE,"4.404,69"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COTTO A MANO ANTICHE TERRE,"4,25"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,MATTONE PIENO,"729,60"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,PIASTRELLE,"5,32"
+VENDITE_CLIENTE,ALB,KONI ARJAN,COPERTURE,"20.122,44"
+VENDITE_CLIENTE,ALB,KONI ARJAN,CORRIM.COPRIM.,"540,00"
+VENDITE_CLIENTE,ALB,KONI ARJAN,MATTONE PIENO,"252,00"
+VENDITE_CLIENTE,ALB,KONI ARJAN,OUTLET,"5.726,50"
+VENDITE_CLIENTE,ALB,KONI ARJAN,PIASTRELLE,"745,71"
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI,"650,35"
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI RETTIFICATI,"775,20"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COPERTURE,"3.875,36"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,"6,97"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,LINEA ARCHEO,"546,52"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,MATTONE PIENO,"4.620,00"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,PIASTRELLE,"7,81"
+VENDITE_CLIENTE,AN,NUOVA COMES SRL,MATTONE PIENO,"3.365,68"
+VENDITE_CLIENTE,ALB,KONI ARJAN,FACCIAVISTA,"18.914,08"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"62.125,49",AN,5,PU,3
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"540,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"23,62",AN,2,PU,2
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"20.585,36",AN,1,PU,1
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"546,52",AN,1,PU,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"44.296,24",AN,6,PU,3
+CATEGORIA_RIEPILOGO,OUTLET,"5.726,50",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"3.289,88",AN,2,PU,2
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"650,35",AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"775,20",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",AN,0,PU,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,109.359,33,83
+RIPARTIZIONE,Altro,23.124,44,17
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00264
+# Ragione Sociale: G. & P. SNC DI GAIAS CLAUDIA E PUTZU ALBERTO
+# Periodo: 01/01/2025 - 05/01/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","0,00",,,0,0,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,NU,,"0,00"
+CLIENTI_PROVINCIA,OT,,"0,00"
+CLIENTI_PROVINCIA,SS,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",NU,0,OT,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00268
+# Ragione Sociale: VISANI DEVIS
+# Periodo: 01/01/2025 - 26/01/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","0,00",,,0,0,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,RN,,"0,00"
+CLIENTI_PROVINCIA,RA,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",RN,0,RA,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00272
+# Ragione Sociale: RAPPRESENTANZE & SERVIZI SRL
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","2.696,39",,,5,5,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CR,2,"3.047,46"
+CLIENTI_PROVINCIA,LO,1,"756,87"
+CLIENTI_PROVINCIA,PC,2,"892,62"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,CR,PLACIDO SRL,COPERTURE,"396,90"
+VENDITE_CLIENTE,CR,FcS SRL,COPERTURE,"2.650,56"
+VENDITE_CLIENTE,LO,CREBI ART SRL,COPERTURE,"657,24"
+VENDITE_CLIENTE,LO,CREBI ART SRL,CORRIM.COPRIM.,"99,63"
+VENDITE_CLIENTE,PC,EDILCERAMICA S.R.L.,FACCIAVISTA,"868,10"
+VENDITE_CLIENTE,PC,REMONDINI MARA & C. SNC,COTTO A MANO ANTICHE TERRE,"6,97"
+VENDITE_CLIENTE,PC,REMONDINI MARA & C. SNC,PIASTRELLE,"17,55"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"3.704,70",CR,2,LO,1
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"99,63",CR,0,LO,1
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"6,97",CR,0,LO,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"868,10",CR,0,LO,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"17,55",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",CR,0,LO,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,0
+RIPARTIZIONE,Altro,0,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
