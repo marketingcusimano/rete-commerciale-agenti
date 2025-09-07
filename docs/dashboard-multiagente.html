@@ -431,14 +431,6 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label">Status</label>
-                        <select id="statusSelect" onchange="filterAgenti()">
-                            <option value="all">Tutti</option>
-                            <option value="active">Attivi</option>
-                            <option value="inactive">Inattivi</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
                         <label class="filter-label">Periodo</label>
                         <select id="periodSelect" onchange="filterAgenti()">
                             <option value="2025">Anno 2025</option>
@@ -503,7 +495,6 @@
                                     <th>Fatturato 2024</th>
                                     <th>Crescita</th>
                                     <th>Clienti</th>
-                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody id="agenti-tbody">
@@ -557,57 +548,94 @@
                         <div class="chart-title">
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                        </svg>
-                        Distribuzione Territoriale
+                            </svg>
+                            Distribuzione Territoriale
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="territorio-chart"></canvas>
+                        </div>
                     </div>
-                    <div class="chart-wrapper">
-                        <canvas id="territorio-chart"></canvas>
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L3.5 16.99z"/>
+                            </svg>
+                            Trend Performance
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="trend-chart"></canvas>
+                        </div>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <div class="chart-title">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L3.5 16.99z"/>
-                        </svg>
-                        Trend Performance
+                
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            Distribuzione Agenti per Regione
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="agenti-regioni-chart"></canvas>
+                        </div>
                     </div>
-                    <div class="chart-wrapper">
-                        <canvas id="trend-chart"></canvas>
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                            </svg>
+                            Performance vs Obiettivi
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="obiettivi-chart"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="table-container">
-                <div class="table-header">
-                    <div class="table-title">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                        </svg>
-                        Performance per Provincia
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                            Performance per Provincia
+                        </div>
                     </div>
-                </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Provincia</th>
-                                <th>Regione</th>
-                                <th>Agenti Attivi</th>
-                                <th>Fatturato Totale</th>
-                                <th>Clienti Serviti</th>
-                                <th>Crescita %</th>
-                                <th>Concentrazione</th>
-                            </tr>
-                        </thead>
-                        <tbody id="regioni-tbody">
-                            <!-- Righe generate dinamicamente -->
-                        </tbody>
-                    </table>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Provincia</th>
+                                    <th>Regione</th>
+                                    <th>Agenti Attivi</th>
+                                    <th>Fatturato Totale</th>
+                                    <th>Clienti Serviti</th>
+                                    <th>Crescita %</th>
+                                    <th>Concentrazione</th>
+                                </tr>
+                            </thead>
+                            <tbody id="regioni-tbody">
+                                <!-- Righe generate dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Zapier Chatbot Integration -->
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        <zapier-interfaces-chatbot-embed 
+            is-popup='false' 
+            chatbot-id='cmf7cw2ev002p1032fkvqlkup' 
+            height='600px' 
+            width='400px'>
+        </zapier-interfaces-chatbot-embed>
+    </div>
+
+    <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
     <script>
         // URL del CSV concatenato con tutti gli agenti
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-2025-09-05.csv';
@@ -643,7 +671,7 @@
         function formatNumber(num) {
             if (typeof num !== 'number') return '0';
             if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+            if (num >= 1000) return (num / 1000).toFixed(0) + 'k';
             return Math.round(num).toLocaleString('it-IT');
         }
 
@@ -655,6 +683,17 @@
         function calculateGrowth(current, previous) {
             if (!previous || previous === 0) return current > 0 ? 100 : 0;
             return ((current - previous) / previous * 100);
+        }
+        
+        function parseItalianNumber(str) {
+            if (!str || str === '') return 0;
+            // Gestisce formati come "67.611,27" -> 67611.27
+            if (str.includes('.') && str.includes(',')) {
+                return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+            } else if (str.includes(',')) {
+                return parseFloat(str.replace(',', '.')) || 0;
+            }
+            return parseFloat(str) || 0;
         }
 
         // Parsing CSV con la stessa logica del file originale
@@ -968,141 +1007,6 @@
             // Crea grafici
             createFatturatoChart();
             createCategorieChart();
-            createObiettiviChart();
-            createClientiChart();
-        }
-
-        function createObiettiviChart() {
-            const ctx = document.getElementById('obiettivi-chart').getContext('2d');
-            
-            if (charts.obiettivi) charts.obiettivi.destroy();
-            
-            const agentiConObiettivi = allAgentsData
-                .map(agent => {
-                    const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    return {
-                        nome: agent.ragioneSociale.split(' ')[0],
-                        fatturato: generale?.Anno_Corrente || 0,
-                        obiettivo: generale?.Obiettivo || 0,
-                        percentuale: generale?.Obiettivo > 0 ? ((generale?.Anno_Corrente || 0) / generale.Obiettivo * 100) : 0
-                    };
-                })
-                .filter(a => a.obiettivo > 0)
-                .sort((a, b) => b.percentuale - a.percentuale)
-                .slice(0, 8);
-
-            charts.obiettivi = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: agentiConObiettivi.map(a => a.nome),
-                    datasets: [{
-                        label: 'Raggiunto',
-                        data: agentiConObiettivi.map(a => a.fatturato),
-                        backgroundColor: '#22c55e',
-                        borderRadius: 4
-                    }, {
-                        label: 'Obiettivo',
-                        data: agentiConObiettivi.map(a => a.obiettivo),
-                        backgroundColor: '#e5e7eb',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                afterLabel: function(context) {
-                                    const index = context.dataIndex;
-                                    const percentuale = agentiConObiettivi[index].percentuale;
-                                    return `Raggiunto: ${percentuale.toFixed(1)}%`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatCurrency(value);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createClientiChart() {
-            const ctx = document.getElementById('clienti-chart').getContext('2d');
-            
-            if (charts.clienti) charts.clienti.destroy();
-            
-            const distribuzioneClienti = allAgentsData
-                .map(agent => {
-                    const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    const clienti = generale?.Clienti_Anno_Corrente || 0;
-                    return {
-                        nome: agent.ragioneSociale.split(' ')[0],
-                        clienti: clienti,
-                        fatturato: generale?.Anno_Corrente || 0
-                    };
-                })
-                .filter(a => a.clienti > 0)
-                .sort((a, b) => b.clienti - a.clienti)
-                .slice(0, 10);
-
-            const colors = distribuzioneClienti.map((_, index) => {
-                const hue = (index * 137.5) % 360; // Golden angle per colori distribuiti
-                return `hsl(${hue}, 70%, 50%)`;
-            });
-
-            charts.clienti = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: distribuzioneClienti.map(a => a.nome),
-                    datasets: [{
-                        data: distribuzioneClienti.map(a => a.clienti),
-                        backgroundColor: colors,
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '50%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const index = context.dataIndex;
-                                    const agente = distribuzioneClienti[index];
-                                    const mediaFatturato = agente.fatturato / agente.clienti;
-                                    return [
-                                        `Clienti: ${context.parsed}`,
-                                        `Media: ${formatCurrency(mediaFatturato)}`
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         function createAgentiTable() {
@@ -1110,7 +1014,6 @@
             tbody.innerHTML = '';
             
             const selectedAgent = document.getElementById('agentSelect').value;
-            const selectedStatus = document.getElementById('statusSelect').value;
             
             let agentsToShow = allAgentsData;
             
@@ -1129,11 +1032,6 @@
                 const clienti = generale.Clienti_Anno_Corrente || 0;
                 
                 const province = agent.clientiProvincia.map(p => p.provincia).filter(p => p).join(', ');
-                const isActive = fatturato2025 > 0;
-                
-                // Filtra per status se selezionato
-                if (selectedStatus === 'active' && !isActive) return;
-                if (selectedStatus === 'inactive' && isActive) return;
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -1150,11 +1048,6 @@
                         </span>
                     </td>
                     <td>${clienti}</td>
-                    <td>
-                        <span class="status-badge ${isActive ? 'status-active' : 'status-inactive'}">
-                            ${isActive ? 'Attivo' : 'Inattivo'}
-                        </span>
-                    </td>
                 `;
                 tbody.appendChild(row);
             });
@@ -1266,6 +1159,9 @@
             document.getElementById('regioni-loading').style.display = 'none';
             document.getElementById('regioni-content').style.display = 'block';
             
+            const selectedRegion = document.getElementById('regionSelect').value;
+            const selectedProvincia = document.getElementById('provinciaSelect').value;
+            
             // Aggrega dati per regione
             const regioniData = new Map();
             
@@ -1280,7 +1176,8 @@
                                 province: new Set(),
                                 agenti: new Set(),
                                 fatturato: 0,
-                                clienti: 0
+                                clienti: 0,
+                                fatturato2024: 0
                             });
                         }
                         
@@ -1289,44 +1186,81 @@
                         regionData.agenti.add(agent.codice);
                         regionData.fatturato += prov.fatturato;
                         regionData.clienti += prov.clientiServiti;
+                        
+                        // Calcola fatturato 2024
+                        const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                        if (generale) {
+                            regionData.fatturato2024 += (generale.Anno_Precedente || 0) * (prov.fatturato / Math.max(generale.Anno_Corrente || 1, 1));
+                        }
                     }
                 });
             });
 
-            // Calcola metriche regioni
-            const regioni = Array.from(regioniData.values());
-            const totaleFatturatoRegioni = regioni.reduce((sum, r) => sum + r.fatturato, 0);
-            const totaleClientiRegioni = regioni.reduce((sum, r) => sum + r.clienti, 0);
+            // Calcola metriche dinamiche basate sui filtri
+            let regioni = Array.from(regioniData.values());
+            let dataToShow = regioni;
             
-            const topRegione = regioni.sort((a, b) => b.fatturato - a.fatturato)[0];
+            // Filtra per regione selezionata
+            if (selectedRegion !== 'all') {
+                dataToShow = regioni.filter(r => r.regione === selectedRegion);
+            }
+            
+            createRegioniMetrics(dataToShow, regioni);
+            createRegioniTable(regioni);
+            
+            // Crea grafici territoriali
+            createTerritorioChart(regioni);
+            createTrendChart();
+            createAgentiRegioniChart(regioni);
+            createObiettiviChart();
+        }
+        
+        function createRegioniMetrics(dataToShow, allRegioni) {
+            const totaleFatturatoRegioni = dataToShow.reduce((sum, r) => sum + r.fatturato, 0);
+            const totaleClientiRegioni = dataToShow.reduce((sum, r) => sum + r.clienti, 0);
+            const totaleAgentiRegioni = new Set();
+            dataToShow.forEach(r => r.agenti.forEach(a => totaleAgentiRegioni.add(a)));
+            
+            const totaleFatturato2024 = dataToShow.reduce((sum, r) => sum + r.fatturato2024, 0);
+            const crescitaMedia = calculateGrowth(totaleFatturatoRegioni, totaleFatturato2024);
+            
+            const topRegione = dataToShow.sort((a, b) => b.fatturato - a.fatturato)[0];
+            const totaleFatturatoNazionale = allRegioni.reduce((sum, r) => sum + r.fatturato, 0);
+            const concentrazione = totaleFatturatoNazionale > 0 ? (totaleFatturatoRegioni / totaleFatturatoNazionale * 100) : 0;
 
-            // Crea cards metriche regioni
+            // Crea cards metriche regioni dinamiche
             const metricsContainer = document.getElementById('regioni-metrics');
+            const selectedRegion = document.getElementById('regionSelect').value;
+            const title = selectedRegion === 'all' ? 'Tutte le Regioni' : selectedRegion;
+            
             metricsContainer.innerHTML = `
-                <div class="metric-card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                            </svg>
-                            Regioni Attive
-                        </div>
-                    </div>
-                    <div class="main-value">${regioni.length}</div>
-                    <div class="comparison">su tutto il territorio</div>
-                </div>
-                
                 <div class="metric-card">
                     <div class="card-header">
                         <div class="card-title">
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
                             </svg>
-                            Top Regione
+                            Fatturato ${title}
+                        </div>
+                        <div class="trend-badge ${crescitaMedia >= 0 ? 'trend-positive' : 'trend-negative'}">
+                            ${crescitaMedia >= 0 ? '+' : ''}${crescitaMedia.toFixed(1)}%
                         </div>
                     </div>
-                    <div class="main-value">${topRegione?.regione || 'N/A'}</div>
-                    <div class="comparison">${formatCurrency(topRegione?.fatturato || 0)}</div>
+                    <div class="main-value">${formatCurrency(totaleFatturatoRegioni)}</div>
+                    <div class="comparison">vs 2024: ${formatCurrency(totaleFatturato2024)}</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                            Agenti Attivi ${title}
+                        </div>
+                    </div>
+                    <div class="main-value">${totaleAgentiRegioni.size}</div>
+                    <div class="comparison">Media: ${(totaleFatturatoRegioni/totaleAgentiRegioni.size || 0).toFixed(0)}k per agente</div>
                 </div>
                 
                 <div class="metric-card">
@@ -1335,11 +1269,11 @@
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
                             </svg>
-                            Fatturato Territoriale
+                            Clienti ${title}
                         </div>
                     </div>
-                    <div class="main-value">${formatCurrency(totaleFatturatoRegioni)}</div>
-                    <div class="comparison">${totaleClientiRegioni} clienti totali</div>
+                    <div class="main-value">${totaleClientiRegioni}</div>
+                    <div class="comparison">Media: ${(totaleClientiRegioni/totaleAgentiRegioni.size || 0).toFixed(1)} per agente</div>
                 </div>
                 
                 <div class="metric-card">
@@ -1348,20 +1282,13 @@
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                             </svg>
-                            Concentrazione
+                            ${selectedRegion === 'all' ? 'Regioni Totali' : 'Concentrazione'}
                         </div>
                     </div>
-                    <div class="main-value">${Math.round((topRegione?.fatturato / totaleFatturatoRegioni * 100) || 0)}%</div>
-                    <div class="comparison">del fatturato totale</div>
+                    <div class="main-value">${selectedRegion === 'all' ? dataToShow.length : concentrazione.toFixed(1) + '%'}</div>
+                    <div class="comparison">${selectedRegion === 'all' ? 'regioni coperte' : 'del fatturato nazionale'}</div>
                 </div>
             `;
-
-            // Crea tabella regioni
-            createRegioniTable(regioni);
-            
-            // Crea grafici territoriali
-            createTerritorioChart(regioni);
-            createTrendChart();
         }
 
         function createRegioniTable(regioni) {
@@ -1519,6 +1446,101 @@
                         backgroundColor: 'rgba(153, 153, 153, 0.1)',
                         tension: 0.4,
                         fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createAgentiRegioniChart(regioni) {
+            const ctx = document.getElementById('agenti-regioni-chart').getContext('2d');
+            
+            if (charts.agentiRegioni) charts.agentiRegioni.destroy();
+            
+            const sortedRegioni = regioni.sort((a, b) => b.agenti.size - a.agenti.size);
+            const colors = ['#1a1a1a', '#333', '#555', '#777', '#999', '#bbb', '#ccc', '#ddd'];
+
+            charts.agentiRegioni = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sortedRegioni.map(r => r.regione),
+                    datasets: [{
+                        data: sortedRegioni.map(r => r.agenti.size),
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createObiettiviChart() {
+            const ctx = document.getElementById('obiettivi-chart').getContext('2d');
+            
+            if (charts.obiettivi) charts.obiettivi.destroy();
+            
+            // Calcola performance vs obiettivi per agenti principali
+            const agentiConObiettivi = allAgentsData
+                .map(agent => {
+                    const generale = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                    if (!generale) return null;
+                    
+                    const fatturato = generale.Anno_Corrente || 0;
+                    const obiettivo = generale.Obiettivo || 0;
+                    const performance = obiettivo > 0 ? (fatturato / obiettivo * 100) : 0;
+                    
+                    return {
+                        nome: agent.ragioneSociale.split(' ')[0],
+                        fatturato,
+                        obiettivo,
+                        performance
+                    };
+                })
+                .filter(a => a && a.obiettivo > 0)
+                .sort((a, b) => b.performance - a.performance)
+                .slice(0, 8);
+
+            charts.obiettivi = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agentiConObiettivi.map(a => a.nome),
+                    datasets: [{
+                        label: 'Fatturato Attuale',
+                        data: agentiConObiettivi.map(a => a.fatturato),
+                        backgroundColor: '#1a1a1a',
+                        borderRadius: 4
+                    }, {
+                        label: 'Obiettivo',
+                        data: agentiConObiettivi.map(a => a.obiettivo),
+                        backgroundColor: '#999',
+                        borderRadius: 4
                     }]
                 },
                 options: {
