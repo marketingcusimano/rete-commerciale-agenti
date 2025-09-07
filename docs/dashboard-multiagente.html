@@ -1511,31 +1511,19 @@
                 
                 const csvText = await response.text();
                 console.log('CSV loaded successfully, length:', csvText.length);
-                console.log('First 500 chars:', csvText.substring(0, 500));
                 
-                allData = parseCSV(csvText);
-                console.log('All parsed data:', allData.slice(0, 5));
-                
-                agentsData = processAgentsData(allData);
+                // Parse the multi-agent CSV format
+                agentsData = parseCSV(csvText);
                 
                 console.log('Final agents data:', agentsData);
                 
-                // Fallback data if no agents found
+                // Filter out agents with no meaningful data
+                agentsData = agentsData.filter(agent => 
+                    agent.fatturato2025 > 0 || agent.fatturato2024 > 0 || agent.clienti > 0
+                );
+                
                 if (agentsData.length === 0) {
-                    console.warn('No agents found, creating sample data');
-                    agentsData = [
-                        {
-                            codice: "SAMPLE_001",
-                            nome: "Agente Sample",
-                            regione: "Lazio", 
-                            fatturato2025: 150000,
-                            fatturato2024: 120000,
-                            obiettivo: 180000,
-                            clienti: 25,
-                            performance: 83,
-                            rank: 1
-                        }
-                    ];
+                    throw new Error('Nessun agente con dati validi trovato nel CSV');
                 }
                 
                 // Hide loading and show content
