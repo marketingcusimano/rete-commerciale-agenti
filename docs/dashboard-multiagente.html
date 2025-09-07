@@ -201,6 +201,9 @@
             transition: all 0.3s ease;
             font-family: inherit;
             font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .nav-tab.active {
@@ -221,36 +224,105 @@
         }
 
         /* Region Filters */
-        .region-filters {
-            display: flex;
-            gap: 0.75rem;
+        .region-filters-container {
             margin-top: 1rem;
-            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .region-filters-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .region-filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            transition: all 0.2s ease;
+            min-width: 180px;
+            justify-content: space-between;
+        }
+
+        .region-filter-toggle:hover {
+            background: rgba(241, 245, 249, 0.9);
+            border-color: #cbd5e1;
+        }
+
+        .chevron-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .region-filter-toggle.active .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        .region-filters-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 50;
+            max-height: 300px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .regions-scrollable {
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 0.5rem 0;
         }
 
         .region-filter {
-            padding: 0.5rem 1rem;
-            border-radius: 12px;
-            font-weight: 500;
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
             border: none;
+            background: transparent;
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: inherit;
             font-size: 0.875rem;
-        }
-
-        .region-filter.active {
-            background: #6366f1;
-            color: white;
-        }
-
-        .region-filter:not(.active) {
-            background: rgba(226, 232, 240, 0.8);
+            font-weight: 500;
+            text-align: left;
             color: #374151;
         }
 
-        .region-filter:not(.active):hover {
-            background: rgba(203, 213, 225, 0.8);
+        .region-filter:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .region-filter.active {
+            background: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+
+        .region-filter.active:hover {
+            background: #2563eb;
         }
 
         /* Loading */
@@ -700,17 +772,25 @@
             
             <div class="header-meta">
                 <div class="date-info">
-                    <span>📅</span>
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                    </svg>
                     <span id="periodInfo">01 Gen - 31 Ago 2025</span>
                 </div>
                 
                 <div class="controls-section">
                     <button class="download-btn" id="downloadBtn">
-                        <span>📥</span>
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8.5 1.5A1.5 1.5 0 0 0 7 0h-2a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 5 10h2a1.5 1.5 0 0 0 1.5-1.5v-7zM5 1a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-7A.5.5 0 0 0 7 1H5z"/>
+                            <path d="M0 12v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H9.5a1.5 1.5 0 0 1-1.5-1.5v-1H2a2 2 0 0 0-2 2zm5.5-1.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+                        </svg>
                         <span>Esporta</span>
                     </button>
                     <button class="refresh-btn" id="refreshBtn">
-                        <span>🔄</span>
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
                         <span>Aggiorna</span>
                     </button>
                 </div>
@@ -719,22 +799,38 @@
             <!-- Navigation -->
             <div class="navigation">
                 <button class="nav-tab active" data-tab="overview">
-                    <span>📊</span>
-                    Panoramica Aziendale
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                    </svg>
+                    <span>Panoramica Aziendale</span>
                 </button>
                 <button class="nav-tab" data-tab="agents">
-                    <span>👥</span>
-                    Dettaglio Agenti
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+                        <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                    </svg>
+                    <span>Dettaglio Agenti</span>
                 </button>
             </div>
             
             <!-- Region Filters -->
-            <div class="region-filters">
-                <button class="region-filter active" data-region="all">Tutte le Regioni</button>
-                <button class="region-filter" data-region="Lazio">Lazio</button>
-                <button class="region-filter" data-region="Marche">Marche</button>
-                <button class="region-filter" data-region="Umbria">Umbria</button>
-                <button class="region-filter" data-region="Toscana">Toscana</button>
+            <div class="region-filters-container">
+                <div class="region-filters-header">
+                    <span class="filter-label">Filtro Territorio:</span>
+                    <button class="region-filter-toggle" id="regionFilterToggle">
+                        <span id="selectedRegionText">Tutte le Regioni</span>
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="chevron-icon">
+                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="region-filters-dropdown hidden" id="regionFiltersDropdown">
+                    <button class="region-filter active" data-region="all">Tutte le Regioni</button>
+                    <div class="regions-scrollable" id="regionsScrollable">
+                        <!-- Regions will be populated dynamically -->
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -803,7 +899,11 @@
             <div id="agentsTab" class="hidden">
                 <!-- Search -->
                 <div class="search-container">
-                    <div class="search-icon">🔍</div>
+                    <div class="search-icon">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </div>
                     <input type="text" class="search-input" id="agentSearch" placeholder="Cerca agenti per nome, codice, regione...">
                 </div>
 
@@ -964,7 +1064,7 @@
                     value: formatCompactCurrency(data.fatturato2025),
                     change: `+${data.crescita.toFixed(1)}%`,
                     changeLabel: 'vs 2024',
-                    icon: '💰',
+                    icon: '<svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M7.5 3.5a.5.5 0 0 1 1 0v1.21l3.13.532a.5.5 0 0 1-.26.966L8.5 5.809V10.5a.5.5 0 0 1-1 0V3.5z"/></svg>',
                     iconClass: 'revenue'
                 },
                 {
@@ -972,7 +1072,7 @@
                     value: `${data.performance}%`,
                     change: '',
                     changeLabel: 'obiettivo',
-                    icon: '🎯',
+                    icon: '<svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a6.5 6.5 0 0 0-6.5 6.5c0 1.747.632 3.5 1.821 4.957L8 16l4.679-3.543A8.442 8.442 0 0 0 14.5 7.5 6.5 6.5 0 0 0 8 1zM8 8a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>',
                     iconClass: 'performance',
                     progress: data.performance
                 },
@@ -981,7 +1081,7 @@
                     value: data.clienti.toString(),
                     change: '',
                     changeLabel: 'totale portafoglio',
-                    icon: '👥',
+                    icon: '<svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002A.274.274 0 0 1 15 13H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>',
                     iconClass: 'clients'
                 },
                 {
@@ -989,7 +1089,7 @@
                     value: data.agenti.toString(),
                     change: '',
                     changeLabel: 'rete vendita',
-                    icon: '🏢',
+                    icon: '<svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M6 2a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3A.5.5 0 0 1 6 2zM3.5 3a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-11zm1 .5v10h8v-10h-8z"/></svg>',
                     iconClass: 'agents'
                 },
                 {
@@ -997,7 +1097,7 @@
                     value: getFilteredRegions().length.toString(),
                     change: '',
                     changeLabel: 'copertura territorio',
-                    icon: '📍',
+                    icon: '<svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/><path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>',
                     iconClass: 'regions'
                 }
             ];
@@ -1166,7 +1266,11 @@
             if (agents.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">👥</div>
+                        <div class="empty-state-icon">
+                            <svg width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002A.274.274 0 0 1 15 13H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                            </svg>
+                        </div>
                         <div class="empty-state-title">Nessun agente trovato</div>
                         <div class="empty-state-description">
                             Modifica i filtri di ricerca per visualizzare gli agenti.
@@ -1382,13 +1486,36 @@
             }
         }
 
+        // Populate region filters dynamically
+        function populateRegionFilters() {
+            const container = document.getElementById('regionsScrollable');
+            const uniqueRegions = [...new Set(processedData.regions.map(r => r.regione))].sort();
+            
+            container.innerHTML = uniqueRegions.map(region => `
+                <button class="region-filter" data-region="${region}">${region}</button>
+            `).join('');
+            
+            // Add event listeners to dynamically created buttons
+            container.querySelectorAll('.region-filter').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchRegion(btn.dataset.region);
+                    document.getElementById('regionFiltersDropdown').classList.add('hidden');
+                    document.getElementById('regionFilterToggle').classList.remove('active');
+                });
+            });
+        }
+
         function switchRegion(regionName) {
             selectedRegion = regionName;
             
-            // Update region buttons
+            // Update all region buttons
             document.querySelectorAll('.region-filter').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.region === regionName);
             });
+            
+            // Update selected text
+            const selectedText = document.getElementById('selectedRegionText');
+            selectedText.textContent = regionName === 'all' ? 'Tutte le Regioni' : regionName;
             
             // Update content
             updateContent();
@@ -1469,9 +1596,28 @@
                 tab.addEventListener('click', () => switchTab(tab.dataset.tab));
             });
             
-            // Region filters
-            document.querySelectorAll('.region-filter').forEach(btn => {
-                btn.addEventListener('click', () => switchRegion(btn.dataset.region));
+            // Region filter toggle
+            const regionToggle = document.getElementById('regionFilterToggle');
+            const regionDropdown = document.getElementById('regionFiltersDropdown');
+            
+            regionToggle.addEventListener('click', () => {
+                regionDropdown.classList.toggle('hidden');
+                regionToggle.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!regionToggle.contains(e.target) && !regionDropdown.contains(e.target)) {
+                    regionDropdown.classList.add('hidden');
+                    regionToggle.classList.remove('active');
+                }
+            });
+            
+            // Add event listener to "Tutte le Regioni" button
+            document.querySelector('.region-filter[data-region="all"]').addEventListener('click', () => {
+                switchRegion('all');
+                regionDropdown.classList.add('hidden');
+                regionToggle.classList.remove('active');
             });
             
             // Search
@@ -1490,7 +1636,6 @@
             });
             
             document.getElementById('downloadBtn').addEventListener('click', () => {
-                // Implement download functionality
                 alert('Funzionalità di export in sviluppo');
             });
             
