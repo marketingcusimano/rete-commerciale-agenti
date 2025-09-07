@@ -849,14 +849,16 @@
             return ((current - previous) / previous * 100);
         }
 
-        // Parsing dei dati CSV
+        // Parsing dei dati CSV migliorato
         function parseAgentData(csvText) {
             const agents = [];
             const sections = csvText.split('# DATI STATISTICHE AGENTE');
             
+            console.log('Sezioni CSV trovate:', sections.length);
+            
             for (let i = 1; i < sections.length; i++) {
                 const section = sections[i];
-                const lines = section.split('\n');
+                const lines = section.split('\n').filter(line => line.trim() !== '');
                 
                 const agent = {
                     codice: '',
@@ -869,63 +871,78 @@
                     ripartizione: []
                 };
                 
-                // Estrai metadata agente
+                // Estrai metadata agente con regex più robusto
                 for (const line of lines) {
                     if (line.includes('Codice Agente:')) {
-                        agent.codice = line.split(':')[1].trim();
+                        agent.codice = line.split(':')[1]?.trim() || '';
                     } else if (line.includes('Ragione Sociale:')) {
-                        agent.ragioneSociale = line.split(':')[1].trim();
+                        agent.ragioneSociale = line.split(':')[1]?.trim() || '';
                     } else if (line.includes('Periodo:')) {
-                        agent.periodo = line.split(':')[1].trim();
+                        agent.periodo = line.split(':')[1]?.trim() || '';
                     }
                 }
                 
-                // Parsa le righe dati
+                // Parsa le righe dati con parsing più robusto
                 for (const line of lines) {
-                    if (line.startsWith('OBIETTIVI,')) {
-                        const parts = line.split(',');
-                        agent.obiettivi.push({
-                            provincia: parts[1],
-                            annoPrecedente: parseFloat(parts[2]?.replace(/"/g, '').replace(',', '.')) || 0,
-                            annoCorrente: parseFloat(parts[3]?.replace(/"/g, '').replace(',', '.')) || 0,
-                            obiettivo: parseFloat(parts[4]?.replace(/"/g, '').replace(',', '.')) || 0,
-                            clientiAnnoPrecedente: parseInt(parts[6]) || 0,
-                            clientiAnnoCorrente: parseInt(parts[7]) || 0,
-                            obiettivoClienti: parseInt(parts[8]) || 0
-                        });
-                    } else if (line.startsWith('CLIENTI_PROVINCIA,')) {
-                        const parts = line.split(',');
-                        agent.clientiProvincia.push({
-                            provincia: parts[1],
-                            clientiServiti: parseInt(parts[2]) || 0,
-                            fatturato: parseFloat(parts[3]?.replace(/"/g, '').replace(',', '.')) || 0
-                        });
-                    } else if (line.startsWith('VENDITE_CLIENTE,')) {
-                        const parts = line.split(',');
-                        agent.venditeClienti.push({
-                            provincia: parts[1],
-                            cliente: parts[2],
-                            categoria: parts[3],
-                            fatturato: parseFloat(parts[4]?.replace(/"/g, '').replace(',', '.')) || 0
-                        });
-                    } else if (line.startsWith('CATEGORIA_RIEPILOGO,')) {
-                        const parts = line.split(',');
-                        agent.categorieRiepilogo.push({
-                            categoria: parts[1],
-                            importoTotale: parseFloat(parts[2]?.replace(/"/g, '').replace(',', '.')) || 0,
-                            provincia1: parts[3],
-                            clientiProv1: parseInt(parts[4]) || 0,
-                            provincia2: parts[5],
-                            clientiProv2: parseInt(parts[6]) || 0
-                        });
+                    try {
+                        if (line.startsWith('OBIETTIVI,')) {
+                            const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
+                            if (parts.length >= 8) {
+                                agent.obiettivi.push({
+                                    provincia: parts[1] || '',
+                                    annoPrecedente: parseFloat(parts[2]?.replace('.', '').replace(',', '.')) || 0,
+                                    annoCorrente: parseFloat(parts[3]?.replace('.', '').replace(',', '.')) || 0,
+                                    obiettivo: parseFloat(parts[4]?.replace('.', '').replace(',', '.')) || 0,
+                                    clientiAnnoPrecedente: parseInt(parts[6]) || 0,
+                                    clientiAnnoCorrente: parseInt(parts[7]) || 0,
+                                    obiettivoClienti: parseInt(parts[8]) || 0
+                                });
+                            }
+                        } else if (line.startsWith('CLIENTI_PROVINCIA,')) {
+                            const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
+                            if (parts.length >= 4) {
+                                agent.clientiProvincia.push({
+                                    provincia: parts[1] || '',
+                                    clientiServiti: parseInt(parts[2]) || 0,
+                                    fatturato: parseFloat(parts[3]?.replace('.', '').replace(',', '.')) || 0
+                                });
+                            }
+                        } else if (line.startsWith('VENDITE_CLIENTE,')) {
+                            const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
+                            if (parts.length >= 5) {
+                                agent.venditeClienti.push({
+                                    provincia: parts[1] || '',
+                                    cliente: parts[2] || '',
+                                    categoria: parts[3] || '',
+                                    fatturato: parseFloat(parts[4]?.replace('.', '').replace(',', '.')) || 0
+                                });
+                            }
+                        } else if (line.startsWith('CATEGORIA_RIEPILOGO,')) {
+                            const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
+                            if (parts.length >= 7) {
+                                agent.categorieRiepilogo.push({
+                                    categoria: parts[1] || '',
+                                    importoTotale: parseFloat(parts[2]?.replace('.', '').replace(',', '.')) || 0,
+                                    provincia1: parts[3] || '',
+                                    clientiProv1: parseInt(parts[4]) || 0,
+                                    provincia2: parts[5] || '',
+                                    clientiProv2: parseInt(parts[6]) || 0
+                                });
+                            }
+                        }
+                    } catch (parseError) {
+                        console.warn('Errore parsing riga:', line, parseError);
                     }
                 }
                 
-                if (agent.codice) {
+                // Aggiungi solo agenti con dati validi
+                if (agent.codice && (agent.obiettivi.length > 0 || agent.clientiProvincia.length > 0)) {
                     agents.push(agent);
+                    console.log('Agente aggiunto:', agent.codice, agent.ragioneSociale);
                 }
             }
             
+            console.log('Agenti parsati totali:', agents.length);
             return agents;
         }
 
