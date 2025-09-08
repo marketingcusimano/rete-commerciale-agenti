@@ -877,19 +877,68 @@
                 }
             };
 
+            console.log('Processing data, sample record:', data[0]);
+            
+            // Trova i nomi delle colonne reali
+            const sampleRow = data[0] || {};
+            const actualHeaders = Object.keys(sampleRow);
+            console.log('Actual headers in data:', actualHeaders);
+
+            // Mapping flessibile per i nomi delle colonne
+            const findColumn = (possibleNames) => {
+                for (const name of possibleNames) {
+                    const found = actualHeaders.find(h => 
+                        h.toLowerCase().includes(name.toLowerCase()) ||
+                        h.toLowerCase().replace(/_/g, '').includes(name.toLowerCase().replace(/_/g, ''))
+                    );
+                    if (found) return found;
+                }
+                return null;
+            };
+
+            const codiceCol = findColumn(['CODICE_AGENTE', 'CODICE', 'ID_AGENTE', 'AGENTE_ID']);
+            const nomeCol = findColumn(['RAGIONE_SOCIALE', 'NOME', 'RAGIONE_SOCIALE_AGENTE', 'AGENTE']);
+            const regioneCol = findColumn(['REGIONE', 'REGION']);
+            const fatturato2025Col = findColumn(['FATTURATO_2025', 'FATTURATO2025', 'FATTURATO_CORRENTE', 'ANNO_CORRENTE']);
+            const fatturato2024Col = findColumn(['FATTURATO_2024', 'FATTURATO2024', 'FATTURATO_PRECEDENTE', 'ANNO_PRECEDENTE']);
+            const obiettivoCol = findColumn(['OBIETTIVO_2025', 'OBIETTIVO2025', 'OBIETTIVO']);
+            const performanceCol = findColumn(['PERFORMANCE', 'PERC_OBIETTIVO', 'PERCENTUALE_OBIETTIVO']);
+            const clientiCol = findColumn(['CLIENTI', 'NUM_CLIENTI', 'CLIENTI_ATTIVI']);
+
+            console.log('Column mapping:', {
+                codice: codiceCol,
+                nome: nomeCol,
+                regione: regioneCol,
+                fatturato2025: fatturato2025Col,
+                fatturato2024: fatturato2024Col,
+                obiettivo: obiettivoCol,
+                performance: performanceCol,
+                clienti: clientiCol
+            });
+
             // Process agents
-            data.forEach(row => {
+            data.forEach((row, index) => {
                 const agent = {
-                    codice: row.CODICE_AGENTE,
-                    nome: row.RAGIONE_SOCIALE_AGENTE,
-                    regione: row.REGIONE,
-                    fatturato2025: row.FATTURATO_2025,
-                    fatturato2024: row.FATTURATO_2024,
-                    obiettivo: row.OBIETTIVO_2025,
-                    performance: row.PERFORMANCE,
-                    clienti: row.CLIENTI,
-                    crescita: row.FATTURATO_2024 > 0 ? ((row.FATTURATO_2025 - row.FATTURATO_2024) / row.FATTURATO_2024 * 100) : 0
+                    codice: row[codiceCol] || `AGT_${index + 1}`,
+                    nome: row[nomeCol] || `Agente ${index + 1}`,
+                    regione: row[regioneCol] || 'Non Specificata',
+                    fatturato2025: parseFloat(row[fatturato2025Col]) || 0,
+                    fatturato2024: parseFloat(row[fatturato2024Col]) || 0,
+                    obiettivo: parseFloat(row[obiettivoCol]) || 0,
+                    performance: parseFloat(row[performanceCol]) || 0,
+                    clienti: parseInt(row[clientiCol]) || 0,
+                    crescita: 0
                 };
+
+                // Calcola crescita se hai i dati
+                if (agent.fatturato2024 > 0) {
+                    agent.crescita = ((agent.fatturato2025 - agent.fatturato2024) / agent.fatturato2024 * 100);
+                }
+
+                // Calcola performance se non presente ma hai obiettivo
+                if (agent.performance === 0 && agent.obiettivo > 0) {
+                    agent.performance = Math.round((agent.fatturato2025 / agent.obiettivo) * 100);
+                }
 
                 processed.agents.push(agent);
 
@@ -945,6 +994,9 @@
             processed.agents.forEach((agent, index) => {
                 agent.rank = index + 1;
             });
+
+            console.log('Processed totals:', processed.totals);
+            console.log('Sample processed agent:', processed.agents[0]);
 
             return processed;
         }
