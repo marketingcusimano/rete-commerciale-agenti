@@ -1358,13 +1358,21 @@
                 }
                 
                 const csvText = await response.text();
-                console.log('CSV loaded successfully');
+                console.log('CSV loaded successfully, length:', csvText.length);
                 
-                rawData = parseCSV(csvText);
-                console.log('Parsed data:', rawData.length, 'records');
+                const agents = parseCSV(csvText);
+                console.log('Parsed agents:', agents.length);
                 
-                processedData = processData(rawData);
-                console.log('Processed data:', processedData);
+                if (agents.length === 0) {
+                    throw new Error('Nessun agente trovato nel file CSV');
+                }
+                
+                processedData = processData(agents);
+                console.log('Final processed data:', processedData);
+                
+                if (processedData.agents.length === 0) {
+                    throw new Error('Nessun agente valido trovato nei dati');
+                }
                 
                 // Update UI
                 document.getElementById('agentCount').innerHTML = `
@@ -1385,6 +1393,9 @@
                     <div style="color: #dc2626; text-align: center;">
                         <h3>❌ Errore nel caricamento dei dati</h3>
                         <p>${error.message}</p>
+                        <p style="font-size: 0.875rem; margin-top: 8px; color: #6b7280;">
+                            Controlla la console del browser (F12) per maggiori dettagli
+                        </p>
                         <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 16px;">
                             Riprova
                         </button>
