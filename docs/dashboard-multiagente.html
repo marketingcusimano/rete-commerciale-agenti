@@ -8,9 +8,6 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
-    
     <!-- Charts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     
@@ -580,19 +577,6 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --surface: #1e293b;
-                --surface-2: #0f172a;
-                --surface-3: #334155;
-                --text: #f8fafc;
-                --text-muted: #cbd5e1;
-                --text-light: #94a3b8;
-                --border: #334155;
-            }
-        }
     </style>
 </head>
 <body>
@@ -812,26 +796,47 @@
         // Data loading and parsing
         async function loadData() {
             try {
+                console.log('Caricamento dati da:', CSV_URL);
                 const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const csvText = await response.text();
+                console.log('CSV scaricato, lunghezza:', csvText.length);
                 allData = parseCSV(csvText);
+                console.log('Dati processati:', allData.length, 'agenti trovati');
                 
                 updateLastUpdateTime();
                 renderDashboard();
                 
             } catch (error) {
                 console.error('Error loading data:', error);
-                showError('Errore nel caricamento dei dati');
+                showError('Errore nel caricamento dei dati: ' + error.message);
             }
         }
 
+        function parseNumber(value) {
+            if (typeof value !== 'string') return parseFloat(value) || 0;
+            
+            // Rimuovi spazi e gestisci il formato italiano
+            value = value.trim();
+            if (!value || value === '' || value === '0,00') return 0;
+            
+            // Formato italiano: "31.318,46" diventa 31318.46
+            // Prima rimuovi tutti i punti (separatori delle migliaia)
+            // Poi sostituisci la virgola con il punto decimale
+            const cleanValue = value.replace(/\./g, '').replace(',', '.');
+            const result = parseFloat(cleanValue) || 0;
+            
+            console.log(`Conversione numero: "${value}" -> ${result}`);
+            return result;
+        }
+
         function parseCSV(csvText) {
+            console.log('Inizio parsing CSV...');
             const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
             const agents = [];
 
-            sections.forEach(section => {
+            sections.forEach((section, sectionIndex) => {
                 if (!section.trim()) return;
 
                 const agent = {
@@ -847,7 +852,6 @@
                 };
 
                 const lines = section.split('\n');
-                let currentSection = '';
                 let headers = [];
 
                 lines.forEach(line => {
@@ -857,8 +861,10 @@
                     // Extract agent info
                     if (line.includes('Codice Agente:')) {
                         agent.codice = line.split(':')[1]?.trim() || '';
+                        console.log('Trovato agente:', agent.codice);
                     } else if (line.includes('Ragione Sociale:')) {
                         agent.nome = line.split(':')[1]?.trim() || '';
+                        console.log('Nome agente:', agent.nome);
                     } else if (line.includes('Periodo:')) {
                         agent.periodo = line.split(':')[1]?.trim() || '';
                     }
@@ -866,29 +872,37 @@
                     // Detect section headers
                     if (line.includes('Tipo_Dato,')) {
                         headers = line.split(',').map(h => h.trim());
+                        console.log('Headers trovati:', headers);
                         return;
                     }
 
                     // Parse data rows
-                    if (headers.length > 0 && line.includes(',')) {
+                    if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
                         const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
                         if (values.length >= headers.length) {
                             const row = {};
                             headers.forEach((header, index) => {
                                 let value = values[index] || '';
-                                // Convert numbers
+                                
+                                // Convert numbers with proper Italian format handling
                                 if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
                                      'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
                                      'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
-                                    value = parseFloat(value.replace(/[.,]/g, match => match === ',' ? '.' : '')) || 0;
+                                    value = parseNumber(value);
                                 }
                                 row[header] = value;
                             });
 
                             // Categorize by section type
                             switch (row.Tipo_Dato) {
-                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
-                                case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
+                                case 'OBIETTIVI': 
+                                    agent.obiettivi.push(row);
+                                    console.log('Obiettivo aggiunto:', row);
+                                    break;
+                                case 'CLIENTI_PROVINCIA': 
+                                    agent.clienti_provincia.push(row);
+                                    console.log('Cliente provincia aggiunto:', row);
+                                    break;
                                 case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
                                 case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
                                 case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
@@ -900,10 +914,43 @@
 
                 if (agent.codice && agent.nome) {
                     agents.push(agent);
+                    console.log(`Agente completato: ${agent.nome} (${agent.codice})`);
                 }
             });
 
+            console.log('Parsing completato. Agenti trovati:', agents.length);
             return agents;
+        }
+
+        function getRegionFromProvince(provinceCode) {
+            const provinceToRegion = {
+                // Lazio
+                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
+                // Marche
+                'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
+                // Sardegna
+                'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
+                // Emilia-Romagna
+                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'BO': 'Emilia-Romagna', 'FE': 'Emilia-Romagna', 
+                'FC': 'Emilia-Romagna', 'MO': 'Emilia-Romagna', 'PR': 'Emilia-Romagna', 'PC': 'Emilia-Romagna', 'RE': 'Emilia-Romagna',
+                // Lombardia
+                'CR': 'Lombardia', 'LO': 'Lombardia', 'MI': 'Lombardia', 'BG': 'Lombardia', 'BS': 'Lombardia', 
+                'CO': 'Lombardia', 'MN': 'Lombardia', 'PV': 'Lombardia', 'SO': 'Lombardia', 'VA': 'Lombardia', 'LC': 'Lombardia', 'MB': 'Lombardia',
+                // Estero
+                'ALB': 'Estero'
+            };
+            return provinceToRegion[provinceCode] || provinceCode;
+        }
+
+        function getProvinceName(code) {
+            const provinces = {
+                'LT': 'Latina', 'RM': 'Roma', 'FR': 'Frosinone', 'VT': 'Viterbo',
+                'AN': 'Ancona', 'PU': 'Pesaro Urbino', 'CA': 'Cagliari', 'SS': 'Sassari',
+                'NU': 'Nuoro', 'OR': 'Oristano', 'SU': 'Sud Sardegna', 'OT': 'Olbia Tempio',
+                'RN': 'Rimini', 'RA': 'Ravenna', 'CR': 'Cremona', 'LO': 'Lodi', 'PC': 'Piacenza',
+                'ALB': 'Albania'
+            };
+            return provinces[code] || code;
         }
 
         function renderDashboard() {
@@ -926,14 +973,19 @@
             let totalClients = 0;
             let totalAgents = allData.length;
 
+            console.log('Calcolo KPI per', allData.length, 'agenti');
+
             allData.forEach(agent => {
                 const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
                 if (general) {
+                    console.log(`Agente ${agent.nome}: Attuale=${general.Anno_Corrente}, Precedente=${general.Anno_Precedente}, Clienti=${general.Clienti_Anno_Corrente}`);
                     totalRevenue += general.Anno_Corrente || 0;
                     totalPrevRevenue += general.Anno_Precedente || 0;
                     totalClients += general.Clienti_Anno_Corrente || 0;
                 }
             });
+
+            console.log(`Totali calcolati: Fatturato=${totalRevenue}, Precedente=${totalPrevRevenue}, Clienti=${totalClients}`);
 
             const revenueGrowth = totalPrevRevenue > 0 ? 
                 ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
@@ -1067,20 +1119,21 @@
                 charts.region.destroy();
             }
 
-            // Aggregate by region
+            // Aggregate by REGION
             const regionData = {};
             allData.forEach(agent => {
                 agent.clienti_provincia.forEach(prov => {
-                    if (!regionData[prov.Provincia]) {
-                        regionData[prov.Provincia] = 0;
+                    const regionName = getRegionFromProvince(prov.Provincia);
+                    if (!regionData[regionName]) {
+                        regionData[regionName] = 0;
                     }
-                    regionData[prov.Provincia] += prov.Fatturato || 0;
+                    regionData[regionName] += prov.Fatturato || 0;
                 });
             });
 
             const labels = Object.keys(regionData);
             const data = Object.values(regionData);
-            const colors = ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+            const colors = ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#84cc16', '#f97316'];
 
             charts.region = new Chart(ctx, {
                 type: 'doughnut',
@@ -1229,7 +1282,7 @@
         function renderRegionCards() {
             const container = document.getElementById('regionGrid');
             
-            // Aggregate data by REGION (not province)
+            // Aggregate data by REGION
             const regions = {};
             allData.forEach(agent => {
                 agent.clienti_provincia.forEach(prov => {
@@ -1286,30 +1339,6 @@
                 return `€${(value / 1000).toFixed(0)}k`;
             }
             return `€${value.toLocaleString('it-IT')}`;
-        }
-
-        function getRegionName(code) {
-            const regions = {
-                'LT': 'Latina',
-                'RM': 'Roma',
-                'FR': 'Frosinone',
-                'VT': 'Viterbo',
-                'AN': 'Ancona',
-                'PU': 'Pesaro Urbino',
-                'CA': 'Cagliari',
-                'SS': 'Sassari',
-                'NU': 'Nuoro',
-                'OR': 'Oristano',
-                'SU': 'Sud Sardegna',
-                'OT': 'Olbia Tempio',
-                'RN': 'Rimini',
-                'RA': 'Ravenna',
-                'CR': 'Cremona',
-                'LO': 'Lodi',
-                'PC': 'Piacenza',
-                'ALB': 'Albania'
-            };
-            return regions[code] || code;
         }
 
         function getPerformanceBadge(growth) {
