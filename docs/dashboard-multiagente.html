@@ -3,10 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Direzionale - Cotto Cusimano</title>
+    <title>Dashboard Commerciale - Rete Agenti</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    
+    <!-- Charts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
+    
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --surface: #ffffff;
+            --surface-2: #f8fafc;
+            --surface-3: #f1f5f9;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,1777 +43,1301 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 50%, #e5e7eb 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--surface-2);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .dashboard {
             min-height: 100vh;
-            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Background Effects */
-        .bg-effects {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            pointer-events: none;
-            opacity: 0.2;
-            z-index: 0;
-        }
-
-        .bg-effect-1 {
-            position: absolute;
-            top: -160px;
-            right: -160px;
-            width: 384px;
-            height: 384px;
-            background: #3b82f6;
-            border-radius: 50%;
-            mix-blend-mode: multiply;
-            filter: blur(48px);
-            animation: pulse 3s ease-in-out infinite;
-        }
-
-        .bg-effect-2 {
-            position: absolute;
-            bottom: -160px;
-            left: -160px;
-            width: 384px;
-            height: 384px;
-            background: #6366f1;
-            border-radius: 50%;
-            mix-blend-mode: multiply;
-            filter: blur(48px);
-            animation: pulse 3s ease-in-out infinite;
-            animation-delay: 2s;
-        }
-
-        .bg-effect-3 {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 384px;
-            height: 384px;
-            background: #06b6d4;
-            border-radius: 50%;
-            mix-blend-mode: multiply;
-            filter: blur(48px);
-            animation: pulse 3s ease-in-out infinite;
-            animation-delay: 4s;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.8; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header Styles */
         .header {
-            margin-bottom: 2rem;
-            transform: translateY(-32px);
-            opacity: 0;
-            animation: slideIn 1s ease-out forwards;
-        }
-
-        @keyframes slideIn {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .header-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(40px);
-            border-radius: 24px;
-            padding: 2rem;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.1);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow-sm);
         }
 
         .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .header-title {
-            text-align: center;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
         }
 
-        .header-title h1 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #111827;
-            letter-spacing: -0.025em;
-            margin-bottom: 0.25rem;
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
         }
 
-        .header-title p {
-            color: #6b7280;
-            font-size: 1.125rem;
-            font-weight: 500;
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
         }
 
-        .status-indicator {
+        .status-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-top: 0.75rem;
-            justify-content: center;
+            padding: 0.5rem 0.75rem;
+            background: var(--surface-3);
+            border-radius: var(--radius);
+            color: var(--text-muted);
         }
 
-        .status-dot {
+        .status-live {
             width: 8px;
             height: 8px;
-            background: #10b981;
+            background: var(--success);
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
 
-        .status-text {
-            font-size: 0.75rem;
-            color: #059669;
-            font-weight: 500;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        .header-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .date-range {
-            background: rgba(156, 163, 175, 0.7);
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .date-range i {
-            width: 16px;
-            height: 16px;
-            color: #6b7280;
-        }
-
-        .date-range span {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .header-buttons {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .btn {
-            padding: 0.75rem;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
-        }
-
-        .btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn i {
-            width: 20px;
-            height: 20px;
-        }
-
-        .agents-count {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .agents-count i {
-            width: 16px;
-            height: 16px;
-            color: #6b7280;
-        }
-
-        .agents-count span {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        /* Navigation Tabs */
-        .nav-tabs {
-            margin-top: 1.5rem;
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .nav-tab {
-            padding: 0.75rem 1.5rem;
-            border-radius: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-tab.active {
-            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-            color: white;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-tab:not(.active) {
-            background: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
-        }
-
-        .nav-tab:not(.active):hover {
-            background: #e5e7eb;
-        }
-
-        .nav-tab i {
-            width: 16px;
-            height: 16px;
-        }
-
-        /* Region Filters */
-        .region-filters {
-            margin-top: 1rem;
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .region-filter {
-            padding: 0.5rem 1rem;
-            border-radius: 12px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .region-filter.active {
-            background: #4f46e5;
-            color: white;
-        }
-
-        .region-filter:not(.active) {
-            background: #e5e7eb;
-            color: #374151;
-        }
-
-        .region-filter:not(.active):hover {
-            background: #d1d5db;
-        }
-
-        /* Dynamic Title Card */
-        .dynamic-title-card {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1d4ed8 100%);
-            border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.3);
-            position: relative;
-            overflow: hidden;
-            transform: translateY(32px);
-            opacity: 0;
-            animation: titleSlideIn 0.8s ease-out forwards;
-            animation-delay: 0.2s;
-        }
-
-        @keyframes titleSlideIn {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .title-update-animation {
-            animation: titleUpdate 0.6s ease-in-out;
-        }
-
-        @keyframes titleUpdate {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        .dynamic-title-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%);
-            background-size: 200% 200%;
-            animation: shimmer 3s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-            0%, 100% { background-position: 0% 0%; }
-            50% { background-position: 100% 100%; }
-        }
-
-        .dynamic-title-content {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: white;
-        }
-
-        .dynamic-title-text {
+        .main-content {
             flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        .dynamic-title {
-            font-size: 2rem;
-            font-weight: 900;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.025em;
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 2rem;
+            padding: 0.25rem;
+            background: var(--surface-3);
+            border-radius: var(--radius-lg);
+            width: fit-content;
         }
 
-        .dynamic-subtitle {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
             font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
         }
 
-        .title-badge {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(16px);
-            padding: 1rem 1.5rem;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 1.125rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            min-width: 120px;
-            text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        .tab:hover {
+            background: var(--surface);
+            color: var(--text);
         }
 
-        /* KPI Cards */
-        .kpi-grid {
+        .tab.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .tab-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Grid Layouts */
+        .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .kpi-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(24px);
-            border-radius: 24px;
-            padding: 1.5rem;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            transform: translateY(32px);
-            opacity: 0;
-            animation: cardSlideIn 0.7s ease-out forwards;
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .kpi-card:nth-child(1) { animation-delay: 0.3s; }
-        .kpi-card:nth-child(2) { animation-delay: 0.4s; }
-        .kpi-card:nth-child(3) { animation-delay: 0.5s; }
-        .kpi-card:nth-child(4) { animation-delay: 0.6s; }
-        .kpi-card:nth-child(5) { animation-delay: 0.7s; }
-
-        @keyframes cardSlideIn {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .full-width {
+            grid-column: 1 / -1;
         }
 
-        .kpi-header {
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            padding: 1.5rem 1.5rem 0;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            justify-content: between;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            position: relative;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0.5rem 0;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
             margin-bottom: 1rem;
         }
 
-        .kpi-icon {
-            padding: 0.5rem;
-            border-radius: 12px;
+        .metric-change {
             display: flex;
             align-items: center;
-            justify-content: center;
-        }
-
-        .kpi-icon i {
-            width: 20px;
-            height: 20px;
-        }
-
-        .kpi-icon.blue {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-
-        .kpi-icon.emerald {
-            background: #d1fae5;
-            color: #059669;
-        }
-
-        .kpi-icon.purple {
-            background: #e9d5ff;
-            color: #7c3aed;
-        }
-
-        .kpi-icon.orange {
-            background: #fed7aa;
-            color: #ea580c;
-        }
-
-        .kpi-icon.cyan {
-            background: #cffafe;
-            color: #0891b2;
-        }
-
-        .kpi-label {
-            color: #6b7280;
+            gap: 0.25rem;
             font-size: 0.875rem;
             font-weight: 500;
         }
 
-        .kpi-value {
-            font-size: 2rem;
-            font-weight: 900;
-            color: #111827;
-            margin-bottom: 0.5rem;
+        .metric-change.positive {
+            color: var(--success);
         }
 
-        .kpi-meta {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .metric-change.negative {
+            color: var(--danger);
         }
 
-        .kpi-growth {
-            color: #059669;
-            font-size: 0.875rem;
-            font-weight: 700;
-        }
-
-        .kpi-comparison {
-            color: #6b7280;
-            font-size: 0.875rem;
+        .metric-progress {
+            margin-top: 1rem;
         }
 
         .progress-bar {
             width: 100%;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
+            height: 6px;
+            background: var(--surface-3);
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
-            transition: width 1.5s ease-in-out;
-            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 3px;
+            transition: width 0.6s ease;
         }
 
-        /* Charts Grid */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
         }
 
-        .chart-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(24px);
-            border-radius: 24px;
-            padding: 2rem;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .chart-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 1.5rem;
-        }
-
+        /* Chart Containers */
         .chart-container {
             position: relative;
             height: 300px;
+            padding: 1rem 0;
         }
 
-        /* Table Styles */
-        .table-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(24px);
-            border-radius: 24px;
-            padding: 2rem;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        .chart-container.large {
+            height: 400px;
         }
 
+        /* Tables */
         .table-container {
             overflow-x: auto;
         }
 
-        table {
+        .table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        th {
+        .table th,
+        .table td {
+            padding: 1rem;
             text-align: left;
-            padding: 1rem;
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: #374151;
-            border-bottom: 2px solid #d1d5db;
+            border-bottom: 1px solid var(--border);
         }
 
-        th.text-center { text-align: center; }
-        th.text-right { text-align: right; }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
+        .table th {
+            background: var(--surface-2);
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        td.text-center { text-align: center; }
-        td.text-right { text-align: right; }
-
-        tr:hover {
-            background: #f9fafb;
-        }
-
-        .rank-badge {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
+        .table td {
             font-size: 0.875rem;
         }
 
-        .rank-1 { background: #d97706; }
-        .rank-2 { background: #9ca3af; }
-        .rank-3 { background: #f59e0b; }
+        .table-row {
+            transition: background-color 0.2s ease;
+        }
 
-        .region-name {
-            display: flex;
+        .table-row:hover {
+            background: var(--surface-2);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
             align-items: center;
-            gap: 0.75rem;
-        }
-
-        .region-name span {
-            font-weight: 700;
-            color: #111827;
-        }
-
-        .agent-count-badge {
+            gap: 0.25rem;
             padding: 0.25rem 0.75rem;
             border-radius: 9999px;
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-weight: 700;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
 
-        .growth-positive {
-            color: #059669;
-            font-weight: 700;
+        .badge.success {
+            background: #dcfce7;
+            color: var(--success);
         }
 
-        .performance-container {
+        .badge.warning {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .badge.danger {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        /* Loading States */
+        .loading {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            padding: 3rem;
+            color: var(--text-muted);
         }
 
-        .performance-value {
-            font-weight: 700;
-            color: #111827;
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--surface-3);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
         }
 
-        .performance-bar {
-            width: 64px;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .performance-bar-fill {
-            height: 100%;
-            background: #10b981;
-            border-radius: 4px;
-        }
-
-        /* Agents Section */
-        .agents-grid {
+        /* Region Specific */
+        .region-grid {
             display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
         }
 
-        .agents-sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(24px);
-            border-radius: 24px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-            position: sticky;
-            top: 2rem;
-        }
-
-        .sidebar-header {
-            background: linear-gradient(135deg, #2563eb 0%, #3730a3 100%);
+        .region-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
             padding: 1.5rem;
-            color: white;
+            transition: all 0.2s ease;
         }
 
-        .sidebar-header-content {
+        .region-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .region-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
 
-        .sidebar-title h3 {
-            font-size: 1.5rem;
-            font-weight: 900;
-        }
-
-        .sidebar-subtitle {
-            color: #bfdbfe;
-            font-size: 0.875rem;
-        }
-
-        .sidebar-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
+        .region-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
+            font-weight: 600;
         }
 
-        .sidebar-icon i {
-            width: 24px;
-            height: 24px;
+        .region-info h3 {
+            font-weight: 600;
+            font-size: 1.125rem;
         }
 
-        .sidebar-stats {
-            padding: 1rem;
-            background: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
+        .region-info p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
         }
 
-        .stats-grid {
+        .region-stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .region-stat {
             text-align: center;
         }
 
-        .stat-value {
-            font-size: 1.125rem;
-            font-weight: 900;
-            color: #111827;
+        .region-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
         }
 
-        .stat-label {
+        .region-stat-label {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
-        .stat-value.emerald { color: #059669; }
-        .stat-value.purple { color: #7c3aed; }
-
-        .agents-list {
-            max-height: 600px;
-            overflow-y: auto;
+        /* Agent Cards */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
         }
 
-        .agent-item {
-            padding: 1.25rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
+        .agent-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.2s ease;
         }
 
-        .agent-item:hover {
-            background: #f9fafb;
-            border-left-color: #d1d5db;
-        }
-
-        .agent-item.selected {
-            background: #eff6ff;
-            border-left-color: #2563eb;
-            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.1);
+        .agent-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
         }
 
         .agent-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-        }
-
-        .agent-rank-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .agent-rank {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            font-weight: 700;
-            font-size: 0.875rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
         }
 
-        .crown {
-            width: 20px;
-            height: 20px;
-        }
-
-        .crown.gold { color: #f59e0b; }
-        .crown.silver { color: #9ca3af; }
-        .crown.bronze { color: #f97316; }
-
-        .selection-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #d1d5db;
-            transition: all 0.3s ease;
-        }
-
-        .agent-item.selected .selection-indicator {
-            background: #2563eb;
-            transform: scale(1.1);
-        }
-
-        .agent-info h4 {
-            font-weight: 700;
-            color: #111827;
-            font-size: 1rem;
-            line-height: 1.2;
+        .agent-name {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
         }
 
         .agent-code {
-            color: #6b7280;
+            opacity: 0.8;
             font-size: 0.875rem;
         }
 
-        .agent-location {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.25rem;
-        }
-
-        .agent-location i {
-            width: 12px;
-            height: 12px;
-            color: #9ca3af;
-        }
-
-        .agent-location span {
-            color: #6b7280;
-            font-size: 0.75rem;
+        .agent-body {
+            padding: 1.5rem;
         }
 
         .agent-metrics {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid #f3f4f6;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agent-metric {
             text-align: center;
         }
 
-        .metric-value {
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: #111827;
+        .agent-metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
         }
 
-        .metric-label {
+        .agent-metric-label {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
-
-        .metric-value.green { color: #059669; }
-        .metric-value.yellow { color: #d97706; }
-        .metric-value.red { color: #dc2626; }
 
         .agent-progress {
-            width: 100%;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 0.75rem;
+            margin-top: 1rem;
         }
 
-        .agent-progress-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        .agent-progress-fill.green { background: #10b981; }
-        .agent-progress-fill.yellow { background: #f59e0b; }
-        .agent-progress-fill.red { background: #ef4444; }
-
-        .empty-state {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(24px);
-            border-radius: 24px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            height: 600px;
+        .agent-progress-label {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .empty-state-content {
-            max-width: 400px;
-        }
-
-        .empty-state-icon {
-            width: 96px;
-            height: 96px;
-            background: #f3f4f6;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-        }
-
-        .empty-state-icon i {
-            width: 48px;
-            height: 48px;
-            color: #9ca3af;
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 1rem;
-        }
-
-        .empty-state p {
-            color: #6b7280;
-            margin-bottom: 1rem;
-        }
-
-        .ready-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding-top: 1rem;
-        }
-
-        .ready-dot {
-            width: 8px;
-            height: 8px;
-            background: #3b82f6;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        .ready-text {
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
             font-size: 0.875rem;
-            color: #2563eb;
-            font-weight: 500;
         }
 
-        /* Animation classes */
-        .animate-in {
-            animation: slideInUp 0.6s ease-out;
-        }
-
-        @keyframes slideInUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .font-bold { font-weight: 700; }
-        .text-gray-700 { color: #374151; }
-        .text-gray-900 { color: #111827; }
-
-        /* Gradient backgrounds for rank badges */
-        .rank-gradient-1 {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-        
-        .rank-gradient-2 {
-            background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
-        }
-        
-        .rank-gradient-3 {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-        }
-        
-        .rank-gradient-default {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        }
-
-        @media (max-width: 1280px) {
-            .agents-grid {
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-grid {
                 grid-template-columns: 1fr;
             }
             
-            .agents-sidebar {
-                position: relative;
-                top: 0;
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
             }
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .header-title {
-                text-align: left;
-            }
-            
-            .header-title h1 {
-                font-size: 2rem;
-            }
-            
-            .header-controls {
+            .header-content {
                 flex-direction: column;
+                gap: 1rem;
                 align-items: stretch;
             }
             
-            .dynamic-title-content {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
+            .tabs {
+                width: 100%;
+                justify-content: space-around;
             }
             
-            .dynamic-title {
-                font-size: 1.5rem;
+            .tab {
+                flex: 1;
+                justify-content: center;
+                padding: 0.75rem 1rem;
             }
             
-            .kpi-grid {
+            .metrics-grid {
                 grid-template-columns: 1fr;
             }
             
-            .charts-grid {
+            .region-grid,
+            .agent-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --surface: #1e293b;
+                --surface-2: #0f172a;
+                --surface-3: #334155;
+                --text: #f8fafc;
+                --text-muted: #cbd5e1;
+                --text-light: #94a3b8;
+                --border: #334155;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Background Effects -->
-    <div class="bg-effects">
-        <div class="bg-effect-1"></div>
-        <div class="bg-effect-2"></div>
-        <div class="bg-effect-3"></div>
-    </div>
-
-    <div class="container">
+    <div class="dashboard">
         <!-- Header -->
-        <div class="header">
-            <div class="header-card">
-                <div class="header-content">
-                    <div class="header-title">
-                        <h1>Dashboard Direzionale</h1>
-                        <p>Cotto Cusimano - Controllo Rete Vendita</p>
-                        <div class="status-indicator">
-                            <div class="status-dot"></div>
-                            <span class="status-text">Aggiornamento automatico attivo</span>
-                        </div>
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                        </svg>
                     </div>
-                    
-                    <div class="header-controls">
-                        <div class="date-range">
-                            <i data-lucide="calendar"></i>
-                            <span>01 Gen - 18 Ago 2025</span>
-                        </div>
-
-                        <div class="header-buttons">
-                            <button class="btn btn-primary" onclick="handleDownload('pdf')" title="Esporta Dashboard PDF">
-                                <i data-lucide="download"></i>
-                            </button>
-                            <button class="btn btn-secondary" onclick="testCSVLoad()" title="Test Caricamento CSV">
-                                <i data-lucide="database"></i>
-                            </button>
-                            <button class="btn btn-secondary" onclick="window.location.reload()" title="Aggiorna Dashboard">
-                                <i data-lucide="refresh-cw"></i>
-                            </button>
-                        </div>
-
-                        <div class="agents-count">
-                            <i data-lucide="building-2"></i>
-                            <span id="agents-count">3 Agenti Attivi</span>
-                        </div>
-                    </div>
+                    <span>Dashboard Commerciale</span>
                 </div>
                 
-                <!-- Navigation Tabs -->
-                <div class="nav-tabs">
-                    <button class="nav-tab active" onclick="setActiveTab('overview')" id="tab-overview">
-                        <i data-lucide="trending-up"></i>
-                        Panoramica Aziendale
-                    </button>
-                    
-                    <button class="nav-tab" onclick="setActiveTab('agents')" id="tab-agents">
-                        <i data-lucide="users"></i>
-                        Dettaglio Agenti
-                    </button>
-                    
-                    <button class="nav-tab" onclick="toggleRegions()" id="toggle-regions">
-                        <i data-lucide="map-pin"></i>
-                        <span>Mostra Regioni</span>
-                    </button>
-                </div>
-
-                <!-- Region Filters -->
-                <div class="region-filters hidden" id="region-filters">
-                    <button class="region-filter active" onclick="setSelectedRegion('all')">
-                        Tutte le Regioni
-                    </button>
-                    <button class="region-filter" onclick="setSelectedRegion('Lazio')">
-                        Lazio
-                    </button>
-                    <button class="region-filter" onclick="setSelectedRegion('Marche')">
-                        Marche
-                    </button>
+                <div class="status-bar">
+                    <div class="status-item">
+                        <div class="status-live"></div>
+                        <span id="lastUpdate">Aggiornamento in corso...</span>
+                    </div>
+                    <div class="status-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12,6 12,12 16,14"/>
+                        </svg>
+                        <span id="currentTime"></span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <!-- Overview Tab Content -->
-        <div id="overview-content">
-            <!-- Dynamic Title Card -->
-            <div class="dynamic-title-card" id="dynamic-title-card">
-                <div class="dynamic-title-content">
-                    <div class="dynamic-title-text">
-                        <h2 class="dynamic-title" id="dynamic-title">Dati Aziendali Completi</h2>
-                        <p class="dynamic-subtitle" id="dynamic-subtitle">Panoramica generale di tutte le regioni • 3 agenti • 40 clienti</p>
-                    </div>
-                    <div class="title-badge" id="title-badge">2 Regioni</div>
-                </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="overview">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M9 9h6v6H9z"/>
+                    </svg>
+                    Panoramica
+                </button>
+                <button class="tab" data-tab="agents">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Agenti
+                </button>
+                <button class="tab" data-tab="regions">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Regioni
+                </button>
             </div>
 
-            <!-- KPI Cards -->
-            <div class="kpi-grid">
-                <!-- Fatturato Totale -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon blue">
-                            <i data-lucide="trending-up"></i>
-                        </div>
-                        <p class="kpi-label">Fatturato 2025</p>
-                    </div>
-                    <p class="kpi-value" id="fatturato-totale">€198k</p>
-                    <div class="kpi-meta">
-                        <span class="kpi-growth" id="crescita-percentuale">+25.3%</span>
-                        <span class="kpi-comparison">vs 2024</span>
-                    </div>
-                </div>
-
-                <!-- Performance Obiettivo -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon emerald">
-                            <i data-lucide="target"></i>
-                        </div>
-                        <p class="kpi-label">Performance</p>
-                    </div>
-                    <p class="kpi-value" id="performance-totale">77%</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="performance-bar" style="width: 77%"></div>
-                    </div>
-                </div>
-
-                <!-- Clienti Totali -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon purple">
-                            <i data-lucide="users"></i>
-                        </div>
-                        <p class="kpi-label">Clienti Attivi</p>
-                    </div>
-                    <p class="kpi-value" id="clienti-totali">40</p>
-                    <p class="kpi-comparison">Totale portafoglio</p>
-                </div>
-
-                <!-- Agenti Attivi -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon orange">
-                            <i data-lucide="building-2"></i>
-                        </div>
-                        <p class="kpi-label">Agenti</p>
-                    </div>
-                    <p class="kpi-value" id="agenti-attivi">3</p>
-                    <p class="kpi-comparison">Rete vendita</p>
-                </div>
-
-                <!-- Regioni Coperte -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon cyan">
-                            <i data-lucide="map-pin"></i>
-                        </div>
-                        <p class="kpi-label">Regioni</p>
-                    </div>
-                    <p class="kpi-value" id="regioni-coperte">2</p>
-                    <p class="kpi-comparison">Copertura territorio</p>
-                </div>
+            <!-- Loading State -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Caricamento dati dal CSV...</p>
             </div>
 
-            <!-- Charts Overview -->
-            <div class="charts-grid">
-                <!-- Performance per Regione -->
-                <div class="chart-card">
-                    <h3 class="chart-title">Performance per Regione</h3>
-                    <div class="chart-container">
-                        <canvas id="performanceChart"></canvas>
+            <!-- Overview Tab -->
+            <div id="overview-content" class="tab-content" style="display: none;">
+                <!-- KPI Metrics -->
+                <div class="metrics-grid" id="kpiMetrics">
+                    <!-- Generated dynamically -->
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="charts-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18h18"/>
+                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                                </svg>
+                                Trend Fatturato
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container large">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="2" y1="12" x2="22" y2="12"/>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                </svg>
+                                Distribuzione Regionale
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="regionChart"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Distribuzione Fatturato -->
-                <div class="chart-card">
-                    <h3 class="chart-title">Distribuzione Fatturato</h3>
-                    <div class="chart-container">
-                        <canvas id="distributionChart"></canvas>
+                <!-- Performance Table -->
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            Performance Agenti
+                        </h3>
                     </div>
-                    
-                    <!-- Legenda Distribuzione -->
-                    <div id="distribution-legend" style="margin-top: 1rem;">
-                        <!-- Legenda sarà popolata dinamicamente -->
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table" id="performanceTable">
+                                <!-- Generated dynamically -->
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tabella Regioni -->
-            <div class="table-card">
-                <h3 class="chart-title">Dettaglio per Regione</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Regione</th>
-                                <th class="text-center">Agenti</th>
-                                <th class="text-right">Fatturato 2025</th>
-                                <th class="text-center">vs 2024</th>
-                                <th class="text-center">Performance</th>
-                                <th class="text-center">Clienti</th>
-                            </tr>
-                        </thead>
-                        <tbody id="regions-table-body">
-                            <!-- Righe saranno popolate dinamicamente -->
-                        </tbody>
-                    </table>
+            <!-- Agents Tab -->
+            <div id="agents-content" class="tab-content" style="display: none;">
+                <div class="agent-grid" id="agentGrid">
+                    <!-- Generated dynamically -->
                 </div>
             </div>
-        </div>
 
-        <!-- Agents Tab Content -->
-        <div id="agents-content" class="hidden">
-            <div class="agents-grid">
-                <!-- Lista Agenti Sidebar -->
-                <div class="agents-sidebar">
-                    <!-- Header Lista -->
-                    <div class="sidebar-header">
-                        <div class="sidebar-header-content">
-                            <div class="sidebar-title">
-                                <h3>Rete Vendita</h3>
-                                <p class="sidebar-subtitle">3 Agenti Attivi</p>
-                            </div>
-                            <div class="sidebar-icon">
-                                <i data-lucide="users"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Statistiche Veloci -->
-                    <div class="sidebar-stats">
-                        <div class="stats-grid">
-                            <div>
-                                <div class="stat-value">€198k</div>
-                                <div class="stat-label">Fatturato</div>
-                            </div>
-                            <div>
-                                <div class="stat-value emerald">77%</div>
-                                <div class="stat-label">Performance</div>
-                            </div>
-                            <div>
-                                <div class="stat-value purple">40</div>
-                                <div class="stat-label">Clienti</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Lista Agenti -->
-                    <div class="agents-list" id="agents-list">
-                        <!-- Agenti saranno popolati dinamicamente -->
-                    </div>
-                </div>
-
-                <!-- Pannello Dettagli Agente -->
-                <div class="agent-details">
-                    <!-- Stato Vuoto -->
-                    <div class="empty-state" id="empty-state">
-                        <div class="empty-state-content">
-                            <div class="empty-state-icon">
-                                <i data-lucide="users"></i>
-                            </div>
-                            <h3>Seleziona un Agente</h3>
-                            <p>Clicca su un agente dalla lista per visualizzare tutti i suoi dati, performance e statistiche dettagliate.</p>
-                            <div class="ready-indicator">
-                                <div class="ready-dot"></div>
-                                <span class="ready-text">Pronto per l'analisi</span>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Regions Tab -->
+            <div id="regions-content" class="tab-content" style="display: none;">
+                <div class="region-grid" id="regionGrid">
+                    <!-- Generated dynamically -->
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        // Dati dell'applicazione (statici come fallback)
-        const agenti = [
-            {
-                codice: "631.00238",
-                nome: "CARABOT NATALINO",
-                regione: "Lazio",
-                province: ["LT", "RM"],
-                fatturato2025: 68178.98,
-                fatturato2024: 51000.00,
-                obiettivo: 92000.00,
-                clienti: 20,
-                obiettivoClienti: 29,
-                performance: 74,
-                rank: 3
-            },
-            {
-                codice: "631.00263",
-                nome: "G-2-G SRL",
-                regione: "Marche",
-                province: ["AN", "PU"],
-                fatturato2025: 95420.15,
-                fatturato2024: 78500.00,
-                obiettivo: 115000.00,
-                clienti: 12,
-                obiettivoClienti: 18,
-                performance: 83,
-                rank: 1
-            },
-            {
-                codice: "631.00120",
-                nome: "CINTI DOMENICO",
-                regione: "Lazio",
-                province: ["FR"],
-                fatturato2025: 34567.23,
-                fatturato2024: 28900.00,
-                obiettivo: 45000.00,
-                clienti: 8,
-                obiettivoClienti: 12,
-                performance: 77,
-                rank: 2
-            }
-        ];
-
-        const regioniData = [
-            {
-                regione: "Lazio",
-                agenti: 2,
-                fatturato2025: 102746.21,
-                fatturato2024: 79900.00,
-                obiettivo: 137000.00,
-                clienti: 28,
-                crescita: 28.6,
-                performance: 75
-            },
-            {
-                regione: "Marche",
-                agenti: 1,
-                fatturato2025: 95420.15,
-                fatturato2024: 78500.00,
-                obiettivo: 115000.00,
-                clienti: 12,
-                crescita: 21.5,
-                performance: 83
-            }
-        ];
-
-        // URL del CSV su GitHub
+        // Configuration
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
-        let csvData = [];
-        let isDataLoaded = false;
+        
+        // Global variables
+        let allData = [];
+        let currentTab = 'overview';
+        let charts = {};
 
-        // Stato dell'applicazione
-        let selectedRegion = 'all';
-        let activeTab = 'overview';
-        let selectedAgent = null;
-        let regionsVisible = false;
-        let performanceChart = null;
-        let distributionChart = null;
-
-        // Utility functions
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('it-IT', {
-                style: 'currency',
-                currency: 'EUR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(value);
-        }
-
-        function formatCompactCurrency(value) {
-            if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
-            if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
-            return formatCurrency(value);
-        }
-
-        // Funzione per parsificare il CSV
-        function parseCSV(csvText) {
-            try {
-                const lines = csvText.trim().split('\n');
-                const headers = lines[0].split(',').map(h => h.trim());
-                const data = [];
-                
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (!line) continue;
-                    
-                    const values = line.split(',').map(v => v.trim());
-                    if (values.length >= headers.length) {
-                        const row = {};
-                        headers.forEach((header, index) => {
-                            row[header] = values[index] || '';
-                        });
-                        data.push(row);
-                    }
-                }
-                
-                return data;
-            } catch (error) {
-                console.error('Errore nel parsing CSV:', error);
-                return [];
-            }
-        }
-
-        // Test di caricamento CSV
-        async function testCSVLoad() {
-            try {
-                console.log('Test caricamento CSV da:', CSV_URL);
-                
-                const statusIndicators = document.querySelectorAll('.status-text');
-                statusIndicators.forEach(indicator => {
-                    indicator.textContent = 'Test caricamento CSV...';
-                    indicator.style.color = '#f59e0b';
-                });
-                
-                const response = await fetch(CSV_URL);
-                console.log('Response status:', response.status);
-                console.log('Response ok:', response.ok);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('CSV Text length:', csvText.length);
-                console.log('Prime 1000 caratteri:', csvText.substring(0, 1000));
-                
-                const parsedData = parseCSV(csvText);
-                console.log('Dati parsificati:', parsedData.length, 'record');
-                
-                if (parsedData.length > 0) {
-                    console.log('Primo record:', parsedData[0]);
-                    console.log('Headers disponibili:', Object.keys(parsedData[0]));
-                }
-                
-                statusIndicators.forEach(indicator => {
-                    indicator.textContent = `Test OK: ${parsedData.length} record trovati`;
-                    indicator.style.color = '#059669';
-                });
-
-                // Mostra alert con risultati
-                alert(`Test CSV completato!\n\nRecords trovati: ${parsedData.length}\nHeaders: ${parsedData.length > 0 ? Object.keys(parsedData[0]).join(', ') : 'Nessuno'}\n\nVedi console per dettagli.`);
-                
-            } catch (error) {
-                console.error('Errore test CSV:', error);
-                
-                const statusIndicators = document.querySelectorAll('.status-text');
-                statusIndicators.forEach(indicator => {
-                    indicator.textContent = 'Test fallito: ' + error.message;
-                    indicator.style.color = '#dc2626';
-                });
-
-                alert(`Errore nel test CSV:\n${error.message}\n\nVedi console per dettagli.`);
-            }
-        }
-
-        function getCurrentTotals() {
-            if (selectedRegion === 'all') {
-                const totaliAziendali = {
-                    fatturato2025: agenti.reduce((sum, a) => sum + a.fatturato2025, 0),
-                    fatturato2024: agenti.reduce((sum, a) => sum + a.fatturato2024, 0),
-                    obiettivo: agenti.reduce((sum, a) => sum + a.obiettivo, 0),
-                    clienti: agenti.reduce((sum, a) => sum + a.clienti, 0),
-                    agenti: agenti.length
-                };
-                totaliAziendali.crescita = ((totaliAziendali.fatturato2025 - totaliAziendali.fatturato2024) / totaliAziendali.fatturato2024 * 100);
-                totaliAziendali.performance = Math.round((totaliAziendali.fatturato2025 / totaliAziendali.obiettivo) * 100);
-                return totaliAziendali;
-            } else {
-                const selected = regioniData.find(r => r.regione === selectedRegion);
-                return {
-                    fatturato2025: selected.fatturato2025,
-                    fatturato2024: selected.fatturato2024,
-                    obiettivo: selected.obiettivo,
-                    clienti: selected.clienti,
-                    agenti: selected.agenti,
-                    crescita: selected.crescita,
-                    performance: selected.performance
-                };
-            }
-        }
-
-        function getFilteredData() {
-            if (selectedRegion === 'all') return regioniData;
-            return regioniData.filter(r => r.regione === selectedRegion);
-        }
-
-        // Update dynamic title based on selected region
-        function updateDynamicTitle() {
-            const titleElement = document.getElementById('dynamic-title');
-            const subtitleElement = document.getElementById('dynamic-subtitle');
-            const badgeElement = document.getElementById('title-badge');
-            const cardElement = document.getElementById('dynamic-title-card');
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTabs();
+            updateClock();
+            setInterval(updateClock, 1000);
+            loadData();
             
-            if (!titleElement || !subtitleElement || !badgeElement || !cardElement) return;
-            
-            // Add animation class
-            cardElement.classList.add('title-update-animation');
-            
-            // Remove animation class after animation completes
-            setTimeout(() => {
-                cardElement.classList.remove('title-update-animation');
-            }, 600);
-            
-            const currentTotals = getCurrentTotals();
-            
-            if (selectedRegion === 'all') {
-                titleElement.textContent = 'Dati Aziendali Completi';
-                subtitleElement.textContent = `Panoramica generale di tutte le regioni • ${currentTotals.agenti} agenti • ${currentTotals.clienti} clienti`;
-                badgeElement.textContent = `${regioniData.length} Regioni`;
-            } else {
-                const selectedData = regioniData.find(r => r.regione === selectedRegion);
-                if (selectedData) {
-                    titleElement.textContent = `Dati ${selectedRegion}`;
-                    subtitleElement.textContent = `Focus specifico sulla regione ${selectedRegion} • ${selectedData.agenti} ${selectedData.agenti === 1 ? 'agente' : 'agenti'} • ${selectedData.clienti} clienti`;
-                    badgeElement.textContent = selectedRegion;
-                }
-            }
-        }
+            // Auto refresh every 2 minutes
+            setInterval(loadData, 120000);
+        });
 
         // Tab management
-        function setActiveTab(tab) {
-            activeTab = tab;
-            
-            // Update tab buttons
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            
-            // Update content visibility
-            document.getElementById('overview-content').classList.toggle('hidden', tab !== 'overview');
-            document.getElementById('agents-content').classList.toggle('hidden', tab !== 'agents');
-            
-            if (tab === 'overview') {
-                updateDynamicTitle(); // Update title when returning to overview
-                updateOverviewContent();
-            } else if (tab === 'agents') {
-                updateAgentsContent();
-            }
+        function initializeTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update content
+                    contents.forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    const targetContent = document.getElementById(`${tabId}-content`);
+                    if (targetContent) {
+                        targetContent.style.display = 'block';
+                    }
+                    
+                    currentTab = tabId;
+                    
+                    // Refresh charts if needed
+                    setTimeout(() => {
+                        Object.values(charts).forEach(chart => {
+                            if (chart && chart.resize) {
+                                chart.resize();
+                            }
+                        });
+                    }, 100);
+                });
+            });
         }
 
-        // Region toggle management
-        function toggleRegions() {
-            regionsVisible = !regionsVisible;
-            const regionFilters = document.getElementById('region-filters');
-            const toggleButton = document.getElementById('toggle-regions');
-            const toggleSpan = toggleButton.querySelector('span');
-            
-            if (regionsVisible) {
-                regionFilters.classList.remove('hidden');
-                regionFilters.classList.add('animate-in');
-                toggleSpan.textContent = 'Nascondi Regioni';
-                toggleButton.classList.add('active');
-            } else {
-                regionFilters.classList.add('hidden');
-                regionFilters.classList.remove('animate-in');
-                toggleSpan.textContent = 'Mostra Regioni';
-                toggleButton.classList.remove('active');
-            }
+        // Clock update
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = 
+                now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
-        // Region management
-        function setSelectedRegion(region) {
-            selectedRegion = region;
-            
-            // Update filter buttons
-            document.querySelectorAll('.region-filter').forEach(f => f.classList.remove('active'));
-            document.querySelector(`button[onclick="setSelectedRegion('${region}')"]`).classList.add('active');
-            
-            updateDynamicTitle();
-            updateOverviewContent();
-        }
-
-        // Update overview content
-        function updateOverviewContent() {
-            const currentTotals = getCurrentTotals();
-            
-            // Update KPI cards
-            document.getElementById('fatturato-totale').textContent = formatCompactCurrency(currentTotals.fatturato2025);
-            document.getElementById('crescita-percentuale').textContent = `+${currentTotals.crescita.toFixed(1)}%`;
-            document.getElementById('performance-totale').textContent = `${currentTotals.performance}%`;
-            document.getElementById('performance-bar').style.width = `${currentTotals.performance}%`;
-            document.getElementById('clienti-totali').textContent = currentTotals.clienti;
-            document.getElementById('agenti-attivi').textContent = currentTotals.agenti;
-            document.getElementById('regioni-coperte').textContent = selectedRegion === 'all' ? regioniData.length : 1;
-            document.getElementById('agents-count').textContent = `${currentTotals.agenti} Agenti Attivi`;
-            
-            // Update charts
-            if (typeof Chart !== 'undefined' && activeTab === 'overview') {
-                setTimeout(updateCharts, 200);
-            }
-            
-            updateRegionsTable();
-        }
-
-        // Update charts with safe error handling
-        function updateCharts() {
+        // Data loading and parsing
+        async function loadData() {
             try {
-                updatePerformanceChart();
-                updateDistributionChart();
+                const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const csvText = await response.text();
+                allData = parseCSV(csvText);
+                
+                updateLastUpdateTime();
+                renderDashboard();
+                
             } catch (error) {
-                console.warn('Errore aggiornamento grafici:', error);
+                console.error('Error loading data:', error);
+                showError('Errore nel caricamento dei dati');
             }
         }
 
-        function updatePerformanceChart() {
-            try {
-                const canvas = document.getElementById('performanceChart');
-                if (!canvas) return;
-                
-                const ctx = canvas.getContext('2d');
-                const data = getFilteredData();
-                
-                if (performanceChart) {
-                    performanceChart.destroy();
-                    performanceChart = null;
-                }
-                
-                performanceChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.map(d => d.regione),
-                        datasets: [{
-                            label: 'Performance %',
-                            data: data.map(d => d.performance),
-                            backgroundColor: '#3b82f6',
-                            borderRadius: 8,
-                            borderSkipped: false,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: '#e5e7eb', drawBorder: false },
-                                ticks: { color: '#6b7280', font: { size: 12 } }
-                            },
-                            x: {
-                                grid: { display: false },
-                                ticks: { color: '#6b7280', font: { size: 11 } }
+        function parseCSV(csvText) {
+            const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
+            const agents = [];
+
+            sections.forEach(section => {
+                if (!section.trim()) return;
+
+                const agent = {
+                    codice: '',
+                    nome: '',
+                    periodo: '',
+                    obiettivi: [],
+                    clienti_provincia: [],
+                    vendite_cliente: [],
+                    categoria_riepilogo: [],
+                    ripartizione: [],
+                    totali: []
+                };
+
+                const lines = section.split('\n');
+                let currentSection = '';
+                let headers = [];
+
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (!line || line.startsWith('##')) return;
+
+                    // Extract agent info
+                    if (line.includes('Codice Agente:')) {
+                        agent.codice = line.split(':')[1]?.trim() || '';
+                    } else if (line.includes('Ragione Sociale:')) {
+                        agent.nome = line.split(':')[1]?.trim() || '';
+                    } else if (line.includes('Periodo:')) {
+                        agent.periodo = line.split(':')[1]?.trim() || '';
+                    }
+                    
+                    // Detect section headers
+                    if (line.includes('Tipo_Dato,')) {
+                        headers = line.split(',').map(h => h.trim());
+                        return;
+                    }
+
+                    // Parse data rows
+                    if (headers.length > 0 && line.includes(',')) {
+                        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+                        if (values.length >= headers.length) {
+                            const row = {};
+                            headers.forEach((header, index) => {
+                                let value = values[index] || '';
+                                // Convert numbers
+                                if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
+                                     'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
+                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
+                                    value = parseFloat(value.replace(/[.,]/g, match => match === ',' ? '.' : '')) || 0;
+                                }
+                                row[header] = value;
+                            });
+
+                            // Categorize by section type
+                            switch (row.Tipo_Dato) {
+                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
+                                case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
+                                case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
+                                case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
+                                case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
+                                case 'TOTALE': agent.totali.push(row); break;
                             }
                         }
                     }
                 });
-            } catch (error) {
-                console.warn('Errore performance chart:', error);
-            }
-        }
 
-        function updateDistributionChart() {
-            try {
-                const canvas = document.getElementById('distributionChart');
-                if (!canvas) return;
-                
-                const ctx = canvas.getContext('2d');
-                const data = getFilteredData();
-                const colors = ['#dc2626', '#ea580c', '#d97706', '#ca8a04', '#65a30d', '#16a34a'];
-                
-                if (distributionChart) {
-                    distributionChart.destroy();
-                    distributionChart = null;
+                if (agent.codice && agent.nome) {
+                    agents.push(agent);
                 }
-                
-                distributionChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: data.map(d => d.regione),
-                        datasets: [{
-                            data: data.map(d => d.fatturato2025),
-                            backgroundColor: colors.slice(0, data.length),
-                            borderWidth: 2,
-                            borderColor: '#fff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } }
-                    }
-                });
-                
-                updateDistributionLegend(data, colors);
-            } catch (error) {
-                console.warn('Errore distribution chart:', error);
-            }
+            });
+
+            return agents;
         }
 
-        function updateDistributionLegend(data, colors) {
-            const currentTotals = getCurrentTotals();
-            const legendContainer = document.getElementById('distribution-legend');
+        function renderDashboard() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('overview-content').style.display = 'block';
             
-            if (!legendContainer) return;
+            renderKPIMetrics();
+            renderCharts();
+            renderPerformanceTable();
+            renderAgentCards();
+            renderRegionCards();
+        }
+
+        function renderKPIMetrics() {
+            const container = document.getElementById('kpiMetrics');
             
-            legendContainer.innerHTML = data.map((regione, index) => `
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: #f9fafb; border-radius: 12px; margin-bottom: 0.75rem;">
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div style="width: 16px; height: 16px; border-radius: 50%; background: ${colors[index]}; flex-shrink: 0;"></div>
-                        <div>
-                            <p style="font-size: 0.875rem; font-weight: 700; color: #111827; margin: 0;">${regione.regione}</p>
-                            <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">${regione.agenti} agenti • ${regione.clienti} clienti</p>
+            // Calculate totals
+            let totalRevenue = 0;
+            let totalPrevRevenue = 0;
+            let totalClients = 0;
+            let totalAgents = allData.length;
+
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                if (general) {
+                    totalRevenue += general.Anno_Corrente || 0;
+                    totalPrevRevenue += general.Anno_Precedente || 0;
+                    totalClients += general.Clienti_Anno_Corrente || 0;
+                }
+            });
+
+            const revenueGrowth = totalPrevRevenue > 0 ? 
+                ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
+
+            const metrics = [
+                {
+                    title: 'Fatturato Totale',
+                    value: formatCurrency(totalRevenue),
+                    change: revenueGrowth,
+                    icon: 'trending-up',
+                    color: 'success'
+                },
+                {
+                    title: 'Clienti Attivi',
+                    value: totalClients.toLocaleString('it-IT'),
+                    change: null,
+                    icon: 'users',
+                    color: 'primary'
+                },
+                {
+                    title: 'Agenti Attivi',
+                    value: totalAgents.toString(),
+                    change: null,
+                    icon: 'user-check',
+                    color: 'primary'
+                },
+                {
+                    title: 'Performance Media',
+                    value: `${(revenueGrowth).toFixed(1)}%`,
+                    change: revenueGrowth,
+                    icon: 'bar-chart-3',
+                    color: revenueGrowth >= 0 ? 'success' : 'danger'
+                }
+            ];
+
+            container.innerHTML = metrics.map(metric => `
+                <div class="card metric-card">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                ${getIconPath(metric.icon)}
+                            </svg>
+                            ${metric.title}
                         </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <p style="font-size: 0.875rem; font-weight: 700; color: #111827; margin: 0;">${formatCompactCurrency(regione.fatturato2025)}</p>
-                        <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">
-                            ${((regione.fatturato2025 / currentTotals.fatturato2025) * 100).toFixed(1)}%
-                        </p>
+                        <div class="metric-value">${metric.value}</div>
+                        ${metric.change !== null ? `
+                            <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    ${metric.change >= 0 ? 
+                                        '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>' :
+                                        '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline>'
+                                    }
+                                </svg>
+                                ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
         }
 
-        function updateRegionsTable() {
-            const tbody = document.getElementById('regions-table-body');
-            if (!tbody) return;
+        function renderCharts() {
+            renderRevenueChart();
+            renderRegionChart();
+        }
+
+        function renderRevenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
             
-            const data = getFilteredData().sort((a, b) => b.fatturato2025 - a.fatturato2025);
+            if (charts.revenue) {
+                charts.revenue.destroy();
+            }
+
+            const agentData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                return {
+                    name: agent.nome.split(' ')[0],
+                    current: general?.Anno_Corrente || 0,
+                    previous: general?.Anno_Precedente || 0
+                };
+            }).slice(0, 8); // Top 8 agents
+
+            charts.revenue = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agentData.map(a => a.name),
+                    datasets: [
+                        {
+                            label: '2024',
+                            data: agentData.map(a => a.previous),
+                            backgroundColor: '#cbd5e1',
+                            borderRadius: 4
+                        },
+                        {
+                            label: '2025',
+                            data: agentData.map(a => a.current),
+                            backgroundColor: '#2563eb',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => formatCurrency(value)
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRegionChart() {
+            const ctx = document.getElementById('regionChart').getContext('2d');
             
-            tbody.innerHTML = data.map((regione, index) => `
-                <tr>
-                    <td>
-                        <div class="region-name">
-                            <div class="rank-badge rank-${index + 1}">${index + 1}</div>
-                            <span>${regione.regione}</span>
+            if (charts.region) {
+                charts.region.destroy();
+            }
+
+            // Aggregate by region
+            const regionData = {};
+            allData.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    if (!regionData[prov.Provincia]) {
+                        regionData[prov.Provincia] = 0;
+                    }
+                    regionData[prov.Provincia] += prov.Fatturato || 0;
+                });
+            });
+
+            const labels = Object.keys(regionData);
+            const data = Object.values(regionData);
+            const colors = ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+            charts.region = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: context => `${context.label}: ${formatCurrency(context.parsed)}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderPerformanceTable() {
+            const table = document.getElementById('performanceTable');
+            
+            const agentPerformance = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                
+                return {
+                    agent,
+                    current,
+                    previous,
+                    growth,
+                    clients
+                };
+            }).sort((a, b) => b.current - a.current);
+
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Agente</th>
+                        <th>Fatturato 2025</th>
+                        <th>Crescita</th>
+                        <th>Clienti</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${agentPerformance.map((item, index) => `
+                        <tr class="table-row">
+                            <td>
+                                <div>
+                                    <strong>${item.agent.nome}</strong><br>
+                                    <small style="color: var(--text-muted);">${item.agent.codice}</small>
+                                </div>
+                            </td>
+                            <td><strong>${formatCurrency(item.current)}</strong></td>
+                            <td>
+                                <span class="badge ${item.growth >= 0 ? 'success' : 'danger'}">
+                                    ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%
+                                </span>
+                            </td>
+                            <td>${item.clients}</td>
+                            <td>
+                                <span class="badge ${getPerformanceBadge(item.growth)}">
+                                    ${getPerformanceLabel(item.growth)}
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+        }
+
+        function renderAgentCards() {
+            const container = document.getElementById('agentGrid');
+            
+            container.innerHTML = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const target = general?.Obiettivo || 0;
+                const progress = target > 0 ? (current / target * 100) : 0;
+
+                return `
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">${agent.nome}</div>
+                            <div class="agent-code">${agent.codice}</div>
                         </div>
-                    </td>
-                    <td class="text-center">
-                        <span class="agent-count-badge">${regione.agenti}</span>
-                    </td>
-                    <td class="text-right">
-                        <span class="font-bold text-gray-900">${formatCurrency(regione.fatturato2025)}</span>
-                    </td>
-                    <td class="text-center">
-                        <span class
+                        <div class="agent-body">
+                            <div class="agent-metrics">
+                                <div class="agent-metric">
+                                    <div class="agent-metric-value">${formatCurrency(current)}</div>
+                                    <div class="agent-metric-label">Fatturato 2025</div>
+                                </div>
+                                <div class="agent-metric">
+                                    <div class="agent-metric-value">${clients}</div>
+                                    <div class="agent-metric-label">Clienti</div>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    ${growth >= 0 ? 
+                                        '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                        '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                    }
+                                </svg>
+                                ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
+                            </div>
+
+                            ${target > 0 ? `
+                                <div class="agent-progress">
+                                    <div class="agent-progress-label">
+                                        <span>Obiettivo 2025</span>
+                                        <span>${Math.round(progress)}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
+                                    </div>
+                                    <div class="progress-text">
+                                        <span>${formatCurrency(current)}</span>
+                                        <span>${formatCurrency(target)}</span>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderRegionCards() {
+            const container = document.getElementById('regionGrid');
+            
+            // Aggregate data by region
+            const regions = {};
+            allData.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    if (!regions[prov.Provincia]) {
+                        regions[prov.Provincia] = {
+                            name: getRegionName(prov.Provincia),
+                            code: prov.Provincia,
+                            revenue: 0,
+                            clients: 0,
+                            agents: new Set()
+                        };
+                    }
+                    
+                    regions[prov.Provincia].revenue += prov.Fatturato || 0;
+                    regions[prov.Provincia].clients += prov.Clienti_Serviti || 0;
+                    regions[prov.Provincia].agents.add(agent.codice);
+                });
+            });
+
+            container.innerHTML = Object.values(regions).map(region => `
+                <div class="region-card">
+                    <div class="region-header">
+                        <div class="region-icon">${region.code}</div>
+                        <div class="region-info">
+                            <h3>${region.name}</h3>
+                            <p>${region.agents.size} agenti attivi</p>
+                        </div>
+                    </div>
+                    <div class="region-stats">
+                        <div class="region-stat">
+                            <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
+                            <div class="region-stat-label">Fatturato</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">${region.clients}</div>
+                            <div class="region-stat-label">Clienti</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Utility functions
+        function formatCurrency(value) {
+            if (value >= 1000000) {
+                return `€${(value / 1000000).toFixed(1)}M`;
+            } else if (value >= 1000) {
+                return `€${(value / 1000).toFixed(0)}k`;
+            }
+            return `€${value.toLocaleString('it-IT')}`;
+        }
+
+        function getRegionName(code) {
+            const regions = {
+                'LT': 'Latina',
+                'RM': 'Roma',
+                'FR': 'Frosinone',
+                'VT': 'Viterbo',
+                'AN': 'Ancona',
+                'PU': 'Pesaro Urbino',
+                'CA': 'Cagliari',
+                'SS': 'Sassari',
+                'NU': 'Nuoro',
+                'OR': 'Oristano',
+                'SU': 'Sud Sardegna',
+                'OT': 'Olbia Tempio',
+                'RN': 'Rimini',
+                'RA': 'Ravenna',
+                'CR': 'Cremona',
+                'LO': 'Lodi',
+                'PC': 'Piacenza',
+                'ALB': 'Albania'
+            };
+            return regions[code] || code;
+        }
+
+        function getPerformanceBadge(growth) {
+            if (growth >= 10) return 'success';
+            if (growth >= 0) return 'warning';
+            return 'danger';
+        }
+
+        function getPerformanceLabel(growth) {
+            if (growth >= 10) return 'Eccellente';
+            if (growth >= 0) return 'Buona';
+            return 'Da migliorare';
+        }
+
+        function getIconPath(iconName) {
+            const icons = {
+                'trending-up': '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>',
+                'users': '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
+                'user-check': '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline>',
+                'bar-chart-3': '<path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>'
+            };
+            return icons[iconName] || '';
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = 
+                `Aggiornato alle ${now.toLocaleTimeString('it-IT')}`;
+        }
+
+        function showError(message) {
+            document.getElementById('lastUpdate').textContent = message;
+            document.getElementById('lastUpdate').style.color = 'var(--danger)';
+        }
+    </script>
+</body>
+</html>
