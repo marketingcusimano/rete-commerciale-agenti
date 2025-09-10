@@ -1229,33 +1229,36 @@
         function renderRegionCards() {
             const container = document.getElementById('regionGrid');
             
-            // Aggregate data by region
+            // Aggregate data by REGION (not province)
             const regions = {};
             allData.forEach(agent => {
                 agent.clienti_provincia.forEach(prov => {
-                    if (!regions[prov.Provincia]) {
-                        regions[prov.Provincia] = {
-                            name: getRegionName(prov.Provincia),
-                            code: prov.Provincia,
+                    const regionName = getRegionFromProvince(prov.Provincia);
+                    
+                    if (!regions[regionName]) {
+                        regions[regionName] = {
+                            name: regionName,
                             revenue: 0,
                             clients: 0,
-                            agents: new Set()
+                            agents: new Set(),
+                            provinces: new Set()
                         };
                     }
                     
-                    regions[prov.Provincia].revenue += prov.Fatturato || 0;
-                    regions[prov.Provincia].clients += prov.Clienti_Serviti || 0;
-                    regions[prov.Provincia].agents.add(agent.codice);
+                    regions[regionName].revenue += prov.Fatturato || 0;
+                    regions[regionName].clients += prov.Clienti_Serviti || 0;
+                    regions[regionName].agents.add(agent.codice);
+                    regions[regionName].provinces.add(`${prov.Provincia} (${getProvinceName(prov.Provincia)})`);
                 });
             });
 
             container.innerHTML = Object.values(regions).map(region => `
                 <div class="region-card">
                     <div class="region-header">
-                        <div class="region-icon">${region.code}</div>
+                        <div class="region-icon">${region.name.charAt(0)}</div>
                         <div class="region-info">
                             <h3>${region.name}</h3>
-                            <p>${region.agents.size} agenti attivi</p>
+                            <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
                         </div>
                     </div>
                     <div class="region-stats">
@@ -1267,6 +1270,9 @@
                             <div class="region-stat-value">${region.clients}</div>
                             <div class="region-stat-label">Clienti</div>
                         </div>
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                        Province: ${Array.from(region.provinces).join(', ')}
                     </div>
                 </div>
             `).join('');
