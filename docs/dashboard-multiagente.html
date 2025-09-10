@@ -1883,9 +1883,15 @@
                 
                 const csvText = await response.text();
                 console.log('CSV caricato con successo');
+                console.log('Prime 500 caratteri del CSV:', csvText.substring(0, 500));
                 
                 csvData = parseCSV(csvText);
                 console.log('Dati parsificati:', csvData);
+                console.log('Numero record trovati:', csvData.length);
+                if (csvData.length > 0) {
+                    console.log('Esempio primo record:', csvData[0]);
+                    console.log('Campi disponibili:', Object.keys(csvData[0]));
+                }
                 
                 // Aggiorna gli array agenti e regioniData con i dati CSV
                 updateDataFromCSV();
