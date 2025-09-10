@@ -1093,6 +1093,9 @@
                             <button class="btn btn-primary" onclick="handleDownload('pdf')" title="Esporta Dashboard PDF">
                                 <i data-lucide="download"></i>
                             </button>
+                            <button class="btn btn-secondary" onclick="testCSVLoad()" title="Test Caricamento CSV">
+                                <i data-lucide="database"></i>
+                            </button>
                             <button class="btn btn-secondary" onclick="window.location.reload()" title="Aggiorna Dashboard">
                                 <i data-lucide="refresh-cw"></i>
                             </button>
@@ -1330,7 +1333,7 @@
     </div>
 
     <script>
-        // Dati dell'applicazione
+        // Dati dell'applicazione (statici come fallback)
         const agenti = [
             {
                 codice: "631.00238",
@@ -1396,6 +1399,11 @@
             }
         ];
 
+        // URL del CSV su GitHub
+        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
+        let csvData = [];
+        let isDataLoaded = false;
+
         // Stato dell'applicazione
         let selectedRegion = 'all';
         let activeTab = 'overview';
@@ -1418,6 +1426,86 @@
             if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
             if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
             return formatCurrency(value);
+        }
+
+        // Funzione per parsificare il CSV
+        function parseCSV(csvText) {
+            try {
+                const lines = csvText.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim());
+                const data = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    const values = line.split(',').map(v => v.trim());
+                    if (values.length >= headers.length) {
+                        const row = {};
+                        headers.forEach((header, index) => {
+                            row[header] = values[index] || '';
+                        });
+                        data.push(row);
+                    }
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Errore nel parsing CSV:', error);
+                return [];
+            }
+        }
+
+        // Test di caricamento CSV
+        async function testCSVLoad() {
+            try {
+                console.log('Test caricamento CSV da:', CSV_URL);
+                
+                const statusIndicators = document.querySelectorAll('.status-text');
+                statusIndicators.forEach(indicator => {
+                    indicator.textContent = 'Test caricamento CSV...';
+                    indicator.style.color = '#f59e0b';
+                });
+                
+                const response = await fetch(CSV_URL);
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const csvText = await response.text();
+                console.log('CSV Text length:', csvText.length);
+                console.log('Prime 1000 caratteri:', csvText.substring(0, 1000));
+                
+                const parsedData = parseCSV(csvText);
+                console.log('Dati parsificati:', parsedData.length, 'record');
+                
+                if (parsedData.length > 0) {
+                    console.log('Primo record:', parsedData[0]);
+                    console.log('Headers disponibili:', Object.keys(parsedData[0]));
+                }
+                
+                statusIndicators.forEach(indicator => {
+                    indicator.textContent = `Test OK: ${parsedData.length} record trovati`;
+                    indicator.style.color = '#059669';
+                });
+
+                // Mostra alert con risultati
+                alert(`Test CSV completato!\n\nRecords trovati: ${parsedData.length}\nHeaders: ${parsedData.length > 0 ? Object.keys(parsedData[0]).join(', ') : 'Nessuno'}\n\nVedi console per dettagli.`);
+                
+            } catch (error) {
+                console.error('Errore test CSV:', error);
+                
+                const statusIndicators = document.querySelectorAll('.status-text');
+                statusIndicators.forEach(indicator => {
+                    indicator.textContent = 'Test fallito: ' + error.message;
+                    indicator.style.color = '#dc2626';
+                });
+
+                alert(`Errore nel test CSV:\n${error.message}\n\nVedi console per dettagli.`);
+            }
         }
 
         function getCurrentTotals() {
@@ -1699,332 +1787,4 @@
                         <span class="font-bold text-gray-900">${formatCurrency(regione.fatturato2025)}</span>
                     </td>
                     <td class="text-center">
-                        <span class="growth-positive">+${regione.crescita.toFixed(1)}%</span>
-                    </td>
-                    <td class="text-center">
-                        <div class="performance-container">
-                            <span class="performance-value">${regione.performance}%</span>
-                            <div class="performance-bar">
-                                <div class="performance-bar-fill" style="width: ${regione.performance}%"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="text-center">
-                        <span class="text-gray-700 font-medium">${regione.clienti}</span>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function updateAgentsContent() {
-            populateAgentsList();
-        }
-
-        function populateAgentsList() {
-            const agentsList = document.getElementById('agents-list');
-            if (!agentsList) return;
-            
-            const sortedAgents = [...agenti].sort((a, b) => b.performance - a.performance);
-            
-            agentsList.innerHTML = sortedAgents.map(agente => {
-                const performanceClass = agente.performance >= 80 ? 'green' : 
-                                       agente.performance >= 70 ? 'yellow' : 'red';
-                const rankClass = agente.rank === 1 ? 'rank-gradient-1' :
-                                 agente.rank === 2 ? 'rank-gradient-2' :
-                                 agente.rank === 3 ? 'rank-gradient-3' :
-                                 'rank-gradient-default';
-                
-                return `
-                    <div class="agent-item" onclick="selectAgent('${agente.codice}')">
-                        <div class="agent-header">
-                            <div class="agent-rank-container">
-                                <div class="agent-rank ${rankClass}">${agente.rank}</div>
-                                ${agente.rank <= 3 ? `<i data-lucide="crown" class="crown ${
-                                    agente.rank === 1 ? 'gold' : 
-                                    agente.rank === 2 ? 'silver' : 'bronze'
-                                }"></i>` : ''}
-                            </div>
-                            <div class="selection-indicator"></div>
-                        </div>
-
-                        <div class="agent-info">
-                            <h4>${agente.nome}</h4>
-                            <p class="agent-code">${agente.codice}</p>
-                            <div class="agent-location">
-                                <i data-lucide="map-pin"></i>
-                                <span>${agente.regione}</span>
-                                <span>•</span>
-                                <span>${agente.province.join(', ')}</span>
-                            </div>
-                        </div>
-
-                        <div class="agent-metrics">
-                            <div>
-                                <div class="metric-value">${formatCompactCurrency(agente.fatturato2025)}</div>
-                                <div class="metric-label">Fatturato</div>
-                            </div>
-                            <div>
-                                <div class="metric-value ${performanceClass}">${agente.performance}%</div>
-                                <div class="metric-label">Performance</div>
-                            </div>
-                            <div>
-                                <div class="metric-value">${agente.clienti}</div>
-                                <div class="metric-label">Clienti</div>
-                            </div>
-                        </div>
-
-                        <div class="agent-progress">
-                            <div class="agent-progress-fill ${performanceClass}" style="width: ${agente.performance}%"></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            // Re-initialize Lucide icons
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        }
-
-        function selectAgent(codice) {
-            selectedAgent = agenti.find(a => a.codice === codice);
-            
-            document.querySelectorAll('.agent-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            
-            if (event && event.currentTarget) {
-                event.currentTarget.classList.add('selected');
-            }
-            
-            const emptyState = document.getElementById('empty-state');
-            if (emptyState) {
-                emptyState.classList.add('hidden');
-            }
-        }
-
-        function handleDownload(format) {
-            const btn = event.currentTarget;
-            const icon = btn.querySelector('i');
-            
-            btn.disabled = true;
-            icon.setAttribute('data-lucide', 'refresh-cw');
-            icon.classList.add('spin');
-            
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-            
-            setTimeout(() => {
-                alert(`Export ${format.toUpperCase()} simulato completato!`);
-                
-                btn.disabled = false;
-                icon.setAttribute('data-lucide', 'download');
-                icon.classList.remove('spin');
-                
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-            }, 2000);
-        }
-
-        // URL del CSV su GitHub
-        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
-        let csvData = [];
-        let isDataLoaded = false;
-
-        // Funzione per parsificare il CSV
-        function parseCSV(csvText) {
-            const lines = csvText.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
-            const data = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-                
-                const values = line.split(',').map(v => v.trim());
-                if (values.length >= headers.length) {
-                    const row = {};
-                    headers.forEach((header, index) => {
-                        let value = values[index] || '';
-                        
-                        // Converti numeri per campi numerici
-                        if (['fatturato2025', 'fatturato2024', 'obiettivo', 'clienti', 'obiettivoClienti', 'performance'].includes(header)) {
-                            value = parseFloat(value) || 0;
-                        }
-                        
-                        row[header] = value;
-                    });
-                    data.push(row);
-                }
-            }
-            
-            return data;
-        }
-
-        // Carica dati dal CSV GitHub
-        async function loadDataFromCSV() {
-            try {
-                console.log('Caricamento dati da:', CSV_URL);
-                
-                // Mostra indicatore di caricamento
-                const statusIndicators = document.querySelectorAll('.status-text');
-                statusIndicators.forEach(indicator => {
-                    indicator.textContent = 'Caricamento dati in corso...';
-                    indicator.style.color = '#f59e0b';
-                });
-                
-                const response = await fetch(CSV_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('CSV caricato con successo');
-                console.log('Prime 500 caratteri del CSV:', csvText.substring(0, 500));
-                
-                csvData = parseCSV(csvText);
-                console.log('Dati parsificati:', csvData);
-                console.log('Numero record trovati:', csvData.length);
-                if (csvData.length > 0) {
-                    console.log('Esempio primo record:', csvData[0]);
-                    console.log('Campi disponibili:', Object.keys(csvData[0]));
-                }
-                
-                // Aggiorna gli array agenti e regioniData con i dati CSV
-                updateDataFromCSV();
-                
-                isDataLoaded = true;
-                
-                // Aggiorna indicatori di stato
-                statusIndicators.forEach(indicator => {
-                    indicator.textContent = 'Dati aggiornati da CSV GitHub';
-                    indicator.style.color = '#059669';
-                });
-                
-                // Aggiorna il dashboard
-                updateOverviewContent();
-                updateAgentsContent();
-                
-                console.log('Dashboard aggiornato con successo');
-                
-            } catch (error) {
-                console.error('Errore nel caricamento dei dati:', error);
-                
-                // Mostra errore negli indicatori
-                const statusIndicators = document.querySelectorAll('.status-text');
-                statusIndicators.forEach(indicator => {
-                    indicator.textContent = 'Errore caricamento - dati statici';
-                    indicator.style.color = '#dc2626';
-                });
-                
-                // Continua con dati statici
-                isDataLoaded = false;
-                updateOverviewContent();
-                updateAgentsContent();
-            }
-        }
-
-        // Aggiorna arrays con dati CSV
-        function updateDataFromCSV() {
-            if (!csvData || csvData.length === 0) return;
-            
-            // Aggiorna array agenti
-            const updatedAgenti = [];
-            const updatedRegioni = new Map();
-            
-            csvData.forEach(row => {
-                if (row.codice && row.nome) {
-                    // Calcola rank basato su performance
-                    const performance = parseFloat(row.performance) || 0;
-                    
-                    const agente = {
-                        codice: row.codice,
-                        nome: row.nome,
-                        regione: row.regione || 'Non specificata',
-                        province: row.province ? row.province.split(';') : ['XX'],
-                        fatturato2025: parseFloat(row.fatturato2025) || 0,
-                        fatturato2024: parseFloat(row.fatturato2024) || 0,
-                        obiettivo: parseFloat(row.obiettivo) || 0,
-                        clienti: parseInt(row.clienti) || 0,
-                        obiettivoClienti: parseInt(row.obiettivoClienti) || 0,
-                        performance: performance,
-                        rank: 1 // Sarà calcolato dopo
-                    };
-                    
-                    updatedAgenti.push(agente);
-                    
-                    // Accumula dati per regioni
-                    if (!updatedRegioni.has(agente.regione)) {
-                        updatedRegioni.set(agente.regione, {
-                            regione: agente.regione,
-                            agenti: 0,
-                            fatturato2025: 0,
-                            fatturato2024: 0,
-                            obiettivo: 0,
-                            clienti: 0,
-                            crescita: 0,
-                            performance: 0
-                        });
-                    }
-                    
-                    const regioneData = updatedRegioni.get(agente.regione);
-                    regioneData.agenti += 1;
-                    regioneData.fatturato2025 += agente.fatturato2025;
-                    regioneData.fatturato2024 += agente.fatturato2024;
-                    regioneData.obiettivo += agente.obiettivo;
-                    regioneData.clienti += agente.clienti;
-                }
-            });
-            
-            // Calcola rank per agenti
-            updatedAgenti.sort((a, b) => b.performance - a.performance);
-            updatedAgenti.forEach((agente, index) => {
-                agente.rank = index + 1;
-            });
-            
-            // Calcola crescita e performance per regioni
-            updatedRegioni.forEach(regioneData => {
-                if (regioneData.fatturato2024 > 0) {
-                    regioneData.crescita = ((regioneData.fatturato2025 - regioneData.fatturato2024) / regioneData.fatturato2024) * 100;
-                }
-                if (regioneData.obiettivo > 0) {
-                    regioneData.performance = Math.round((regioneData.fatturato2025 / regioneData.obiettivo) * 100);
-                }
-            });
-            
-            // Aggiorna gli array globali
-            agenti.length = 0;
-            agenti.push(...updatedAgenti);
-            
-            regioniData.length = 0;
-            regioniData.push(...Array.from(updatedRegioni.values()));
-            
-            console.log('Dati aggiornati:', { agenti: agenti.length, regioni: regioniData.length });
-        }
-
-        // Initialize application
-        function init() {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-            
-            setActiveTab('overview');
-            
-            // Carica dati da CSV
-            loadDataFromCSV();
-        }
-
-        // Start the application
-        document.addEventListener('DOMContentLoaded', init);
-
-        window.addEventListener('load', () => {
-            if (typeof Chart !== 'undefined' && activeTab === 'overview' && isDataLoaded) {
-                updateCharts();
-            }
-        });
-    </script>
-</body>
-</html>
+                        <span class
