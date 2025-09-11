@@ -815,20 +815,45 @@
         }
 
         function parseNumber(value) {
+            // Se è già un numero, restituiscilo
+            if (typeof value === 'number') return value;
+            
+            // Se non è una stringa, prova a convertirlo
             if (typeof value !== 'string') return parseFloat(value) || 0;
             
-            // Rimuovi spazi e gestisci il formato italiano
-            value = value.trim();
-            if (!value || value === '' || value === '0,00') return 0;
+            // Rimuovi spazi e virgolette
+            value = value.trim().replace(/"/g, '');
             
-            // Formato italiano: "31.318,46" diventa 31318.46
-            // Prima rimuovi tutti i punti (separatori delle migliaia)
-            // Poi sostituisci la virgola con il punto decimale
-            const cleanValue = value.replace(/\./g, '').replace(',', '.');
-            const result = parseFloat(cleanValue) || 0;
+            // Gestisci casi vuoti
+            if (!value || value === '') return 0;
             
-            console.log(`Conversione numero: "${value}" -> ${result}`);
-            return result;
+            // Gestisci percentuali (27,% -> 27)
+            if (value.includes('%')) {
+                const numPart = value.replace('%', '').replace(',', '.');
+                return Math.round(parseFloat(numPart) || 0);
+            }
+            
+            // Gestisci formato decimale italiano: "67.611,27" -> 67611.27
+            if (value.includes('.') && value.includes(',')) {
+                // Ha sia punto che virgola: formato italiano completo
+                const cleanValue = value.replace(/\./g, '').replace(',', '.');
+                const result = parseFloat(cleanValue) || 0;
+                console.log(`Formato completo: "${value}" -> ${result}`);
+                return Math.round(result); // Arrotonda come richiesto
+            }
+            
+            // Ha solo virgola: probabile decimale semplice "8,00" -> 8
+            if (value.includes(',') && !value.includes('.')) {
+                const cleanValue = value.replace(',', '.');
+                const result = parseFloat(cleanValue) || 0;
+                console.log(`Solo virgola: "${value}" -> ${result}`);
+                return Math.round(result);
+            }
+            
+            // Ha solo punto o nessun separatore: numero normale
+            const result = parseFloat(value) || 0;
+            console.log(`Numero normale: "${value}" -> ${result}`);
+            return Math.round(result);
         }
 
         function parseCSV(csvText) {
