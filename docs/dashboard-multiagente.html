@@ -1032,7 +1032,15 @@
                 });
             });
 
-            document.getElementById('regionGrid').innerHTML = Object.values(regions).map(region => `
+            // Applica filtro regioni
+            const filteredRegions = Object.values(regions).filter(region => {
+                return selectedRegions.size === 0 || selectedRegions.has(region.name);
+            });
+
+            // Aggiorna testo pulsante
+            updateFilterButtonText();
+
+            document.getElementById('regionGrid').innerHTML = filteredRegions.map(region => `
                 <div class="region-card">
                     <div class="region-header">
                         <div class="region-icon">${region.name.charAt(0)}</div>
