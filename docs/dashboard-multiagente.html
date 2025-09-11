@@ -605,6 +605,7 @@
         let allData = [];
         let currentTab = 'overview';
         let charts = {};
+        let selectedRegions = new Set(); // FIX: Dichiarazione della variabile mancante
 
         function parseNumber(value) {
             if (typeof value === 'number') return value;
@@ -1010,9 +1011,6 @@
         }
 
         function renderRegionCards() {
-            // Assicurati che selectedRegions sia definita
-            if (!selectedRegions) selectedRegions = new Set();
-            
             const regions = {};
             allData.forEach(agent => {
                 agent.clienti_provincia.forEach(prov => {
@@ -1035,13 +1033,10 @@
                 });
             });
 
-            // Applica filtro regioni
+            // Applica filtro regioni (ora che selectedRegions è definita)
             const filteredRegions = Object.values(regions).filter(region => {
                 return selectedRegions.size === 0 || selectedRegions.has(region.name);
             });
-
-            // Aggiorna testo pulsante
-            updateFilterButtonText();
 
             const container = document.getElementById('regionGrid');
             if (container) {
