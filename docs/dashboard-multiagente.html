@@ -3,1401 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Commerciale - Rete Agenti</title>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Charts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    
+    <title>Test Dashboard - Parsing Numeri</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --success: #059669;
-            --warning: #d97706;
-            --danger: #dc2626;
-            --surface: #ffffff;
-            --surface-2: #f8fafc;
-            --surface-3: #f1f5f9;
-            --border: #e2e8f0;
-            --text: #0f172a;
-            --text-muted: #64748b;
-            --text-light: #94a3b8;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --radius: 8px;
-            --radius-lg: 12px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--surface-2);
-            color: var(--text);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Layout */
-        .dashboard {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-weight: 700;
-            font-size: 1.25rem;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background: var(--surface-3);
-            border-radius: var(--radius);
-            color: var(--text-muted);
-        }
-
-        .status-live {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 0.25rem;
-            margin-bottom: 2rem;
-            padding: 0.25rem;
-            background: var(--surface-3);
-            border-radius: var(--radius-lg);
-            width: fit-content;
-        }
-
-        .tab {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .tab:hover {
-            background: var(--surface);
-            color: var(--text);
-        }
-
-        .tab.active {
-            background: var(--surface);
-            color: var(--primary);
-            box-shadow: var(--shadow);
-        }
-
-        .tab-icon {
-            width: 16px;
-            height: 16px;
-        }
-
-        /* Grid Layouts */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow);
-            border-color: var(--primary);
-        }
-
-        .card-header {
-            padding: 1.5rem 1.5rem 0;
-            display: flex;
-            align-items: center;
-            justify-content: between;
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        /* Metric Cards */
-        .metric-card {
-            position: relative;
-        }
-
-        .metric-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 0.5rem 0;
-        }
-
-        .metric-label {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-        }
-
-        .metric-change {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .metric-change.positive {
-            color: var(--success);
-        }
-
-        .metric-change.negative {
-            color: var(--danger);
-        }
-
-        .metric-progress {
-            margin-top: 1rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: var(--surface-3);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            border-radius: 3px;
-            transition: width 0.6s ease;
-        }
-
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 0.5rem;
-            font-size: 0.75rem;
-            color: var(--text-light);
-        }
-
-        /* Chart Containers */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            padding: 1rem 0;
-        }
-
-        .chart-container.large {
-            height: 400px;
-        }
-
-        /* Tables */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th,
-        .table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .table th {
-            background: var(--surface-2);
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .table td {
-            font-size: 0.875rem;
-        }
-
-        .table-row {
-            transition: background-color 0.2s ease;
-        }
-
-        .table-row:hover {
-            background: var(--surface-2);
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .badge.success {
-            background: #dcfce7;
-            color: var(--success);
-        }
-
-        .badge.warning {
-            background: #fef3c7;
-            color: var(--warning);
-        }
-
-        .badge.danger {
-            background: #fef2f2;
-            color: var(--danger);
-        }
-
-        /* Loading States */
-        .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-            color: var(--text-muted);
-        }
-
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid var(--surface-3);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Region Specific */
-        .region-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .region-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .region-card:hover {
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
-        }
-
-        .region-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .region-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .region-info h3 {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .region-info p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        .region-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .region-stat {
-            text-align: center;
-        }
-
-        .region-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .region-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        /* Agent Cards */
-        .agent-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .agent-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .agent-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-4px);
-        }
-
-        .agent-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 1.5rem;
-        }
-
-        .agent-name {
-            font-weight: 600;
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .agent-code {
-            opacity: 0.8;
-            font-size: 0.875rem;
-        }
-
-        .agent-body {
-            padding: 1.5rem;
-        }
-
-        .agent-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-metric {
-            text-align: center;
-        }
-
-        .agent-metric-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .agent-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .agent-progress {
-            margin-top: 1rem;
-        }
-
-        .agent-progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .main-content {
-                padding: 1rem;
-            }
-            
-            .header {
-                padding: 1rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-            
-            .tabs {
-                width: 100%;
-                justify-content: space-around;
-            }
-            
-            .tab {
-                flex: 1;
-                justify-content: center;
-                padding: 0.75rem 1rem;
-            }
-            
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .region-grid,
-            .agent-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .test-section { margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .error { color: red; font-weight: bold; }
+        .success { color: green; font-weight: bold; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; }
+        .metric { display: inline-block; margin: 10px; padding: 15px; background: #e3f2fd; border-radius: 5px; min-width: 150px; text-align: center; }
+        .metric-value { font-size: 24px; font-weight: bold; color: #1976d2; }
+        .metric-label { font-size: 12px; color: #666; }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                        </svg>
-                    </div>
-                    <span>Dashboard Commerciale</span>
-                </div>
-                
-                <div class="status-bar">
-                    <div class="status-item">
-                        <div class="status-live"></div>
-                        <span id="lastUpdate">Aggiornamento in corso...</span>
-                    </div>
-                    <div class="status-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12,6 12,12 16,14"/>
-                        </svg>
-                        <span id="currentTime"></span>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active" data-tab="overview">
-                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <path d="M9 9h6v6H9z"/>
-                    </svg>
-                    Panoramica
-                </button>
-                <button class="tab" data-tab="agents">
-                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                    Agenti
-                </button>
-                <button class="tab" data-tab="regions">
-                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    Regioni
-                </button>
-            </div>
-
-            <!-- Loading State -->
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>Caricamento dati dal CSV...</p>
-            </div>
-
-            <!-- Overview Tab -->
-            <div id="overview-content" class="tab-content" style="display: none;">
-                <!-- KPI Metrics -->
-                <div class="metrics-grid" id="kpiMetrics">
-                    <!-- Generated dynamically -->
-                </div>
-
-                <!-- Charts Grid -->
-                <div class="charts-grid">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18h18"/>
-                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                                </svg>
-                                Trend Fatturato
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container large">
-                                <canvas id="revenueChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="2" y1="12" x2="22" y2="12"/>
-                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                                </svg>
-                                Distribuzione Regionale
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="regionChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Performance Table -->
-                <div class="card full-width">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                            </svg>
-                            Performance Agenti
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-container">
-                            <table class="table" id="performanceTable">
-                                <!-- Generated dynamically -->
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Agents Tab -->
-            <div id="agents-content" class="tab-content" style="display: none;">
-                <div class="agent-grid" id="agentGrid">
-                    <!-- Generated dynamically -->
-                </div>
-            </div>
-
-            <!-- Regions Tab -->
-            <div id="regions-content" class="tab-content" style="display: none;">
-                <div class="region-grid" id="regionGrid">
-                    <!-- Generated dynamically -->
-                </div>
-            </div>
-        </main>
+    <div class="container">
+        <h1>Test Dashboard - Debug Parsing Numeri</h1>
+        
+        <div class="test-section">
+            <h3>Stato Connessione CSV</h3>
+            <div id="connectionStatus">Testando connessione...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Parsing Numeri</h3>
+            <div id="parsingTest"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Dati Raw dal CSV</h3>
+            <div id="rawData">Caricamento...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Metriche Calcolate</h3>
+            <div id="metrics">Elaborazione...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Log Debug</h3>
+            <div id="debugLog" class="debug"></div>
+        </div>
     </div>
 
     <script>
-        // Configuration
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
-        
-        // Global variables
-        let allData = [];
-        let currentTab = 'overview';
-        let charts = {};
+        let debugLog = [];
 
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeTabs();
-            updateClock();
-            setInterval(updateClock, 1000);
-            loadData();
+        function log(message) {
+            console.log(message);
+            debugLog.push(new Date().toLocaleTimeString() + ': ' + message);
+            document.getElementById('debugLog').innerHTML = debugLog.join('<br>');
+        }
+
+        // Funzione di parsing numeri specifica per il tuo formato
+        function parseMyNumber(value) {
+            log(`Input: "${value}" (tipo: ${typeof value})`);
             
-            // Auto refresh every 2 minutes
-            setInterval(loadData, 120000);
-        });
+            // Se è già un numero
+            if (typeof value === 'number') {
+                log(`  -> Già numero: ${value}`);
+                return value;
+            }
+            
+            // Se non è stringa
+            if (typeof value !== 'string') {
+                const result = parseFloat(value) || 0;
+                log(`  -> Convertito: ${result}`);
+                return result;
+            }
+            
+            // Rimuovi virgolette e spazi
+            let clean = value.trim().replace(/"/g, '');
+            log(`  -> Pulito: "${clean}"`);
+            
+            // Vuoto
+            if (!clean || clean === '') {
+                log(`  -> Vuoto: 0`);
+                return 0;
+            }
+            
+            // Percentuali: "27,%" -> 27
+            if (clean.includes('%')) {
+                const num = clean.replace('%', '').replace(',', '.');
+                const result = Math.round(parseFloat(num) || 0);
+                log(`  -> Percentuale: ${result}`);
+                return result;
+            }
+            
+            // Formato italiano completo: "67.611,27" -> 67611
+            if (clean.includes('.') && clean.includes(',')) {
+                const num = clean.replace(/\./g, '').replace(',', '.');
+                const result = Math.round(parseFloat(num) || 0);
+                log(`  -> Formato italiano: ${result}`);
+                return result;
+            }
+            
+            // Solo virgola: "8,00" -> 8
+            if (clean.includes(',') && !clean.includes('.')) {
+                const num = clean.replace(',', '.');
+                const result = Math.round(parseFloat(num) || 0);
+                log(`  -> Solo virgola: ${result}`);
+                return result;
+            }
+            
+            // Numero normale
+            const result = Math.round(parseFloat(clean) || 0);
+            log(`  -> Numero normale: ${result}`);
+            return result;
+        }
 
-        // Tab management
-        function initializeTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            const contents = document.querySelectorAll('.tab-content');
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.dataset.tab;
-                    
-                    // Update active tab
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    // Update content
-                    contents.forEach(content => {
-                        content.style.display = 'none';
-                    });
-                    
-                    const targetContent = document.getElementById(`${tabId}-content`);
-                    if (targetContent) {
-                        targetContent.style.display = 'block';
-                    }
-                    
-                    currentTab = tabId;
-                    
-                    // Refresh charts if needed
-                    setTimeout(() => {
-                        Object.values(charts).forEach(chart => {
-                            if (chart && chart.resize) {
-                                chart.resize();
-                            }
-                        });
-                    }, 100);
-                });
+        // Test dei numeri
+        function testParsing() {
+            const testCases = [
+                '"67.611,27"',
+                '67.611,27',
+                '"8,00"',
+                '8,00',
+                '"27,%"',
+                '27,%',
+                '""',
+                '',
+                '8',
+                '0',
+                '"0,00"'
+            ];
+            
+            let html = '<h4>Test Casi:</h4>';
+            testCases.forEach(test => {
+                const result = parseMyNumber(test);
+                html += `<div><code>${test}</code> → <strong>${result}</strong></div>`;
             });
+            
+            document.getElementById('parsingTest').innerHTML = html;
         }
 
-        // Clock update
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('currentTime').textContent = 
-                now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-        }
-
-        // Data loading and parsing
-        async function loadData() {
+        // Carica e testa CSV
+        async function loadAndTest() {
             try {
-                console.log('Caricamento dati da:', CSV_URL);
-                const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                log('Inizio caricamento CSV...');
+                document.getElementById('connectionStatus').innerHTML = '<span class="success">Connessione in corso...</span>';
+                
+                const response = await fetch(CSV_URL + '?t=' + Date.now());
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
                 
                 const csvText = await response.text();
-                console.log('CSV scaricato, lunghezza:', csvText.length);
-                allData = parseCSV(csvText);
-                console.log('Dati processati:', allData.length, 'agenti trovati');
+                log(`CSV caricato, dimensione: ${csvText.length} caratteri`);
+                document.getElementById('connectionStatus').innerHTML = '<span class="success">✓ CSV caricato correttamente</span>';
                 
-                updateLastUpdateTime();
-                renderDashboard();
+                // Mostra primi 500 caratteri
+                document.getElementById('rawData').innerHTML = `
+                    <pre style="max-height: 200px; overflow-y: auto; font-size: 12px;">
+                    ${csvText.substring(0, 1000)}...
+                    </pre>
+                `;
+                
+                // Parsing semplice
+                parseCSVSimple(csvText);
                 
             } catch (error) {
-                console.error('Error loading data:', error);
-                showError('Errore nel caricamento dei dati: ' + error.message);
+                log(`ERRORE: ${error.message}`);
+                document.getElementById('connectionStatus').innerHTML = `<span class="error">✗ Errore: ${error.message}</span>`;
             }
         }
 
-        function parseNumber(value) {
-            // Se è già un numero, restituiscilo
-            if (typeof value === 'number') return value;
+        function parseCSVSimple(csvText) {
+            log('Inizio parsing CSV...');
             
-            // Se non è una stringa, prova a convertirlo
-            if (typeof value !== 'string') return parseFloat(value) || 0;
+            const lines = csvText.split('\n');
+            let agenti = [];
+            let currentAgent = null;
             
-            // Rimuovi spazi e virgolette
-            value = value.trim().replace(/"/g, '');
-            
-            // Gestisci casi vuoti
-            if (!value || value === '') return 0;
-            
-            // Gestisci percentuali (27,% -> 27)
-            if (value.includes('%')) {
-                const numPart = value.replace('%', '').replace(',', '.');
-                return Math.round(parseFloat(numPart) || 0);
-            }
-            
-            // Gestisci formato decimale italiano: "67.611,27" -> 67611.27
-            if (value.includes('.') && value.includes(',')) {
-                // Ha sia punto che virgola: formato italiano completo
-                const cleanValue = value.replace(/\./g, '').replace(',', '.');
-                const result = parseFloat(cleanValue) || 0;
-                console.log(`Formato completo: "${value}" -> ${result}`);
-                return Math.round(result); // Arrotonda come richiesto
-            }
-            
-            // Ha solo virgola: probabile decimale semplice "8,00" -> 8
-            if (value.includes(',') && !value.includes('.')) {
-                const cleanValue = value.replace(',', '.');
-                const result = parseFloat(cleanValue) || 0;
-                console.log(`Solo virgola: "${value}" -> ${result}`);
-                return Math.round(result);
-            }
-            
-            // Ha solo punto o nessun separatore: numero normale
-            const result = parseFloat(value) || 0;
-            console.log(`Numero normale: "${value}" -> ${result}`);
-            return Math.round(result);
-        }
-
-        function parseCSV(csvText) {
-            console.log('Inizio parsing CSV...');
-            const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
-            const agents = [];
-
-            sections.forEach((section, sectionIndex) => {
-                if (!section.trim()) return;
-
-                const agent = {
-                    codice: '',
-                    nome: '',
-                    periodo: '',
-                    obiettivi: [],
-                    clienti_provincia: [],
-                    vendite_cliente: [],
-                    categoria_riepilogo: [],
-                    ripartizione: [],
-                    totali: []
-                };
-
-                const lines = section.split('\n');
-                let headers = [];
-
-                lines.forEach(line => {
-                    line = line.trim();
-                    if (!line || line.startsWith('##')) return;
-
-                    // Extract agent info
-                    if (line.includes('Codice Agente:')) {
-                        agent.codice = line.split(':')[1]?.trim() || '';
-                        console.log('Trovato agente:', agent.codice);
-                    } else if (line.includes('Ragione Sociale:')) {
-                        agent.nome = line.split(':')[1]?.trim() || '';
-                        console.log('Nome agente:', agent.nome);
-                    } else if (line.includes('Periodo:')) {
-                        agent.periodo = line.split(':')[1]?.trim() || '';
-                    }
-                    
-                    // Detect section headers
-                    if (line.includes('Tipo_Dato,')) {
-                        headers = line.split(',').map(h => h.trim());
-                        console.log('Headers trovati:', headers);
-                        return;
-                    }
-
-                    // Parse data rows
-                    if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
-                        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-                        if (values.length >= headers.length) {
-                            const row = {};
-                            headers.forEach((header, index) => {
-                                let value = values[index] || '';
-                                
-                                // Convert numbers with proper Italian format handling
-                                if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
-                                     'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
-                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
-                                    value = parseNumber(value);
-                                }
-                                row[header] = value;
-                            });
-
-                            // Categorize by section type
-                            switch (row.Tipo_Dato) {
-                                case 'OBIETTIVI': 
-                                    agent.obiettivi.push(row);
-                                    console.log('Obiettivo aggiunto:', row);
-                                    break;
-                                case 'CLIENTI_PROVINCIA': 
-                                    agent.clienti_provincia.push(row);
-                                    console.log('Cliente provincia aggiunto:', row);
-                                    break;
-                                case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
-                                case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
-                                case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
-                                case 'TOTALE': agent.totali.push(row); break;
-                            }
-                        }
-                    }
-                });
-
-                if (agent.codice && agent.nome) {
-                    agents.push(agent);
-                    console.log(`Agente completato: ${agent.nome} (${agent.codice})`);
-                }
-            });
-
-            console.log('Parsing completato. Agenti trovati:', agents.length);
-            return agents;
-        }
-
-        function getRegionFromProvince(provinceCode) {
-            const provinceToRegion = {
-                // Lazio
-                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
-                // Marche
-                'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
-                // Sardegna
-                'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
-                // Emilia-Romagna
-                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'BO': 'Emilia-Romagna', 'FE': 'Emilia-Romagna', 
-                'FC': 'Emilia-Romagna', 'MO': 'Emilia-Romagna', 'PR': 'Emilia-Romagna', 'PC': 'Emilia-Romagna', 'RE': 'Emilia-Romagna',
-                // Lombardia
-                'CR': 'Lombardia', 'LO': 'Lombardia', 'MI': 'Lombardia', 'BG': 'Lombardia', 'BS': 'Lombardia', 
-                'CO': 'Lombardia', 'MN': 'Lombardia', 'PV': 'Lombardia', 'SO': 'Lombardia', 'VA': 'Lombardia', 'LC': 'Lombardia', 'MB': 'Lombardia',
-                // Estero
-                'ALB': 'Estero'
-            };
-            return provinceToRegion[provinceCode] || provinceCode;
-        }
-
-        function getProvinceName(code) {
-            const provinces = {
-                'LT': 'Latina', 'RM': 'Roma', 'FR': 'Frosinone', 'VT': 'Viterbo',
-                'AN': 'Ancona', 'PU': 'Pesaro Urbino', 'CA': 'Cagliari', 'SS': 'Sassari',
-                'NU': 'Nuoro', 'OR': 'Oristano', 'SU': 'Sud Sardegna', 'OT': 'Olbia Tempio',
-                'RN': 'Rimini', 'RA': 'Ravenna', 'CR': 'Cremona', 'LO': 'Lodi', 'PC': 'Piacenza',
-                'ALB': 'Albania'
-            };
-            return provinces[code] || code;
-        }
-
-        function renderDashboard() {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('overview-content').style.display = 'block';
-            
-            renderKPIMetrics();
-            renderCharts();
-            renderPerformanceTable();
-            renderAgentCards();
-            renderRegionCards();
-        }
-
-        function renderKPIMetrics() {
-            const container = document.getElementById('kpiMetrics');
-            
-            // Calculate totals
-            let totalRevenue = 0;
-            let totalPrevRevenue = 0;
-            let totalClients = 0;
-            let totalAgents = allData.length;
-
-            console.log('Calcolo KPI per', allData.length, 'agenti');
-
-            allData.forEach(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                if (general) {
-                    console.log(`Agente ${agent.nome}: Attuale=${general.Anno_Corrente}, Precedente=${general.Anno_Precedente}, Clienti=${general.Clienti_Anno_Corrente}`);
-                    totalRevenue += general.Anno_Corrente || 0;
-                    totalPrevRevenue += general.Anno_Precedente || 0;
-                    totalClients += general.Clienti_Anno_Corrente || 0;
-                }
-            });
-
-            console.log(`Totali calcolati: Fatturato=${totalRevenue}, Precedente=${totalPrevRevenue}, Clienti=${totalClients}`);
-
-            const revenueGrowth = totalPrevRevenue > 0 ? 
-                ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
-
-            const metrics = [
-                {
-                    title: 'Fatturato Totale',
-                    value: formatCurrency(totalRevenue),
-                    change: revenueGrowth,
-                    icon: 'trending-up',
-                    color: 'success'
-                },
-                {
-                    title: 'Clienti Attivi',
-                    value: totalClients.toLocaleString('it-IT'),
-                    change: null,
-                    icon: 'users',
-                    color: 'primary'
-                },
-                {
-                    title: 'Agenti Attivi',
-                    value: totalAgents.toString(),
-                    change: null,
-                    icon: 'user-check',
-                    color: 'primary'
-                },
-                {
-                    title: 'Performance Media',
-                    value: `${(revenueGrowth).toFixed(1)}%`,
-                    change: revenueGrowth,
-                    icon: 'bar-chart-3',
-                    color: revenueGrowth >= 0 ? 'success' : 'danger'
-                }
-            ];
-
-            container.innerHTML = metrics.map(metric => `
-                <div class="card metric-card">
-                    <div class="card-body">
-                        <div class="card-title">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                ${getIconPath(metric.icon)}
-                            </svg>
-                            ${metric.title}
-                        </div>
-                        <div class="metric-value">${metric.value}</div>
-                        ${metric.change !== null ? `
-                            <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    ${metric.change >= 0 ? 
-                                        '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>' :
-                                        '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline>'
-                                    }
-                                </svg>
-                                ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderCharts() {
-            renderRevenueChart();
-            renderRegionChart();
-        }
-
-        function renderRevenueChart() {
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-            
-            if (charts.revenue) {
-                charts.revenue.destroy();
-            }
-
-            const agentData = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                return {
-                    name: agent.nome.split(' ')[0],
-                    current: general?.Anno_Corrente || 0,
-                    previous: general?.Anno_Precedente || 0
-                };
-            }).slice(0, 8); // Top 8 agents
-
-            charts.revenue = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: agentData.map(a => a.name),
-                    datasets: [
-                        {
-                            label: '2024',
-                            data: agentData.map(a => a.previous),
-                            backgroundColor: '#cbd5e1',
-                            borderRadius: 4
-                        },
-                        {
-                            label: '2025',
-                            data: agentData.map(a => a.current),
-                            backgroundColor: '#2563eb',
-                            borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: value => formatCurrency(value)
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderRegionChart() {
-            const ctx = document.getElementById('regionChart').getContext('2d');
-            
-            if (charts.region) {
-                charts.region.destroy();
-            }
-
-            // Aggregate by REGION
-            const regionData = {};
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    if (!regionData[regionName]) {
-                        regionData[regionName] = 0;
-                    }
-                    regionData[regionName] += prov.Fatturato || 0;
-                });
-            });
-
-            const labels = Object.keys(regionData);
-            const data = Object.values(regionData);
-            const colors = ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#84cc16', '#f97316'];
-
-            charts.region = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data,
-                        backgroundColor: colors.slice(0, labels.length),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `${context.label}: ${formatCurrency(context.parsed)}`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderPerformanceTable() {
-            const table = document.getElementById('performanceTable');
-            
-            const agentPerformance = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
                 
-                return {
-                    agent,
-                    current,
-                    previous,
-                    growth,
-                    clients
-                };
-            }).sort((a, b) => b.current - a.current);
-
-            table.innerHTML = `
-                <thead>
-                    <tr>
-                        <th>Agente</th>
-                        <th>Fatturato 2025</th>
-                        <th>Crescita</th>
-                        <th>Clienti</th>
-                        <th>Performance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${agentPerformance.map((item, index) => `
-                        <tr class="table-row">
-                            <td>
-                                <div>
-                                    <strong>${item.agent.nome}</strong><br>
-                                    <small style="color: var(--text-muted);">${item.agent.codice}</small>
-                                </div>
-                            </td>
-                            <td><strong>${formatCurrency(item.current)}</strong></td>
-                            <td>
-                                <span class="badge ${item.growth >= 0 ? 'success' : 'danger'}">
-                                    ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%
-                                </span>
-                            </td>
-                            <td>${item.clients}</td>
-                            <td>
-                                <span class="badge ${getPerformanceBadge(item.growth)}">
-                                    ${getPerformanceLabel(item.growth)}
-                                </span>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            `;
-        }
-
-        function renderAgentCards() {
-            const container = document.getElementById('agentGrid');
-            
-            container.innerHTML = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                const target = general?.Obiettivo || 0;
-                const progress = target > 0 ? (current / target * 100) : 0;
-
-                return `
-                    <div class="agent-card">
-                        <div class="agent-header">
-                            <div class="agent-name">${agent.nome}</div>
-                            <div class="agent-code">${agent.codice}</div>
-                        </div>
-                        <div class="agent-body">
-                            <div class="agent-metrics">
-                                <div class="agent-metric">
-                                    <div class="agent-metric-value">${formatCurrency(current)}</div>
-                                    <div class="agent-metric-label">Fatturato 2025</div>
-                                </div>
-                                <div class="agent-metric">
-                                    <div class="agent-metric-value">${clients}</div>
-                                    <div class="agent-metric-label">Clienti</div>
-                                </div>
-                            </div>
-                            
-                            <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    ${growth >= 0 ? 
-                                        '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                        '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                    }
-                                </svg>
-                                ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
-                            </div>
-
-                            ${target > 0 ? `
-                                <div class="agent-progress">
-                                    <div class="agent-progress-label">
-                                        <span>Obiettivo 2025</span>
-                                        <span>${Math.round(progress)}%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
-                                    </div>
-                                    <div class="progress-text">
-                                        <span>${formatCurrency(current)}</span>
-                                        <span>${formatCurrency(target)}</span>
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderRegionCards() {
-            const container = document.getElementById('regionGrid');
-            
-            // Aggregate data by REGION
-            const regions = {};
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    
-                    if (!regions[regionName]) {
-                        regions[regionName] = {
-                            name: regionName,
-                            revenue: 0,
-                            clients: 0,
-                            agents: new Set(),
-                            provinces: new Set()
-                        };
+                if (line.includes('Codice Agente:')) {
+                    if (currentAgent) agenti.push(currentAgent);
+                    currentAgent = {
+                        codice: line.split(':')[1]?.trim() || '',
+                        nome: '',
+                        fatturato_attuale: 0,
+                        fatturato_precedente: 0,
+                        clienti: 0
+                    };
+                    log(`Nuovo agente trovato: ${currentAgent.codice}`);
+                }
+                
+                if (line.includes('Ragione Sociale:') && currentAgent) {
+                    currentAgent.nome = line.split(':')[1]?.trim() || '';
+                    log(`Nome agente: ${currentAgent.nome}`);
+                }
+                
+                // Cerca righe OBIETTIVI con Generale
+                if (line.startsWith('OBIETTIVI,Generale,') && currentAgent) {
+                    const parts = line.split(',');
+                    if (parts.length >= 4) {
+                        currentAgent.fatturato_precedente = parseMyNumber(parts[2]);
+                        currentAgent.fatturato_attuale = parseMyNumber(parts[3]);
+                        if (parts.length >= 8) {
+                            currentAgent.clienti = parseMyNumber(parts[7]);
+                        }
+                        log(`Dati agente ${currentAgent.nome}: ${currentAgent.fatturato_attuale} (${currentAgent.fatturato_precedente}) - ${currentAgent.clienti} clienti`);
                     }
-                    
-                    regions[regionName].revenue += prov.Fatturato || 0;
-                    regions[regionName].clients += prov.Clienti_Serviti || 0;
-                    regions[regionName].agents.add(agent.codice);
-                    regions[regionName].provinces.add(`${prov.Provincia} (${getProvinceName(prov.Provincia)})`);
-                });
-            });
-
-            container.innerHTML = Object.values(regions).map(region => `
-                <div class="region-card">
-                    <div class="region-header">
-                        <div class="region-icon">${region.name.charAt(0)}</div>
-                        <div class="region-info">
-                            <h3>${region.name}</h3>
-                            <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
-                        </div>
-                    </div>
-                    <div class="region-stats">
-                        <div class="region-stat">
-                            <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
-                            <div class="region-stat-label">Fatturato</div>
-                        </div>
-                        <div class="region-stat">
-                            <div class="region-stat-value">${region.clients}</div>
-                            <div class="region-stat-label">Clienti</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
-                        Province: ${Array.from(region.provinces).join(', ')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Utility functions
-        function formatCurrency(value) {
-            if (value >= 1000000) {
-                return `€${(value / 1000000).toFixed(1)}M`;
-            } else if (value >= 1000) {
-                return `€${(value / 1000).toFixed(0)}k`;
+                }
             }
-            return `€${value.toLocaleString('it-IT')}`;
+            
+            if (currentAgent) agenti.push(currentAgent);
+            
+            log(`Parsing completato. Agenti trovati: ${agenti.length}`);
+            
+            // Calcola metriche
+            let totaleCorrente = 0;
+            let totalePrecedente = 0;
+            let totaleClienti = 0;
+            
+            agenti.forEach(agente => {
+                totaleCorrente += agente.fatturato_attuale;
+                totalePrecedente += agente.fatturato_precedente;
+                totaleClienti += agente.clienti;
+            });
+            
+            const crescita = totalePrecedente > 0 ? 
+                ((totaleCorrente - totalePrecedente) / totalePrecedente * 100) : 0;
+            
+            // Mostra metriche
+            document.getElementById('metrics').innerHTML = `
+                <div class="metric">
+                    <div class="metric-value">€${Math.round(totaleCorrente/1000)}k</div>
+                    <div class="metric-label">Fatturato 2025</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">€${Math.round(totalePrecedente/1000)}k</div>
+                    <div class="metric-label">Fatturato 2024</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${totaleClienti}</div>
+                    <div class="metric-label">Clienti Totali</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${crescita.toFixed(1)}%</div>
+                    <div class="metric-label">Crescita</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${agenti.length}</div>
+                    <div class="metric-label">Agenti</div>
+                </div>
+            `;
+            
+            log(`METRICHE FINALI - Fatturato: €${totaleCorrente}, Clienti: ${totaleClienti}, Crescita: ${crescita.toFixed(1)}%`);
         }
 
-        function getPerformanceBadge(growth) {
-            if (growth >= 10) return 'success';
-            if (growth >= 0) return 'warning';
-            return 'danger';
-        }
-
-        function getPerformanceLabel(growth) {
-            if (growth >= 10) return 'Eccellente';
-            if (growth >= 0) return 'Buona';
-            return 'Da migliorare';
-        }
-
-        function getIconPath(iconName) {
-            const icons = {
-                'trending-up': '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>',
-                'users': '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
-                'user-check': '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline>',
-                'bar-chart-3': '<path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>'
-            };
-            return icons[iconName] || '';
-        }
-
-        function updateLastUpdateTime() {
-            const now = new Date();
-            document.getElementById('lastUpdate').textContent = 
-                `Aggiornato alle ${now.toLocaleTimeString('it-IT')}`;
-        }
-
-        function showError(message) {
-            document.getElementById('lastUpdate').textContent = message;
-            document.getElementById('lastUpdate').style.color = 'var(--danger)';
-        }
+        // Avvia test
+        document.addEventListener('DOMContentLoaded', () => {
+            testParsing();
+            loadAndTest();
+        });
     </script>
 </body>
 </html>
