@@ -606,30 +606,58 @@
         let currentTab = 'overview';
         let charts = {};
 
-        // Funzione corretta per parsing numeri italiani
+        // Funzione corretta per parsing numeri italiani - DEBUG VERSION
         function parseItalianNumber(value) {
-            if (typeof value === 'number') return Math.round(value);
-            if (typeof value !== 'string') return 0;
+            console.log(`Input: "${value}" (tipo: ${typeof value})`);
             
-            let clean = value.trim().replace(/"/g, '');
-            if (!clean || clean === '') return 0;
+            if (typeof value === 'number') {
+                console.log(`  -> Già numero: ${value}`);
+                return Math.round(value);
+            }
+            
+            if (typeof value !== 'string') {
+                console.log(`  -> Non stringa, convertito: 0`);
+                return 0;
+            }
+            
+            // Rimuovi virgolette e spazi
+            let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
+            console.log(`  -> Pulito: "${clean}"`);
+            
+            if (!clean || clean === '') {
+                console.log(`  -> Vuoto: 0`);
+                return 0;
+            }
             
             // Percentuali: "27,%" -> 27
             if (clean.includes('%')) {
-                return Math.round(parseFloat(clean.replace('%', '').replace(',', '.')) || 0);
+                let numStr = clean.replace('%', '').replace(',', '.');
+                let result = Math.round(parseFloat(numStr) || 0);
+                console.log(`  -> Percentuale "${clean}" -> ${result}`);
+                return result;
             }
             
-            // Formato italiano: "67.611,27" -> 67611
+            // Formato italiano completo: "67.611,27" -> 67611.27
             if (clean.includes('.') && clean.includes(',')) {
-                return Math.round(parseFloat(clean.replace(/\./g, '').replace(',', '.')) || 0);
+                // Rimuovi tutti i punti (separatori migliaia) e sostituisci virgola con punto
+                let numStr = clean.replace(/\./g, '').replace(',', '.');
+                let result = Math.round(parseFloat(numStr) || 0);
+                console.log(`  -> Formato italiano "${clean}" -> numStr="${numStr}" -> ${result}`);
+                return result;
             }
             
-            // Solo virgola: "8,00" -> 8
-            if (clean.includes(',')) {
-                return Math.round(parseFloat(clean.replace(',', '.')) || 0);
+            // Solo virgola (decimali): "8,00" -> 8
+            if (clean.includes(',') && !clean.includes('.')) {
+                let numStr = clean.replace(',', '.');
+                let result = Math.round(parseFloat(numStr) || 0);
+                console.log(`  -> Solo virgola "${clean}" -> numStr="${numStr}" -> ${result}`);
+                return result;
             }
             
-            return Math.round(parseFloat(clean) || 0);
+            // Numero normale (solo cifre o con punto come decimale)
+            let result = Math.round(parseFloat(clean) || 0);
+            console.log(`  -> Numero normale "${clean}" -> ${result}`);
+            return result;
         }
 
         function updateClock() {
