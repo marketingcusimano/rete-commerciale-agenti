@@ -606,21 +606,13 @@
         let currentTab = 'overview';
         let charts = {};
 
-        // Funzione semplificata per numeri corretti
-        function parseItalianNumber(value) {
-            // Se è già un numero, restituiscilo
+        function parseNumber(value) {
             if (typeof value === 'number') return value;
+            if (typeof value !== 'string') return 0;
             
-            // Se non è stringa, prova conversione diretta
-            if (typeof value !== 'string') return parseFloat(value) || 0;
-            
-            // Rimuovi spazi e virgolette
             let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
-            
-            // Se vuoto, ritorna 0
             if (!clean || clean === '') return 0;
             
-            // Conversione diretta a numero
             return parseFloat(clean) || 0;
         }
 
@@ -673,6 +665,7 @@
             } catch (error) {
                 console.error('Errore caricamento:', error);
                 document.getElementById('lastUpdate').textContent = 'Errore caricamento';
+                document.getElementById('lastUpdate').style.color = 'var(--danger)';
             }
         }
 
@@ -719,7 +712,7 @@
                                 if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
                                      'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
                                      'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
-                                    value = parseItalianNumber(value);
+                                    value = parseNumber(value);
                                 }
                                 row[header] = value;
                             });
@@ -1039,15 +1032,7 @@
                 });
             });
 
-            // Filtra regioni selezionate
-            const filteredRegions = Object.values(regions).filter(region => {
-                return selectedRegions.size === 0 || selectedRegions.has(region.name);
-            });
-
-            // Aggiorna pulsante filtro
-            updateRegionFilterButton();
-
-            document.getElementById('regionGrid').innerHTML = filteredRegions.map(region => `
+            document.getElementById('regionGrid').innerHTML = Object.values(regions).map(region => `
                 <div class="region-card">
                     <div class="region-header">
                         <div class="region-icon">${region.name.charAt(0)}</div>
@@ -1085,7 +1070,7 @@
             updateClock();
             setInterval(updateClock, 1000);
             loadData();
-            setInterval(loadData, 120000); // Auto refresh ogni 2 minuti
+            setInterval(loadData, 120000);
         });
     </script>
 </body>
