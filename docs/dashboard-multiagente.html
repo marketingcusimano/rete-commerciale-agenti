@@ -1010,6 +1010,9 @@
         }
 
         function renderRegionCards() {
+            // Assicurati che selectedRegions sia definita
+            if (!selectedRegions) selectedRegions = new Set();
+            
             const regions = {};
             allData.forEach(agent => {
                 agent.clienti_provincia.forEach(prov => {
@@ -1040,30 +1043,33 @@
             // Aggiorna testo pulsante
             updateFilterButtonText();
 
-            document.getElementById('regionGrid').innerHTML = filteredRegions.map(region => `
-                <div class="region-card">
-                    <div class="region-header">
-                        <div class="region-icon">${region.name.charAt(0)}</div>
-                        <div class="region-info">
-                            <h3>${region.name}</h3>
-                            <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
+            const container = document.getElementById('regionGrid');
+            if (container) {
+                container.innerHTML = filteredRegions.map(region => `
+                    <div class="region-card">
+                        <div class="region-header">
+                            <div class="region-icon">${region.name.charAt(0)}</div>
+                            <div class="region-info">
+                                <h3>${region.name}</h3>
+                                <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
+                            </div>
+                        </div>
+                        <div class="region-stats">
+                            <div class="region-stat">
+                                <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
+                                <div class="region-stat-label">Fatturato</div>
+                            </div>
+                            <div class="region-stat">
+                                <div class="region-stat-value">${region.clients}</div>
+                                <div class="region-stat-label">Clienti</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                            Province: ${Array.from(region.provinces).join(', ')}
                         </div>
                     </div>
-                    <div class="region-stats">
-                        <div class="region-stat">
-                            <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
-                            <div class="region-stat-label">Fatturato</div>
-                        </div>
-                        <div class="region-stat">
-                            <div class="region-stat-value">${region.clients}</div>
-                            <div class="region-stat-label">Clienti</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
-                        Province: ${Array.from(region.provinces).join(', ')}
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
 
         function formatCurrency(value) {
