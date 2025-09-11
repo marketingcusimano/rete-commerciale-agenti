@@ -1039,7 +1039,15 @@
                 });
             });
 
-            document.getElementById('regionGrid').innerHTML = Object.values(regions).map(region => `
+            // Filtra regioni selezionate
+            const filteredRegions = Object.values(regions).filter(region => {
+                return selectedRegions.size === 0 || selectedRegions.has(region.name);
+            });
+
+            // Aggiorna pulsante filtro
+            updateRegionFilterButton();
+
+            document.getElementById('regionGrid').innerHTML = filteredRegions.map(region => `
                 <div class="region-card">
                     <div class="region-header">
                         <div class="region-icon">${region.name.charAt(0)}</div>
@@ -1057,6 +1065,9 @@
                             <div class="region-stat-value">${region.clients}</div>
                             <div class="region-stat-label">Clienti</div>
                         </div>
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                        Province: ${Array.from(region.provinces).join(', ')}
                     </div>
                 </div>
             `).join('');
