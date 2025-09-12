@@ -1134,6 +1134,136 @@
             });
         }
 
+        function openAgentFilterModal() {
+            console.log('Apertura filtro agenti...', availableAgents.length, 'agenti disponibili');
+            
+            tempSelectedAgents = new Set(selectedAgents);
+            
+            const filterList = document.getElementById('agentFilterList');
+            if (!filterList) {
+                console.error('Element agentFilterList non trovato');
+                return;
+            }
+            
+            console.log('Popolamento lista agenti...');
+            filterList.innerHTML = '';
+            
+            availableAgents.forEach((agent, index) => {
+                console.log(`Agente ${index + 1}:`, agent.nome, agent.codice);
+                const isSelected = tempSelectedAgents.has(agent.codice);
+                
+                const item = document.createElement('div');
+                item.className = 'region-filter-item';
+                item.innerHTML = `
+                    <input type="checkbox" 
+                           class="region-checkbox" 
+                           id="agent-${agent.codice}" 
+                           ${isSelected ? 'checked' : ''}
+                           data-agent="${agent.codice}">
+                    <div class="region-filter-info">
+                        <div class="region-filter-name">${agent.nome}</div>
+                        <div class="region-filter-stats">
+                            ${formatCurrency(agent.current)} • ${agent.clients} clienti • ${agent.growth.toFixed(1)}% crescita
+                        </div>
+                        <div class="region-filter-stats">
+                            <span class="badge ${agent.growth >= 10 ? 'success' : agent.growth >= 0 ? 'warning' : 'danger'}" style="margin-top: 0.25rem;">
+                                ${agent.status}
+                            </span>
+                            <span style="font-size: 0.65rem; margin-left: 0.5rem; color: var(--text-muted);">
+                                ${agent.regions.join(', ')}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                
+                const checkbox = item.querySelector('.region-checkbox');
+                if (checkbox) {
+                    checkbox.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            tempSelectedAgents.add(agent.codice);
+                        } else {
+                            tempSelectedAgents.delete(agent.codice);
+                        }
+                    });
+                }
+                
+                filterList.appendChild(item);
+            });
+            
+            const modal = document.getElementById('agentFilterModal');
+            if (modal) {
+                console.log('Apertura modal agenti...');
+                modal.classList.add('show');
+            } else {
+                console.error('Element agentFilterModal non trovato');
+            }
+        }
+
+        function closeAgentFilterModal() {
+            const modal = document.getElementById('agentFilterModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function applyAgentFilter() {
+            selectedAgents = new Set(tempSelectedAgents);
+            renderAgentCards();
+            updateAgentFilterButtonText();
+            closeAgentFilterModal();
+        }
+
+        function selectAllAgents() {
+            tempSelectedAgents.clear();
+            availableAgents.forEach(agent => {
+                tempSelectedAgents.add(agent.codice);
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllAgents() {
+            tempSelectedAgents.clear();
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function selectTopPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth >= 10) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                const agentCode = checkbox.dataset.agent;
+                const agent = availableAgents.find(a => a.codice === agentCode);
+                checkbox.checked = agent && agent.growth >= 10;
+            });
+        }
+
+        function selectLowPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth < 0) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                const agentCode = checkbox.dataset.agent;
+                const agent = availableAgents.find(a => a.codice === agentCode);
+                checkbox.checked = agent && agent.growth < 0;
+            });
+        }
+
         function initializeRegionFilter() {
             const regionFilterBtn = document.getElementById('regionFilterBtn');
             const closeRegionFilter = document.getElementById('closeRegionFilter');
