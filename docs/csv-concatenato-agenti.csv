@@ -1,2970 +1,635 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Commerciale - Rete Agenti</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --success: #059669;
-            --warning: #d97706;
-            --danger: #dc2626;
-            --surface: #ffffff;
-            --surface-2: #f8fafc;
-            --surface-3: #f1f5f9;
-            --border: #e2e8f0;
-            --text: #0f172a;
-            --text-muted: #64748b;
-            --text-light: #94a3b8;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --radius: 8px;
-            --radius-lg: 12px;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--surface-2);
-            color: var(--text);
-            line-height: 1.6;
-        }
-
-        .dashboard {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-weight: 700;
-            font-size: 1.25rem;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background: var(--surface-3);
-            border-radius: var(--radius);
-            color: var(--text-muted);
-        }
-
-        .status-live {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 0.25rem;
-            margin-bottom: 2rem;
-            padding: 0.25rem;
-            background: var(--surface-3);
-            border-radius: var(--radius-lg);
-            width: fit-content;
-        }
-
-        .tab {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .tab:hover {
-            background: var(--surface);
-            color: var(--text);
-        }
-
-        .tab.active {
-            background: var(--surface);
-            color: var(--primary);
-            box-shadow: var(--shadow);
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow);
-            border-color: var(--primary);
-        }
-
-        .card-header {
-            padding: 1.5rem 1.5rem 0;
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .metric-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 0.5rem 0;
-        }
-
-        .metric-change {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .metric-change.positive { color: var(--success); }
-        .metric-change.negative { color: var(--danger); }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            padding: 1rem 0;
-        }
-
-        .chart-container.large { height: 400px; }
-
-        .table-container { overflow-x: auto; }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th,
-        .table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .table th {
-            background: var(--surface-2);
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .table td { font-size: 0.875rem; }
-
-        .table-row { transition: background-color 0.2s ease; }
-        .table-row:hover { background: var(--surface-2); }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .badge.success { background: #dcfce7; color: var(--success); }
-        .badge.warning { background: #fef3c7; color: var(--warning); }
-        .badge.danger { background: #fef2f2; color: var(--danger); }
-
-        .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-            color: var(--text-muted);
-        }
-
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid var(--surface-3);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .region-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .region-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .region-card:hover {
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
-            border-color: var(--primary);
-        }
-
-        .region-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .region-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .region-info h3 {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .region-info p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        .region-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .region-stat { text-align: center; }
-
-        .region-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .region-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .agent-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .agent-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .agent-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-4px);
-        }
-
-        .agent-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 1.5rem;
-        }
-
-        .agent-name {
-            font-weight: 600;
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .agent-code {
-            opacity: 0.8;
-            font-size: 0.875rem;
-        }
-
-        .agent-body { padding: 1.5rem; }
-
-        .agent-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-metric { text-align: center; }
-
-        .agent-metric-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .agent-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: var(--surface-3);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 0.5rem 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            border-radius: 3px;
-            transition: width 0.6s ease;
-        }
-
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-light);
-        }
-
-        /* Filtro Styles */
-        .filter-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .filter-button {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .filter-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .filter-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow: hidden;
-            transform: scale(0.9);
-            transition: transform 0.2s ease;
-        }
-
-        .modal-overlay.show .modal {
-            transform: scale(1);
-        }
-
-        /* Modal Dettaglio Regione - Più Grande */
-        .region-detail-modal {
-            width: 95%;
-            max-width: 1200px;
-            max-height: 90vh;
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            padding: 0.5rem;
-            cursor: pointer;
-            border-radius: var(--radius);
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-            background: var(--surface-3);
-            color: var(--text);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .filter-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        .filter-action-btn {
-            padding: 0.5rem 0.75rem;
-            background: var(--surface-3);
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .filter-action-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .region-filter-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .region-filter-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            transition: all 0.2s ease;
-        }
-
-        .region-filter-item:hover {
-            background: var(--surface-3);
-        }
-
-        .region-checkbox {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-
-        .region-filter-info {
-            flex: 1;
-        }
-
-        .region-filter-name {
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-
-        .region-filter-stats {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 0.75rem;
-            justify-content: flex-end;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-secondary {
-            background: var(--surface-3);
-            color: var(--text-muted);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        /* NUOVO: Styles per Modal Dettaglio Regione */
-        .region-detail-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 2rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .region-detail-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .region-detail-info h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .region-detail-info p {
-            opacity: 0.9;
-            font-size: 0.875rem;
-        }
-
-        .region-detail-tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface);
-        }
-
-        .region-detail-tab {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .region-detail-tab:hover {
-            background: var(--surface-2);
-            color: var(--text);
-        }
-
-        .region-detail-tab.active {
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
-            background: var(--surface-2);
-        }
-
-        .region-detail-content {
-            flex: 1;
-            overflow-y: auto;
-            max-height: calc(90vh - 200px);
-        }
-
-        .region-detail-tab-content {
-            display: none;
-            padding: 2rem;
-        }
-
-        .region-detail-tab-content.active {
-            display: block;
-        }
-
-        .region-overview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .region-overview-card {
-            background: var(--surface-2);
-            padding: 1.5rem;
-            border-radius: var(--radius-lg);
-            text-align: center;
-        }
-
-        .region-overview-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .region-overview-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .region-overview-change {
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-top: 0.25rem;
-        }
-
-        .region-overview-change.positive { color: var(--success); }
-        .region-overview-change.negative { color: var(--danger); }
-
-        .performance-section {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .top-performers {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-        }
-
-        .top-performers h4 {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            color: var(--text);
-        }
-
-        .performer-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .performer-item:last-child {
-            border-bottom: none;
-        }
-
-        .performer-rank {
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .performer-info {
-            flex: 1;
-        }
-
-        .performer-name {
-            font-weight: 500;
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .performer-value {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .performer-change {
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .province-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .province-card {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .province-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .province-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .province-badge {
-            font-size: 0.75rem;
-        }
-
-        .province-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .province-metric {
-            text-align: center;
-        }
-
-        .province-metric-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .province-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .agent-detail-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .agent-detail-card {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .agent-detail-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-avatar {
-            width: 48px;
-            height: 48px;
-            background: var(--primary);
-            color: white;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .agent-detail-info h4 {
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .agent-detail-info p {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .agent-detail-metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-detail-metric {
-            text-align: center;
-        }
-
-        .agent-detail-metric-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .agent-detail-metric-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .analytics-card {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .analytics-card h4 {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            color: var(--text);
-        }
-
-        @media (max-width: 1024px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            .main-content, .header { padding: 1rem; }
-            .performance-section { grid-template-columns: 1fr; }
-            .region-detail-modal { max-width: 95%; }
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-            .tabs {
-                width: 100%;
-                justify-content: space-around;
-            }
-            .tab {
-                flex: 1;
-                justify-content: center;
-                padding: 0.75rem 1rem;
-            }
-            .metrics-grid,
-            .region-grid,
-            .agent-grid {
-                grid-template-columns: 1fr;
-            }
-            .region-detail-tabs {
-                flex-wrap: wrap;
-            }
-            .region-detail-tab {
-                flex: 1;
-                min-width: 120px;
-                font-size: 0.75rem;
-            }
-            .region-overview-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard">
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                        </svg>
-                    </div>
-                    <span>Dashboard Commerciale</span>
-                </div>
-                
-                <div class="status-bar">
-                    <div class="status-item">
-                        <div class="status-live"></div>
-                        <span id="lastUpdate">Caricamento...</span>
-                    </div>
-                    <div class="status-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12,6 12,12 16,14"/>
-                        </svg>
-                        <span id="currentTime"></span>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="main-content">
-            <div class="tabs">
-                <button class="tab active" data-tab="overview">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <path d="M9 9h6v6H9z"/>
-                    </svg>
-                    Panoramica
-                </button>
-                <button class="tab" data-tab="agents">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                    Agenti
-                </button>
-                <button class="tab" data-tab="regions">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    Regioni
-                </button>
-            </div>
-
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>Caricamento dati...</p>
-            </div>
-
-            <div id="overview-content" class="tab-content" style="display: none;">
-                <div class="metrics-grid" id="kpiMetrics"></div>
-
-                <div class="charts-grid">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18h18"/>
-                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                                </svg>
-                                Performance Agenti
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container large">
-                                <canvas id="revenueChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                </svg>
-                                Distribuzione Regionale
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="regionChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                            </svg>
-                            Classifica Performance
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-container">
-                            <table class="table" id="performanceTable"></table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="agents-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="agentFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Agenti
-                        <span class="filter-count" id="agentFilterCount">Tutti</span>
-                    </button>
-                </div>
-                <div class="agent-grid" id="agentGrid"></div>
-            </div>
-
-            <div id="regions-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="regionFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Regioni
-                        <span class="filter-count" id="filterCount">Tutte</span>
-                    </button>
-                </div>
-                <div class="region-grid" id="regionGrid"></div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Modal Filtro Regioni -->
-    <div class="modal-overlay" id="regionFilterModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Filtro Regioni</h3>
-                <button class="modal-close" id="closeRegionFilter">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="filter-actions">
-                    <button class="filter-action-btn" id="selectAllRegions">Seleziona Tutte</button>
-                    <button class="filter-action-btn" id="deselectAllRegions">Deseleziona Tutte</button>
-                </div>
-                <div class="region-filter-list" id="regionFilterList">
-                    <!-- Lista regioni sarà popolata dinamicamente -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelRegionFilter">Annulla</button>
-                <button class="btn btn-primary" id="applyRegionFilter">Applica Filtro</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Filtro Agenti -->
-    <div class="modal-overlay" id="agentFilterModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Filtro Agenti</h3>
-                <button class="modal-close" id="closeAgentFilter">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="filter-actions">
-                    <button class="filter-action-btn" id="selectAllAgents">Seleziona Tutti</button>
-                    <button class="filter-action-btn" id="deselectAllAgents">Deseleziona Tutti</button>
-                    <button class="filter-action-btn" id="selectTopPerformers">Top Performer</button>
-                    <button class="filter-action-btn" id="selectLowPerformers">Performance Basse</button>
-                </div>
-                <div class="region-filter-list" id="agentFilterList">
-                    <!-- Lista agenti sarà popolata dinamicamente -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelAgentFilter">Annulla</button>
-                <button class="btn btn-primary" id="applyAgentFilter">Applica Filtro</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- NUOVO: Modal Dettaglio Regione -->
-    <div class="modal-overlay" id="regionDetailModal">
-        <div class="modal region-detail-modal">
-            <div class="region-detail-header">
-                <div class="region-detail-icon" id="regionDetailIcon">L</div>
-                <div class="region-detail-info">
-                    <h2 id="regionDetailName">Lazio</h2>
-                    <p id="regionDetailSummary">5 agenti attivi in 4 province</p>
-                </div>
-                <button class="modal-close" id="closeRegionDetail" style="color: white;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="region-detail-tabs">
-                <button class="region-detail-tab active" data-region-tab="overview">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <path d="M9 9h6v6H9z"/>
-                    </svg>
-                    Panoramica
-                </button>
-                <button class="region-detail-tab" data-region-tab="provinces">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    Province
-                </button>
-                <button class="region-detail-tab" data-region-tab="agents">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                    </svg>
-                    Agenti
-                </button>
-                <button class="region-detail-tab" data-region-tab="analytics">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 3v18h18"/>
-                        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                    </svg>
-                    Analytics
-                </button>
-            </div>
-
-            <div class="region-detail-content">
-                <!-- Tab Overview -->
-                <div id="regionOverviewTab" class="region-detail-tab-content active">
-                    <div class="region-overview-grid" id="regionOverviewMetrics">
-                        <!-- Metriche popolate dinamicamente -->
-                    </div>
-                    
-                    <div class="performance-section">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Performance nel Tempo</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="regionPerformanceChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="top-performers">
-                            <h4>Top Performer</h4>
-                            <div id="regionTopPerformers">
-                                <!-- Top performers popolati dinamicamente -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab Province -->
-                <div id="regionProvincesTab" class="region-detail-tab-content">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Confronto Province</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="provincesComparisonChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="province-grid" id="provinceDetailGrid">
-                        <!-- Province cards popolate dinamicamente -->
-                    </div>
-                </div>
-
-                <!-- Tab Agenti -->
-                <div id="regionAgentsTab" class="region-detail-tab-content">
-                    <div class="agent-detail-grid" id="regionAgentGrid">
-                        <!-- Agenti cards popolate dinamicamente -->
-                    </div>
-                </div>
-
-                <!-- Tab Analytics -->
-                <div id="regionAnalyticsTab" class="region-detail-tab-content">
-                    <div class="analytics-grid">
-                        <div class="analytics-card">
-                            <h4>Trend Crescita</h4>
-                            <div class="chart-container" style="height: 200px;">
-                                <canvas id="regionGrowthChart"></canvas>
-                            </div>
-                        </div>
-                        
-                        <div class="analytics-card">
-                            <h4>Distribuzione Clienti</h4>
-                            <div class="chart-container" style="height: 200px;">
-                                <canvas id="regionClientsChart"></canvas>
-                            </div>
-                        </div>
-                        
-                        <div class="analytics-card" style="grid-column: 1 / -1;">
-                            <h4>Confronto con Altre Regioni</h4>
-                            <div class="chart-container" style="height: 300px;">
-                                <canvas id="regionComparisonChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
-        
-        let allData = [];
-        let currentTab = 'overview';
-        let charts = {};
-        let selectedRegions = new Set();
-        let availableRegions = new Map();
-        let tempSelectedRegions = new Set();
-        
-        // Variabili per filtro agenti
-        let selectedAgents = new Set();
-        let availableAgents = [];
-        let tempSelectedAgents = new Set();
-
-        // NUOVO: Variabili per modal dettaglio regione
-        let currentRegionData = null;
-        let currentRegionTab = 'overview';
-        let regionDetailCharts = {};
-
-        function parseNumber(value) {
-            if (typeof value === 'number') return value;
-            if (typeof value !== 'string') return 0;
-            
-            let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
-            if (!clean || clean === '') return 0;
-            
-            return parseFloat(clean) || 0;
-        }
-
-        function updateClock() {
-            const clockElement = document.getElementById('currentTime');
-            if (clockElement) {
-                clockElement.textContent = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-            }
-        }
-
-        function initializeTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            
-            tabs.forEach(tab => {
-                if (tab && typeof tab.addEventListener === 'function') {
-                    tab.addEventListener('click', () => {
-                        const tabId = tab.dataset.tab;
-                        
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        
-                        document.querySelectorAll('.tab-content').forEach(content => {
-                            content.style.display = 'none';
-                        });
-                        
-                        const targetContent = document.getElementById(`${tabId}-content`);
-                        if (targetContent) targetContent.style.display = 'block';
-                        
-                        currentTab = tabId;
-                        
-                        setTimeout(() => {
-                            Object.values(charts).forEach(chart => {
-                                if (chart && typeof chart.resize === 'function') {
-                                    chart.resize();
-                                }
-                            });
-                        }, 100);
-                    });
-                }
-            });
-        }
-
-        async function loadData() {
-            try {
-                const lastUpdateElement = document.getElementById('lastUpdate');
-                if (lastUpdateElement) {
-                    lastUpdateElement.textContent = 'Caricamento...';
-                }
-                
-                const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const csvText = await response.text();
-                allData = parseCSV(csvText);
-                
-                if (lastUpdateElement) {
-                    lastUpdateElement.textContent = `Aggiornato alle ${new Date().toLocaleTimeString('it-IT')}`;
-                }
-                
-                renderDashboard();
-                
-            } catch (error) {
-                console.error('Errore caricamento:', error);
-                const lastUpdateElement = document.getElementById('lastUpdate');
-                if (lastUpdateElement) {
-                    lastUpdateElement.textContent = 'Errore caricamento';
-                    lastUpdateElement.style.color = 'var(--danger)';
-                }
-            }
-        }
-
-        function parseCSV(csvText) {
-            const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
-            const agents = [];
-
-            sections.forEach(section => {
-                if (!section.trim()) return;
-
-                const agent = {
-                    codice: '', nome: '', periodo: '',
-                    obiettivi: [], clienti_provincia: [], vendite_cliente: [],
-                    categoria_riepilogo: [], ripartizione: [], totali: []
-                };
-
-                const lines = section.split('\n');
-                let headers = [];
-
-                lines.forEach(line => {
-                    line = line.trim();
-                    if (!line || line.startsWith('##')) return;
-
-                    if (line.includes('Codice Agente:')) {
-                        agent.codice = line.split(':')[1]?.trim() || '';
-                    } else if (line.includes('Ragione Sociale:')) {
-                        agent.nome = line.split(':')[1]?.trim() || '';
-                    } else if (line.includes('Periodo:')) {
-                        agent.periodo = line.split(':')[1]?.trim() || '';
-                    }
-                    
-                    if (line.includes('Tipo_Dato,')) {
-                        headers = line.split(',').map(h => h.trim());
-                        return;
-                    }
-
-                    if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
-                        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-                        if (values.length >= headers.length) {
-                            const row = {};
-                            headers.forEach((header, index) => {
-                                let value = values[index] || '';
-                                
-                                if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
-                                     'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
-                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
-                                    value = parseNumber(value);
-                                }
-                                row[header] = value;
-                            });
-
-                            switch (row.Tipo_Dato) {
-                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
-                                case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
-                                case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
-                                case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
-                                case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
-                                case 'TOTALE': agent.totali.push(row); break;
-                            }
-                        }
-                    }
-                });
-
-                if (agent.codice && agent.nome) {
-                    agents.push(agent);
-                }
-            });
-
-            return agents;
-        }
-
-        function getRegionFromProvince(prov) {
-            const map = {
-                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio',
-                'AN': 'Marche', 'PU': 'Marche',
-                'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
-                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'PC': 'Emilia-Romagna',
-                'CR': 'Lombardia', 'LO': 'Lombardia',
-                'ALB': 'Estero'
-            };
-            return map[prov] || prov;
-        }
-
-        function populateAvailableRegions() {
-            availableRegions.clear();
-            
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    
-                    if (!availableRegions.has(regionName)) {
-                        availableRegions.set(regionName, {
-                            name: regionName,
-                            revenue: 0,
-                            clients: 0,
-                            agents: new Set(),
-                            provinces: new Set()
-                        });
-                    }
-                    
-                    const region = availableRegions.get(regionName);
-                    region.revenue += prov.Fatturato || 0;
-                    region.clients += prov.Clienti_Serviti || 0;
-                    region.agents.add(agent.codice);
-                    region.provinces.add(prov.Provincia);
-                });
-            });
-        }
-
-        function populateAvailableAgents() {
-            availableAgents = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                
-                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                
-                let status = 'Critico';
-                if (growth >= 10) status = 'Ottimo';
-                else if (growth >= 0) status = 'Buono';
-                
-                return {
-                    codice: agent.codice,
-                    nome: agent.nome,
-                    current,
-                    previous,
-                    growth,
-                    clients,
-                    status,
-                    regions
-                };
-            }).sort((a, b) => b.current - a.current);
-        }
-
-        function updateFilterButtonText() {
-            const filterCount = document.getElementById('filterCount');
-            if (!filterCount) return;
-            
-            const totalRegions = availableRegions.size;
-            
-            if (selectedRegions.size === 0) {
-                filterCount.textContent = 'Tutte';
-            } else if (selectedRegions.size === totalRegions) {
-                filterCount.textContent = 'Tutte';
-            } else {
-                filterCount.textContent = `${selectedRegions.size}/${totalRegions}`;
-            }
-        }
-
-        function updateAgentFilterButtonText() {
-            const filterCount = document.getElementById('agentFilterCount');
-            if (!filterCount) return;
-            
-            const totalAgents = availableAgents.length;
-            
-            if (selectedAgents.size === 0) {
-                filterCount.textContent = 'Tutti';
-            } else if (selectedAgents.size === totalAgents) {
-                filterCount.textContent = 'Tutti';
-            } else {
-                filterCount.textContent = `${selectedAgents.size}/${totalAgents}`;
-            }
-        }
-
-        function openRegionFilterModal() {
-            tempSelectedRegions = new Set(selectedRegions);
-            
-            const filterList = document.getElementById('regionFilterList');
-            if (!filterList) return;
-            
-            filterList.innerHTML = '';
-            
-            Array.from(availableRegions.values())
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .forEach(region => {
-                    const isSelected = tempSelectedRegions.has(region.name);
-                    
-                    const item = document.createElement('div');
-                    item.className = 'region-filter-item';
-                    item.innerHTML = `
-                        <input type="checkbox" 
-                               class="region-checkbox" 
-                               id="region-${region.name}" 
-                               ${isSelected ? 'checked' : ''}
-                               data-region="${region.name}">
-                        <div class="region-filter-info">
-                            <div class="region-filter-name">${region.name}</div>
-                            <div class="region-filter-stats">
-                                ${formatCurrency(region.revenue)} • ${region.clients} clienti • ${region.agents.size} agenti
-                            </div>
-                        </div>
-                    `;
-                    
-                    const checkbox = item.querySelector('.region-checkbox');
-                    if (checkbox) {
-                        checkbox.addEventListener('change', (e) => {
-                            if (e.target.checked) {
-                                tempSelectedRegions.add(region.name);
-                            } else {
-                                tempSelectedRegions.delete(region.name);
-                            }
-                        });
-                    }
-                    
-                    filterList.appendChild(item);
-                });
-            
-            const modal = document.getElementById('regionFilterModal');
-            if (modal) {
-                modal.classList.add('show');
-            }
-        }
-
-        function closeRegionFilterModal() {
-            const modal = document.getElementById('regionFilterModal');
-            if (modal) {
-                modal.classList.remove('show');
-            }
-        }
-
-        function applyRegionFilter() {
-            selectedRegions = new Set(tempSelectedRegions);
-            renderRegionCards();
-            updateFilterButtonText();
-            closeRegionFilterModal();
-        }
-
-        function selectAllRegions() {
-            tempSelectedRegions.clear();
-            availableRegions.forEach((region, name) => {
-                tempSelectedRegions.add(name);
-            });
-            
-            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
-                checkbox.checked = true;
-            });
-        }
-
-        function deselectAllRegions() {
-            tempSelectedRegions.clear();
-            
-            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-        }
-
-        function openAgentFilterModal() {
-            tempSelectedAgents = new Set(selectedAgents);
-            
-            const filterList = document.getElementById('agentFilterList');
-            if (!filterList) return;
-            
-            filterList.innerHTML = '';
-            
-            availableAgents.forEach((agent, index) => {
-                const isSelected = tempSelectedAgents.has(agent.codice);
-                
-                const item = document.createElement('div');
-                item.className = 'region-filter-item';
-                item.innerHTML = `
-                    <input type="checkbox" 
-                           class="region-checkbox" 
-                           id="agent-${agent.codice}" 
-                           ${isSelected ? 'checked' : ''}
-                           data-agent="${agent.codice}">
-                    <div class="region-filter-info">
-                        <div class="region-filter-name">${agent.nome}</div>
-                        <div class="region-filter-stats">
-                            ${formatCurrency(agent.current)} • ${agent.clients} clienti • ${agent.growth.toFixed(1)}% crescita
-                        </div>
-                        <div class="region-filter-stats">
-                            <span class="badge ${agent.growth >= 10 ? 'success' : agent.growth >= 0 ? 'warning' : 'danger'}" style="margin-top: 0.25rem;">
-                                ${agent.status}
-                            </span>
-                            <span style="font-size: 0.65rem; margin-left: 0.5rem; color: var(--text-muted);">
-                                ${agent.regions.join(', ')}
-                            </span>
-                        </div>
-                    </div>
-                `;
-                
-                const checkbox = item.querySelector('.region-checkbox');
-                if (checkbox) {
-                    checkbox.addEventListener('change', (e) => {
-                        if (e.target.checked) {
-                            tempSelectedAgents.add(agent.codice);
-                        } else {
-                            tempSelectedAgents.delete(agent.codice);
-                        }
-                    });
-                }
-                
-                filterList.appendChild(item);
-            });
-            
-            const modal = document.getElementById('agentFilterModal');
-            if (modal) {
-                modal.classList.add('show');
-            }
-        }
-
-        function closeAgentFilterModal() {
-            const modal = document.getElementById('agentFilterModal');
-            if (modal) {
-                modal.classList.remove('show');
-            }
-        }
-
-        function applyAgentFilter() {
-            selectedAgents = new Set(tempSelectedAgents);
-            renderAgentCards();
-            updateAgentFilterButtonText();
-            closeAgentFilterModal();
-        }
-
-        function selectAllAgents() {
-            tempSelectedAgents.clear();
-            availableAgents.forEach(agent => {
-                tempSelectedAgents.add(agent.codice);
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                checkbox.checked = true;
-            });
-        }
-
-        function deselectAllAgents() {
-            tempSelectedAgents.clear();
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-        }
-
-        function selectTopPerformers() {
-            tempSelectedAgents.clear();
-            
-            availableAgents.forEach(agent => {
-                if (agent.growth >= 10) {
-                    tempSelectedAgents.add(agent.codice);
-                }
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                const agentCode = checkbox.dataset.agent;
-                const agent = availableAgents.find(a => a.codice === agentCode);
-                checkbox.checked = agent && agent.growth >= 10;
-            });
-        }
-
-        function selectLowPerformers() {
-            tempSelectedAgents.clear();
-            
-            availableAgents.forEach(agent => {
-                if (agent.growth < 0) {
-                    tempSelectedAgents.add(agent.codice);
-                }
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                const agentCode = checkbox.dataset.agent;
-                const agent = availableAgents.find(a => a.codice === agentCode);
-                checkbox.checked = agent && agent.growth < 0;
-            });
-        }
-
-        function initializeRegionFilter() {
-            const regionFilterBtn = document.getElementById('regionFilterBtn');
-            const closeRegionFilter = document.getElementById('closeRegionFilter');
-            const cancelRegionFilter = document.getElementById('cancelRegionFilter');
-            const applyRegionFilterBtn = document.getElementById('applyRegionFilter');
-            const selectAllRegionsBtn = document.getElementById('selectAllRegions');
-            const deselectAllRegionsBtn = document.getElementById('deselectAllRegions');
-            const regionFilterModal = document.getElementById('regionFilterModal');
-
-            if (regionFilterBtn) {
-                regionFilterBtn.addEventListener('click', openRegionFilterModal);
-            }
-            
-            if (closeRegionFilter) {
-                closeRegionFilter.addEventListener('click', closeRegionFilterModal);
-            }
-            
-            if (cancelRegionFilter) {
-                cancelRegionFilter.addEventListener('click', closeRegionFilterModal);
-            }
-            
-            if (applyRegionFilterBtn) {
-                applyRegionFilterBtn.addEventListener('click', applyRegionFilter);
-            }
-            
-            if (selectAllRegionsBtn) {
-                selectAllRegionsBtn.addEventListener('click', selectAllRegions);
-            }
-            
-            if (deselectAllRegionsBtn) {
-                deselectAllRegionsBtn.addEventListener('click', deselectAllRegions);
-            }
-            
-            if (regionFilterModal) {
-                regionFilterModal.addEventListener('click', (e) => {
-                    if (e.target.id === 'regionFilterModal') {
-                        closeRegionFilterModal();
-                    }
-                });
-            }
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && regionFilterModal && regionFilterModal.classList.contains('show')) {
-                    closeRegionFilterModal();
-                }
-            });
-        }
-
-        function initializeAgentFilter() {
-            const agentFilterBtn = document.getElementById('agentFilterBtn');
-            const closeAgentFilter = document.getElementById('closeAgentFilter');
-            const cancelAgentFilter = document.getElementById('cancelAgentFilter');
-            const applyAgentFilterBtn = document.getElementById('applyAgentFilter');
-            const selectAllAgentsBtn = document.getElementById('selectAllAgents');
-            const deselectAllAgentsBtn = document.getElementById('deselectAllAgents');
-            const selectTopPerformersBtn = document.getElementById('selectTopPerformers');
-            const selectLowPerformersBtn = document.getElementById('selectLowPerformers');
-            const agentFilterModal = document.getElementById('agentFilterModal');
-
-            if (agentFilterBtn) {
-                agentFilterBtn.addEventListener('click', openAgentFilterModal);
-            }
-            
-            if (closeAgentFilter) {
-                closeAgentFilter.addEventListener('click', closeAgentFilterModal);
-            }
-            
-            if (cancelAgentFilter) {
-                cancelAgentFilter.addEventListener('click', closeAgentFilterModal);
-            }
-            
-            if (applyAgentFilterBtn) {
-                applyAgentFilterBtn.addEventListener('click', applyAgentFilter);
-            }
-            
-            if (selectAllAgentsBtn) {
-                selectAllAgentsBtn.addEventListener('click', selectAllAgents);
-            }
-            
-            if (deselectAllAgentsBtn) {
-                deselectAllAgentsBtn.addEventListener('click', deselectAllAgents);
-            }
-            
-            if (selectTopPerformersBtn) {
-                selectTopPerformersBtn.addEventListener('click', selectTopPerformers);
-            }
-            
-            if (selectLowPerformersBtn) {
-                selectLowPerformersBtn.addEventListener('click', selectLowPerformers);
-            }
-            
-            if (agentFilterModal) {
-                agentFilterModal.addEventListener('click', (e) => {
-                    if (e.target.id === 'agentFilterModal') {
-                        closeAgentFilterModal();
-                    }
-                });
-            }
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && agentFilterModal && agentFilterModal.classList.contains('show')) {
-                    closeAgentFilterModal();
-                }
-            });
-        }
-
-        // NUOVO: Funzioni per modal dettaglio regione
-        function initializeRegionDetailModal() {
-            console.log('Inizializzazione modal dettaglio regione...');
-            
-            // Event listeners per i tab del modal
-            const regionTabs = document.querySelectorAll('.region-detail-tab');
-            regionTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.dataset.regionTab;
-                    switchRegionTab(tabId);
-                });
-            });
-
-            // Event listener per chiusura modal
-            const closeBtn = document.getElementById('closeRegionDetail');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeRegionDetailModal);
-            }
-
-            // Chiusura con ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    const modal = document.getElementById('regionDetailModal');
-                    if (modal && modal.classList.contains('show')) {
-                        closeRegionDetailModal();
-                    }
-                }
-            });
-
-            // Chiusura cliccando fuori dal modal
-            const modal = document.getElementById('regionDetailModal');
-            if (modal) {
-                modal.addEventListener('click', (e) => {
-                    if (e.target.id === 'regionDetailModal') {
-                        closeRegionDetailModal();
-                    }
-                });
-            }
-            
-            // Event delegation per region cards
-            document.addEventListener('click', (e) => {
-                const regionCard = e.target.closest('.region-card[data-region]');
-                if (regionCard) {
-                    e.preventDefault();
-                    const regionName = regionCard.dataset.region;
-                    console.log('Region card clicked:', regionName);
-                    openRegionDetailModal(regionName);
-                }
-            });
-        }
-
-        function openRegionDetailModal(regionName) {
-            const region = availableRegions.get(regionName);
-            if (!region) return;
-
-            currentRegionData = region;
-            
-            // Aggiorna header del modal
-            const icon = document.getElementById('regionDetailIcon');
-            const name = document.getElementById('regionDetailName');
-            const summary = document.getElementById('regionDetailSummary');
-            
-            if (icon) icon.textContent = region.name.charAt(0);
-            if (name) name.textContent = region.name;
-            if (summary) {
-                summary.textContent = `${region.agents.size} agenti attivi in ${region.provinces.size} province`;
-            }
-
-            // Mostra modal
-            const modal = document.getElementById('regionDetailModal');
-            if (modal) {
-                modal.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            }
-
-            // Carica contenuti del tab attivo
-            switchRegionTab('overview');
-        }
-
-        function closeRegionDetailModal() {
-            const modal = document.getElementById('regionDetailModal');
-            if (modal) {
-                modal.classList.remove('show');
-                document.body.style.overflow = '';
-            }
-
-            // Pulisci charts
-            Object.values(regionDetailCharts).forEach(chart => {
-                if (chart && typeof chart.destroy === 'function') {
-                    chart.destroy();
-                }
-            });
-            regionDetailCharts = {};
-            currentRegionData = null;
-        }
-
-        function switchRegionTab(tabId) {
-            // Aggiorna tab attivi
-            document.querySelectorAll('.region-detail-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.region-detail-tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-
-            const activeTab = document.querySelector(`[data-region-tab="${tabId}"]`);
-            const activeContent = document.getElementById(`region${tabId.charAt(0).toUpperCase() + tabId.slice(1)}Tab`);
-            
-            if (activeTab) activeTab.classList.add('active');
-            if (activeContent) activeContent.classList.add('active');
-
-            currentRegionTab = tabId;
-
-            // Carica contenuti specifici del tab
-            setTimeout(() => {
-                switch(tabId) {
-                    case 'overview':
-                        renderRegionOverview();
-                        break;
-                    case 'provinces':
-                        renderRegionProvinces();
-                        break;
-                    case 'agents':
-                        renderRegionAgents();
-                        break;
-                    case 'analytics':
-                        renderRegionAnalytics();
-                        break;
-                }
-            }, 100);
-        }
-
-        function renderRegionOverview() {
-            if (!currentRegionData) return;
-
-            // Calcola metriche regionali
-            const regionAgents = allData.filter(agent => 
-                agent.clienti_provincia.some(prov => 
-                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
-                )
-            );
-
-            let totalPrevious = 0;
-            regionAgents.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
-                        // Simula dato anno precedente
-                        totalPrevious += (prov.Fatturato || 0) * 0.85;
-                    }
-                });
-            });
-
-            const growth = totalPrevious > 0 ? 
-                ((currentRegionData.revenue - totalPrevious) / totalPrevious * 100) : 0;
-
-            // Popola metriche overview
-            const metricsContainer = document.getElementById('regionOverviewMetrics');
-            if (metricsContainer) {
-                metricsContainer.innerHTML = `
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${formatCurrency(currentRegionData.revenue)}</div>
-                        <div class="region-overview-label">Fatturato Totale</div>
-                        <div class="region-overview-change ${growth >= 0 ? 'positive' : 'negative'}">
-                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${currentRegionData.clients}</div>
-                        <div class="region-overview-label">Clienti Attivi</div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${currentRegionData.agents.size}</div>
-                        <div class="region-overview-label">Agenti</div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${currentRegionData.provinces.size}</div>
-                        <div class="region-overview-label">Province</div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${formatCurrency(currentRegionData.revenue / currentRegionData.agents.size)}</div>
-                        <div class="region-overview-label">Media per Agente</div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${Math.round(currentRegionData.clients / currentRegionData.agents.size)}</div>
-                        <div class="region-overview-label">Clienti per Agente</div>
-                    </div>
-                `;
-            }
-
-            // Render performance chart
-            renderRegionPerformanceChart();
-            
-            // Render top performers
-            renderRegionTopPerformers();
-        }
-
-        function renderRegionPerformanceChart() {
-            const canvas = document.getElementById('regionPerformanceChart');
-            if (!canvas) return;
-
-            const ctx = canvas.getContext('2d');
-            
-            if (regionDetailCharts.performance) {
-                regionDetailCharts.performance.destroy();
-            }
-
-            // Simula dati mensili
-            const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
-            const monthlyData = months.map((month, index) => {
-                const baseValue = currentRegionData.revenue / 12;
-                const variation = (Math.sin(index * 0.5) + Math.random() * 0.3) * baseValue * 0.2;
-                return Math.max(0, baseValue + variation);
-            });
-
-            regionDetailCharts.performance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [{
-                        label: 'Fatturato Mensile',
-                        data: monthlyData,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: context => formatCurrency(context.parsed.y)
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { callback: value => formatCurrency(value) }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderRegionTopPerformers() {
-            const container = document.getElementById('regionTopPerformers');
-            if (!container) return;
-
-            const regionAgents = allData.filter(agent => 
-                agent.clienti_provincia.some(prov => 
-                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
-                )
-            );
-
-            const performers = regionAgents.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                
-                return { agent, current, growth };
-            }).sort((a, b) => b.current - a.current).slice(0, 5);
-
-            container.innerHTML = performers.map((performer, index) => `
-                <div class="performer-item">
-                    <div class="performer-rank">${index + 1}</div>
-                    <div class="performer-info">
-                        <div class="performer-name">${performer.agent.nome}</div>
-                        <div class="performer-value">${formatCurrency(performer.current)}</div>
-                    </div>
-                    <div class="performer-change ${performer.growth >= 0 ? 'positive' : 'negative'}">
-                        ${performer.growth >= 0 ? '+' : ''}${performer.growth.toFixed(1)}%
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderRegionProvinces() {
-            if (!currentRegionData) return;
-
-            // Render provinces comparison chart
-            const canvas = document.getElementById('provincesComparisonChart');
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                
-                if (regionDetailCharts.provinces) {
-                    regionDetailCharts.provinces.destroy();
-                }
-
-                const provinceData = {};
-                allData.forEach(agent => {
-                    agent.clienti_provincia.forEach(prov => {
-                        if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
-                            if (!provinceData[prov.Provincia]) {
-                                provinceData[prov.Provincia] = { revenue: 0, clients: 0 };
-                            }
-                            provinceData[prov.Provincia].revenue += prov.Fatturato || 0;
-                            provinceData[prov.Provincia].clients += prov.Clienti_Serviti || 0;
-                        }
-                    });
-                });
-
-                const labels = Object.keys(provinceData);
-                const data = Object.values(provinceData).map(p => p.revenue);
-                
-                regionDetailCharts.provinces = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Fatturato per Provincia',
-                            data,
-                            backgroundColor: '#2563eb',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: context => formatCurrency(context.parsed.y)
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { callback: value => formatCurrency(value) }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Render province cards
-            const container = document.getElementById('provinceDetailGrid');
-            if (container) {
-                const provinceData = {};
-                allData.forEach(agent => {
-                    agent.clienti_provincia.forEach(prov => {
-                        if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
-                            if (!provinceData[prov.Provincia]) {
-                                provinceData[prov.Provincia] = { 
-                                    revenue: 0, 
-                                    clients: 0, 
-                                    agents: new Set() 
-                                };
-                            }
-                            provinceData[prov.Provincia].revenue += prov.Fatturato || 0;
-                            provinceData[prov.Provincia].clients += prov.Clienti_Serviti || 0;
-                            provinceData[prov.Provincia].agents.add(agent.codice);
-                        }
-                    });
-                });
-
-                container.innerHTML = Object.entries(provinceData).map(([provincia, data]) => {
-                    const avgRevenue = currentRegionData.revenue / currentRegionData.provinces.size;
-                    const performance = data.revenue >= avgRevenue ? 'success' : 
-                                      data.revenue >= avgRevenue * 0.8 ? 'warning' : 'danger';
-                    
-                    return `
-                        <div class="province-card">
-                            <div class="province-header">
-                                <div class="province-name">${provincia}</div>
-                                <div class="province-badge badge ${performance}">
-                                    ${performance === 'success' ? 'Top' : performance === 'warning' ? 'Medio' : 'Basso'}
-                                </div>
-                            </div>
-                            <div class="province-metrics">
-                                <div class="province-metric">
-                                    <div class="province-metric-value">${formatCurrency(data.revenue)}</div>
-                                    <div class="province-metric-label">Fatturato</div>
-                                </div>
-                                <div class="province-metric">
-                                    <div class="province-metric-value">${data.clients}</div>
-                                    <div class="province-metric-label">Clienti</div>
-                                </div>
-                                <div class="province-metric">
-                                    <div class="province-metric-value">${data.agents.size}</div>
-                                    <div class="province-metric-label">Agenti</div>
-                                </div>
-                                <div class="province-metric">
-                                    <div class="province-metric-value">${formatCurrency(data.revenue / data.agents.size)}</div>
-                                    <div class="province-metric-label">Media/Agente</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-        }
-
-        function renderRegionAgents() {
-            if (!currentRegionData) return;
-
-            const container = document.getElementById('regionAgentGrid');
-            if (!container) return;
-
-            const regionAgents = allData.filter(agent => 
-                agent.clienti_provincia.some(prov => 
-                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
-                )
-            );
-
-            container.innerHTML = regionAgents.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                
-                // Calcola fatturato specifico per questa regione
-                const regionRevenue = agent.clienti_provincia
-                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
-                    .reduce((sum, prov) => sum + (prov.Fatturato || 0), 0);
-                    
-                const regionClients = agent.clienti_provincia
-                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
-                    .reduce((sum, prov) => sum + (prov.Clienti_Serviti || 0), 0);
-
-                const agentProvinces = agent.clienti_provincia
-                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
-                    .map(prov => prov.Provincia);
-
-                return `
-                    <div class="agent-detail-card">
-                        <div class="agent-detail-header">
-                            <div class="agent-avatar">${agent.nome.split(' ').map(n => n.charAt(0)).join('')}</div>
-                            <div class="agent-detail-info">
-                                <h4>${agent.nome}</h4>
-                                <p>${agent.codice} • ${agentProvinces.join(', ')}</p>
-                            </div>
-                        </div>
-                        <div class="agent-detail-metrics">
-                            <div class="agent-detail-metric">
-                                <div class="agent-detail-metric-value">${formatCurrency(regionRevenue)}</div>
-                                <div class="agent-detail-metric-label">Fatturato Regione</div>
-                            </div>
-                            <div class="agent-detail-metric">
-                                <div class="agent-detail-metric-value">${regionClients}</div>
-                                <div class="agent-detail-metric-label">Clienti Regione</div>
-                            </div>
-                            <div class="agent-detail-metric">
-                                <div class="agent-detail-metric-value">${formatCurrency(current)}</div>
-                                <div class="agent-detail-metric-label">Totale Agente</div>
-                            </div>
-                        </div>
-                        <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                ${growth >= 0 ? 
-                                    '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                    '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                }
-                            </svg>
-                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% crescita totale
-                        </div>
-                        <div style="margin-top: 0.75rem;">
-                            <span class="badge ${growth >= 10 ? 'success' : growth >= 0 ? 'warning' : 'danger'}">
-                                ${growth >= 10 ? 'Top Performer' : growth >= 0 ? 'Performance Buona' : 'Necessita Attenzione'}
-                            </span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderRegionAnalytics() {
-            if (!currentRegionData) return;
-
-            // Aggiungi disclaimer per dati simulati
-            const analyticsContainer = document.querySelector('#regionAnalyticsTab .analytics-grid');
-            if (analyticsContainer && !analyticsContainer.querySelector('.analytics-disclaimer')) {
-                const disclaimer = document.createElement('div');
-                disclaimer.className = 'analytics-disclaimer';
-                disclaimer.style.cssText = `
-                    grid-column: 1 / -1;
-                    background: #fef3c7;
-                    color: #92400e;
-                    padding: 1rem;
-                    border-radius: var(--radius);
-                    margin-bottom: 1rem;
-                    font-size: 0.875rem;
-                    border-left: 4px solid #f59e0b;
-                `;
-                disclaimer.innerHTML = `
-                    <strong>ℹ️ Nota:</strong> I grafici seguenti mostrano dati simulati per scopi dimostrativi. 
-                    I trend di crescita, la distribuzione clienti per categoria e i confronti sono basati su stime 
-                    e algoritmi predittivi, non su dati storici reali.
-                `;
-                analyticsContainer.prepend(disclaimer);
-            }
-
-            // Growth trend chart
-            const growthCanvas = document.getElementById('regionGrowthChart');
-            if (growthCanvas) {
-                const ctx = growthCanvas.getContext('2d');
-                
-                if (regionDetailCharts.growth) {
-                    regionDetailCharts.growth.destroy();
-                }
-
-                const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu'];
-                // Simula crescita basata sui dati reali della regione
-                const baseGrowth = Math.random() * 10 - 2; // -2% a +8%
-                const growthData = months.map((month, index) => {
-                    const seasonality = Math.sin(index * 0.8) * 2;
-                    const randomVariation = (Math.random() - 0.5) * 3;
-                    return Math.max(-5, Math.min(15, baseGrowth + seasonality + randomVariation));
-                });
-
-                regionDetailCharts.growth = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: months,
-                        datasets: [{
-                            label: 'Crescita % (Simulata)',
-                            data: growthData,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: true, position: 'top' },
-                            tooltip: {
-                                callbacks: {
-                                    label: context => `${context.parsed.y.toFixed(1)}% (dato simulato)`
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { callback: value => `${value.toFixed(1)}%` }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Clients distribution chart
-            const clientsCanvas = document.getElementById('regionClientsChart');
-            if (clientsCanvas) {
-                const ctx = clientsCanvas.getContext('2d');
-                
-                if (regionDetailCharts.clients) {
-                    regionDetailCharts.clients.destroy();
-                }
-
-                // Distribuzione stimata basata sulla tipologia di regione
-                const categories = ['Piccole Imprese', 'Medie Imprese', 'Grandi Aziende', 'Enti Pubblici'];
-                let distribution;
-                
-                // Logica semplificata basata sul nome della regione
-                if (currentRegionData.name === 'Lazio') {
-                    distribution = [30, 35, 25, 10]; // Più enti pubblici per Roma
-                } else if (currentRegionData.name === 'Lombardia') {
-                    distribution = [25, 40, 30, 5]; // Più grandi aziende
-                } else {
-                    distribution = [45, 35, 15, 5]; // Prevalenza PMI
-                }
-
-                regionDetailCharts.clients = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: categories,
-                        datasets: [{
-                            data: distribution,
-                            backgroundColor: ['#2563eb', '#06b6d4', '#10b981', '#f59e0b'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom' },
-                            tooltip: {
-                                callbacks: {
-                                    label: context => `${context.label}: ${context.parsed}% (stimato)`
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Comparison chart - Basato su dati reali
-            const comparisonCanvas = document.getElementById('regionComparisonChart');
-            if (comparisonCanvas) {
-                const ctx = comparisonCanvas.getContext('2d');
-                
-                if (regionDetailCharts.comparison) {
-                    regionDetailCharts.comparison.destroy();
-                }
-
-                // Usa dati reali per il confronto
-                const regions = Array.from(availableRegions.values())
-                    .sort((a, b) => b.revenue - a.revenue)
-                    .slice(0, Math.min(5, availableRegions.size));
-
-                const maxRevenue = regions[0]?.revenue || 1;
-                const maxClients = regions[0]?.clients || 1;
-                const maxAgents = regions[0]?.agents.size || 1;
-
-                regionDetailCharts.comparison = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: ['Fatturato', 'Clienti', 'Agenti', 'Crescita*', 'Efficienza'],
-                        datasets: regions.map((region, index) => ({
-                            label: region.name,
-                            data: [
-                                Math.round((region.revenue / maxRevenue) * 100),
-                                Math.round((region.clients / maxClients) * 100),
-                                Math.round((region.agents.size / maxAgents) * 100),
-                                Math.round(70 + Math.random() * 30), // Crescita simulata
-                                Math.round((region.revenue / region.agents.size) / (maxRevenue / maxAgents) * 100)
-                            ],
-                            borderColor: ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'][index],
-                            backgroundColor: ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'][index] + '20',
-                            borderWidth: 2
-                        }))
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        elements: {
-                            line: { borderWidth: 2 }
-                        },
-                        plugins: {
-                            legend: { position: 'top' },
-                            tooltip: {
-                                callbacks: {
-                                    label: context => {
-                                        const label = context.dataset.label;
-                                        const value = context.parsed.r;
-                                        const metric = context.label;
-                                        const suffix = metric === 'Crescita*' ? '% (simulato)' : '%';
-                                        return `${label} - ${metric}: ${value}${suffix}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            r: {
-                                beginAtZero: true,
-                                max: 100,
-                                ticks: { 
-                                    display: false,
-                                    stepSize: 20
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        function renderDashboard() {
-            const loadingElement = document.getElementById('loading');
-            const overviewElement = document.getElementById('overview-content');
-            
-            if (loadingElement) loadingElement.style.display = 'none';
-            if (overviewElement) overviewElement.style.display = 'block';
-            
-            populateAvailableRegions();
-            populateAvailableAgents();
-            renderKPIMetrics();
-            renderCharts();
-            renderPerformanceTable();
-            renderAgentCards();
-            renderRegionCards();
-            updateFilterButtonText();
-            updateAgentFilterButtonText();
-        }
-
-        function renderKPIMetrics() {
-            let totalRevenue = 0, totalPrevRevenue = 0, totalClients = 0;
-            
-            allData.forEach(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                if (general) {
-                    totalRevenue += general.Anno_Corrente || 0;
-                    totalPrevRevenue += general.Anno_Precedente || 0;
-                    totalClients += general.Clienti_Anno_Corrente || 0;
-                }
-            });
-
-            const growth = totalPrevRevenue > 0 ? 
-                ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
-
-            const metrics = [
-                { title: 'Fatturato Totale', value: formatCurrency(totalRevenue), change: growth },
-                { title: 'Clienti Attivi', value: totalClients.toLocaleString('it-IT'), change: null },
-                { title: 'Agenti Attivi', value: allData.length.toString(), change: null },
-                { title: 'Crescita Media', value: `${growth.toFixed(1)}%`, change: growth }
-            ];
-
-            const kpiElement = document.getElementById('kpiMetrics');
-            if (kpiElement) {
-                kpiElement.innerHTML = metrics.map(metric => `
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="card-title">${metric.title}</div>
-                            <div class="metric-value">${metric.value}</div>
-                            ${metric.change !== null ? `
-                                <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        ${metric.change >= 0 ? 
-                                            '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                            '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                        }
-                                    </svg>
-                                    ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function renderCharts() {
-            renderRevenueChart();
-            renderRegionChart();
-        }
-
-        function renderRevenueChart() {
-            const canvas = document.getElementById('revenueChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.revenue) charts.revenue.destroy();
-
-            const agentData = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                return {
-                    name: agent.nome.split(' ')[0],
-                    current: general?.Anno_Corrente || 0,
-                    previous: general?.Anno_Precedente || 0
-                };
-            }).sort((a, b) => b.current - a.current).slice(0, 8);
-
-            charts.revenue = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: agentData.map(a => a.name),
-                    datasets: [
-                        {
-                            label: '2024',
-                            data: agentData.map(a => a.previous),
-                            backgroundColor: '#cbd5e1',
-                            borderRadius: 4
-                        },
-                        {
-                            label: '2025',
-                            data: agentData.map(a => a.current),
-                            backgroundColor: '#2563eb',
-                            borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { callback: value => formatCurrency(value) }
-                        }
-                    },
-                    plugins: {
-                        legend: { position: 'top' },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderRegionChart() {
-            const canvas = document.getElementById('regionChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.region) charts.region.destroy();
-
-            const regionData = {};
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    regionData[regionName] = (regionData[regionName] || 0) + (prov.Fatturato || 0);
-                });
-            });
-
-            const labels = Object.keys(regionData);
-            const data = Object.values(regionData);
-            const colors = ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-
-            charts.region = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data,
-                        backgroundColor: colors.slice(0, labels.length),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `${context.label}: ${formatCurrency(context.parsed)}`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderPerformanceTable() {
-            const tableElement = document.getElementById('performanceTable');
-            if (!tableElement) return;
-            
-            const agentPerformance = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                
-                return { agent, current, previous, growth, clients };
-            }).sort((a, b) => b.current - a.current);
-
-            tableElement.innerHTML = `
-                <thead>
-                    <tr>
-                        <th>Agente</th>
-                        <th>Fatturato 2025</th>
-                        <th>Crescita</th>
-                        <th>Clienti</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${agentPerformance.map(item => `
-                        <tr class="table-row">
-                            <td>
-                                <strong>${item.agent.nome}</strong><br>
-                                <small style="color: var(--text-muted);">${item.agent.codice}</small>
-                            </td>
-                            <td><strong>${formatCurrency(item.current)}</strong></td>
-                            <td>
-                                <span class="badge ${item.growth >= 0 ? 'success' : 'danger'}">
-                                    ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%
-                                </span>
-                            </td>
-                            <td>${item.clients}</td>
-                            <td>
-                                <span class="badge ${item.growth >= 10 ? 'success' : item.growth >= 0 ? 'warning' : 'danger'}">
-                                    ${item.growth >= 10 ? 'Ottimo' : item.growth >= 0 ? 'Buono' : 'Critico'}
-                                </span>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            `;
-        }
-
-        function renderAgentCards() {
-            const agentGridElement = document.getElementById('agentGrid');
-            if (!agentGridElement) return;
-            
-            const filteredAgents = allData.filter(agent => {
-                return selectedAgents.size === 0 || selectedAgents.has(agent.codice);
-            });
-            
-            agentGridElement.innerHTML = filteredAgents.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                const target = general?.Obiettivo || 0;
-                const progress = target > 0 ? (current / target * 100) : 0;
-
-                return `
-                    <div class="agent-card">
-                        <div class="agent-header">
-                            <div class="agent-name">${agent.nome}</div>
-                            <div class="agent-code">${agent.codice}</div>
-                        </div>
-                        <div class="agent-body">
-                            <div class="agent-metrics">
-                                <div class="agent-metric">
-                                    <div class="agent-metric-value">${formatCurrency(current)}</div>
-                                    <div class="agent-metric-label">Fatturato 2025</div>
-                                </div>
-                                <div class="agent-metric">
-                                    <div class="agent-metric-value">${clients}</div>
-                                    <div class="agent-metric-label">Clienti</div>
-                                </div>
-                            </div>
-                            
-                            <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    ${growth >= 0 ? 
-                                        '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                        '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                    }
-                                </svg>
-                                ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
-                            </div>
-
-                            ${target > 0 ? `
-                                <div style="margin-top: 1rem;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
-                                        <span>Obiettivo</span>
-                                        <span>${Math.round(progress)}%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
-                                    </div>
-                                    <div class="progress-text">
-                                        <span>${formatCurrency(current)}</span>
-                                        <span>${formatCurrency(target)}</span>
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderRegionCards() {
-            const regionGridElement = document.getElementById('regionGrid');
-            if (!regionGridElement) return;
-            
-            const filteredRegions = Array.from(availableRegions.values()).filter(region => {
-                return selectedRegions.size === 0 || selectedRegions.has(region.name);
-            });
-
-            regionGridElement.innerHTML = filteredRegions.map(region => `
-                <div class="region-card" data-region="${region.name}">
-                    <div class="region-header">
-                        <div class="region-icon">${region.name.charAt(0)}</div>
-                        <div class="region-info">
-                            <h3>${region.name}</h3>
-                            <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
-                        </div>
-                    </div>
-                    <div class="region-stats">
-                        <div class="region-stat">
-                            <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
-                            <div class="region-stat-label">Fatturato</div>
-                        </div>
-                        <div class="region-stat">
-                            <div class="region-stat-value">${region.clients}</div>
-                            <div class="region-stat-label">Clienti</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
-                        Province: ${Array.from(region.provinces).join(', ')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function formatCurrency(value) {
-            if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
-            if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
-            return `€${value.toLocaleString('it-IT')}`;
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Inizializzazione dashboard...');
-            
-            try {
-                initializeTabs();
-                console.log('Tabs inizializzati');
-            } catch (error) {
-                console.error('Errore tabs:', error);
-            }
-            
-            try {
-                updateClock();
-                setInterval(updateClock, 1000);
-                console.log('Clock inizializzato');
-            } catch (error) {
-                console.error('Errore clock:', error);
-            }
-            
-            try {
-                loadData();
-                setInterval(loadData, 120000);
-                console.log('Caricamento dati avviato');
-            } catch (error) {
-                console.error('Errore caricamento dati:', error);
-            }
-            
-            setTimeout(() => {
-                try {
-                    initializeRegionFilter();
-                    console.log('Filtro regioni inizializzato');
-                } catch (error) {
-                    console.error('Errore inizializzazione filtro regioni:', error);
-                }
-                
-                try {
-                    initializeAgentFilter();
-                    console.log('Filtro agenti inizializzato');
-                } catch (error) {
-                    console.error('Errore inizializzazione filtro agenti:', error);
-                }
-                
-                try {
-                    initializeRegionDetailModal();
-                    console.log('Modal dettaglio regione inizializzato');
-                } catch (error) {
-                    console.error('Errore inizializzazione modal regione:', error);
-                }
-            }, 500);
-        });
-    </script>
-</body>
-</html>
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00120
+# Ragione Sociale: CINTI DOMENICO
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,67611.27,31318.46,,,602,8,,
+OBIETTIVI,FR,67611.27,31318.46,120000.00,27,16,8,20,40
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,FR,8,33082.42
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,FR,GINO MARIANI & C. S.N.C. - MANUFATTI IN CEMENTO,MATTONE PIENO,4032.00
+VENDITE_CLIENTE,FR,GINO MARIANI & C. S.N.C. - MANUFATTI IN CEMENTO,REFRATTARI RETTIFICATI,1229.97
+VENDITE_CLIENTE,FR,MARCONI SANDRO,MATTONE PIENO,1814.40
+VENDITE_CLIENTE,FR,MARCONI SANDRO,PAVIMENTAZIONE POLIS,416.40
+VENDITE_CLIENTE,FR,MARCONI SANDRO,REFRATTARI,379.47
+VENDITE_CLIENTE,FR,MARCONI SANDRO,REFRATTARI RETTIFICATI,409.99
+VENDITE_CLIENTE,FR,EDILSTAR SRL,MATTONE PIENO,1166.40
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL,MATTONE PIENO,1209.60
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL,REFRATTARI,816.45
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL,REFRATTARI RETTIFICATI,1550.40
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,CORRIM.COPRIM.,2.40
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,MATTONE PIENO,907.21
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,OUTLET,1.50
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,PAVIMENTAZIONE POLIS,8681.95
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,MATTONE PIENO,1332.00
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,PAVIMENTAZIONE POLIS,1278.72
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,REFRATTARI,111.21
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,REFRATTARI RETTIFICATI,1550.40
+VENDITE_CLIENTE,FR,BRICOMAG SRL,FACCIAVISTA,874.80
+VENDITE_CLIENTE,FR,BRICOMAG SRL,LINEA ARCHEO,4.20
+VENDITE_CLIENTE,FR,BRICOMAG SRL,MATTONE PIENO,273.60
+VENDITE_CLIENTE,FR,BRICOMAG SRL,PAVIMENTAZIONE POLIS,432.73
+VENDITE_CLIENTE,FR,BRICOMAG SRL,REFRATTARI,563.13
+VENDITE_CLIENTE,FR,BRICOMAG SRL,REFRATTARI RETTIFICATI,1695.88
+VENDITE_CLIENTE,FR,EDILIZIA STIRPE 2014 SRL,PRODOTTI FORNO,686.00
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,0.00,FR,0,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,2.40,FR,1,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,0.00,FR,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,874.80,FR,1,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,0.00,FR,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,4.20,FR,1,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,10735.21,FR,7,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,1.50,FR,1,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,10809.80,FR,4,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,0.00,FR,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,0.00,FR,0,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,686.00,FR,1,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,0.00,FR,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,1870.26,FR,4,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,6436.64,FR,5,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,0.00,FR,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,10742.59,34
+RIPARTIZIONE,Altro,20575.87,66
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,31318.46
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,8
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00220
+# Ragione Sociale: TRAFIERI ANDREA
+# Periodo: 01/01/2025 - 05/01/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,2024.02,0.00,,,3,0,,
+OBIETTIVI,VT,2024.02,0.00,25000.00,0,1,0,10,0
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,VT,0,0.00
+CLIENTI_PROVINCIA,RM,0,0.00
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,0.00,VT,0,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,0.00,VT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0.00,0
+RIPARTIZIONE,Altro,0.00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00222
+# Ragione Sociale: SARTINI GABRIELE
+# Periodo: 01/01/2024 - 16/06/2024
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,5485.77,0.00,,,112,1,,
+OBIETTIVI,N/A,0.00,0.00,0.00,999,0,1,0,999
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,N/A,1,30659.89
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,COPERTURE,12.05
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,CORRIM.COPRIM.,178.85
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,COTTO A MANO ANTICHE TERRE,288.00
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,FACCIAVISTA,2366.14
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,GANCI E ACCESSO,24.00
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,LINEA ARCHEO,1185.84
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,PAVIMENTAZIONE POLIS,902.30
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,PIASTRELLE,1241.86
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,PRODOTTI FORNO,22804.60
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,REFRATTARI,426.42
+VENDITE_CLIENTE,N/A,Cliente_Non_Specificato,REFRATTARI RETTIFICATI,1229.83
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,12.05,LT,1,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,178.85,LT,1,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,288.00,LT,1,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,2366.14,LT,1,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,24.00,LT,1,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,1185.84,LT,1,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,0.00,LT,1,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,0.00,LT,1,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,902.30,LT,1,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,1241.86,LT,1,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,22804.60,LT,1,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,0.00,LT,1,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,426.42,LT,1,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,1229.83,LT,1,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,0.00,LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0.00,0
+RIPARTIZIONE,Altro,30659.89,100
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,30659.89
+TOTALE,Fatturato_LT,30659.89
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,1
+TOTALE,Clienti_LT,1
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00231
+# Ragione Sociale: ERRE RAPPRESENTANZE SNC
+# Periodo: 01/01/2024 - 16/06/2024
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,5708.77,0.00,,,151,0,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CA,0,0.00
+CLIENTI_PROVINCIA,OT,0,0.00
+CLIENTI_PROVINCIA,NU,0,0.00
+CLIENTI_PROVINCIA,SU,0,0.00
+CLIENTI_PROVINCIA,OR,0,0.00
+CLIENTI_PROVINCIA,SS,0,0.00
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,OUTLET,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,TAVELLONI,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,0.00,CA,0,OT,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,0.00,CA,0,OT,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0.00,0
+RIPARTIZIONE,Altro,0.00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00238
+# Ragione Sociale: CARABOT NATALINO
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,80238.72,90159.79,,,354,20,,
+OBIETTIVI,LT,79029.16,82389.23,155000.00,53,23,18,35,51
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,LT,18,60437.22
+CLIENTI_PROVINCIA,RM,2,7770.56
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,LT,EDILIZIA SETINA S.R.L.,MATTONE PIENO,1512.00
+VENDITE_CLIENTE,LT,EDILIZIA SETINA S.R.L.,PAVIMENTAZIONE POLIS,1665.62
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,FACCIAVISTA,583.78
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,LINEA ARCHEO,743.00
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,MATTONE PIENO,151.20
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,PAVIMENTAZIONE POLIS,416.40
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,COPERTURE,3.36
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,LINEA ARCHEO,1.74
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,MATTONE PIENO,3110.40
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,PAVIMENTAZIONE POLIS,1382.40
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL,MATTONE PIENO,3693.60
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL,OUTLET,0.01
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL,PIASTRELLE,1240.95
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,CORRIM.COPRIM.,73.26
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,MATTONE PIENO,7776.00
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,PAVIMENTAZIONE POLIS,8.67
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,REFRATTARI RETTIFICATI,1281.60
+VENDITE_CLIENTE,LT,STENI SRL,MATTONE PIENO,547.20
+VENDITE_CLIENTE,LT,STENI SRL,PAVIMENTAZIONE POLIS,984.96
+VENDITE_CLIENTE,RM,DOVAL SRL,REFRATTARI,1019.82
+VENDITE_CLIENTE,LT,ROSANCOS SRL,MATTONE PIENO,1528.80
+VENDITE_CLIENTE,LT,ROSANCOS SRL,PAVIMENTAZIONE POLIS,604.80
+VENDITE_CLIENTE,LT,EDILCERAMICA SAS DI VEGLIA CRISTIAN & C.,MATTONE PIENO,1440.00
+VENDITE_CLIENTE,LT,D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS,MATTONE PIENO,3744.00
+VENDITE_CLIENTE,LT,D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS,PAVIMENTAZIONE POLIS,832.81
+VENDITE_CLIENTE,LT,DIMED SRL,MATTONE PIENO,1326.96
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,MATTONE PIENO,1209.60
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,REFRATTARI,900.83
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,REFRATTARI RETTIFICATI,1935.58
+VENDITE_CLIENTE,LT,EDILIM SRL,MATTONE PIENO,1370.88
+VENDITE_CLIENTE,LT,EDILIM SRL,PAVIMENTAZIONE POLIS,984.96
+VENDITE_CLIENTE,LT,EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC,MATTONE PIENO,3456.00
+VENDITE_CLIENTE,LT,EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC,PAVIMENTAZIONE POLIS,2230.80
+VENDITE_CLIENTE,LT,L'EMPORIO DI IOZZI SONIA,MATTONE PIENO,957.60
+VENDITE_CLIENTE,LT,L'EMPORIO DI IOZZI SONIA,PAVIMENTAZIONE POLIS,984.96
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS,MATTONE PIENO,864.00
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS,REFRATTARI,379.47
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS,REFRATTARI RETTIFICATI,819.98
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL,PAVIMENTAZIONE POLIS,2695.68
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL,REFRATTARI,640.35
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL,REFRATTARI RETTIFICATI,460.34
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL,PAVIMENTAZIONE POLIS,933.12
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL,REFRATTARI,1969.92
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL,REFRATTARI RETTIFICATI,870.33
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL,LINEA ARCHEO,1.94
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL,MATTONE PIENO,5150.40
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL,PAVIMENTAZIONE POLIS,1598.40
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL,FACCIAVISTA,1007.62
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL,MATTONE PIENO,720.00
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL,PAVIMENTAZIONE POLIS,362.88
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,3.36,LT,1,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,73.26,LT,1,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,1591.40,LT,2,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,746.68,LT,2,RM,1
+CATEGORIA_RIEPILOGO,MATTONE PIENO,38558.64,LT,16,RM,1
+CATEGORIA_RIEPILOGO,OUTLET,0.01,LT,1,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,15686.46,LT,13,RM,1
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,1240.95,LT,1,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,4910.39,LT,4,RM,1
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,5367.83,LT,5,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,0.00,LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,54909.62,61
+RIPARTIZIONE,Altro,35250.17,39
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,68207.78
+TOTALE,Fatturato_LT,60437.22
+TOTALE,Fatturato_RM,7770.56
+TOTALE,Clienti_Totali,20
+TOTALE,Clienti_LT,18
+TOTALE,Clienti_RM,2
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00247
+# Ragione Sociale: LUCIANI LEONARDO
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,0.00,0.00,,,102,0,,
+OBIETTIVI,N/A,0.00,0.00,0.00,999,0,0,0,999
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,N/A,0,0.00
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,0.00,LT,0,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,0.00,LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0.00,0
+RIPARTIZIONE,Altro,0.00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00263
+# Ragione Sociale: G 2 G SRL
+# Periodo: 01/01/2025 - 08/06/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,71453.02,99976.78,,,135,12,,
+OBIETTIVI,AN,37799.09,61385.27,90000.00,68,6,6,15,40
+OBIETTIVI,PU,33653.93,22704.27,90000.00,25,6,4,15,27
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AN,6,49079.42
+CLIENTI_PROVINCIA,PU,4,22685.71
+CLIENTI_PROVINCIA,ALB,2,21579.08
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,COPERTURE,5500.00
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,MATTONE PIENO,3600.96
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,PIASTRELLE,2526.39
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COPERTURE,4070.00
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,0.08
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,FACCIAVISTA,0.88
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,PIASTRELLE,4.65
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COPERTURE,8932.00
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COTTO A MANO ANTICHE TERRE,12.32
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,MATTONE PIENO,1305.60
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,COPERTURE,4356.00
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,MATTONE PIENO,691.20
+VENDITE_CLIENTE,PU,EDIL PIEFFE SRL,MATTONE PIENO,7286.40
+VENDITE_CLIENTE,AN,GIACCHE' SRL,MATTONE PIENO,15033.60
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COPERTURE,4404.69
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COTTO A MANO ANTICHE TERRE,4.25
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,MATTONE PIENO,729.60
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,PIASTRELLE,5.32
+VENDITE_CLIENTE,ALB,KONI ARJAN,COPERTURE,11622.48
+VENDITE_CLIENTE,ALB,KONI ARJAN,MATTONE PIENO,252.00
+VENDITE_CLIENTE,ALB,KONI ARJAN,OUTLET,2531.50
+VENDITE_CLIENTE,ALB,KONI ARJAN,PIASTRELLE,745.71
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI,347.95
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI RETTIFICATI,387.60
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COPERTURE,3875.36
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,6.97
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,LINEA ARCHEO,546.52
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,MATTONE PIENO,4620.00
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,PIASTRELLE,7.81
+VENDITE_CLIENTE,AN,NUOVA COMES SRL,MATTONE PIENO,3365.68
+VENDITE_CLIENTE,ALB,KONI ARJAN,FACCIAVISTA,5691.84
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,42760.53,AN,4,PU,2
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,23.62,AN,2,PU,2
+CATEGORIA_RIEPILOGO,FACCIAVISTA,5692.72,AN,0,PU,1
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,546.52,AN,1,PU,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,36885.04,AN,5,PU,3
+CATEGORIA_RIEPILOGO,OUTLET,2531.50,AN,0,PU,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,3289.88,AN,2,PU,2
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,TAVELLONI,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI,347.95,AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,387.60,AN,0,PU,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,0.00,AN,0,PU,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,82583.17,83
+RIPARTIZIONE,Altro,17393.61,17
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,93344.21
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,12
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00263
+# Ragione Sociale: G2G TRADE CONSULTING SRL
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,100612.29,132483.77,,,183,14,,
+OBIETTIVI,AN,56773.08,75247.30,90000.00,84,7,7,15,47
+OBIETTIVI,PU,43839.21,28424.27,90000.00,32,7,5,15,33
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AN,7,63306.02
+CLIENTI_PROVINCIA,PU,5,28405.71
+CLIENTI_PROVINCIA,ALB,2,47726.28
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,COPERTURE,8230.00
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,MATTONE PIENO,5396.16
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,PIASTRELLE,2526.39
+VENDITE_CLIENTE,AN,EDILMUSONE SRL,COPERTURE,2415.00
+VENDITE_CLIENTE,AN,EDILMUSONE SRL,MATTONE PIENO,1987.20
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COPERTURE,4070.00
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,0.08
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,FACCIAVISTA,0.88
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,PIASTRELLE,4.65
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COPERTURE,8932.00
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COTTO A MANO ANTICHE TERRE,12.32
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,MATTONE PIENO,1305.60
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,COPERTURE,4356.00
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,MATTONE PIENO,691.20
+VENDITE_CLIENTE,PU,EDIL PIEFFE SRL,MATTONE PIENO,7286.40
+VENDITE_CLIENTE,PU,RI.M.EDIL SRL,COPERTURE,5720.00
+VENDITE_CLIENTE,AN,GIACCHE' SRL,FACCIAVISTA,1670.40
+VENDITE_CLIENTE,AN,GIACCHE' SRL,MATTONE PIENO,18662.40
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COPERTURE,4404.69
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COTTO A MANO ANTICHE TERRE,4.25
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,MATTONE PIENO,729.60
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,PIASTRELLE,5.32
+VENDITE_CLIENTE,ALB,KONI ARJAN,COPERTURE,20122.44
+VENDITE_CLIENTE,ALB,KONI ARJAN,CORRIM.COPRIM.,540.00
+VENDITE_CLIENTE,ALB,KONI ARJAN,MATTONE PIENO,252.00
+VENDITE_CLIENTE,ALB,KONI ARJAN,OUTLET,5726.50
+VENDITE_CLIENTE,ALB,KONI ARJAN,PIASTRELLE,745.71
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI,650.35
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI RETTIFICATI,775.20
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COPERTURE,3875.36
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,6.97
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,LINEA ARCHEO,546.52
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,MATTONE PIENO,4620.00
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,PIASTRELLE,7.81
+VENDITE_CLIENTE,AN,NUOVA COMES SRL,MATTONE PIENO,3365.68
+VENDITE_CLIENTE,ALB,KONI ARJAN,FACCIAVISTA,18914.08
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,62125.49,AN,5,PU,3
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,540.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,23.62,AN,2,PU,2
+CATEGORIA_RIEPILOGO,FACCIAVISTA,20585.36,AN,1,PU,1
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,546.52,AN,1,PU,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,44296.24,AN,6,PU,3
+CATEGORIA_RIEPILOGO,OUTLET,5726.50,AN,0,PU,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,3289.88,AN,2,PU,2
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,TAVELLONI,0.00,AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI,650.35,AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,775.20,AN,0,PU,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,0.00,AN,0,PU,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,109359.33,78
+RIPARTIZIONE,Altro,30578.68,22
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,139438.01
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,14
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+
+
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00272
+# Ragione Sociale: RAPPRESENTANZE & SERVIZI SRL
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,0.00,2696.39,,,5,5,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CR,2,3047.46
+CLIENTI_PROVINCIA,LO,1,756.87
+CLIENTI_PROVINCIA,PC,2,892.62
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,CR,PLACIDO SRL,COPERTURE,396.90
+VENDITE_CLIENTE,CR,FcS SRL,COPERTURE,2650.56
+VENDITE_CLIENTE,LO,CREBI ART SRL,COPERTURE,657.24
+VENDITE_CLIENTE,LO,CREBI ART SRL,CORRIM.COPRIM.,99.63
+VENDITE_CLIENTE,PC,EDILCERAMICA S.R.L.,FACCIAVISTA,868.10
+VENDITE_CLIENTE,PC,REMONDINI MARA & C. SNC,COTTO A MANO ANTICHE TERRE,6.97
+VENDITE_CLIENTE,PC,REMONDINI MARA & C. SNC,PIASTRELLE,17.55
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,3704.70,CR,2,LO,1
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,99.63,CR,0,LO,1
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,6.97,CR,0,LO,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,868.10,CR,0,LO,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,OUTLET,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,17.55,CR,0,LO,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,TAVELLONI,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,REFRATTARI,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,0.00,CR,0,LO,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,0.00,CR,0,LO,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,3704.70,77
+RIPARTIZIONE,Altro,992.25,23
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,4696.95
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,5
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
