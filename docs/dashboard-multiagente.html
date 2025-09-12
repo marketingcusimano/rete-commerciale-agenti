@@ -443,7 +443,7 @@
             color: var(--text-light);
         }
 
-        /* Filtro Regioni Styles */
+        /* Filtro Styles */
         .filter-container {
             display: flex;
             align-items: center;
@@ -555,6 +555,7 @@
             margin-bottom: 1rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
         }
 
         .filter-action-btn {
@@ -797,6 +798,16 @@
             </div>
 
             <div id="agents-content" class="tab-content" style="display: none;">
+                <!-- AGGIUNTO: Filtro per Agenti -->
+                <div class="filter-container">
+                    <button class="filter-button" id="agentFilterBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                        </svg>
+                        Filtra Agenti
+                        <span class="filter-count" id="agentFilterCount">Tutti</span>
+                    </button>
+                </div>
                 <div class="agent-grid" id="agentGrid"></div>
             </div>
 
@@ -843,6 +854,36 @@
         </div>
     </div>
 
+    <!-- AGGIUNTO: Modal Filtro Agenti -->
+    <div class="modal-overlay" id="agentFilterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Filtro Agenti</h3>
+                <button class="modal-close" id="closeAgentFilter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-actions">
+                    <button class="filter-action-btn" id="selectAllAgents">Seleziona Tutti</button>
+                    <button class="filter-action-btn" id="deselectAllAgents">Deseleziona Tutti</button>
+                    <button class="filter-action-btn" id="selectTopPerformers">Top Performer</button>
+                    <button class="filter-action-btn" id="selectLowPerformers">Performance Basse</button>
+                </div>
+                <div class="region-filter-list" id="agentFilterList">
+                    <!-- Lista agenti sarà popolata dinamicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAgentFilter">Annulla</button>
+                <button class="btn btn-primary" id="applyAgentFilter">Applica Filtro</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
         
@@ -852,6 +893,11 @@
         let selectedRegions = new Set();
         let availableRegions = new Map();
         let tempSelectedRegions = new Set();
+        
+        // AGGIUNTE: Variabili per filtro agenti
+        let selectedAgents = new Set();
+        let availableAgents = [];
+        let tempSelectedAgents = new Set();
 
         function parseNumber(value) {
             if (typeof value === 'number') return value;
@@ -1037,6 +1083,35 @@
             });
         }
 
+        // AGGIUNTA: Funzione per popolare agenti disponibili
+        function populateAvailableAgents() {
+            availableAgents = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                
+                // Trova le regioni dell'agente
+                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                
+                let status = 'Critico';
+                if (growth >= 10) status = 'Ottimo';
+                else if (growth >= 0) status = 'Buono';
+                
+                return {
+                    codice: agent.codice,
+                    nome: agent.nome,
+                    current,
+                    previous,
+                    growth,
+                    clients,
+                    status,
+                    regions
+                };
+            }).sort((a, b) => b.current - a.current);
+        }
+
         function updateFilterButtonText() {
             const filterCount = document.getElementById('filterCount');
             if (!filterCount) return;
@@ -1049,6 +1124,22 @@
                 filterCount.textContent = 'Tutte';
             } else {
                 filterCount.textContent = `${selectedRegions.size}/${totalRegions}`;
+            }
+        }
+
+        // AGGIUNTA: Funzione per aggiornare testo filtro agenti
+        function updateAgentFilterButtonText() {
+            const filterCount = document.getElementById('agentFilterCount');
+            if (!filterCount) return;
+            
+            const totalAgents = availableAgents.length;
+            
+            if (selectedAgents.size === 0) {
+                filterCount.textContent = 'Tutti';
+            } else if (selectedAgents.size === totalAgents) {
+                filterCount.textContent = 'Tutti';
+            } else {
+                filterCount.textContent = `${selectedAgents.size}/${totalAgents}`;
             }
         }
 
@@ -1135,8 +1226,6 @@
         }
 
         function openAgentFilterModal() {
-            console.log('Apertura filtro agenti...', availableAgents.length, 'agenti disponibili');
-            
             tempSelectedAgents = new Set(selectedAgents);
             
             const filterList = document.getElementById('agentFilterList');
@@ -1145,11 +1234,9 @@
                 return;
             }
             
-            console.log('Popolamento lista agenti...');
             filterList.innerHTML = '';
             
             availableAgents.forEach((agent, index) => {
-                console.log(`Agente ${index + 1}:`, agent.nome, agent.codice);
                 const isSelected = tempSelectedAgents.has(agent.codice);
                 
                 const item = document.createElement('div');
@@ -1192,7 +1279,6 @@
             
             const modal = document.getElementById('agentFilterModal');
             if (modal) {
-                console.log('Apertura modal agenti...');
                 modal.classList.add('show');
             } else {
                 console.error('Element agentFilterModal non trovato');
@@ -1378,12 +1464,14 @@
             if (overviewElement) overviewElement.style.display = 'block';
             
             populateAvailableRegions();
+            populateAvailableAgents(); // AGGIUNTA
             renderKPIMetrics();
             renderCharts();
             renderPerformanceTable();
             renderAgentCards();
             renderRegionCards();
             updateFilterButtonText();
+            updateAgentFilterButtonText(); // AGGIUNTA
         }
 
         function renderKPIMetrics() {
@@ -1592,7 +1680,12 @@
             const agentGridElement = document.getElementById('agentGrid');
             if (!agentGridElement) return;
             
-            agentGridElement.innerHTML = allData.map(agent => {
+            // MODIFICATA: Filtra agenti se ci sono filtri selezionati
+            const filteredAgents = allData.filter(agent => {
+                return selectedAgents.size === 0 || selectedAgents.has(agent.codice);
+            });
+            
+            agentGridElement.innerHTML = filteredAgents.map(agent => {
                 const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
                 const current = general?.Anno_Corrente || 0;
                 const previous = general?.Anno_Precedente || 0;
