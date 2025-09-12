@@ -1752,7 +1752,7 @@
             });
 
             regionGridElement.innerHTML = filteredRegions.map(region => `
-                <div class="region-card">
+                <div class="region-card" data-region="${region.name}">
                     <div class="region-header">
                         <div class="region-icon">${region.name.charAt(0)}</div>
                         <div class="region-info">
@@ -1775,6 +1775,605 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        // NUOVE FUNZIONI: Gestione modal dettaglio regione
+        function initializeRegionDetailModal() {
+            // Event listeners per i tab del modal
+            const regionTabs = document.querySelectorAll('.region-detail-tab');
+            regionTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.regionTab;
+                    switchRegionTab(tabId);
+                });
+            });
+
+            // Event listener per chiusura modal
+            const closeBtn = document.getElementById('closeRegionDetail');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeRegionDetailModal);
+            }
+
+            // Event listener per click su region cards
+            document.addEventListener('click', (e) => {
+                const regionCard = e.target.closest('.region-card');
+                if (regionCard) {
+                    const regionName = regionCard.dataset.region;
+                    openRegionDetailModal(regionName);
+                }
+            });
+
+            // Chiusura con ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeRegionDetailModal();
+                }
+            });
+
+            // Chiusura cliccando fuori dal modal
+            const modal = document.getElementById('regionDetailModal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target.id === 'regionDetailModal') {
+                        closeRegionDetailModal();
+                    }
+                });
+            }
+        }
+
+        function openRegionDetailModal(regionName) {
+            const region = availableRegions.get(regionName);
+            if (!region) return;
+
+            currentRegionData = region;
+            
+            // Aggiorna header del modal
+            const icon = document.getElementById('regionDetailIcon');
+            const name = document.getElementById('regionDetailName');
+            const summary = document.getElementById('regionDetailSummary');
+            
+            if (icon) icon.textContent = region.name.charAt(0);
+            if (name) name.textContent = region.name;
+            if (summary) {
+                summary.textContent = `${region.agents.size} agenti attivi in ${region.provinces.size} province`;
+            }
+
+            // Mostra modal
+            const modal = document.getElementById('regionDetailModal');
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // Carica contenuti del tab attivo
+            switchRegionTab('overview');
+        }
+
+        function closeRegionDetailModal() {
+            const modal = document.getElementById('regionDetailModal');
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+
+            // Pulisci charts
+            Object.values(regionDetailCharts).forEach(chart => {
+                if (chart && typeof chart.destroy === 'function') {
+                    chart.destroy();
+                }
+            });
+            regionDetailCharts = {};
+            currentRegionData = null;
+        }
+
+        function switchRegionTab(tabId) {
+            // Aggiorna tab attivi
+            document.querySelectorAll('.region-detail-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.region-detail-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            const activeTab = document.querySelector(`[data-region-tab="${tabId}"]`);
+            const activeContent = document.getElementById(`region${tabId.charAt(0).toUpperCase() + tabId.slice(1)}Tab`);
+            
+            if (activeTab) activeTab.classList.add('active');
+            if (activeContent) activeContent.classList.add('active');
+
+            currentRegionTab = tabId;
+
+            // Carica contenuti specifici del tab
+            setTimeout(() => {
+                switch(tabId) {
+                    case 'overview':
+                        renderRegionOverview();
+                        break;
+                    case 'provinces':
+                        renderRegionProvinces();
+                        break;
+                    case 'agents':
+                        renderRegionAgents();
+                        break;
+                    case 'analytics':
+                        renderRegionAnalytics();
+                        break;
+                }
+            }, 100);
+        }
+
+        function renderRegionOverview() {
+            if (!currentRegionData) return;
+
+            // Calcola metriche regionali
+            const regionAgents = allData.filter(agent => 
+                agent.clienti_provincia.some(prov => 
+                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
+                )
+            );
+
+            let totalPrevious = 0;
+            regionAgents.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
+                        // Simula dato anno precedente
+                        totalPrevious += (prov.Fatturato || 0) * 0.85;
+                    }
+                });
+            });
+
+            const growth = totalPrevious > 0 ? 
+                ((currentRegionData.revenue - totalPrevious) / totalPrevious * 100) : 0;
+
+            // Popola metriche overview
+            const metricsContainer = document.getElementById('regionOverviewMetrics');
+            if (metricsContainer) {
+                metricsContainer.innerHTML = `
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${formatCurrency(currentRegionData.revenue)}</div>
+                        <div class="region-overview-label">Fatturato Totale</div>
+                        <div class="region-overview-change ${growth >= 0 ? 'positive' : 'negative'}">
+                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${currentRegionData.clients}</div>
+                        <div class="region-overview-label">Clienti Attivi</div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${currentRegionData.agents.size}</div>
+                        <div class="region-overview-label">Agenti</div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${currentRegionData.provinces.size}</div>
+                        <div class="region-overview-label">Province</div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${formatCurrency(currentRegionData.revenue / currentRegionData.agents.size)}</div>
+                        <div class="region-overview-label">Media per Agente</div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${Math.round(currentRegionData.clients / currentRegionData.agents.size)}</div>
+                        <div class="region-overview-label">Clienti per Agente</div>
+                    </div>
+                `;
+            }
+
+            // Render performance chart
+            renderRegionPerformanceChart();
+            
+            // Render top performers
+            renderRegionTopPerformers();
+        }
+
+        function renderRegionPerformanceChart() {
+            const canvas = document.getElementById('regionPerformanceChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            
+            if (regionDetailCharts.performance) {
+                regionDetailCharts.performance.destroy();
+            }
+
+            // Simula dati mensili
+            const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+            const monthlyData = months.map((month, index) => {
+                const baseValue = currentRegionData.revenue / 12;
+                const variation = (Math.sin(index * 0.5) + Math.random() * 0.3) * baseValue * 0.2;
+                return Math.max(0, baseValue + variation);
+            });
+
+            regionDetailCharts.performance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Fatturato Mensile',
+                        data: monthlyData,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: context => formatCurrency(context.parsed.y)
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: value => formatCurrency(value) }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRegionTopPerformers() {
+            const container = document.getElementById('regionTopPerformers');
+            if (!container) return;
+
+            const regionAgents = allData.filter(agent => 
+                agent.clienti_provincia.some(prov => 
+                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
+                )
+            );
+
+            const performers = regionAgents.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                
+                return { agent, current, growth };
+            }).sort((a, b) => b.current - a.current).slice(0, 5);
+
+            container.innerHTML = performers.map((performer, index) => `
+                <div class="performer-item">
+                    <div class="performer-rank">${index + 1}</div>
+                    <div class="performer-info">
+                        <div class="performer-name">${performer.agent.nome}</div>
+                        <div class="performer-value">${formatCurrency(performer.current)}</div>
+                    </div>
+                    <div class="performer-change ${performer.growth >= 0 ? 'positive' : 'negative'}">
+                        ${performer.growth >= 0 ? '+' : ''}${performer.growth.toFixed(1)}%
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRegionProvinces() {
+            if (!currentRegionData) return;
+
+            // Render provinces comparison chart
+            const canvas = document.getElementById('provincesComparisonChart');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                
+                if (regionDetailCharts.provinces) {
+                    regionDetailCharts.provinces.destroy();
+                }
+
+                const provinceData = {};
+                allData.forEach(agent => {
+                    agent.clienti_provincia.forEach(prov => {
+                        if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
+                            if (!provinceData[prov.Provincia]) {
+                                provinceData[prov.Provincia] = { revenue: 0, clients: 0 };
+                            }
+                            provinceData[prov.Provincia].revenue += prov.Fatturato || 0;
+                            provinceData[prov.Provincia].clients += prov.Clienti_Serviti || 0;
+                        }
+                    });
+                });
+
+                const labels = Object.keys(provinceData);
+                const data = Object.values(provinceData).map(p => p.revenue);
+                
+                regionDetailCharts.provinces = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Fatturato per Provincia',
+                            data,
+                            backgroundColor: '#2563eb',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => formatCurrency(context.parsed.y)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: value => formatCurrency(value) }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Render province cards
+            const container = document.getElementById('provinceDetailGrid');
+            if (container) {
+                const provinceData = {};
+                allData.forEach(agent => {
+                    agent.clienti_provincia.forEach(prov => {
+                        if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
+                            if (!provinceData[prov.Provincia]) {
+                                provinceData[prov.Provincia] = { 
+                                    revenue: 0, 
+                                    clients: 0, 
+                                    agents: new Set() 
+                                };
+                            }
+                            provinceData[prov.Provincia].revenue += prov.Fatturato || 0;
+                            provinceData[prov.Provincia].clients += prov.Clienti_Serviti || 0;
+                            provinceData[prov.Provincia].agents.add(agent.codice);
+                        }
+                    });
+                });
+
+                container.innerHTML = Object.entries(provinceData).map(([provincia, data]) => {
+                    const avgRevenue = currentRegionData.revenue / currentRegionData.provinces.size;
+                    const performance = data.revenue >= avgRevenue ? 'success' : 
+                                      data.revenue >= avgRevenue * 0.8 ? 'warning' : 'danger';
+                    
+                    return `
+                        <div class="province-card">
+                            <div class="province-header">
+                                <div class="province-name">${provincia}</div>
+                                <div class="province-badge badge ${performance}">
+                                    ${performance === 'success' ? 'Top' : performance === 'warning' ? 'Medio' : 'Basso'}
+                                </div>
+                            </div>
+                            <div class="province-metrics">
+                                <div class="province-metric">
+                                    <div class="province-metric-value">${formatCurrency(data.revenue)}</div>
+                                    <div class="province-metric-label">Fatturato</div>
+                                </div>
+                                <div class="province-metric">
+                                    <div class="province-metric-value">${data.clients}</div>
+                                    <div class="province-metric-label">Clienti</div>
+                                </div>
+                                <div class="province-metric">
+                                    <div class="province-metric-value">${data.agents.size}</div>
+                                    <div class="province-metric-label">Agenti</div>
+                                </div>
+                                <div class="province-metric">
+                                    <div class="province-metric-value">${formatCurrency(data.revenue / data.agents.size)}</div>
+                                    <div class="province-metric-label">Media/Agente</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderRegionAgents() {
+            if (!currentRegionData) return;
+
+            const container = document.getElementById('regionAgentGrid');
+            if (!container) return;
+
+            const regionAgents = allData.filter(agent => 
+                agent.clienti_provincia.some(prov => 
+                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
+                )
+            );
+
+            container.innerHTML = regionAgents.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                
+                // Calcola fatturato specifico per questa regione
+                const regionRevenue = agent.clienti_provincia
+                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
+                    .reduce((sum, prov) => sum + (prov.Fatturato || 0), 0);
+                    
+                const regionClients = agent.clienti_provincia
+                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
+                    .reduce((sum, prov) => sum + (prov.Clienti_Serviti || 0), 0);
+
+                const agentProvinces = agent.clienti_provincia
+                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
+                    .map(prov => prov.Provincia);
+
+                return `
+                    <div class="agent-detail-card">
+                        <div class="agent-detail-header">
+                            <div class="agent-avatar">${agent.nome.split(' ').map(n => n.charAt(0)).join('')}</div>
+                            <div class="agent-detail-info">
+                                <h4>${agent.nome}</h4>
+                                <p>${agent.codice} • ${agentProvinces.join(', ')}</p>
+                            </div>
+                        </div>
+                        <div class="agent-detail-metrics">
+                            <div class="agent-detail-metric">
+                                <div class="agent-detail-metric-value">${formatCurrency(regionRevenue)}</div>
+                                <div class="agent-detail-metric-label">Fatturato Regione</div>
+                            </div>
+                            <div class="agent-detail-metric">
+                                <div class="agent-detail-metric-value">${regionClients}</div>
+                                <div class="agent-detail-metric-label">Clienti Regione</div>
+                            </div>
+                            <div class="agent-detail-metric">
+                                <div class="agent-detail-metric-value">${formatCurrency(current)}</div>
+                                <div class="agent-detail-metric-label">Totale Agente</div>
+                            </div>
+                        </div>
+                        <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                ${growth >= 0 ? 
+                                    '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                    '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                }
+                            </svg>
+                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% crescita totale
+                        </div>
+                        <div style="margin-top: 0.75rem;">
+                            <span class="badge ${growth >= 10 ? 'success' : growth >= 0 ? 'warning' : 'danger'}">
+                                ${growth >= 10 ? 'Top Performer' : growth >= 0 ? 'Performance Buona' : 'Necessita Attenzione'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderRegionAnalytics() {
+            if (!currentRegionData) return;
+
+            // Growth trend chart
+            const growthCanvas = document.getElementById('regionGrowthChart');
+            if (growthCanvas) {
+                const ctx = growthCanvas.getContext('2d');
+                
+                if (regionDetailCharts.growth) {
+                    regionDetailCharts.growth.destroy();
+                }
+
+                const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu'];
+                const growthData = months.map((month, index) => {
+                    const base = 5 + Math.sin(index * 0.8) * 3;
+                    return base + (Math.random() - 0.5) * 4;
+                });
+
+                regionDetailCharts.growth = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Crescita %',
+                            data: growthData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: value => `${value.toFixed(1)}%` }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Clients distribution chart
+            const clientsCanvas = document.getElementById('regionClientsChart');
+            if (clientsCanvas) {
+                const ctx = clientsCanvas.getContext('2d');
+                
+                if (regionDetailCharts.clients) {
+                    regionDetailCharts.clients.destroy();
+                }
+
+                // Simula distribuzione clienti per categoria
+                const categories = ['Piccole Imprese', 'Medie Imprese', 'Grandi Aziende', 'Enti Pubblici'];
+                const distribution = [40, 35, 20, 5]; // Percentuali
+
+                regionDetailCharts.clients = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: categories,
+                        datasets: [{
+                            data: distribution,
+                            backgroundColor: ['#2563eb', '#06b6d4', '#10b981', '#f59e0b'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+
+            // Comparison chart
+            const comparisonCanvas = document.getElementById('regionComparisonChart');
+            if (comparisonCanvas) {
+                const ctx = comparisonCanvas.getContext('2d');
+                
+                if (regionDetailCharts.comparison) {
+                    regionDetailCharts.comparison.destroy();
+                }
+
+                // Confronto con altre regioni principali
+                const regions = Array.from(availableRegions.values())
+                    .sort((a, b) => b.revenue - a.revenue)
+                    .slice(0, 5);
+
+                regionDetailCharts.comparison = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Fatturato', 'Clienti', 'Agenti', 'Crescita', 'Efficienza'],
+                        datasets: regions.map((region, index) => ({
+                            label: region.name,
+                            data: [
+                                Math.min(100, (region.revenue / regions[0].revenue) * 100),
+                                Math.min(100, (region.clients / regions[0].clients) * 100),
+                                Math.min(100, (region.agents.size / regions[0].agents.size) * 100),
+                                Math.min(100, 70 + Math.random() * 30), // Simula crescita
+                                Math.min(100, (region.revenue / region.agents.size) / (regions[0].revenue / regions[0].agents.size) * 100)
+                            ],
+                            borderColor: ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'][index],
+                            backgroundColor: ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'][index] + '20',
+                            borderWidth: 2
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        elements: {
+                            line: { borderWidth: 2 }
+                        },
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         function formatCurrency(value) {
