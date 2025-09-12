@@ -2423,6 +2423,14 @@
                 } catch (error) {
                     console.error('Errore inizializzazione filtro agenti:', error);
                 }
+                
+                // NUOVO: Inizializza modal dettaglio regione
+                try {
+                    initializeRegionDetailModal();
+                    console.log('Modal dettaglio regione inizializzato');
+                } catch (error) {
+                    console.error('Errore inizializzazione modal regione:', error);
+                }
             }, 500);
         });
     </script>
