@@ -478,6 +478,178 @@
             font-size: 0.75rem;
         }
 
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--surface-3);
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-action-btn {
+            padding: 0.5rem 0.75rem;
+            background: var(--surface-3);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .filter-action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .region-filter-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .region-filter-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .region-filter-item:hover {
+            background: var(--surface-3);
+        }
+
+        .region-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .region-filter-info {
+            flex: 1;
+        }
+
+        .region-filter-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .region-filter-stats {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: var(--surface-3);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
         @media (max-width: 1024px) {
             .charts-grid { grid-template-columns: 1fr; }
             .main-content, .header { padding: 1rem; }
@@ -630,17 +802,45 @@
 
             <div id="regions-content" class="tab-content" style="display: none;">
                 <div class="filter-container">
-                    <button class="filter-button" onclick="alert('Filtro regioni - funzionalità in sviluppo')">
+                    <button class="filter-button" id="regionFilterBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
                         </svg>
                         Filtra Regioni
-                        <span class="filter-count">Tutte</span>
+                        <span class="filter-count" id="filterCount">Tutte</span>
                     </button>
                 </div>
                 <div class="region-grid" id="regionGrid"></div>
             </div>
         </main>
+
+        <!-- Modal Filtro Regioni -->
+        <div class="modal-overlay" id="regionFilterModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">Filtro Regioni</h3>
+                    <button class="modal-close" id="closeRegionFilter">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="filter-actions">
+                        <button class="filter-action-btn" id="selectAllRegions">Seleziona Tutte</button>
+                        <button class="filter-action-btn" id="deselectAllRegions">Deseleziona Tutte</button>
+                    </div>
+                    <div class="region-filter-list" id="regionFilterList">
+                        <!-- Lista regioni sarà popolata dinamicamente -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelRegionFilter">Annulla</button>
+                    <button class="btn btn-primary" id="applyRegionFilter">Applica Filtro</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -649,6 +849,9 @@
         let allData = [];
         let currentTab = 'overview';
         let charts = {};
+        let selectedRegions = new Set();
+        let availableRegions = new Map();
+        let tempSelectedRegions = new Set();
 
         function parseNumber(value) {
             if (typeof value === 'number') return value;
@@ -675,22 +878,18 @@
                     tab.addEventListener('click', () => {
                         const tabId = tab.dataset.tab;
                         
-                        // Remove active class from all tabs
                         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                         tab.classList.add('active');
                         
-                        // Hide all tab contents
                         document.querySelectorAll('.tab-content').forEach(content => {
                             content.style.display = 'none';
                         });
                         
-                        // Show target content
                         const targetContent = document.getElementById(`${tabId}-content`);
                         if (targetContent) targetContent.style.display = 'block';
                         
                         currentTab = tabId;
                         
-                        // Resize charts after tab switch
                         setTimeout(() => {
                             Object.values(charts).forEach(chart => {
                                 if (chart && typeof chart.resize === 'function') {
@@ -812,6 +1011,177 @@
             return map[prov] || prov;
         }
 
+        function populateAvailableRegions() {
+            availableRegions.clear();
+            
+            allData.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    const regionName = getRegionFromProvince(prov.Provincia);
+                    
+                    if (!availableRegions.has(regionName)) {
+                        availableRegions.set(regionName, {
+                            name: regionName,
+                            revenue: 0,
+                            clients: 0,
+                            agents: new Set(),
+                            provinces: new Set()
+                        });
+                    }
+                    
+                    const region = availableRegions.get(regionName);
+                    region.revenue += prov.Fatturato || 0;
+                    region.clients += prov.Clienti_Serviti || 0;
+                    region.agents.add(agent.codice);
+                    region.provinces.add(prov.Provincia);
+                });
+            });
+        }
+
+        function updateFilterButtonText() {
+            const filterCount = document.getElementById('filterCount');
+            if (!filterCount) return;
+            
+            const totalRegions = availableRegions.size;
+            
+            if (selectedRegions.size === 0) {
+                filterCount.textContent = 'Tutte';
+            } else if (selectedRegions.size === totalRegions) {
+                filterCount.textContent = 'Tutte';
+            } else {
+                filterCount.textContent = `${selectedRegions.size}/${totalRegions}`;
+            }
+        }
+
+        function openRegionFilterModal() {
+            tempSelectedRegions = new Set(selectedRegions);
+            
+            const filterList = document.getElementById('regionFilterList');
+            if (!filterList) return;
+            
+            filterList.innerHTML = '';
+            
+            Array.from(availableRegions.values())
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .forEach(region => {
+                    const isSelected = tempSelectedRegions.has(region.name);
+                    
+                    const item = document.createElement('div');
+                    item.className = 'region-filter-item';
+                    item.innerHTML = `
+                        <input type="checkbox" 
+                               class="region-checkbox" 
+                               id="region-${region.name}" 
+                               ${isSelected ? 'checked' : ''}
+                               data-region="${region.name}">
+                        <div class="region-filter-info">
+                            <div class="region-filter-name">${region.name}</div>
+                            <div class="region-filter-stats">
+                                ${formatCurrency(region.revenue)} • ${region.clients} clienti • ${region.agents.size} agenti
+                            </div>
+                        </div>
+                    `;
+                    
+                    const checkbox = item.querySelector('.region-checkbox');
+                    if (checkbox) {
+                        checkbox.addEventListener('change', (e) => {
+                            if (e.target.checked) {
+                                tempSelectedRegions.add(region.name);
+                            } else {
+                                tempSelectedRegions.delete(region.name);
+                            }
+                        });
+                    }
+                    
+                    filterList.appendChild(item);
+                });
+            
+            const modal = document.getElementById('regionFilterModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeRegionFilterModal() {
+            const modal = document.getElementById('regionFilterModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function applyRegionFilter() {
+            selectedRegions = new Set(tempSelectedRegions);
+            renderRegionCards();
+            updateFilterButtonText();
+            closeRegionFilterModal();
+        }
+
+        function selectAllRegions() {
+            tempSelectedRegions.clear();
+            availableRegions.forEach((region, name) => {
+                tempSelectedRegions.add(name);
+            });
+            
+            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllRegions() {
+            tempSelectedRegions.clear();
+            
+            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function initializeRegionFilter() {
+            const regionFilterBtn = document.getElementById('regionFilterBtn');
+            const closeRegionFilter = document.getElementById('closeRegionFilter');
+            const cancelRegionFilter = document.getElementById('cancelRegionFilter');
+            const applyRegionFilterBtn = document.getElementById('applyRegionFilter');
+            const selectAllRegionsBtn = document.getElementById('selectAllRegions');
+            const deselectAllRegionsBtn = document.getElementById('deselectAllRegions');
+            const regionFilterModal = document.getElementById('regionFilterModal');
+
+            if (regionFilterBtn) {
+                regionFilterBtn.addEventListener('click', openRegionFilterModal);
+            }
+            
+            if (closeRegionFilter) {
+                closeRegionFilter.addEventListener('click', closeRegionFilterModal);
+            }
+            
+            if (cancelRegionFilter) {
+                cancelRegionFilter.addEventListener('click', closeRegionFilterModal);
+            }
+            
+            if (applyRegionFilterBtn) {
+                applyRegionFilterBtn.addEventListener('click', applyRegionFilter);
+            }
+            
+            if (selectAllRegionsBtn) {
+                selectAllRegionsBtn.addEventListener('click', selectAllRegions);
+            }
+            
+            if (deselectAllRegionsBtn) {
+                deselectAllRegionsBtn.addEventListener('click', deselectAllRegions);
+            }
+            
+            if (regionFilterModal) {
+                regionFilterModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'regionFilterModal') {
+                        closeRegionFilterModal();
+                    }
+                });
+            }
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && regionFilterModal && regionFilterModal.classList.contains('show')) {
+                    closeRegionFilterModal();
+                }
+            });
+        }
+
         function renderDashboard() {
             const loadingElement = document.getElementById('loading');
             const overviewElement = document.getElementById('overview-content');
@@ -819,11 +1189,13 @@
             if (loadingElement) loadingElement.style.display = 'none';
             if (overviewElement) overviewElement.style.display = 'block';
             
+            populateAvailableRegions();
             renderKPIMetrics();
             renderCharts();
             renderPerformanceTable();
             renderAgentCards();
             renderRegionCards();
+            updateFilterButtonText();
         }
 
         function renderKPIMetrics() {
@@ -1094,29 +1466,11 @@
             const regionGridElement = document.getElementById('regionGrid');
             if (!regionGridElement) return;
             
-            const regions = {};
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    
-                    if (!regions[regionName]) {
-                        regions[regionName] = {
-                            name: regionName,
-                            revenue: 0,
-                            clients: 0,
-                            agents: new Set(),
-                            provinces: new Set()
-                        };
-                    }
-                    
-                    regions[regionName].revenue += prov.Fatturato || 0;
-                    regions[regionName].clients += prov.Clienti_Serviti || 0;
-                    regions[regionName].agents.add(agent.codice);
-                    regions[regionName].provinces.add(prov.Provincia);
-                });
+            const filteredRegions = Array.from(availableRegions.values()).filter(region => {
+                return selectedRegions.size === 0 || selectedRegions.has(region.name);
             });
 
-            regionGridElement.innerHTML = Object.values(regions).map(region => `
+            regionGridElement.innerHTML = filteredRegions.map(region => `
                 <div class="region-card">
                     <div class="region-header">
                         <div class="region-icon">${region.name.charAt(0)}</div>
@@ -1175,7 +1529,6 @@
                 console.error('Errore caricamento dati:', error);
             }
             
-            // Inizializza il filtro regioni
             setTimeout(() => {
                 try {
                     initializeRegionFilter();
