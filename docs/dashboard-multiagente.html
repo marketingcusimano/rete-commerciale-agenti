@@ -1182,6 +1182,64 @@
             });
         }
 
+        function initializeAgentFilter() {
+            const agentFilterBtn = document.getElementById('agentFilterBtn');
+            const closeAgentFilter = document.getElementById('closeAgentFilter');
+            const cancelAgentFilter = document.getElementById('cancelAgentFilter');
+            const applyAgentFilterBtn = document.getElementById('applyAgentFilter');
+            const selectAllAgentsBtn = document.getElementById('selectAllAgents');
+            const deselectAllAgentsBtn = document.getElementById('deselectAllAgents');
+            const selectTopPerformersBtn = document.getElementById('selectTopPerformers');
+            const selectLowPerformersBtn = document.getElementById('selectLowPerformers');
+            const agentFilterModal = document.getElementById('agentFilterModal');
+
+            if (agentFilterBtn) {
+                agentFilterBtn.addEventListener('click', openAgentFilterModal);
+            }
+            
+            if (closeAgentFilter) {
+                closeAgentFilter.addEventListener('click', closeAgentFilterModal);
+            }
+            
+            if (cancelAgentFilter) {
+                cancelAgentFilter.addEventListener('click', closeAgentFilterModal);
+            }
+            
+            if (applyAgentFilterBtn) {
+                applyAgentFilterBtn.addEventListener('click', applyAgentFilter);
+            }
+            
+            if (selectAllAgentsBtn) {
+                selectAllAgentsBtn.addEventListener('click', selectAllAgents);
+            }
+            
+            if (deselectAllAgentsBtn) {
+                deselectAllAgentsBtn.addEventListener('click', deselectAllAgents);
+            }
+            
+            if (selectTopPerformersBtn) {
+                selectTopPerformersBtn.addEventListener('click', selectTopPerformers);
+            }
+            
+            if (selectLowPerformersBtn) {
+                selectLowPerformersBtn.addEventListener('click', selectLowPerformers);
+            }
+            
+            if (agentFilterModal) {
+                agentFilterModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'agentFilterModal') {
+                        closeAgentFilterModal();
+                    }
+                });
+            }
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && agentFilterModal && agentFilterModal.classList.contains('show')) {
+                    closeAgentFilterModal();
+                }
+            });
+        }
+
         function renderDashboard() {
             const loadingElement = document.getElementById('loading');
             const overviewElement = document.getElementById('overview-content');
@@ -1535,6 +1593,13 @@
                     console.log('Filtro regioni inizializzato');
                 } catch (error) {
                     console.error('Errore inizializzazione filtro regioni:', error);
+                }
+                
+                try {
+                    initializeAgentFilter();
+                    console.log('Filtro agenti inizializzato');
+                } catch (error) {
+                    console.error('Errore inizializzazione filtro agenti:', error);
                 }
             }, 500);
         });
