@@ -1903,7 +1903,10 @@
             const name = document.getElementById('regionDetailName');
             const summary = document.getElementById('regionDetailSummary');
             
-            if (icon) icon.textContent = region.name.charAt(0);
+            if (icon) {
+                icon.textContent = region.name.charAt(0);
+                icon.style.background = getRegionColor(region.name);
+            }
             if (name) name.textContent = region.name;
             if (summary) {
                 summary.textContent = `${region.agents.size} agenti attivi in ${region.provinces.size} province`;
