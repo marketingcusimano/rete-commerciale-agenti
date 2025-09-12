@@ -2524,6 +2524,51 @@
             });
         }
 
+        function renderRegionChart() {
+            const canvas = document.getElementById('regionChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (charts.region) charts.region.destroy();
+
+            const regionData = {};
+            allData.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    const regionName = getRegionFromProvince(prov.Provincia);
+                    regionData[regionName] = (regionData[regionName] || 0) + (prov.Fatturato || 0);
+                });
+            });
+
+            const labels = Object.keys(regionData);
+            const data = Object.values(regionData);
+            const colors = labels.map(label => getRegionColor(label));
+
+            charts.region = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: context => `${context.label}: ${formatCurrency(context.parsed)}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         // Nuovi grafici avanzati
         function renderScatterChart() {
             const canvas = document.getElementById('scatterChart');
