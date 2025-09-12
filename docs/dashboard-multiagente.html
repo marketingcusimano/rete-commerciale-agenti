@@ -1174,6 +1174,16 @@
             } catch (error) {
                 console.error('Errore caricamento dati:', error);
             }
+            
+            // Inizializza il filtro regioni
+            setTimeout(() => {
+                try {
+                    initializeRegionFilter();
+                    console.log('Filtro regioni inizializzato');
+                } catch (error) {
+                    console.error('Errore inizializzazione filtro regioni:', error);
+                }
+            }, 500);
         });
     </script>
 </body>
