@@ -813,32 +813,32 @@
                 <div class="region-grid" id="regionGrid"></div>
             </div>
         </main>
+    </div>
 
-        <!-- Modal Filtro Regioni -->
-        <div class="modal-overlay" id="regionFilterModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <h3 class="modal-title">Filtro Regioni</h3>
-                    <button class="modal-close" id="closeRegionFilter">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"/>
-                            <line x1="6" y1="6" x2="18" y2="18"/>
-                        </svg>
-                    </button>
+    <!-- Modal Filtro Regioni -->
+    <div class="modal-overlay" id="regionFilterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Filtro Regioni</h3>
+                <button class="modal-close" id="closeRegionFilter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-actions">
+                    <button class="filter-action-btn" id="selectAllRegions">Seleziona Tutte</button>
+                    <button class="filter-action-btn" id="deselectAllRegions">Deseleziona Tutte</button>
                 </div>
-                <div class="modal-body">
-                    <div class="filter-actions">
-                        <button class="filter-action-btn" id="selectAllRegions">Seleziona Tutte</button>
-                        <button class="filter-action-btn" id="deselectAllRegions">Deseleziona Tutte</button>
-                    </div>
-                    <div class="region-filter-list" id="regionFilterList">
-                        <!-- Lista regioni sarà popolata dinamicamente -->
-                    </div>
+                <div class="region-filter-list" id="regionFilterList">
+                    <!-- Lista regioni sarà popolata dinamicamente -->
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" id="cancelRegionFilter">Annulla</button>
-                    <button class="btn btn-primary" id="applyRegionFilter">Applica Filtro</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelRegionFilter">Annulla</button>
+                <button class="btn btn-primary" id="applyRegionFilter">Applica Filtro</button>
             </div>
         </div>
     </div>
