@@ -1341,6 +1341,31 @@
         let currentRegionTab = 'overview';
         let regionDetailCharts = {};
 
+        // Mappa colori regioni
+        const regionColors = {
+            'Lazio': '#2563eb',
+            'Sardegna': '#10b981', 
+            'Marche': '#f59e0b',
+            'Estero': '#ef4444',
+            'Lombardia': '#8b5cf6',
+            'Emilia-Romagna': '#06b6d4',
+            'Piemonte': '#ec4899',
+            'Veneto': '#84cc16',
+            'Toscana': '#f97316',
+            'Campania': '#06b6d4',
+            'Sicilia': '#eab308',
+            'Puglia': '#14b8a6',
+            'Calabria': '#a855f7',
+            'Liguria': '#f59e0b',
+            'Abruzzo': '#3b82f6',
+            'Molise': '#6366f1',
+            'Basilicata': '#8b5cf6',
+            'Umbria': '#059669',
+            'Valle d\'Aosta': '#dc2626',
+            'Trentino-Alto Adige': '#7c3aed',
+            'Friuli-Venezia Giulia': '#be185d'
+        };
+
         function parseNumber(value) {
             if (typeof value === 'number') return value;
             if (typeof value !== 'string') return 0;
@@ -1489,14 +1514,33 @@
 
         function getRegionFromProvince(prov) {
             const map = {
-                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio',
-                'AN': 'Marche', 'PU': 'Marche',
+                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
+                'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
                 'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
-                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'PC': 'Emilia-Romagna',
-                'CR': 'Lombardia', 'LO': 'Lombardia',
+                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'PC': 'Emilia-Romagna', 'BO': 'Emilia-Romagna', 'MO': 'Emilia-Romagna', 'RE': 'Emilia-Romagna', 'PR': 'Emilia-Romagna', 'FE': 'Emilia-Romagna', 'FC': 'Emilia-Romagna',
+                'CR': 'Lombardia', 'LO': 'Lombardia', 'MI': 'Lombardia', 'BG': 'Lombardia', 'BS': 'Lombardia', 'CO': 'Lombardia', 'MN': 'Lombardia', 'PV': 'Lombardia', 'SO': 'Lombardia', 'VA': 'Lombardia', 'LC': 'Lombardia', 'MB': 'Lombardia',
+                'TO': 'Piemonte', 'AL': 'Piemonte', 'AT': 'Piemonte', 'BI': 'Piemonte', 'CN': 'Piemonte', 'NO': 'Piemonte', 'VB': 'Piemonte', 'VC': 'Piemonte',
+                'VE': 'Veneto', 'VR': 'Veneto', 'VI': 'Veneto', 'PD': 'Veneto', 'TV': 'Veneto', 'BL': 'Veneto', 'RO': 'Veneto',
+                'FI': 'Toscana', 'PI': 'Toscana', 'SI': 'Toscana', 'AR': 'Toscana', 'GR': 'Toscana', 'LI': 'Toscana', 'LU': 'Toscana', 'MS': 'Toscana', 'PT': 'Toscana', 'PO': 'Toscana',
+                'NA': 'Campania', 'AV': 'Campania', 'BN': 'Campania', 'CE': 'Campania', 'SA': 'Campania',
+                'PA': 'Sicilia', 'CT': 'Sicilia', 'ME': 'Sicilia', 'AG': 'Sicilia', 'CL': 'Sicilia', 'EN': 'Sicilia', 'RG': 'Sicilia', 'SR': 'Sicilia', 'TP': 'Sicilia',
+                'BA': 'Puglia', 'BR': 'Puglia', 'FG': 'Puglia', 'LE': 'Puglia', 'TA': 'Puglia', 'BT': 'Puglia',
+                'CZ': 'Calabria', 'CS': 'Calabria', 'KR': 'Calabria', 'RC': 'Calabria', 'VV': 'Calabria',
+                'GE': 'Liguria', 'IM': 'Liguria', 'LA': 'Liguria', 'SV': 'Liguria',
+                'AQ': 'Abruzzo', 'CH': 'Abruzzo', 'PE': 'Abruzzo', 'TE': 'Abruzzo',
+                'CB': 'Molise', 'IS': 'Molise',
+                'MT': 'Basilicata', 'PZ': 'Basilicata',
+                'PG': 'Umbria', 'TR': 'Umbria',
+                'AO': 'Valle d\'Aosta',
+                'TN': 'Trentino-Alto Adige', 'BZ': 'Trentino-Alto Adige',
+                'UD': 'Friuli-Venezia Giulia', 'PN': 'Friuli-Venezia Giulia', 'GO': 'Friuli-Venezia Giulia', 'TS': 'Friuli-Venezia Giulia',
                 'ALB': 'Estero'
             };
             return map[prov] || prov;
+        }
+
+        function getRegionColor(regionName) {
+            return regionColors[regionName] || '#64748b';
         }
 
         function populateAvailableRegions() {
@@ -1740,6 +1784,44 @@
             });
             
             document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllAgents() {
+            tempSelectedAgents.clear();
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function selectTopPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth >= 10) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                const agentCode = checkbox.dataset.agent;
+                const agent = availableAgents.find(a => a.codice === agentCode);
+                checkbox.checked = agent && agent.growth >= 10;
+            });
+        }
+
+        function selectLowPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth < 0) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
                 const agentCode = checkbox.dataset.agent;
                 const agent = availableAgents.find(a => a.codice === agentCode);
                 checkbox.checked = agent && agent.growth < 0;
@@ -1897,19 +1979,21 @@
             if (!region) return;
 
             currentRegionData = region;
+            const regionColor = getRegionColor(regionName);
             
             // Aggiorna header del modal
             const icon = document.getElementById('regionDetailIcon');
             const name = document.getElementById('regionDetailName');
             const summary = document.getElementById('regionDetailSummary');
+            const header = document.querySelector('.region-detail-header');
             
-            if (icon) {
-                icon.textContent = region.name.charAt(0);
-                icon.style.background = getRegionColor(region.name);
-            }
+            if (icon) icon.textContent = region.name.charAt(0);
             if (name) name.textContent = region.name;
             if (summary) {
                 summary.textContent = `${region.agents.size} agenti attivi in ${region.provinces.size} province`;
+            }
+            if (header) {
+                header.style.background = `linear-gradient(135deg, ${regionColor}, ${regionColor}dd)`;
             }
 
             // Mostra modal
@@ -2458,7 +2542,7 @@
 
             const labels = Object.keys(regionData);
             const data = Object.values(regionData);
-            const colors = ['#2563eb', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+            const colors = labels.map(label => getRegionColor(label));
 
             charts.region = new Chart(ctx, {
                 type: 'doughnut',
@@ -2466,7 +2550,7 @@
                     labels,
                     datasets: [{
                         data,
-                        backgroundColor: colors.slice(0, labels.length),
+                        backgroundColor: colors,
                         borderWidth: 0
                     }]
                 },
@@ -2551,9 +2635,14 @@
                 const target = general?.Obiettivo || 0;
                 const progress = target > 0 ? (current / target * 100) : 0;
 
+                // Calcola regioni e colore principale
+                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                const mainRegion = agentRegions[0] || 'Generale';
+                const regionColor = getRegionColor(mainRegion);
+
                 return `
                     <div class="agent-card">
-                        <div class="agent-header">
+                        <div class="agent-header" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">
                             <div class="agent-name">${agent.nome}</div>
                             <div class="agent-code">${agent.codice}</div>
                         </div>
@@ -2579,6 +2668,10 @@
                                 ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
                             </div>
 
+                            <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
+                                <strong>Regioni:</strong> ${agentRegions.join(', ')}
+                            </div>
+
                             ${target > 0 ? `
                                 <div style="margin-top: 1rem;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
@@ -2586,7 +2679,7 @@
                                         <span>${Math.round(progress)}%</span>
                                     </div>
                                     <div class="progress-bar">
-                                        <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
+                                        <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
                                     </div>
                                     <div class="progress-text">
                                         <span>${formatCurrency(current)}</span>
@@ -2608,37 +2701,41 @@
                 return selectedRegions.size === 0 || selectedRegions.has(region.name);
             });
 
-            regionGridElement.innerHTML = filteredRegions.map(region => `
-                <div class="region-card">
-                    <div class="region-header">
-                        <div class="region-icon">${region.name.charAt(0)}</div>
-                        <div class="region-info">
-                            <h3>${region.name}</h3>
-                            <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
+            regionGridElement.innerHTML = filteredRegions.map(region => {
+                const regionColor = getRegionColor(region.name);
+                
+                return `
+                    <div class="region-card">
+                        <div class="region-header">
+                            <div class="region-icon" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">${region.name.charAt(0)}</div>
+                            <div class="region-info">
+                                <h3>${region.name}</h3>
+                                <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="region-stats">
-                        <div class="region-stat">
-                            <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
-                            <div class="region-stat-label">Fatturato</div>
+                        <div class="region-stats">
+                            <div class="region-stat">
+                                <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
+                                <div class="region-stat-label">Fatturato</div>
+                            </div>
+                            <div class="region-stat">
+                                <div class="region-stat-value">${region.clients}</div>
+                                <div class="region-stat-label">Clienti</div>
+                            </div>
                         </div>
-                        <div class="region-stat">
-                            <div class="region-stat-value">${region.clients}</div>
-                            <div class="region-stat-label">Clienti</div>
+                        <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                            Province: ${Array.from(region.provinces).join(', ')}
                         </div>
+                        <button class="region-detail-button" onclick="openRegionDetailModal('${region.name}')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                                <path d="m12 5 7 7-7 7"/>
+                            </svg>
+                            Visualizza Dettagli
+                        </button>
                     </div>
-                    <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
-                        Province: ${Array.from(region.provinces).join(', ')}
-                    </div>
-                    <button class="region-detail-button" onclick="openRegionDetailModal('${region.name}')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14"/>
-                            <path d="m12 5 7 7-7 7"/>
-                        </svg>
-                        Visualizza Dettagli
-                    </button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function formatCurrency(value) {
@@ -2699,42 +2796,4 @@
         });
     </script>
 </body>
-</html>').forEach(checkbox => {
-                checkbox.checked = true;
-            });
-        }
-
-        function deselectAllAgents() {
-            tempSelectedAgents.clear();
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-        }
-
-        function selectTopPerformers() {
-            tempSelectedAgents.clear();
-            
-            availableAgents.forEach(agent => {
-                if (agent.growth >= 10) {
-                    tempSelectedAgents.add(agent.codice);
-                }
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                const agentCode = checkbox.dataset.agent;
-                const agent = availableAgents.find(a => a.codice === agentCode);
-                checkbox.checked = agent && agent.growth >= 10;
-            });
-        }
-
-        function selectLowPerformers() {
-            tempSelectedAgents.clear();
-            
-            availableAgents.forEach(agent => {
-                if (agent.growth < 0) {
-                    tempSelectedAgents.add(agent.codice);
-                }
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox
+</html>
