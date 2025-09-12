@@ -1779,6 +1779,8 @@
 
         // NUOVE FUNZIONI: Gestione modal dettaglio regione
         function initializeRegionDetailModal() {
+            console.log('Inizializzazione modal dettaglio regione...');
+            
             // Event listeners per i tab del modal
             const regionTabs = document.querySelectorAll('.region-detail-tab');
             regionTabs.forEach(tab => {
@@ -1793,15 +1795,6 @@
             if (closeBtn) {
                 closeBtn.addEventListener('click', closeRegionDetailModal);
             }
-
-            // Event listener per click su region cards
-            document.addEventListener('click', (e) => {
-                const regionCard = e.target.closest('.region-card');
-                if (regionCard) {
-                    const regionName = regionCard.dataset.region;
-                    openRegionDetailModal(regionName);
-                }
-            });
 
             // Chiusura con ESC
             document.addEventListener('keydown', (e) => {
@@ -1819,6 +1812,17 @@
                     }
                 });
             }
+            
+            // AGGIUNTO: Event delegation per region cards (più affidabile)
+            document.addEventListener('click', (e) => {
+                const regionCard = e.target.closest('.region-card[data-region]');
+                if (regionCard) {
+                    e.preventDefault();
+                    const regionName = regionCard.dataset.region;
+                    console.log('Region card clicked:', regionName);
+                    openRegionDetailModal(regionName);
+                }
+            });
         }
 
         function openRegionDetailModal(regionName) {
