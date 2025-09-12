@@ -2524,7 +2524,275 @@
             });
         }
 
-        function renderRegionChart() {
+        // Nuovi grafici avanzati
+        function renderScatterChart() {
+            const canvas = document.getElementById('scatterChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (charts.scatter) charts.scatter.destroy();
+
+            const scatterData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                
+                // Calcola regione principale per il colore
+                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                const mainRegion = agentRegions[0] || 'Generale';
+                const color = getRegionColor(mainRegion);
+                
+                return {
+                    x: clients,
+                    y: current,
+                    label: agent.nome.split(' ')[0],
+                    backgroundColor: color + '80', // Aggiungi trasparenza
+                    borderColor: color,
+                    growth: growth,
+                    efficiency: clients > 0 ? current / clients : 0
+                };
+            }).filter(item => item.x > 0 && item.y > 0); // Filtra agenti senza dati
+
+            charts.scatter = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Agenti',
+                        data: scatterData,
+                        backgroundColor: scatterData.map(item => item.backgroundColor),
+                        borderColor: scatterData.map(item => item.borderColor),
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const point = scatterData[context[0].dataIndex];
+                                    return point.label;
+                                },
+                                label: function(context) {
+                                    const point = scatterData[context.dataIndex];
+                                    return [
+                                        `Fatturato: ${formatCurrency(point.y)}`,
+                                        `Clienti: ${point.x}`,
+                                        `Efficienza: ${formatCurrency(point.efficiency)}/cliente`,
+                                        `Crescita: ${point.growth.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Numero Clienti'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Fatturato (€)'
+                            },
+                            ticks: {
+                                callback: value => formatCurrency(value)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderFunnelChart() {
+            const canvas = document.getElementById('funnelChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (charts.funnel) charts.funnel.destroy();
+
+            // Calcola distribuzione obiettivi
+            let critici = 0, rischio = 0, buoni = 0, ottimi = 0, totalAgents = 0;
+            
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const target = general?.Obiettivo || 0;
+                
+                if (target > 0) {
+                    totalAgents++;
+                    const achievement = (current / target) * 100;
+                    
+                    if (achievement >= 100) ottimi++;
+                    else if (achievement >= 80) buoni++;
+                    else if (achievement >= 60) rischio++;
+                    else critici++;
+                }
+            });
+
+            const funnelData = [
+                { label: 'Sotto 60%', value: critici, color: '#dc2626', percentage: (critici/totalAgents*100).toFixed(1) },
+                { label: '60-79%', value: rischio, color: '#f59e0b', percentage: (rischio/totalAgents*100).toFixed(1) },
+                { label: '80-99%', value: buoni, color: '#06b6d4', percentage: (buoni/totalAgents*100).toFixed(1) },
+                { label: '100%+', value: ottimi, color: '#10b981', percentage: (ottimi/totalAgents*100).toFixed(1) }
+            ];
+
+            charts.funnel = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: funnelData.map(item => `${item.label} (${item.percentage}%)`),
+                    datasets: [{
+                        data: funnelData.map(item => item.value),
+                        backgroundColor: funnelData.map(item => item.color),
+                        borderWidth: 0,
+                        cutout: '50%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const item = funnelData[context.dataIndex];
+                                    return `${item.label}: ${item.value} agenti (${item.percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderBoxplotChart() {
+            const canvas = document.getElementById('boxplotChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (charts.boxplot) charts.boxplot.destroy();
+
+            // Raggruppa dati per regione
+            const regionPerformance = {};
+            
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                
+                // Trova regione principale
+                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                const mainRegion = agentRegions[0] || 'Generale';
+                
+                if (!regionPerformance[mainRegion]) {
+                    regionPerformance[mainRegion] = [];
+                }
+                regionPerformance[mainRegion].push(growth);
+            });
+
+            // Calcola statistiche per ogni regione
+            const boxplotData = Object.entries(regionPerformance).map(([region, growths]) => {
+                const sorted = growths.sort((a, b) => a - b);
+                const len = sorted.length;
+                const q1 = sorted[Math.floor(len * 0.25)];
+                const median = sorted[Math.floor(len * 0.5)];
+                const q3 = sorted[Math.floor(len * 0.75)];
+                const min = sorted[0];
+                const max = sorted[len - 1];
+                
+                return {
+                    label: region,
+                    min: min,
+                    q1: q1,
+                    median: median,
+                    q3: q3,
+                    max: max,
+                    color: getRegionColor(region)
+                };
+            });
+
+            // Simula box plot con bar chart
+            const labels = boxplotData.map(item => item.label);
+            const medians = boxplotData.map(item => item.median);
+            const colors = boxplotData.map(item => item.color);
+
+            charts.boxplot = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Crescita Mediana (%)',
+                        data: medians,
+                        backgroundColor: colors.map(color => color + '60'),
+                        borderColor: colors,
+                        borderWidth: 2,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return `Regione: ${context[0].label}`;
+                                },
+                                label: function(context) {
+                                    const region = boxplotData[context.dataIndex];
+                                    return [
+                                        `Mediana: ${region.median.toFixed(1)}%`,
+                                        `Min: ${region.min.toFixed(1)}%`,
+                                        `Max: ${region.max.toFixed(1)}%`,
+                                        `Q1: ${region.q1.toFixed(1)}%`,
+                                        `Q3: ${region.q3.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Regioni'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Crescita (%)'
+                            },
+                            ticks: {
+                                callback: value => `${value.toFixed(0)}%`
+                            }
+                        }
+                    }
+                }
+            });
+        }
             const canvas = document.getElementById('regionChart');
             if (!canvas) return;
             
