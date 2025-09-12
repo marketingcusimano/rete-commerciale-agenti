@@ -304,13 +304,35 @@
             border: 1px solid var(--border);
             padding: 1.5rem;
             transition: all 0.2s ease;
-            cursor: pointer;
         }
 
         .region-card:hover {
             box-shadow: var(--shadow);
             transform: translateY(-2px);
             border-color: var(--primary);
+        }
+
+        .region-detail-button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .region-detail-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
         }
 
         .region-header {
@@ -957,25 +979,6 @@
             text-transform: uppercase;
         }
 
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .analytics-card {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .analytics-card h4 {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            color: var(--text);
-        }
-
         @media (max-width: 1024px) {
             .charts-grid { grid-template-columns: 1fr; }
             .main-content, .header { padding: 1rem; }
@@ -1221,7 +1224,7 @@
         </div>
     </div>
 
-    <!-- NUOVO: Modal Dettaglio Regione -->
+    <!-- Modal Dettaglio Regione -->
     <div class="modal-overlay" id="regionDetailModal">
         <div class="modal region-detail-modal">
             <div class="region-detail-header">
@@ -1259,13 +1262,6 @@
                         <circle cx="9" cy="7" r="4"/>
                     </svg>
                     Agenti
-                </button>
-                <button class="region-detail-tab" data-region-tab="analytics">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 3v18h18"/>
-                        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                    </svg>
-                    Analytics
                 </button>
             </div>
 
@@ -1321,32 +1317,6 @@
                         <!-- Agenti cards popolate dinamicamente -->
                     </div>
                 </div>
-
-                <!-- Tab Analytics -->
-                <div id="regionAnalyticsTab" class="region-detail-tab-content">
-                    <div class="analytics-grid">
-                        <div class="analytics-card">
-                            <h4>Trend Crescita</h4>
-                            <div class="chart-container" style="height: 200px;">
-                                <canvas id="regionGrowthChart"></canvas>
-                            </div>
-                        </div>
-                        
-                        <div class="analytics-card">
-                            <h4>Distribuzione Clienti</h4>
-                            <div class="chart-container" style="height: 200px;">
-                                <canvas id="regionClientsChart"></canvas>
-                            </div>
-                        </div>
-                        
-                        <div class="analytics-card" style="grid-column: 1 / -1;">
-                            <h4>Confronto con Altre Regioni</h4>
-                            <div class="chart-container" style="height: 300px;">
-                                <canvas id="regionComparisonChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -1366,7 +1336,7 @@
         let availableAgents = [];
         let tempSelectedAgents = new Set();
 
-        // NUOVO: Variabili per modal dettaglio regione
+        // Variabili per modal dettaglio regione
         let currentRegionData = null;
         let currentRegionTab = 'overview';
         let regionDetailCharts = {};
@@ -1770,44 +1740,6 @@
             });
             
             document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                checkbox.checked = true;
-            });
-        }
-
-        function deselectAllAgents() {
-            tempSelectedAgents.clear();
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-        }
-
-        function selectTopPerformers() {
-            tempSelectedAgents.clear();
-            
-            availableAgents.forEach(agent => {
-                if (agent.growth >= 10) {
-                    tempSelectedAgents.add(agent.codice);
-                }
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                const agentCode = checkbox.dataset.agent;
-                const agent = availableAgents.find(a => a.codice === agentCode);
-                checkbox.checked = agent && agent.growth >= 10;
-            });
-        }
-
-        function selectLowPerformers() {
-            tempSelectedAgents.clear();
-            
-            availableAgents.forEach(agent => {
-                if (agent.growth < 0) {
-                    tempSelectedAgents.add(agent.codice);
-                }
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
                 const agentCode = checkbox.dataset.agent;
                 const agent = availableAgents.find(a => a.codice === agentCode);
                 checkbox.checked = agent && agent.growth < 0;
@@ -1920,7 +1852,7 @@
             });
         }
 
-        // NUOVO: Funzioni per modal dettaglio regione
+        // Funzioni per modal dettaglio regione
         function initializeRegionDetailModal() {
             console.log('Inizializzazione modal dettaglio regione...');
             
@@ -1958,17 +1890,6 @@
                     }
                 });
             }
-            
-            // Event delegation per region cards
-            document.addEventListener('click', (e) => {
-                const regionCard = e.target.closest('.region-card[data-region]');
-                if (regionCard) {
-                    e.preventDefault();
-                    const regionName = regionCard.dataset.region;
-                    console.log('Region card clicked:', regionName);
-                    openRegionDetailModal(regionName);
-                }
-            });
         }
 
         function openRegionDetailModal(regionName) {
@@ -2044,9 +1965,6 @@
                         break;
                     case 'agents':
                         renderRegionAgents();
-                        break;
-                    case 'analytics':
-                        renderRegionAnalytics();
                         break;
                 }
             }, 100);
@@ -2688,7 +2606,7 @@
             });
 
             regionGridElement.innerHTML = filteredRegions.map(region => `
-                <div class="region-card" data-region="${region.name}">
+                <div class="region-card">
                     <div class="region-header">
                         <div class="region-icon">${region.name.charAt(0)}</div>
                         <div class="region-info">
@@ -2709,6 +2627,13 @@
                     <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
                         Province: ${Array.from(region.provinces).join(', ')}
                     </div>
+                    <button class="region-detail-button" onclick="openRegionDetailModal('${region.name}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14"/>
+                            <path d="m12 5 7 7-7 7"/>
+                        </svg>
+                        Visualizza Dettagli
+                    </button>
                 </div>
             `).join('');
         }
@@ -2771,4 +2696,42 @@
         });
     </script>
 </body>
-</html>
+</html>').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllAgents() {
+            tempSelectedAgents.clear();
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function selectTopPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth >= 10) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                const agentCode = checkbox.dataset.agent;
+                const agent = availableAgents.find(a => a.codice === agentCode);
+                checkbox.checked = agent && agent.growth >= 10;
+            });
+        }
+
+        function selectLowPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth < 0) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox
