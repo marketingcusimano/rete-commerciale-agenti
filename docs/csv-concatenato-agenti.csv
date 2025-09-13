@@ -1,2648 +1,791 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Commerciale - Rete Agenti</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
-        :root {
-            --primary: #6366f1;           /* Indigo moderno */
-            --primary-dark: #4f46e5;     /* Indigo scuro */
-            --primary-light: #8b5cf6;    /* Viola chiaro */
-            --secondary: #94a3b8;        /* Grigio slate */
-            --success: #10b981;          /* Emerald */
-            --warning: #f59e0b;          /* Amber */
-            --danger: #ef4444;           /* Red */
-            --surface: #ffffff;
-            --surface-2: #f8fafc;        /* Gray 50 */
-            --surface-3: #f1f5f9;        /* Slate 100 */
-            --surface-4: #e2e8f0;        /* Slate 200 */
-            --border: #e2e8f0;           /* Slate 200 */
-            --text: #1e293b;             /* Slate 800 */
-            --text-muted: #64748b;       /* Slate 500 */
-            --text-light: #94a3b8;       /* Slate 400 */
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            --radius: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        .dashboard {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header migliorato */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: var(--text);
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            box-shadow: var(--shadow);
-        }
-
-        .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            background: rgba(248, 250, 252, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .status-item:hover {
-            background: var(--surface);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow);
-        }
-
-        .status-live {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.1); }
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Tabs ridisegnati */
-        .tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 2rem;
-            padding: 4px;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            width: fit-content;
-        }
-
-        .tab {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.875rem 1.75rem;
-            background: transparent;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            white-space: nowrap;
-        }
-
-        .tab::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: var(--radius);
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .tab:hover {
-            color: var(--text);
-            transform: translateY(-1px);
-        }
-
-        .tab:hover::before {
-            opacity: 0.1;
-        }
-
-        .tab.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
-
-        .tab.active::before {
-            opacity: 0;
-        }
-
-        .tab svg {
-            transition: transform 0.2s ease;
-        }
-
-        .tab:hover svg {
-            transform: scale(1.1);
-        }
-
-        /* Cards migliorati con padding aumentati */
-        .card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(226, 232, 240, 0.6);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-light));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
-            border-color: var(--primary);
-        }
-
-        .card:hover::before {
-            opacity: 1;
-        }
-
-        .card-header {
-            padding: 2rem 2rem 0;
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .card-body {
-            padding: 2rem;
-        }
-
-        /* KPI Cards con padding migliorati */
-        .metrics-grid .card {
-            padding: 0;
-        }
-
-        .metrics-grid .card-body {
-            padding: 2.5rem 2rem;
-        }
-
-        .metric-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 0.75rem 0;
-        }
-
-        .metric-change {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-top: 0.75rem;
-        }
-
-        .metric-change.positive { color: var(--success); }
-        .metric-change.negative { color: var(--danger); }
-
-        .metric-previous {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        /* Region e Agent cards con padding migliorati */
-        .region-card, .agent-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(226, 232, 240, 0.6);
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow);
-        }
-
-        .region-card:hover, .agent-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-xl);
-            border-color: var(--primary);
-        }
-
-        .region-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding: 2rem 2rem 0;
-        }
-
-        .region-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .region-info h3 {
-            font-weight: 600;
-            font-size: 1.25rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .region-info p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        .region-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-            padding: 0 2rem;
-        }
-
-        .region-stat { 
-            text-align: center;
-            padding: 1rem;
-            background: var(--surface-2);
-            border-radius: var(--radius);
-        }
-
-        .region-stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .region-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Agent cards styling migliorato */
-        .agent-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            padding: 2rem;
-        }
-
-        .agent-name {
-            font-weight: 600;
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .agent-code {
-            opacity: 0.8;
-            font-size: 0.875rem;
-        }
-
-        .agent-body { 
-            padding: 2rem;
-        }
-
-        .agent-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .agent-metric { 
-            text-align: center;
-            padding: 1.25rem;
-            background: var(--surface-2);
-            border-radius: var(--radius);
-        }
-
-        .agent-metric-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 0.5rem;
-        }
-
-        .agent-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Progress bar migliorata */
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--surface-3);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 1rem 0;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-light));
-            border-radius: 4px;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-light);
-            margin-top: 0.75rem;
-        }
-
-        /* Colori per i badge di stato dell'obiettivo */
-        .objective-excellent { color: var(--success) !important; }
-        .objective-good { color: var(--warning) !important; }
-        .objective-warning { color: var(--danger) !important; }
-        .objective-undefined { color: var(--text-muted) !important; }
-
-        /* Progress bar colorate per stato obiettivo */
-        .progress-fill.excellent {
-            background: linear-gradient(90deg, var(--success), #059669);
-        }
-
-        .progress-fill.good {
-            background: linear-gradient(90deg, var(--warning), #d97706);
-        }
-
-        .progress-fill.warning {
-            background: linear-gradient(90deg, var(--danger), #dc2626);
-        }
-
-        .progress-fill.undefined {
-            background: linear-gradient(90deg, var(--text-muted), #64748b);
-        }
-
-        .filter-button {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.875rem 1.25rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .filter-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .filter-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .filter-button:hover::before {
-            left: 100%;
-        }
-
-        .filter-button:active {
-            transform: translateY(0);
-        }
-
-        .filter-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-        }
-
-        .region-detail-button {
-            width: calc(100% - 4rem);
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            padding: 1rem 1.25rem;
-            margin: 1.5rem 2rem;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .region-detail-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .region-detail-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .region-detail-button:hover::before {
-            left: 100%;
-        }
-
-        /* Responsive migliorato */
-        @media (max-width: 1024px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            .main-content, .header { padding: 1rem; }
-            .card-body, .metrics-grid .card-body { padding: 1.5rem; }
-            .region-header { padding: 1.5rem 1.5rem 0; }
-            .region-stats { padding: 0 1.5rem; }
-            .agent-header, .agent-body { padding: 1.5rem; }
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-            .tabs {
-                width: 100%;
-                overflow-x: auto;
-                scrollbar-width: none;
-                -ms-overflow-style: none;
-            }
-            .tabs::-webkit-scrollbar {
-                display: none;
-            }
-            .tab {
-                flex-shrink: 0;
-            }
-            .metrics-grid,
-            .region-grid,
-            .agent-grid {
-                grid-template-columns: 1fr;
-            }
-            .card-body, .metrics-grid .card-body { padding: 1.25rem; }
-            .region-header { padding: 1.25rem 1.25rem 0; }
-            .region-stats { padding: 0 1.25rem; }
-            .agent-header, .agent-body { padding: 1.25rem; }
-            .region-detail-button { margin: 1.25rem; width: calc(100% - 2.5rem); }
-        }
-
-        /* Grids */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .advanced-charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .region-grid, .agent-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            padding: 1rem 0;
-        }
-
-        .chart-container.large { height: 400px; }
-
-        .chart-details-button {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            padding: 0.5rem 0.75rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 10;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
-        }
-
-        .chart-details-button:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .table-container { overflow-x: auto; }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th,
-        .table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .table th {
-            background: var(--surface-2);
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .table td { font-size: 0.875rem; }
-
-        .table-row { transition: background-color 0.2s ease; }
-        .table-row:hover { background: var(--surface-2); }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.375rem 0.875rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            backdrop-filter: blur(10px);
-        }
-
-        .badge.success { 
-            background: rgba(16, 185, 129, 0.1); 
-            color: #059669; 
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-        
-        .badge.warning { 
-            background: rgba(245, 158, 11, 0.1); 
-            color: #d97706; 
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
-        
-        .badge.danger { 
-            background: rgba(239, 68, 68, 0.1); 
-            color: #dc2626; 
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 4rem;
-            color: var(--text-muted);
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--surface-3);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1.5rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .filter-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Modal e altri componenti esistenti mantengono i loro stili */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-xl);
-            border: 1px solid rgba(226, 232, 240, 0.6);
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow: hidden;
-            transform: scale(0.9);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .modal-overlay.show .modal {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            padding: 0.5rem;
-            cursor: pointer;
-            border-radius: var(--radius);
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-            background: var(--surface-3);
-            color: var(--text);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 0.75rem;
-            justify-content: flex-end;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-secondary {
-            background: var(--surface-3);
-            color: var(--text-muted);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard">
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                        </svg>
-                    </div>
-                    <span>Dashboard Commerciale</span>
-                </div>
-                
-                <div class="status-bar">
-                    <div class="status-item">
-                        <div class="status-live"></div>
-                        <span id="lastUpdate">Caricamento...</span>
-                    </div>
-                    <div class="status-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12,6 12,12 16,14"/>
-                        </svg>
-                        <span id="currentTime"></span>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="main-content">
-            <div class="tabs">
-                <button class="tab active" data-tab="overview">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <path d="M9 9h6v6H9z"/>
-                    </svg>
-                    Panoramica
-                </button>
-                <button class="tab" data-tab="agents">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                    Agenti
-                </button>
-                <button class="tab" data-tab="regions">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    Regioni
-                </button>
-            </div>
-
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>Caricamento dati...</p>
-            </div>
-
-            <div id="overview-content" class="tab-content" style="display: none;">
-                <div class="metrics-grid" id="kpiMetrics"></div>
-
-                <div class="charts-grid">
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('performance')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18h18"/>
-                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                                </svg>
-                                Performance Agenti
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container large">
-                                <canvas id="revenueChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('regions')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                </svg>
-                                Distribuzione Regionale
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="regionChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="advanced-charts-grid">
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('scatter')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="3"/>
-                                    <circle cx="19" cy="5" r="2"/>
-                                    <circle cx="5" cy="19" r="2"/>
-                                    <path d="M10.4 21.9a10 10 0 0 0 9.941-15.416"/>
-                                    <path d="M13.5 2.1a10 10 0 0 0-9.841 15.416"/>
-                                </svg>
-                                Efficienza Commerciale
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="scatterChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('heatmap')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="7" height="7"/>
-                                    <rect x="14" y="3" width="7" height="7"/>
-                                    <rect x="14" y="14" width="7" height="7"/>
-                                    <rect x="3" y="14" width="7" height="7"/>
-                                </svg>
-                                Matrice Performance
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="heatmapChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('boxplot')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                    <path d="M9 9h6v6H9z"/>
-                                </svg>
-                                Distribuzione Performance
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="boxplotChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                            </svg>
-                            Classifica Performance
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-container">
-                            <table class="table" id="performanceTable"></table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="agents-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="agentFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Agenti
-                        <span class="filter-count" id="agentFilterCount">Tutti</span>
-                    </button>
-                </div>
-                <div class="agent-grid" id="agentGrid"></div>
-            </div>
-
-            <div id="regions-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="regionFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Regioni
-                        <span class="filter-count" id="filterCount">Tutte</span>
-                    </button>
-                </div>
-                <div class="region-grid" id="regionGrid"></div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
-        
-        let allData = [];
-        let currentTab = 'overview';
-        let charts = {};
-        let selectedRegions = new Set();
-        let availableRegions = new Map();
-        let tempSelectedRegions = new Set();
-        
-        // Variabili per filtro agenti
-        let selectedAgents = new Set();
-        let availableAgents = [];
-        let tempSelectedAgents = new Set();
-
-        // Mappa colori regioni - Palette moderna aggiornata
-        const regionColors = {
-            'Lazio': '#3B82F6',        // Blue
-            'Sardegna': '#10B981',     // Emerald
-            'Marche': '#F59E0B',       // Amber
-            'Estero': '#EF4444',       // Red
-            'Lombardia': '#8B5CF6',    // Purple
-            'Emilia-Romagna': '#06B6D4', // Cyan
-            'Piemonte': '#EC4899',     // Pink
-            'Veneto': '#84CC16',       // Lime
-            'Toscana': '#F97316',      // Orange
-            'Campania': '#0EA5E9',     // Sky
-            'Sicilia': '#EAB308',      // Yellow
-            'Puglia': '#14B8A6',       // Teal
-            'Calabria': '#A855F7',     // Violet
-            'Liguria': '#F59E0B',      // Amber
-            'Abruzzo': '#3B82F6',      // Blue
-            'Molise': '#8B5CF6',       // Purple
-            'Basilicata': '#EC4899',   // Pink
-            'Umbria': '#10B981',       // Emerald
-            'Valle d\'Aosta': '#EF4444', // Red
-            'Trentino-Alto Adige': '#8B5CF6', // Purple
-            'Friuli-Venezia Giulia': '#EC4899' // Pink
-        };
-
-        function parseNumber(value) {
-            if (typeof value === 'number') return value;
-            if (typeof value !== 'string') return 0;
-            
-            let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
-            if (!clean || clean === '') return 0;
-            
-            return parseFloat(clean) || 0;
-        }
-
-        function updateClock() {
-            const clockElement = document.getElementById('currentTime');
-            if (clockElement) {
-                clockElement.textContent = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-            }
-        }
-
-        function initializeTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            
-            tabs.forEach(tab => {
-                if (tab && typeof tab.addEventListener === 'function') {
-                    tab.addEventListener('click', () => {
-                        const tabId = tab.dataset.tab;
-                        
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        
-                        document.querySelectorAll('.tab-content').forEach(content => {
-                            content.style.display = 'none';
-                        });
-                        
-                        const targetContent = document.getElementById(`${tabId}-content`);
-                        if (targetContent) targetContent.style.display = 'block';
-                        
-                        currentTab = tabId;
-                        
-                        setTimeout(() => {
-                            Object.values(charts).forEach(chart => {
-                                if (chart && typeof chart.resize === 'function') {
-                                    chart.resize();
-                                }
-                            });
-                        }, 100);
-                    });
-                }
-            });
-        }
-
-        async function loadData() {
-            try {
-                const lastUpdateElement = document.getElementById('lastUpdate');
-                if (lastUpdateElement) {
-                    lastUpdateElement.textContent = 'Caricamento...';
-                }
-                
-                const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const csvText = await response.text();
-                allData = parseCSV(csvText);
-                
-                if (lastUpdateElement) {
-                    lastUpdateElement.textContent = `Aggiornato alle ${new Date().toLocaleTimeString('it-IT')}`;
-                }
-                
-                renderDashboard();
-                
-            } catch (error) {
-                console.error('Errore caricamento:', error);
-                const lastUpdateElement = document.getElementById('lastUpdate');
-                if (lastUpdateElement) {
-                    lastUpdateElement.textContent = 'Errore caricamento';
-                    lastUpdateElement.style.color = 'var(--danger)';
-                }
-            }
-        }
-
-        function parseCSV(csvText) {
-            const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
-            const agents = [];
-
-            sections.forEach(section => {
-                if (!section.trim()) return;
-
-                const agent = {
-                    codice: '', nome: '', periodo: '',
-                    obiettivi: [], clienti_provincia: [], vendite_cliente: [],
-                    categoria_riepilogo: [], ripartizione: [], totali: []
-                };
-
-                const lines = section.split('\n');
-                let headers = [];
-
-                lines.forEach(line => {
-                    line = line.trim();
-                    if (!line || line.startsWith('##')) return;
-
-                    if (line.includes('Codice Agente:')) {
-                        agent.codice = line.split(':')[1]?.trim() || '';
-                    } else if (line.includes('Ragione Sociale:')) {
-                        agent.nome = line.split(':')[1]?.trim() || '';
-                    } else if (line.includes('Periodo:')) {
-                        agent.periodo = line.split(':')[1]?.trim() || '';
-                    }
-                    
-                    if (line.includes('Tipo_Dato,')) {
-                        headers = line.split(',').map(h => h.trim());
-                        return;
-                    }
-
-                    if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
-                        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-                        if (values.length >= headers.length) {
-                            const row = {};
-                            headers.forEach((header, index) => {
-                                let value = values[index] || '';
-                                
-                                if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
-                                     'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
-                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
-                                    value = parseNumber(value);
-                                }
-                                row[header] = value;
-                            });
-
-                            switch (row.Tipo_Dato) {
-                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
-                                case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
-                                case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
-                                case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
-                                case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
-                                case 'TOTALE': agent.totali.push(row); break;
-                            }
-                        }
-                    }
-                });
-
-                if (agent.codice && agent.nome) {
-                    agents.push(agent);
-                }
-            });
-
-            return agents;
-        }
-
-        function getRegionFromProvince(prov) {
-            const map = {
-                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
-                'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
-                'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
-                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'PC': 'Emilia-Romagna', 'BO': 'Emilia-Romagna', 'MO': 'Emilia-Romagna', 'RE': 'Emilia-Romagna', 'PR': 'Emilia-Romagna', 'FE': 'Emilia-Romagna', 'FC': 'Emilia-Romagna',
-                'CR': 'Lombardia', 'LO': 'Lombardia', 'MI': 'Lombardia', 'BG': 'Lombardia', 'BS': 'Lombardia', 'CO': 'Lombardia', 'MN': 'Lombardia', 'PV': 'Lombardia', 'SO': 'Lombardia', 'VA': 'Lombardia', 'LC': 'Lombardia', 'MB': 'Lombardia',
-                'TO': 'Piemonte', 'AL': 'Piemonte', 'AT': 'Piemonte', 'BI': 'Piemonte', 'CN': 'Piemonte', 'NO': 'Piemonte', 'VB': 'Piemonte', 'VC': 'Piemonte',
-                'VE': 'Veneto', 'VR': 'Veneto', 'VI': 'Veneto', 'PD': 'Veneto', 'TV': 'Veneto', 'BL': 'Veneto', 'RO': 'Veneto',
-                'FI': 'Toscana', 'PI': 'Toscana', 'SI': 'Toscana', 'AR': 'Toscana', 'GR': 'Toscana', 'LI': 'Toscana', 'LU': 'Toscana', 'MS': 'Toscana', 'PT': 'Toscana', 'PO': 'Toscana',
-                'NA': 'Campania', 'AV': 'Campania', 'BN': 'Campania', 'CE': 'Campania', 'SA': 'Campania',
-                'PA': 'Sicilia', 'CT': 'Sicilia', 'ME': 'Sicilia', 'AG': 'Sicilia', 'CL': 'Sicilia', 'EN': 'Sicilia', 'RG': 'Sicilia', 'SR': 'Sicilia', 'TP': 'Sicilia',
-                'BA': 'Puglia', 'BR': 'Puglia', 'FG': 'Puglia', 'LE': 'Puglia', 'TA': 'Puglia', 'BT': 'Puglia',
-                'CZ': 'Calabria', 'CS': 'Calabria', 'KR': 'Calabria', 'RC': 'Calabria', 'VV': 'Calabria',
-                'GE': 'Liguria', 'IM': 'Liguria', 'LA': 'Liguria', 'SV': 'Liguria',
-                'AQ': 'Abruzzo', 'CH': 'Abruzzo', 'PE': 'Abruzzo', 'TE': 'Abruzzo',
-                'CB': 'Molise', 'IS': 'Molise',
-                'MT': 'Basilicata', 'PZ': 'Basilicata',
-                'PG': 'Umbria', 'TR': 'Umbria',
-                'AO': 'Valle d\'Aosta',
-                'TN': 'Trentino-Alto Adige', 'BZ': 'Trentino-Alto Adige',
-                'UD': 'Friuli-Venezia Giulia', 'PN': 'Friuli-Venezia Giulia', 'GO': 'Friuli-Venezia Giulia', 'TS': 'Friuli-Venezia Giulia',
-                'ALB': 'Estero'
-            };
-            return map[prov] || prov;
-        }
-
-        function getRegionColor(regionName) {
-            return regionColors[regionName] || '#64748b';
-        }
-
-        function populateAvailableRegions() {
-            availableRegions.clear();
-            
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    
-                    if (!availableRegions.has(regionName)) {
-                        availableRegions.set(regionName, {
-                            name: regionName,
-                            revenue: 0,
-                            clients: 0,
-                            agents: new Set(),
-                            provinces: new Set()
-                        });
-                    }
-                    
-                    const region = availableRegions.get(regionName);
-                    region.revenue += prov.Fatturato || 0;
-                    region.clients += prov.Clienti_Serviti || 0;
-                    region.agents.add(agent.codice);
-                    region.provinces.add(prov.Provincia);
-                });
-            });
-        }
-
-        function populateAvailableAgents() {
-            availableAgents = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                
-                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                
-                let status = 'Critico';
-                if (growth >= 10) status = 'Ottimo';
-                else if (growth >= 0) status = 'Buono';
-                
-                return {
-                    codice: agent.codice,
-                    nome: agent.nome,
-                    current,
-                    previous,
-                    growth,
-                    clients,
-                    status,
-                    regions
-                };
-            }).sort((a, b) => b.current - a.current);
-        }
-
-        function renderDashboard() {
-            const loadingElement = document.getElementById('loading');
-            const overviewElement = document.getElementById('overview-content');
-            
-            if (loadingElement) loadingElement.style.display = 'none';
-            if (overviewElement) overviewElement.style.display = 'block';
-            
-            populateAvailableRegions();
-            populateAvailableAgents();
-            renderKPIMetrics();
-            renderCharts();
-            renderPerformanceTable();
-            renderAgentCards();
-            renderRegionCards();
-        }
-
-        // Funzione migliorata per KPI con confronto anno precedente
-        function renderKPIMetrics() {
-            let totalRevenue = 0, totalPrevRevenue = 0, totalClients = 0;
-            
-            allData.forEach(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                if (general) {
-                    totalRevenue += general.Anno_Corrente || 0;
-                    totalPrevRevenue += general.Anno_Precedente || 0;
-                    totalClients += general.Clienti_Anno_Corrente || 0;
-                }
-            });
-
-            const growth = totalPrevRevenue > 0 ? 
-                ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
-
-            const metrics = [
-                { 
-                    title: 'Fatturato Totale', 
-                    value: formatCurrency(totalRevenue), 
-                    change: growth,
-                    previousValue: formatCurrency(totalPrevRevenue),
-                    showComparison: true
-                },
-                { title: 'Clienti Attivi', value: totalClients.toLocaleString('it-IT'), change: null },
-                { title: 'Agenti Attivi', value: allData.length.toString(), change: null },
-                { title: 'Crescita Media', value: `${growth.toFixed(1)}%`, change: growth }
-            ];
-
-            const kpiElement = document.getElementById('kpiMetrics');
-            if (kpiElement) {
-                kpiElement.innerHTML = metrics.map(metric => `
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="card-title">${metric.title}</div>
-                            <div class="metric-value">${metric.value}</div>
-                            ${metric.change !== null ? `
-                                <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        ${metric.change >= 0 ? 
-                                            '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                            '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                        }
-                                    </svg>
-                                    ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
-                                </div>
-                            ` : ''}
-                            ${metric.showComparison ? `
-                                <div class="metric-previous">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12,6 12,12 16,14"/>
-                                    </svg>
-                                    2024: ${metric.previousValue}
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function renderCharts() {
-            renderRevenueChart();
-            renderRegionChart();
-            renderScatterChart();
-            renderHeatmapChart();
-            renderBoxplotChart();
-        }
-
-        function renderRevenueChart() {
-            const canvas = document.getElementById('revenueChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.revenue) charts.revenue.destroy();
-
-            const agentData = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                return {
-                    name: agent.nome.split(' ')[0],
-                    current: general?.Anno_Corrente || 0,
-                    previous: general?.Anno_Precedente || 0
-                };
-            }).sort((a, b) => b.current - a.current).slice(0, 8);
-
-            charts.revenue = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: agentData.map(a => a.name),
-                    datasets: [
-                        {
-                            label: '2024',
-                            data: agentData.map(a => a.previous),
-                            backgroundColor: 'rgba(148, 163, 184, 0.6)',
-                            borderRadius: 4
-                        },
-                        {
-                            label: '2025',
-                            data: agentData.map(a => a.current),
-                            backgroundColor: 'var(--primary)',
-                            borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { callback: value => formatCurrency(value) }
-                        }
-                    },
-                    plugins: {
-                        legend: { position: 'top' },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderRegionChart() {
-            const canvas = document.getElementById('regionChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.region) charts.region.destroy();
-
-            const regionData = {};
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    regionData[regionName] = (regionData[regionName] || 0) + (prov.Fatturato || 0);
-                });
-            });
-
-            const labels = Object.keys(regionData);
-            const data = Object.values(regionData);
-            const colors = labels.map(label => getRegionColor(label));
-
-            charts.region = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data,
-                        backgroundColor: colors,
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `${context.label}: ${formatCurrency(context.parsed)}`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderScatterChart() {
-            const canvas = document.getElementById('scatterChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.scatter) charts.scatter.destroy();
-
-            const scatterData = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                
-                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                const mainRegion = agentRegions[0] || 'Generale';
-                const color = getRegionColor(mainRegion);
-                
-                return {
-                    x: clients,
-                    y: current,
-                    label: agent.nome.split(' ')[0],
-                    backgroundColor: color + '80',
-                    borderColor: color,
-                    growth: growth,
-                    efficiency: clients > 0 ? current / clients : 0
-                };
-            }).filter(item => item.x > 0 && item.y > 0);
-
-            charts.scatter = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Agenti',
-                        data: scatterData,
-                        backgroundColor: scatterData.map(item => item.backgroundColor),
-                        borderColor: scatterData.map(item => item.borderColor),
-                        borderWidth: 2,
-                        pointRadius: 8,
-                        pointHoverRadius: 12
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    const point = scatterData[context[0].dataIndex];
-                                    return point.label;
-                                },
-                                label: function(context) {
-                                    const point = scatterData[context.dataIndex];
-                                    return [
-                                        `Fatturato: ${formatCurrency(point.y)}`,
-                                        `Clienti: ${point.x}`,
-                                        `Efficienza: ${formatCurrency(point.efficiency)}/cliente`,
-                                        `Crescita: ${point.growth.toFixed(1)}%`
-                                    ];
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Numero Clienti'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Fatturato (€)'
-                            },
-                            ticks: {
-                                callback: value => formatCurrency(value)
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderHeatmapChart() {
-            const canvas = document.getElementById('heatmapChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.heatmap) charts.heatmap.destroy();
-
-            const matrixData = [];
-            const colors = [];
-            
-            allData.forEach((agent, index) => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                
-                const revenueNorm = Math.min(current / 1000000, 5);
-                const growthNorm = Math.max(-50, Math.min(growth, 100));
-                
-                matrixData.push({
-                    x: revenueNorm,
-                    y: growthNorm,
-                    v: 1,
-                    agent: agent.nome.split(' ')[0],
-                    revenue: current,
-                    growth: growth
-                });
-                
-                let color;
-                if (growth >= 20 && current >= 2000000) color = '#10B981';
-                else if (growth >= 10 && current >= 1000000) color = '#F59E0B';
-                else if (growth >= 0 || current >= 500000) color = '#3B82F6';
-                else color = '#EF4444';
-                
-                colors.push(color);
-            });
-
-            charts.heatmap = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Performance Matrix',
-                        data: matrixData,
-                        backgroundColor: colors,
-                        borderColor: colors,
-                        borderWidth: 2,
-                        pointRadius: 8,
-                        pointHoverRadius: 12
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    const point = matrixData[context[0].dataIndex];
-                                    return point.agent;
-                                },
-                                label: function(context) {
-                                    const point = matrixData[context.dataIndex];
-                                    return [
-                                        `Fatturato: ${formatCurrency(point.revenue)}`,
-                                        `Crescita: ${point.growth.toFixed(1)}%`
-                                    ];
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            max: 5,
-                            title: {
-                                display: true,
-                                text: 'Fatturato (Milioni €)'
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return value + 'M';
-                                }
-                            }
-                        },
-                        y: {
-                            min: -50,
-                            max: 100,
-                            title: {
-                                display: true,
-                                text: 'Crescita (%)'
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderBoxplotChart() {
-            const canvas = document.getElementById('boxplotChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.boxplot) charts.boxplot.destroy();
-
-            const regionPerformance = {};
-            
-            allData.forEach(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                
-                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                const mainRegion = agentRegions[0] || 'Generale';
-                
-                if (!regionPerformance[mainRegion]) {
-                    regionPerformance[mainRegion] = [];
-                }
-                regionPerformance[mainRegion].push(growth);
-            });
-
-            const boxplotData = Object.entries(regionPerformance).map(([region, growths]) => {
-                const sorted = growths.sort((a, b) => a - b);
-                const len = sorted.length;
-                const median = sorted[Math.floor(len * 0.5)];
-                
-                return {
-                    label: region,
-                    median: median,
-                    color: getRegionColor(region)
-                };
-            });
-
-            const labels = boxplotData.map(item => item.label);
-            const medians = boxplotData.map(item => item.median);
-            const colors = boxplotData.map(item => item.color);
-
-            charts.boxplot = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Crescita Mediana (%)',
-                        data: medians,
-                        backgroundColor: colors.map(color => color + '60'),
-                        borderColor: colors,
-                        borderWidth: 2,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    return `Regione: ${context[0].label}`;
-                                },
-                                label: function(context) {
-                                    const region = boxplotData[context.dataIndex];
-                                    return `Mediana: ${region.median.toFixed(1)}%`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Regioni'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Crescita (%)'
-                            },
-                            ticks: {
-                                callback: value => `${value.toFixed(0)}%`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderPerformanceTable() {
-            const tableElement = document.getElementById('performanceTable');
-            if (!tableElement) return;
-            
-            const agentPerformance = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                
-                return { agent, current, previous, growth, clients };
-            }).sort((a, b) => b.current - a.current);
-
-            tableElement.innerHTML = `
-                <thead>
-                    <tr>
-                        <th>Agente</th>
-                        <th>Fatturato 2025</th>
-                        <th>Crescita</th>
-                        <th>Clienti</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${agentPerformance.map(item => `
-                        <tr class="table-row">
-                            <td>
-                                <strong>${item.agent.nome}</strong><br>
-                                <small style="color: var(--text-muted);">${item.agent.codice}</small>
-                            </td>
-                            <td><strong>${formatCurrency(item.current)}</strong></td>
-                            <td>
-                                <span class="badge ${item.growth >= 0 ? 'success' : 'danger'}">
-                                    ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%
-                                </span>
-                            </td>
-                            <td>${item.clients}</td>
-                            <td>
-                                <span class="badge ${item.growth >= 10 ? 'success' : item.growth >= 0 ? 'warning' : 'danger'}">
-                                    ${item.growth >= 10 ? 'Ottimo' : item.growth >= 0 ? 'Buono' : 'Critico'}
-                                </span>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            `;
-        }
-
-        function renderAgentCards() {
-            const agentGridElement = document.getElementById('agentGrid');
-            if (!agentGridElement) return;
-            
-            const filteredAgents = allData.filter(agent => {
-                return selectedAgents.size === 0 || selectedAgents.has(agent.codice);
-            });
-            
-            agentGridElement.innerHTML = filteredAgents.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                const clientsPrevious = general?.Clienti_Anno_Precedente || 0;
-                const clientsGrowth = clientsPrevious > 0 ? ((clients - clientsPrevious) / clientsPrevious * 100) : 0;
-                const target = general?.Obiettivo || 0;
-                const progress = target > 0 ? (current / target * 100) : 0;
-                const remaining = target > current ? target - current : 0;
-
-                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                const mainRegion = agentRegions[0] || 'Generale';
-                const regionColor = getRegionColor(mainRegion);
-
-                // Fixed variables
-                const hasObjective = target > 0;
-                let progressClass = 'undefined';
-                let statusColor = 'var(--text-muted)';
-                let statusText = 'Da definire';
-                let objectiveText = hasObjective ? formatCurrency(target) : 'Da definire';
-                let progressWidth = hasObjective ? Math.min(progress, 100) : 0;
-                
-                if (target > 0) {
-                    if (progress >= 100) {
-                        progressClass = 'excellent';
-                        statusColor = 'var(--success)';
-                        statusText = `${Math.round(progress)}% - Eccellente!`;
-                    } else if (progress >= 80) {
-                        progressClass = 'good';
-                        statusColor = 'var(--warning)';
-                        statusText = `${Math.round(progress)}% - Buono`;
-                    } else {
-                        progressClass = 'warning';
-                        statusColor = 'var(--danger)';
-                        statusText = `${Math.round(progress)}% - Attenzione`;
-                    }
-                }
-
-                // Top performing province
-                let topProvince = null;
-                let topProvinceRevenue = 0;
-                agent.clienti_provincia.forEach(prov => {
-                    if (prov.Fatturato > topProvinceRevenue) {
-                        topProvinceRevenue = prov.Fatturato;
-                        topProvince = prov.Provincia;
-                    }
-                });
-
-                return `
-                    <div class="agent-card">
-                        <div class="agent-header" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">
-                            <div class="agent-name">${agent.nome}</div>
-                            <div class="agent-code">${agent.codice}</div>
-                        </div>
-                        <div class="agent-body">
-                            <!-- KPI Grid stile dashboard -->
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
-                                <!-- Fatturato 2025 -->
-                                <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border);">
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 600;">
-                                        Fatturato 2025
-                                    </div>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem;">
-                                        ${formatCurrency(current)}
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem;">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            ${growth >= 0 ? 
-                                                '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                                '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                            }
-                                        </svg>
-                                        <span style="color: ${growth >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: 500;">
-                                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%
-                                        </span>
-                                    </div>
-                                    <div style="font-size: 0.7rem; color: var(--text-light); margin-top: 0.25rem;">
-                                        vs 2024: ${formatCurrency(previous)}
-                                    </div>
-                                </div>
-
-                                <!-- Clienti Attivi -->
-                                <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border);">
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 600;">
-                                        Clienti Attivi
-                                    </div>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem;">
-                                        ${clients}
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem;">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            ${clientsGrowth >= 0 ? 
-                                                '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                                '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                            }
-                                        </svg>
-                                        <span style="color: ${clientsGrowth >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: 500;">
-                                            ${clientsGrowth >= 0 ? '+' : ''}${clientsGrowth.toFixed(1)}%
-                                        </span>
-                                    </div>
-                                    <div style="font-size: 0.7rem; color: var(--text-light); margin-top: 0.25rem;">
-                                        vs 2024: ${clientsPrevious}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Obiettivo 2025 - SEMPRE VISIBILE -->
-                            <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 1rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                                    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Obiettivo 2025</span>
-                                    <span style="font-size: 0.875rem; font-weight: 600; color: ${statusColor};">
-                                        ${statusText}
-                                    </span>
-                                </div>
-                                <div style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">
-                                    ${objectiveText}
-                                </div>
-                                <!-- Progress bar sempre presente -->
-                                <div class="progress-bar" style="margin: 0.5rem 0;">
-                                    <div class="progress-fill ${progressClass}" style="width: ${progressWidth}%;"></div>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-light);">
-                                    <span>Raggiunto: ${formatCurrency(current)}</span>
-                                    <span>
-                                        ${hasObjective && target > 0 ? 
-                                            (remaining > 0 ? `Mancano: ${formatCurrency(remaining)}` : 'Obiettivo raggiunto!') : 
-                                            'Da definire'
-                                        }
-                                    </span>
-                                </div>
-                            </div>
-
-                            ${topProvince ? `
-                                <!-- Top Performance -->
-                                <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border);">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <div>
-                                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 600;">
-                                                Top Performance
-                                            </div>
-                                            <div style="font-size: 1.125rem; font-weight: 600; color: var(--text);">
-                                                ${topProvince}
-                                            </div>
-                                            <div style="font-size: 0.8rem; color: var(--text-muted);">
-                                                ${getRegionFromProvince(topProvince)}
-                                            </div>
-                                        </div>
-                                        <div style="text-align: right;">
-                                            <div style="font-size: 1rem; font-weight: 600; color: var(--primary);">
-                                                ${formatCurrency(topProvinceRevenue)}
-                                            </div>
-                                            <div style="font-size: 0.7rem; color: var(--text-muted);">
-                                                ${((topProvinceRevenue / current) * 100).toFixed(0)}% del totale
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderRegionCards() {
-            const regionGridElement = document.getElementById('regionGrid');
-            if (!regionGridElement) return;
-            
-            const filteredRegions = Array.from(availableRegions.values()).filter(region => {
-                return selectedRegions.size === 0 || selectedRegions.has(region.name);
-            });
-
-            regionGridElement.innerHTML = filteredRegions.map(region => {
-                const regionColor = getRegionColor(region.name);
-                
-                return `
-                    <div class="region-card">
-                        <div class="region-header">
-                            <div class="region-icon" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">${region.name.charAt(0)}</div>
-                            <div class="region-info">
-                                <h3>${region.name}</h3>
-                                <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
-                            </div>
-                        </div>
-                        
-                        <div class="region-stats">
-                            <div class="region-stat">
-                                <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
-                                <div class="region-stat-label">Fatturato</div>
-                            </div>
-                            <div class="region-stat">
-                                <div class="region-stat-value">${region.clients}</div>
-                                <div class="region-stat-label">Clienti</div>
-                            </div>
-                        </div>
-                        
-                        <div style="background: var(--surface-2); padding: 1.5rem; border-radius: var(--radius); margin: 1.5rem 0; border: 1px solid var(--border);">
-                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">
-                                Province Operative
-                            </div>
-                            <div style="font-size: 0.875rem; color: var(--text); line-height: 1.5;">
-                                ${Array.from(region.provinces).slice(0, 8).join(', ')}${region.provinces.size > 8 ? ` e altre ${region.provinces.size - 8}` : ''}
-                            </div>
-                        </div>
-                        
-                        <button class="region-detail-button" onclick="openRegionDetailModal('${region.name}')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14"/>
-                                <path d="m12 5 7 7-7 7"/>
-                            </svg>
-                            Visualizza Dettagli
-                        </button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function formatCurrency(value) {
-            if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
-            if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
-            return `€${value.toLocaleString('it-IT')}`;
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Inizializzazione dashboard...');
-            
-            try {
-                initializeTabs();
-                console.log('Tabs inizializzati');
-            } catch (error) {
-                console.error('Errore tabs:', error);
-            }
-            
-            try {
-                updateClock();
-                setInterval(updateClock, 1000);
-                console.log('Clock inizializzato');
-            } catch (error) {
-                console.error('Errore clock:', error);
-            }
-            
-            try {
-                loadData();
-                setInterval(loadData, 120000);
-                console.log('Caricamento dati avviato');
-            } catch (error) {
-                console.error('Errore caricamento dati:', error);
-            }
-        });
-
-        // Funzioni per gestire i modali delle regioni - CORRETTE
-        function openRegionDetailModal(regionName) {
-            const region = availableRegions.get(regionName);
-            if (!region) {
-                console.error('Regione non trovata:', regionName);
-                return;
-            }
-            
-            // Crea un modal semplice con le informazioni della regione
-            const modalHtml = `
-                <div class="modal-overlay" id="regionModal" style="opacity: 1; visibility: visible;">
-                    <div class="modal" style="transform: scale(1); max-width: 600px;">
-                        <div class="modal-header" style="background: linear-gradient(135deg, ${getRegionColor(regionName)}, ${getRegionColor(regionName)}dd); color: white;">
-                            <h3 class="modal-title">Dettagli ${regionName}</h3>
-                            <button class="modal-close" onclick="closeRegionModal()" style="color: white;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"/>
-                                    <line x1="6" y1="6" x2="18" y2="18"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="modal-body" style="padding: 2rem;">
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                                <div style="text-align: center; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius);">
-                                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">
-                                        ${formatCurrency(region.revenue)}
-                                    </div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
-                                        Fatturato Totale
-                                    </div>
-                                </div>
-                                <div style="text-align: center; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius);">
-                                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">
-                                        ${region.clients}
-                                    </div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
-                                        Clienti Serviti
-                                    </div>
-                                </div>
-                                <div style="text-align: center; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius);">
-                                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">
-                                        ${region.agents.size}
-                                    </div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
-                                        Agenti Attivi
-                                    </div>
-                                </div>
-                                <div style="text-align: center; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius);">
-                                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">
-                                        ${region.provinces.size}
-                                    </div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
-                                        Province Coperte
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div style="background: var(--surface-2); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
-                                <h4 style="margin-bottom: 1rem; color: var(--text);">Province Operative</h4>
-                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                                    ${Array.from(region.provinces).map(prov => `
-                                        <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500;">
-                                            ${prov}
-                                        </span>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            
-                            <div style="background: var(--surface-2); padding: 1.5rem; border-radius: var(--radius);">
-                                <h4 style="margin-bottom: 1rem; color: var(--text);">Agenti della Regione</h4>
-                                <div style="display: grid; gap: 0.75rem;">
-                                    ${Array.from(region.agents).map(agentCode => {
-                                        const agent = allData.find(a => a.codice === agentCode);
-                                        const general = agent?.obiettivi.find(o => o.Provincia === 'Generale');
-                                        const current = general?.Anno_Corrente || 0;
-                                        return `
-                                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
-                                                <div>
-                                                    <div style="font-weight: 600; font-size: 0.875rem;">${agent?.nome || agentCode}</div>
-                                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${agentCode}</div>
-                                                </div>
-                                                <div style="text-align: right;">
-                                                    <div style="font-weight: 600; color: var(--primary);">${formatCurrency(current)}</div>
-                                                </div>
-                                            </div>
-                                        `;
-                                    }).join('')}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-primary" onclick="closeRegionModal()">Chiudi</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Rimuovi modal esistente se presente
-            const existingModal = document.getElementById('regionModal');
-            if (existingModal) {
-                existingModal.remove();
-            }
-            
-            // Aggiungi nuovo modal
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeRegionModal() {
-            const modal = document.getElementById('regionModal');
-            if (modal) {
-                modal.remove();
-                document.body.style.overflow = '';
-            }
-        }
-
-        // Chart Details Modal Functions
-        function openChartDetailsModal(chartType) {
-            const modalHtml = `
-                <div class="modal-overlay" id="chartDetailsModal" style="opacity: 1; visibility: visible;">
-                    <div class="modal" style="transform: scale(1); max-width: 800px;">
-                        <div class="modal-header">
-                            <h3 class="modal-title">Dettagli ${getChartTitle(chartType)}</h3>
-                            <button class="modal-close" onclick="closeChartDetailsModal()">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"/>
-                                    <line x1="6" y1="6" x2="18" y2="18"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="modal-body" style="padding: 2rem; max-height: 500px; overflow-y: auto;">
-                            ${generateChartDetails(chartType)}
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-primary" onclick="closeChartDetailsModal()">Chiudi</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Rimuovi modal esistente se presente
-            const existingModal = document.getElementById('chartDetailsModal');
-            if (existingModal) {
-                existingModal.remove();
-            }
-            
-            // Aggiungi nuovo modal
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeChartDetailsModal() {
-            const modal = document.getElementById('chartDetailsModal');
-            if (modal) {
-                modal.remove();
-                document.body.style.overflow = '';
-            }
-        }
-
-        function getChartTitle(chartType) {
-            const titles = {
-                'performance': 'Performance Agenti',
-                'regions': 'Distribuzione Regionale',
-                'scatter': 'Efficienza Commerciale',
-                'heatmap': 'Matrice Performance',
-                'boxplot': 'Distribuzione Performance'
-            };
-            return titles[chartType] || 'Grafico';
-        }
-
-        function generateChartDetails(chartType) {
-            switch(chartType) {
-                case 'performance':
-                    return generatePerformanceDetails();
-                case 'regions':
-                    return generateRegionDetails();
-                case 'scatter':
-                    return generateScatterDetails();
-                case 'heatmap':
-                    return generateHeatmapDetails();
-                case 'boxplot':
-                    return generateBoxplotDetails();
-                default:
-                    return '<p>Dettagli non disponibili per questo grafico.</p>';
-            }
-        }
-
-        function generatePerformanceDetails() {
-            const agentData = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                
-                return { 
-                    agent, current, previous, growth, clients, regions,
-                    efficiency: clients > 0 ? current / clients : 0
-                };
-            }).sort((a, b) => b.current - a.current);
-
-            return `
-                <h4 style="margin-bottom: 1rem; color: var(--primary);">Top 10 Agenti per Performance</h4>
-                <div style="display: grid; gap: 1rem;">
-                    ${agentData.slice(0, 10).map((item, index) => `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--surface-2); border-radius: var(--radius); border: 1px solid var(--border);">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
-                                    ${index + 1}
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 0.875rem;">${item.agent.nome}</div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${item.agent.codice}</div>
-                                </div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-weight: 600; color: var(--primary); font-size: 1rem;">${formatCurrency(item.current)}</div>
-                                <div style="font-size: 0.75rem; color: ${item.growth >= 0 ? 'var(--success)' : 'var(--danger)'};">
-                                    ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}% vs 2024
-                                </div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted);">
-                                    ${item.clients} clienti • ${formatCurrency(item.efficiency)}/cliente
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <div style="margin-top: 2rem; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius);">
-                    <h5 style="margin-bottom: 1rem;">Statistiche Generali</h5>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">
-                                ${formatCurrency(agentData.reduce((sum, item) => sum + item.current, 0))}
-                            </div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">Fatturato Totale</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">
-                                ${agentData.reduce((sum, item) => sum + item.clients, 0)}
-                            </div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">Clienti Totali</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">
-                                ${((agentData.reduce((sum, item) => sum + item.growth, 0)) / agentData.length).toFixed(1)}%
-                            </div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">Crescita Media</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function generateRegionDetails() {
-            const regionData = {};
-            
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    if (!regionData[regionName]) {
-                        regionData[regionName] = {
-                            name: regionName,
-                            revenue: 0,
-                            clients: 0,
-                            agents: new Set(),
-                            provinces: new Set()
-                        };
-                    }
-                    regionData[regionName].revenue += prov.Fatturato || 0;
-                    regionData[regionName].clients += prov.Clienti_Serviti || 0;
-                    regionData[regionName].agents.add(agent.codice);
-                    regionData[regionName].provinces.add(prov.Provincia);
-                });
-            });
-
-            const sortedRegions = Object.values(regionData).sort((a, b) => b.revenue - a.revenue);
-
-            return `
-                <h4 style="margin-bottom: 1rem; color: var(--primary);">Ranking Regioni per Fatturato</h4>
-                <div style="display: grid; gap: 1rem;">
-                    ${sortedRegions.map((region, index) => `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--surface-2); border-radius: var(--radius); border: 1px solid var(--border);">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div style="background: ${getRegionColor(region.name)}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
-                                    ${index + 1}
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 0.875rem;">${region.name}</div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${region.agents.size} agenti • ${region.provinces.size} province</div>
-                                </div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-weight: 600; color: var(--primary); font-size: 1rem;">${formatCurrency(region.revenue)}</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">
-                                    ${region.clients} clienti
-                                </div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted);">
-                                    ${formatCurrency(region.revenue / region.agents.size)}/agente
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function generateScatterDetails() {
-            const scatterData = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                const efficiency = clients > 0 ? current / clients : 0;
-                
-                return { agent, current, clients, efficiency };
-            }).filter(item => item.clients > 0 && item.current > 0)
-              .sort((a, b) => b.efficiency - a.efficiency);
-
-            return `
-                <h4 style="margin-bottom: 1rem; color: var(--primary);">Top Agenti per Efficienza (€/cliente)</h4>
-                <div style="display: grid; gap: 1rem;">
-                    ${scatterData.slice(0, 10).map((item, index) => `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--surface-2); border-radius: var(--radius); border: 1px solid var(--border);">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
-                                    ${index + 1}
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 0.875rem;">${item.agent.nome}</div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${item.agent.codice}</div>
-                                </div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-weight: 600; color: var(--primary); font-size: 1rem;">${formatCurrency(item.efficiency)}/cliente</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">
-                                    ${formatCurrency(item.current)} totale
-                                </div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted);">
-                                    ${item.clients} clienti
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function generateHeatmapDetails() {
-            return `
-                <h4 style="margin-bottom: 1rem; color: var(--primary);">Matrice Performance: Fatturato vs Crescita</h4>
-                <p style="margin-bottom: 1.5rem; color: var(--text-muted);">
-                    Questa matrice confronta il fatturato (asse X) con la crescita percentuale (asse Y) per identificare i quadranti di performance.
-                </p>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
-                    <div style="padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: var(--radius); border: 1px solid rgba(16, 185, 129, 0.2);">
-                        <h5 style="color: #059669; margin-bottom: 0.5rem;">🌟 Stelle (Alto Fatturato + Alta Crescita)</h5>
-                        <p style="font-size: 0.875rem; color: var(--text-muted);">Agenti con fatturato elevato e crescita sostenuta</p>
-                    </div>
-                    <div style="padding: 1rem; background: rgba(245, 158, 11, 0.1); border-radius: var(--radius); border: 1px solid rgba(245, 158, 11, 0.2);">
-                        <h5 style="color: #d97706; margin-bottom: 0.5rem;">💰 Cash Cow (Alto Fatturato + Bassa Crescita)</h5>
-                        <p style="font-size: 0.875rem; color: var(--text-muted);">Agenti consolidati da monitorare</p>
-                    </div>
-                    <div style="padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: var(--radius); border: 1px solid rgba(59, 130, 246, 0.2);">
-                        <h5 style="color: #2563eb; margin-bottom: 0.5rem;">🚀 Emergenti (Basso Fatturato + Alta Crescita)</h5>
-                        <p style="font-size: 0.875rem; color: var(--text-muted);">Agenti in crescita da supportare</p>
-                    </div>
-                    <div style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: var(--radius); border: 1px solid rgba(239, 68, 68, 0.2);">
-                        <h5 style="color: #dc2626; margin-bottom: 0.5rem;">⚠️ Attenzione (Basso Fatturato + Bassa Crescita)</h5>
-                        <p style="font-size: 0.875rem; color: var(--text-muted);">Agenti che necessitano intervento</p>
-                    </div>
-                </div>
-                
-                <div style="background: var(--surface-2); padding: 1.5rem; border-radius: var(--radius);">
-                    <h5 style="margin-bottom: 1rem;">Come leggere la matrice</h5>
-                    <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-muted);">
-                        <li>Asse X: Fatturato in milioni di euro (0-5M+)</li>
-                        <li>Asse Y: Crescita percentuale (-50% a +100%)</li>
-                        <li>Colori: Verde = Performance eccellente, Rosso = Necessita attenzione</li>
-                    </ul>
-                </div>
-            `;
-        }
-
-        function generateBoxplotDetails() {
-            const regionPerformance = {};
-            
-            allData.forEach(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                
-                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                const mainRegion = agentRegions[0] || 'Generale';
-                
-                if (!regionPerformance[mainRegion]) {
-                    regionPerformance[mainRegion] = { agents: [], growths: [] };
-                }
-                regionPerformance[mainRegion].agents.push({ agent, growth });
-                regionPerformance[mainRegion].growths.push(growth);
-            });
-
-            // Calcola statistiche per ogni regione
-            Object.values(regionPerformance).forEach(region => {
-                const sorted = region.growths.sort((a, b) => a - b);
-                const len = sorted.length;
-                region.stats = {
-                    min: sorted[0],
-                    q1: sorted[Math.floor(len * 0.25)],
-                    median: sorted[Math.floor(len * 0.5)],
-                    q3: sorted[Math.floor(len * 0.75)],
-                    max: sorted[len - 1],
-                    average: sorted.reduce((sum, val) => sum + val, 0) / len
-                };
-            });
-
-            const sortedRegions = Object.entries(regionPerformance).sort(([,a], [,b]) => b.stats.median - a.stats.median);
-
-            return `
-                <h4 style="margin-bottom: 1rem; color: var(--primary);">Distribuzione Crescita per Regione</h4>
-                <div style="display: grid; gap: 1rem;">
-                    ${sortedRegions.map(([regionName, data], index) => `
-                        <div style="padding: 1rem; background: var(--surface-2); border-radius: var(--radius); border: 1px solid var(--border);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <div style="background: ${getRegionColor(regionName)}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
-                                        ${index + 1}
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: 600; font-size: 0.875rem;">${regionName}</div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);">${data.agents.length} agenti</div>
-                                    </div>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="font-weight: 600; color: var(--primary); font-size: 1rem;">
-                                        ${data.stats.median.toFixed(1)}% mediana
-                                    </div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">
-                                        Range: ${data.stats.min.toFixed(1)}% - ${data.stats.max.toFixed(1)}%
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; font-size: 0.75rem;">
-                                <div style="text-align: center; padding: 0.5rem; background: var(--surface); border-radius: 4px;">
-                                    <div style="font-weight: 600;">${data.stats.min.toFixed(1)}%</div>
-                                    <div style="color: var(--text-muted);">Min</div>
-                                </div>
-                                <div style="text-align: center; padding: 0.5rem; background: var(--surface); border-radius: 4px;">
-                                    <div style="font-weight: 600;">${data.stats.q1.toFixed(1)}%</div>
-                                    <div style="color: var(--text-muted);">Q1</div>
-                                </div>
-                                <div style="text-align: center; padding: 0.5rem; background: var(--surface); border-radius: 4px;">
-                                    <div style="font-weight: 600;">${data.stats.q3.toFixed(1)}%</div>
-                                    <div style="color: var(--text-muted);">Q3</div>
-                                </div>
-                                <div style="text-align: center; padding: 0.5rem; background: var(--surface); border-radius: 4px;">
-                                    <div style="font-weight: 600;">${data.stats.max.toFixed(1)}%</div>
-                                    <div style="color: var(--text-muted);">Max</div>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-    </script>
-</body>
-</html>
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00120
+# Ragione Sociale: CINTI DOMENICO
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"67.611,27","31.318,46",,,602,8,,
+OBIETTIVI,FR,"67.611,27","31.318,46","120.000,00","27,%",16,8,20,40%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,FR,8,"33.082,42"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,FR,GINO MARIANI & C. S.N.C. - MANUFATTI IN CEMENTO,MATTONE PIENO,"4.032,00"
+VENDITE_CLIENTE,FR,GINO MARIANI & C. S.N.C. - MANUFATTI IN CEMENTO,REFRATTARI RETTIFICATI,"1.229,97"
+VENDITE_CLIENTE,FR,MARCONI SANDRO,MATTONE PIENO,"1.814,40"
+VENDITE_CLIENTE,FR,MARCONI SANDRO,PAVIMENTAZIONE POLIS,"416,40"
+VENDITE_CLIENTE,FR,MARCONI SANDRO,REFRATTARI,"379,47"
+VENDITE_CLIENTE,FR,MARCONI SANDRO,REFRATTARI RETTIFICATI,"409,99"
+VENDITE_CLIENTE,FR,EDILSTAR SRL,MATTONE PIENO,"1.166,40"
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL,MATTONE PIENO,"1.209,60"
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL,REFRATTARI,"816,45"
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL,REFRATTARI RETTIFICATI,"1.550,40"
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,CORRIM.COPRIM.,"2,40"
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,MATTONE PIENO,"907,21"
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,OUTLET,"1,50"
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL,PAVIMENTAZIONE POLIS,"8.681,95"
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,MATTONE PIENO,"1.332,00"
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,PAVIMENTAZIONE POLIS,"1.278,72"
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,REFRATTARI,"111,21"
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL,REFRATTARI RETTIFICATI,"1.550,40"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,FACCIAVISTA,"874,80"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,LINEA ARCHEO,"4,20"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,MATTONE PIENO,"273,60"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,PAVIMENTAZIONE POLIS,"432,73"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,REFRATTARI,"563,13"
+VENDITE_CLIENTE,FR,BRICOMAG SRL,REFRATTARI RETTIFICATI,"1.695,88"
+VENDITE_CLIENTE,FR,EDILIZIA STIRPE 2014 SRL,PRODOTTI FORNO,"686,00"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"2,40",FR,1,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"874,80",FR,1,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"4,20",FR,1,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"10.735,21",FR,7,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"1,50",FR,1,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"10.809,80",FR,4,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"686,00",FR,1,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",FR,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"1.870,26",FR,4,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"6.436,64",FR,5,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",FR,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,10.742,59,34
+RIPARTIZIONE,Altro,20.575,87,66
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00220
+# Ragione Sociale: TRAFIERI ANDREA
+# Periodo: 01/01/2025 - 05/01/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"2.024,02","0,00",,,3,0,,
+OBIETTIVI,VT,"2.024,02","0,00","25.000,00",0%,1,0,10,0%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,VT,,"0,00"
+CLIENTI_PROVINCIA,RM,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",VT,0,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",VT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00222
+# Ragione Sociale: SARTINI GABRIELE
+# Periodo: 01/01/2024 - 16/06/2024
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"5.485,77","0,00",,,112,1,,
+OBIETTIVI,,"0,00","0,00","0,00",999%,0,1,0,999%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,,1,"30.659,89"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,,,COPERTURE,"12,05"
+VENDITE_CLIENTE,,,CORRIM.COPRIM.,"178,85"
+VENDITE_CLIENTE,,,COTTO A MANO ANTICHE TERRE,"288,00"
+VENDITE_CLIENTE,,,FACCIAVISTA,"2.366,14"
+VENDITE_CLIENTE,,,GANCI E ACCESSO,"24,00"
+VENDITE_CLIENTE,,,LINEA ARCHEO,"1.185,84"
+VENDITE_CLIENTE,,,PAVIMENTAZIONE POLIS,"902,30"
+VENDITE_CLIENTE,,,PIASTRELLE,"1.241,86"
+VENDITE_CLIENTE,,,PRODOTTI FORNO,"22.804,60"
+VENDITE_CLIENTE,,,REFRATTARI,"426,42"
+VENDITE_CLIENTE,,,REFRATTARI RETTIFICATI,"1.229,83"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"12,05",LT,1,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"178,85",LT,1,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"288,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"2.366,14",LT,1,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"24,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"1.185,84",LT,1,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"902,30",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"1.241,86",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"22.804,60",LT,1,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",LT,1,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"426,42",LT,1,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"1.229,83",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00231
+# Ragione Sociale: ERRE RAPPRESENTANZE SNC
+# Periodo: 01/01/2024 - 16/06/2024
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"5.708,77","0,00",,,151,0,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CA,,"0,00"
+CLIENTI_PROVINCIA,OT,,"0,00"
+CLIENTI_PROVINCIA,NU,,"0,00"
+CLIENTI_PROVINCIA,SU,,"0,00"
+CLIENTI_PROVINCIA,OR,,"0,00"
+CLIENTI_PROVINCIA,SS,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",CA,0,OT,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",CA,0,OT,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00238
+# Ragione Sociale: CARABOT NATALINO
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"80.238,72","90.159,79",,,354,20,,
+OBIETTIVI,LT,"79.029,16","82.389,23","155.000,00","38,%",23,18,35,"51,%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,LT,18,"60.437,22"
+CLIENTI_PROVINCIA,RM,2,"7.770,56"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,LT,EDILIZIA SETINA S.R.L.,MATTONE PIENO,"1.512,00"
+VENDITE_CLIENTE,LT,EDILIZIA SETINA S.R.L.,PAVIMENTAZIONE POLIS,"1.665,62"
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,FACCIAVISTA,"583,78"
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,LINEA ARCHEO,"743,00"
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,MATTONE PIENO,"151,20"
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL,PAVIMENTAZIONE POLIS,"416,40"
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,COPERTURE,"3,36"
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,LINEA ARCHEO,"1,74"
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,MATTONE PIENO,"3.110,40"
+VENDITE_CLIENTE,LT,F.LLI TORA SRL,PAVIMENTAZIONE POLIS,"1.382,40"
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL,MATTONE PIENO,"3.693,60"
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL,OUTLET,"0,01"
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL,PIASTRELLE,"1.240,95"
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,CORRIM.COPRIM.,"73,26"
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,MATTONE PIENO,"7.776,00"
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,PAVIMENTAZIONE POLIS,"8,67"
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL,REFRATTARI RETTIFICATI,"1.281,60"
+VENDITE_CLIENTE,LT,STENI SRL,MATTONE PIENO,"547,20"
+VENDITE_CLIENTE,LT,STENI SRL,PAVIMENTAZIONE POLIS,"984,96"
+VENDITE_CLIENTE,RM,DOVAL SRL,REFRATTARI,"1.019,82"
+VENDITE_CLIENTE,LT,ROSANCOS SRL,MATTONE PIENO,"1.528,80"
+VENDITE_CLIENTE,LT,ROSANCOS SRL,PAVIMENTAZIONE POLIS,"604,80"
+VENDITE_CLIENTE,LT,EDILCERAMICA SAS DI VEGLIA CRISTIAN & C.,MATTONE PIENO,"1.440,00"
+VENDITE_CLIENTE,LT,D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS,MATTONE PIENO,"3.744,00"
+VENDITE_CLIENTE,LT,D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS,PAVIMENTAZIONE POLIS,"832,81"
+VENDITE_CLIENTE,LT,DIMED SRL,MATTONE PIENO,"1.326,96"
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,MATTONE PIENO,"1.209,60"
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,REFRATTARI,"900,83"
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C,REFRATTARI RETTIFICATI,"1.935,58"
+VENDITE_CLIENTE,LT,EDILIM SRL,MATTONE PIENO,"1.370,88"
+VENDITE_CLIENTE,LT,EDILIM SRL,PAVIMENTAZIONE POLIS,"984,96"
+VENDITE_CLIENTE,LT,EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC,MATTONE PIENO,"3.456,00"
+VENDITE_CLIENTE,LT,EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC,PAVIMENTAZIONE POLIS,"2.230,80"
+VENDITE_CLIENTE,LT,L'EMPORIO DI IOZZI SONIA,MATTONE PIENO,"957,60"
+VENDITE_CLIENTE,LT,L'EMPORIO DI IOZZI SONIA,PAVIMENTAZIONE POLIS,"984,96"
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS,MATTONE PIENO,"864,00"
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS,REFRATTARI,"379,47"
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS,REFRATTARI RETTIFICATI,"819,98"
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL,PAVIMENTAZIONE POLIS,"2.695,68"
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL,REFRATTARI,"640,35"
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL,REFRATTARI RETTIFICATI,"460,34"
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL,PAVIMENTAZIONE POLIS,"933,12"
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL,REFRATTARI,"1.969,92"
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL,REFRATTARI RETTIFICATI,"870,33"
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL,LINEA ARCHEO,"1,94"
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL,MATTONE PIENO,"5.150,40"
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL,PAVIMENTAZIONE POLIS,"1.598,40"
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL,FACCIAVISTA,"1.007,62"
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL,MATTONE PIENO,"720,00"
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL,PAVIMENTAZIONE POLIS,"362,88"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"3,36",LT,1,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"73,26",LT,1,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"1.591,40",LT,2,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"746,68",LT,2,RM,1
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"38.558,64",LT,16,RM,1
+CATEGORIA_RIEPILOGO,OUTLET,"0,01",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"15.686,46",LT,13,RM,1
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"1.240,95",LT,1,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"4.910,39",LT,4,RM,1
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"5.367,83",LT,5,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,54.909,62,61
+RIPARTIZIONE,Altro,35.250,17,39
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,6820778.00
+TOTALE,Fatturato_LT,6043722.00
+TOTALE,Fatturato_RM,777056.00
+TOTALE,Clienti_Totali,20
+TOTALE,Clienti_LT,18
+TOTALE,Clienti_RM,2
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00247
+# Ragione Sociale: LUCIANI LEONARDO
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","0,00",,,102,0,,
+OBIETTIVI,,"0,00","0,00","0,00",999%,0,0,0,999%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",LT,0,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00248
+# Ragione Sociale: GALLO D.
+# Periodo: 01/01/2023 - 30/07/2023
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"2.123,39","3.382,03",,,1,1,,
+OBIETTIVI,,"0,00","3.382,03","0,00",999%,0,1,0,999%
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,,1,"33.412,37"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,,,CORRIM.COPRIM.,"512,65"
+VENDITE_CLIENTE,,,FACCIAVISTA,"9.156,00"
+VENDITE_CLIENTE,,,GANCI E ACCESSO,"417,20"
+VENDITE_CLIENTE,,,OUTLET,"420,00"
+VENDITE_CLIENTE,,,PIASTRELLE,"700,80"
+VENDITE_CLIENTE,,,PRODOTTI FORNO,"21.281,06"
+VENDITE_CLIENTE,,,REFRATTARI,"924,66"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"1.025,30",LT,2,RM,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"18.312,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"834,40",LT,2,RM,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,OUTLET,"840,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"1.401,60",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"42.562,12",LT,2,RM,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"1.849,32",LT,2,RM,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",LT,2,RM,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",LT,0,RM,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,3.382,03,100
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00263
+# Ragione Sociale: G 2 G SRL
+# Periodo: 01/01/2025 - 08/06/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"71.453,02","99.976,78",,,135,12,,
+OBIETTIVI,AN,"37.799,09","61.385,27","90.000,00","54,%",6,6,15,40%
+OBIETTIVI,PU,"33.653,93","22.704,27","90.000,00","25,%",6,4,15,"26,%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AN,6,"49.079,42"
+CLIENTI_PROVINCIA,PU,4,"22.685,71"
+CLIENTI_PROVINCIA,ALB,2,"21.579,08"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,COPERTURE,"5.500,00"
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,MATTONE PIENO,"3.600,96"
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,PIASTRELLE,"2.526,39"
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COPERTURE,"4.070,00"
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,"0,08"
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,FACCIAVISTA,"0,88"
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,PIASTRELLE,"4,65"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COPERTURE,"8.932,00"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COTTO A MANO ANTICHE TERRE,"12,32"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,MATTONE PIENO,"1.305,60"
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,COPERTURE,"4.356,00"
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,MATTONE PIENO,"691,20"
+VENDITE_CLIENTE,PU,EDIL PIEFFE SRL,MATTONE PIENO,"7.286,40"
+VENDITE_CLIENTE,AN,GIACCHE' SRL,MATTONE PIENO,"15.033,60"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COPERTURE,"4.404,69"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COTTO A MANO ANTICHE TERRE,"4,25"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,MATTONE PIENO,"729,60"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,PIASTRELLE,"5,32"
+VENDITE_CLIENTE,ALB,KONI ARJAN,COPERTURE,"11.622,48"
+VENDITE_CLIENTE,ALB,KONI ARJAN,MATTONE PIENO,"252,00"
+VENDITE_CLIENTE,ALB,KONI ARJAN,OUTLET,"2.531,50"
+VENDITE_CLIENTE,ALB,KONI ARJAN,PIASTRELLE,"745,71"
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI,"347,95"
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI RETTIFICATI,"387,60"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COPERTURE,"3.875,36"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,"6,97"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,LINEA ARCHEO,"546,52"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,MATTONE PIENO,"4.620,00"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,PIASTRELLE,"7,81"
+VENDITE_CLIENTE,AN,NUOVA COMES SRL,MATTONE PIENO,"3.365,68"
+VENDITE_CLIENTE,ALB,KONI ARJAN,FACCIAVISTA,"5.691,84"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"42.760,53",AN,4,PU,2
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"23,62",AN,2,PU,2
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"5.692,72",AN,0,PU,1
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"546,52",AN,1,PU,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"36.885,04",AN,5,PU,3
+CATEGORIA_RIEPILOGO,OUTLET,"2.531,50",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"3.289,88",AN,2,PU,2
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"347,95",AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"387,60",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",AN,0,PU,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,82.583,17,83
+RIPARTIZIONE,Altro,17.393,61,17
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00263
+# Ragione Sociale: G2G TRADE CONSULTING SRL
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"100.612,29","132.483,77",,,183,14,,
+OBIETTIVI,AN,"56.773,08","75.247,30","90.000,00","70,%",7,7,15,"46,%"
+OBIETTIVI,PU,"43.839,21","28.424,27","90.000,00","31,%",7,5,15,"33,%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AN,7,"63.306,02"
+CLIENTI_PROVINCIA,PU,5,"28.405,71"
+CLIENTI_PROVINCIA,ALB,2,"47.726,28"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,COPERTURE,"8.230,00"
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,MATTONE PIENO,"5.396,16"
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL,PIASTRELLE,"2.526,39"
+VENDITE_CLIENTE,AN,EDILMUSONE SRL,COPERTURE,"2.415,00"
+VENDITE_CLIENTE,AN,EDILMUSONE SRL,MATTONE PIENO,"1.987,20"
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COPERTURE,"4.070,00"
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,"0,08"
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,FACCIAVISTA,"0,88"
+VENDITE_CLIENTE,PU,GIUSTO GOSTOLI SRL MATERIALI EDILI,PIASTRELLE,"4,65"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COPERTURE,"8.932,00"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,COTTO A MANO ANTICHE TERRE,"12,32"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL,MATTONE PIENO,"1.305,60"
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,COPERTURE,"4.356,00"
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL,MATTONE PIENO,"691,20"
+VENDITE_CLIENTE,PU,EDIL PIEFFE SRL,MATTONE PIENO,"7.286,40"
+VENDITE_CLIENTE,PU,RI.M.EDIL SRL,COPERTURE,"5.720,00"
+VENDITE_CLIENTE,AN,GIACCHE' SRL,FACCIAVISTA,"1.670,40"
+VENDITE_CLIENTE,AN,GIACCHE' SRL,MATTONE PIENO,"18.662,40"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COPERTURE,"4.404,69"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,COTTO A MANO ANTICHE TERRE,"4,25"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,MATTONE PIENO,"729,60"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL,PIASTRELLE,"5,32"
+VENDITE_CLIENTE,ALB,KONI ARJAN,COPERTURE,"20.122,44"
+VENDITE_CLIENTE,ALB,KONI ARJAN,CORRIM.COPRIM.,"540,00"
+VENDITE_CLIENTE,ALB,KONI ARJAN,MATTONE PIENO,"252,00"
+VENDITE_CLIENTE,ALB,KONI ARJAN,OUTLET,"5.726,50"
+VENDITE_CLIENTE,ALB,KONI ARJAN,PIASTRELLE,"745,71"
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI,"650,35"
+VENDITE_CLIENTE,ALB,KONI ARJAN,REFRATTARI RETTIFICATI,"775,20"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COPERTURE,"3.875,36"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,COTTO A MANO ANTICHE TERRE,"6,97"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,LINEA ARCHEO,"546,52"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,MATTONE PIENO,"4.620,00"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL,PIASTRELLE,"7,81"
+VENDITE_CLIENTE,AN,NUOVA COMES SRL,MATTONE PIENO,"3.365,68"
+VENDITE_CLIENTE,ALB,KONI ARJAN,FACCIAVISTA,"18.914,08"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"62.125,49",AN,5,PU,3
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"540,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"23,62",AN,2,PU,2
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"20.585,36",AN,1,PU,1
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"546,52",AN,1,PU,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"44.296,24",AN,6,PU,3
+CATEGORIA_RIEPILOGO,OUTLET,"5.726,50",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"3.289,88",AN,2,PU,2
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"650,35",AN,0,PU,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"775,20",AN,0,PU,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",AN,0,PU,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,109.359,33,83
+RIPARTIZIONE,Altro,23.124,44,17
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00264
+# Ragione Sociale: G. & P. SNC DI GAIAS CLAUDIA E PUTZU ALBERTO
+# Periodo: 01/01/2025 - 05/01/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","0,00",,,0,0,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,NU,,"0,00"
+CLIENTI_PROVINCIA,OT,,"0,00"
+CLIENTI_PROVINCIA,SS,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",NU,0,OT,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",NU,0,OT,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00268
+# Ragione Sociale: VISANI DEVIS
+# Periodo: 01/01/2025 - 26/01/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","0,00",,,0,0,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,RN,,"0,00"
+CLIENTI_PROVINCIA,RA,,"0,00"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",RN,0,RA,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",RN,0,RA,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,00,0
+RIPARTIZIONE,Altro,0,00,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
+
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00272
+# Ragione Sociale: RAPPRESENTANZE & SERVIZI SRL
+# Periodo: 01/01/2025 - 31/08/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","2.696,39",,,5,5,,
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CR,2,"3.047,46"
+CLIENTI_PROVINCIA,LO,1,"756,87"
+CLIENTI_PROVINCIA,PC,2,"892,62"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Categoria_Articoli,Fatturato
+VENDITE_CLIENTE,CR,PLACIDO SRL,COPERTURE,"396,90"
+VENDITE_CLIENTE,CR,FcS SRL,COPERTURE,"2.650,56"
+VENDITE_CLIENTE,LO,CREBI ART SRL,COPERTURE,"657,24"
+VENDITE_CLIENTE,LO,CREBI ART SRL,CORRIM.COPRIM.,"99,63"
+VENDITE_CLIENTE,PC,EDILCERAMICA S.R.L.,FACCIAVISTA,"868,10"
+VENDITE_CLIENTE,PC,REMONDINI MARA & C. SNC,COTTO A MANO ANTICHE TERRE,"6,97"
+VENDITE_CLIENTE,PC,REMONDINI MARA & C. SNC,PIASTRELLE,"17,55"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale,Provincia_1,Clienti_Prov_1,Provincia_2,Clienti_Prov_2
+CATEGORIA_RIEPILOGO,COPERTURE,"3.704,70",CR,2,LO,1
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.,"99,63",CR,0,LO,1
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE,"6,97",CR,0,LO,0
+CATEGORIA_RIEPILOGO,FACCIAVISTA,"868,10",CR,0,LO,0
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,LINEA ARCHEO,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,MATTONE PIENO,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,OUTLET,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PIASTRELLE,"17,55",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,TAVELLONI,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,REFRATTARI,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI,"0,00",CR,0,LO,0
+CATEGORIA_RIEPILOGO,PROMOZIONALI,"0,00",CR,0,LO,0
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni_e_Coppi,0,0
+RIPARTIZIONE,Altro,0,0
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,0.00
+TOTALE,Fatturato_LT,0.00
+TOTALE,Fatturato_RM,0.00
+TOTALE,Clienti_Totali,0
+TOTALE,Clienti_LT,0
+TOTALE,Clienti_RM,0
