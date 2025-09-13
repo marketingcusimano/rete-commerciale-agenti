@@ -1,32 +1,4 @@
-function renderRegionOverview() {
-            if (!currentRegionData) return;
-
-            const regionAgents = allData.filter(agent => 
-                agent.clienti_provincia.some(prov => 
-                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
-                )
-            );
-
-            let totalPrevious = 0;
-            regionAgents.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
-                        totalPrevious += (prov.Fatturato || 0) * 0.85;
-                    }
-                });
-            });
-
-            const growth = totalPrevious > 0 ? 
-                ((currentRegionData.revenue - totalPrevious) / totalPrevious * 100) : 0;
-
-            const metricsContainer = document.getElementById('regionOverviewMetrics');
-            if (metricsContainer) {
-                metricsContainer.innerHTML = `
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${formatCurrency(currentRegionData.revenue)}</div>
-                        <div class="region-overview-label">Fatturato Totale</div>
-                        <div class="region-overview-change ${growth >= 0 ? 'positive' : 'negative'}">
-                            ${growth >= 0<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -1748,4 +1720,10 @@ function renderRegionOverview() {
                 const lastUpdateElement = document.getElementById('lastUpdate');
                 if (lastUpdateElement) {
                     lastUpdateElement.textContent = 'Errore caricamento';
-                    lastUpdateElement.style.color = 'var(--danger)
+                    lastUpdateElement.style.color = 'var(--danger)';
+                }
+            }
+        }
+
+        function parseCSV(csvText) {
+            const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
