@@ -1845,12 +1845,25 @@
                 const previous = general?.Anno_Precedente || 0;
                 const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
                 const clients = general?.Clienti_Anno_Corrente || 0;
+                const clientsPrevious = general?.Clienti_Anno_Precedente || 0;
+                const clientsGrowth = clientsPrevious > 0 ? ((clients - clientsPrevious) / clientsPrevious * 100) : 0;
                 const target = general?.Obiettivo || 0;
                 const progress = target > 0 ? (current / target * 100) : 0;
+                const remaining = target > current ? target - current : 0;
 
                 const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
                 const mainRegion = agentRegions[0] || 'Generale';
                 const regionColor = getRegionColor(mainRegion);
+
+                // Top performing province
+                let topProvince = null;
+                let topProvinceRevenue = 0;
+                agent.clienti_provincia.forEach(prov => {
+                    if (prov.Fatturato > topProvinceRevenue) {
+                        topProvinceRevenue = prov.Fatturato;
+                        topProvince = prov.Provincia;
+                    }
+                });
 
                 return `
                     <div class="agent-card">
@@ -1859,43 +1872,102 @@
                             <div class="agent-code">${agent.codice}</div>
                         </div>
                         <div class="agent-body">
-                            <div class="agent-metrics">
-                                <div class="agent-metric">
-                                    <div class="agent-metric-value">${formatCurrency(current)}</div>
-                                    <div class="agent-metric-label">Fatturato 2025</div>
+                            <!-- KPI Grid stile dashboard -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                                <!-- Fatturato 2025 -->
+                                <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border);">
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 600;">
+                                        Fatturato 2025
+                                    </div>
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem;">
+                                        ${formatCurrency(current)}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            ${growth >= 0 ? 
+                                                '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                                '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                            }
+                                        </svg>
+                                        <span style="color: ${growth >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: 500;">
+                                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%
+                                        </span>
+                                    </div>
+                                    <div style="font-size: 0.7rem; color: var(--text-light); margin-top: 0.25rem;">
+                                        vs 2024: ${formatCurrency(previous)}
+                                    </div>
                                 </div>
-                                <div class="agent-metric">
-                                    <div class="agent-metric-value">${clients}</div>
-                                    <div class="agent-metric-label">Clienti</div>
-                                </div>
-                            </div>
-                            
-                            <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    ${growth >= 0 ? 
-                                        '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                        '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                    }
-                                </svg>
-                                ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
-                            </div>
 
-                            <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
-                                <strong>Regioni:</strong> ${agentRegions.join(', ')}
+                                <!-- Clienti Attivi -->
+                                <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border);">
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 600;">
+                                        Clienti Attivi
+                                    </div>
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem;">
+                                        ${clients}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            ${clientsGrowth >= 0 ? 
+                                                '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                                '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                            }
+                                        </svg>
+                                        <span style="color: ${clientsGrowth >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: 500;">
+                                            ${clientsGrowth >= 0 ? '+' : ''}${clientsGrowth.toFixed(1)}%
+                                        </span>
+                                    </div>
+                                    <div style="font-size: 0.7rem; color: var(--text-light); margin-top: 0.25rem;">
+                                        vs 2024: ${clientsPrevious}
+                                    </div>
+                                </div>
                             </div>
 
                             ${target > 0 ? `
-                                <div style="margin-top: 1rem;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
-                                        <span>Obiettivo</span>
-                                        <span>${Math.round(progress)}%</span>
+                                <!-- Obiettivo 2025 -->
+                                <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                                        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Obiettivo 2025</span>
+                                        <span style="font-size: 0.875rem; font-weight: 600; color: ${progress >= 100 ? 'var(--success)' : progress >= 80 ? 'var(--warning)' : 'var(--danger)'};">
+                                            ${Math.round(progress)}%
+                                        </span>
                                     </div>
-                                    <div class="progress-bar">
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">
+                                        ${formatCurrency(target)}
+                                    </div>
+                                    <div class="progress-bar" style="margin: 0.5rem 0;">
                                         <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
                                     </div>
-                                    <div class="progress-text">
-                                        <span>${formatCurrency(current)}</span>
-                                        <span>${formatCurrency(target)}</span>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-light);">
+                                        <span>Raggiunto: ${formatCurrency(current)}</span>
+                                        <span>${remaining > 0 ? `Mancano: ${formatCurrency(remaining)}` : 'Obiettivo raggiunto!'}</span>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${topProvince ? `
+                                <!-- Top Performance -->
+                                <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 600;">
+                                                Top Performance
+                                            </div>
+                                            <div style="font-size: 1.125rem; font-weight: 600; color: var(--text);">
+                                                ${topProvince}
+                                            </div>
+                                            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                                ${getRegionFromProvince(topProvince)}
+                                            </div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-size: 1rem; font-weight: 600; color: var(--primary);">
+                                                ${formatCurrency(topProvinceRevenue)}
+                                            </div>
+                                            <div style="font-size: 0.7rem; color: var(--text-muted);">
+                                                ${((topProvinceRevenue / current) * 100).toFixed(0)}% del totale
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ` : ''}
