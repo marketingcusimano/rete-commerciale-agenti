@@ -8,24 +8,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         :root {
-            --primary: #7C93C3;        /* Blu pastello principale */
-            --primary-dark: #6B8CAE;   /* Blu pastello scuro */
-            --secondary: #94A3B8;      /* Grigio pastello */
-            --success: #A8E6A1;        /* Verde pastello */
-            --warning: #FFD3A5;        /* Arancione pastello */
-            --danger: #FFB3BA;         /* Rosa pastello */
+            --primary: #7C93C3;
+            --primary-dark: #6B8CAE;
+            --primary-light: #A8DADC;
+            --secondary: #94A3B8;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
             --surface: #ffffff;
-            --surface-2: #F8FAFF;      /* Sfondo molto leggero */
-            --surface-3: #F1F5FF;      /* Sfondo leggero */
-            --border: #E8E8E8;         /* Bordo pastello */
-            --text: #4A4A4A;           /* Testo grigio scuro */
-            --text-muted: #8A8A8A;     /* Testo grigio medio */
-            --text-light: #B8B8B8;     /* Testo grigio chiaro */
+            --surface-2: #F8FAFF;
+            --surface-3: #F1F5FF;
+            --border: #E5E7EB;
+            --text: #1F2937;
+            --text-muted: #6B7280;
+            --text-light: #9CA3AF;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
             --radius: 8px;
             --radius-lg: 12px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -37,12 +39,7 @@
             line-height: 1.6;
         }
 
-        .dashboard {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
+        /* Header semplificato */
         .header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -67,40 +64,37 @@
             gap: 0.75rem;
             font-weight: 700;
             font-size: 1.25rem;
+            color: var(--primary);
         }
 
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: var(--radius);
+        .breadcrumb {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
             font-size: 0.875rem;
+            color: var(--text-muted);
         }
 
-        .status-item {
+        .breadcrumb-separator {
+            color: var(--text-light);
+        }
+
+        .status-indicator {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 0.75rem;
-            background: var(--surface-3);
-            border-radius: var(--radius);
-            color: var(--text-muted);
+            background: var(--success);
+            color: white;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
 
-        .status-live {
+        .pulse {
             width: 8px;
             height: 8px;
-            background: var(--success);
+            background: white;
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
@@ -110,25 +104,287 @@
             50% { opacity: 0.5; }
         }
 
-        .main-content {
-            flex: 1;
-            padding: 2rem;
+        /* Layout principale */
+        .dashboard {
             max-width: 1400px;
             margin: 0 auto;
-            width: 100%;
+            padding: 2rem;
         }
 
-        .tabs {
-            display: flex;
-            gap: 0.25rem;
+        /* Vista Executive Summary */
+        .executive-summary {
+            margin-bottom: 3rem;
+        }
+
+        .summary-header {
+            text-align: center;
             margin-bottom: 2rem;
-            padding: 0.25rem;
+        }
+
+        .summary-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .summary-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* KPI Cards con maggiore emphasis */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            position: relative;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .kpi-card.primary::before { background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
+        .kpi-card.success::before { background: var(--success); }
+        .kpi-card.warning::before { background: var(--warning); }
+        .kpi-card.danger::before { background: var(--danger); }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .kpi-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .kpi-icon.primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+        .kpi-icon.success { background: var(--success); }
+        .kpi-icon.warning { background: var(--warning); }
+        .kpi-icon.danger { background: var(--danger); }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .kpi-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .kpi-change.positive { color: var(--success); }
+        .kpi-change.negative { color: var(--danger); }
+        .kpi-change.neutral { color: var(--text-muted); }
+
+        .kpi-trend {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* Alert Cards */
+        .alerts-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alerts-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .alert-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+
+        .alert-card:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow);
+        }
+
+        .alert-card.critical { border-left-color: var(--danger); background: rgba(239, 68, 68, 0.05); }
+        .alert-card.warning { border-left-color: var(--warning); background: rgba(245, 158, 11, 0.05); }
+        .alert-card.success { border-left-color: var(--success); background: rgba(16, 185, 129, 0.05); }
+
+        .alert-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .alert-icon.critical { background: var(--danger); }
+        .alert-icon.warning { background: var(--warning); }
+        .alert-icon.success { background: var(--success); }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-action {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .alert-meta {
+            text-align: right;
+            color: var(--text-light);
+            font-size: 0.75rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 3rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .action-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Navigation Pills */
+        .nav-pills {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
             background: var(--surface-3);
             border-radius: var(--radius-lg);
-            width: fit-content;
+            margin-bottom: 2rem;
+            overflow-x: auto;
         }
 
-        .tab {
+        .nav-pill {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -140,172 +396,83 @@
             font-weight: 500;
             font-size: 0.875rem;
             color: var(--text-muted);
-            transition: all 0.2s ease;
+            transition: var(--transition);
+            white-space: nowrap;
         }
 
-        .tab:hover {
+        .nav-pill:hover {
             background: var(--surface);
             color: var(--text);
         }
 
-        .tab.active {
-            background: var(--surface);
-            color: var(--primary);
+        .nav-pill.active {
+            background: var(--primary);
+            color: white;
             box-shadow: var(--shadow);
         }
 
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .advanced-charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .card {
+        /* Chart Container migliorato */
+        .chart-section {
             background: var(--surface);
             border-radius: var(--radius-lg);
             border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-            transition: all 0.2s ease;
+            padding: 2rem;
+            position: relative;
         }
 
-        .card:hover {
-            box-shadow: var(--shadow);
-            border-color: var(--primary);
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
         }
 
-        .card-header {
-            padding: 1.5rem 1.5rem 0;
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
         }
 
-        .card-title {
+        .chart-controls {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
+        }
+
+        .chart-control-btn {
+            padding: 0.5rem;
+            background: var(--surface-3);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            transition: var(--transition);
         }
 
-        .card-body {
-            padding: 1.5rem;
+        .chart-control-btn:hover {
+            background: var(--primary);
+            color: white;
         }
-
-        .metric-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 0.5rem 0;
-        }
-
-        .metric-change {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .metric-change.positive { color: #4A7C59; }
-        .metric-change.negative { color: #8B4A4A; }
 
         .chart-container {
             position: relative;
-            height: 300px;
-            padding: 1rem 0;
+            height: 400px;
+            margin: 1rem 0;
         }
 
-        .chart-container.large { height: 400px; }
-
-        .chart-details-button {
+        /* Loading States migliorati */
+        .loading-overlay {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            padding: 0.5rem 0.75rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .chart-details-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .table-container { overflow-x: auto; }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th,
-        .table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .table th {
-            background: var(--surface-2);
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .table td { font-size: 0.875rem; }
-
-        .table-row { transition: background-color 0.2s ease; }
-        .table-row:hover { background: var(--surface-2); }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .badge.success { background: rgba(168, 230, 161, 0.2); color: #4A7C59; }
-        .badge.warning { background: rgba(255, 211, 165, 0.2); color: #8B5A2B; }
-        .badge.danger { background: rgba(255, 179, 186, 0.2); color: #8B4A4A; }
-
-        .loading {
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 3rem;
-            color: var(--text-muted);
+            z-index: 10;
+            border-radius: var(--radius-lg);
         }
 
         .spinner {
@@ -315,7 +482,6 @@
             border-top: 3px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
         }
 
         @keyframes spin {
@@ -323,614 +489,101 @@
             100% { transform: rotate(360deg); }
         }
 
-        .region-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .region-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .region-card:hover {
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
-            border-color: var(--primary);
-        }
-
-        .region-detail-button {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            padding: 0.75rem 1rem;
+        .loading-text {
             margin-top: 1rem;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .region-detail-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .region-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .region-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .region-info h3 {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .region-info p {
             color: var(--text-muted);
             font-size: 0.875rem;
         }
 
-        .region-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .region-stat { text-align: center; }
-
-        .region-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .region-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .agent-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .agent-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .agent-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-4px);
-        }
-
-        .agent-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 1.5rem;
-        }
-
-        .agent-name {
-            font-weight: 600;
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .agent-code {
-            opacity: 0.8;
-            font-size: 0.875rem;
-        }
-
-        .agent-body { padding: 1.5rem; }
-
-        .agent-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-metric { text-align: center; }
-
-        .agent-metric-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .agent-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: var(--surface-3);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 0.5rem 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            border-radius: 3px;
-            transition: width 0.6s ease;
-        }
-
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-light);
-        }
-
-        .filter-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .filter-button {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .filter-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .filter-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-        }
-
-        .modal-overlay {
+        /* Toast notifications */
+        .toast-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            top: 1rem;
+            right: 1rem;
             z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow: hidden;
-            transform: scale(0.9);
-            transition: transform 0.2s ease;
-        }
-
-        .modal-overlay.show .modal {
-            transform: scale(1);
-        }
-
-        .region-detail-modal {
-            width: 95%;
-            max-width: 1200px;
-            max-height: 90vh;
-        }
-
-        .details-modal {
-            width: 95%;
-            max-width: 1400px;
-            max-height: 90vh;
-        }
-
-        .details-modal-content {
-            max-height: calc(90vh - 120px);
-            overflow-y: auto;
-        }
-
-        .details-section {
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .details-section:last-child {
-            border-bottom: none;
-        }
-
-        .details-section h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .details-card {
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            padding: 1rem;
-            border: 1px solid var(--border);
-        }
-
-        .details-card h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }
-
-        .details-card p {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-        }
-
-        .details-metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .details-metric:last-child {
-            border-bottom: none;
-        }
-
-        .details-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .details-metric-value {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .details-metric-value.positive { color: #4A7C59; }
-        .details-metric-value.negative { color: #8B4A4A; }
-
-        .region-color-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.5rem;
-        }
-
-        .performance-category {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            padding: 0.75rem;
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            border-left: 4px solid;
-        }
-
-        .performance-category.excellent {
-            border-left-color: #7ED957;
-            background: rgba(126, 217, 87, 0.15);
-        }
-
-        .performance-category.good {
-            border-left-color: #FFB366;
-            background: rgba(255, 179, 102, 0.15);
-        }
-
-        .performance-category.warning {
-            border-left-color: #FFB366;
-            background: rgba(255, 179, 102, 0.20);
-        }
-
-        .performance-category.critical {
-            border-left-color: #FF7A85;
-            background: rgba(255, 122, 133, 0.15);
-        }
-
-        .performance-category h4 {
-            margin: 0;
-            font-size: 1rem;
-        }
-
-        .performance-category span {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            padding: 0.5rem;
-            cursor: pointer;
-            border-radius: var(--radius);
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-            background: var(--surface-3);
-            color: var(--text);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .filter-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        .filter-action-btn {
-            padding: 0.5rem 0.75rem;
-            background: var(--surface-3);
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .filter-action-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .region-filter-list {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .region-filter-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            transition: all 0.2s ease;
-        }
-
-        .region-filter-item:hover {
-            background: var(--surface-3);
-        }
-
-        .region-checkbox {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-
-        .region-filter-info {
-            flex: 1;
-        }
-
-        .region-filter-name {
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-
-        .region-filter-stats {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 0.75rem;
-            justify-content: flex-end;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-secondary {
-            background: var(--surface-3);
-            color: var(--text-muted);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .region-detail-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 2rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            position: relative;
-        }
-
-        .region-detail-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .region-detail-info h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .region-detail-info p {
-            opacity: 0.9;
-            font-size: 0.875rem;
-        }
-
-        /* Miglioramento delle tabs nel modal */
-        .region-detail-tabs {
-            display: flex;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            overflow-x: auto;
-        }
-
-        .region-detail-tab {
-            flex-shrink: 0;
-            min-width: 140px;
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             gap: 0.5rem;
-            position: relative;
-            border-bottom: 3px solid transparent;
         }
 
-        .region-detail-tab:hover {
-            background: var(--surface-3);
-            color: var(--text);
+        .toast {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-lg);
+            min-width: 300px;
+            transform: translateX(400px);
+            transition: var(--transition);
         }
 
-        .region-detail-tab.active {
-            color: var(--primary);
-            background: var(--surface-3);
-            border-bottom-color: var(--primary);
+        .toast.show {
+            transform: translateX(0);
         }
 
-        .region-detail-tab svg {
-            width: 16px;
-            height: 16px;
+        .toast.success {
+            border-left: 4px solid var(--success);
         }
 
-        .region-detail-content {
-            flex: 1;
-            overflow-y: auto;
-            max-height: calc(90vh - 200px);
+        .toast.error {
+            border-left: 4px solid var(--danger);
         }
 
-        .region-detail-tab-content {
-            display: none;
-            padding: 2rem;
-            animation: fadeIn 0.3s ease;
+        /* Responsive Design migliorato */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .dashboard {
+                padding: 1rem;
+            }
+            
+            .summary-title {
+                font-size: 1.5rem;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .kpi-card {
+                padding: 1.5rem;
+            }
+            
+            .kpi-value {
+                font-size: 2rem;
+            }
+            
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nav-pills {
+                padding: 0.25rem;
+            }
+            
+            .nav-pill {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
         }
 
-        .region-detail-tab-content.active {
-            display: block;
+        @media (max-width: 480px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        /* Animation utilities */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
         }
 
         @keyframes fadeIn {
@@ -938,773 +591,836 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .region-overview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
         }
 
-        .region-overview-card {
-            background: var(--surface-2);
-            padding: 1.5rem;
-            border-radius: var(--radius-lg);
-            text-align: center;
-            border: 2px solid transparent;
-            transition: all 0.2s ease;
-        }
-
-        .region-overview-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .region-overview-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .region-overview-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .region-overview-change {
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-top: 0.25rem;
-        }
-
-        .region-overview-change.positive { color: #4A7C59; }
-        .region-overview-change.negative { color: #8B4A4A; }
-
-        .performance-section {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .top-performers {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 2px solid transparent;
-            transition: all 0.2s ease;
-        }
-
-        .top-performers:hover {
-            border-color: var(--primary);
-        }
-
-        .top-performers h4 {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .performer-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border);
-            border-radius: var(--radius);
-            transition: all 0.2s ease;
-        }
-
-        .performer-item:hover {
-            background: var(--surface-3);
-        }
-
-        .performer-item:last-child {
-            border-bottom: none;
-        }
-
-        .performer-rank {
-            width: 28px;
-            height: 28px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .performer-info {
-            flex: 1;
-        }
-
-        .performer-name {
-            font-weight: 500;
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .performer-value {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .performer-change {
-            font-size: 0.75rem;
-            font-weight: 500;
-            padding: 0.25rem 0.5rem;
-            border-radius: var(--radius);
-        }
-
-        .performer-change.positive { background: rgba(74, 124, 89, 0.1); color: #4A7C59; }
-        .performer-change.negative { background: rgba(139, 74, 74, 0.1); color: #8B4A4A; }
-
-        .province-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .province-card {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-            transition: all 0.2s ease;
-        }
-
-        .province-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .province-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .province-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .province-badge {
-            font-size: 0.75rem;
-        }
-
-        .province-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .province-metric {
-            text-align: center;
-        }
-
-        .province-metric-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .province-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .agent-detail-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .agent-detail-card {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-            transition: all 0.2s ease;
-        }
-
-        .agent-detail-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .agent-detail-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-avatar {
-            width: 48px;
-            height: 48px;
-            background: var(--primary);
-            color: white;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .agent-detail-info h4 {
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .agent-detail-info p {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .agent-detail-metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-detail-metric {
-            text-align: center;
-        }
-
-        .agent-detail-metric-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .agent-detail-metric-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        /* Miglioramenti per dispositivi mobili */
-        @media (max-width: 1024px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            .main-content, .header { padding: 1rem; }
-            .performance-section { grid-template-columns: 1fr; }
-            .region-detail-modal { max-width: 95%; }
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-            .tabs {
-                width: 100%;
-                justify-content: space-around;
-            }
-            .tab {
-                flex: 1;
-                justify-content: center;
-                padding: 0.75rem 1rem;
-            }
-            .metrics-grid,
-            .region-grid,
-            .agent-grid {
-                grid-template-columns: 1fr;
-            }
-            .region-detail-tabs {
-                flex-wrap: wrap;
-            }
-            .region-detail-tab {
-                flex: 1;
-                min-width: 120px;
-                font-size: 0.75rem;
-            }
-            .region-overview-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .details-modal {
-                max-width: 98%;
-                margin: 1rem;
-            }
-            .details-grid {
-                grid-template-columns: 1fr;
-            }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"/>
+                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                </svg>
+                Dashboard Commerciale
+            </div>
+            
+            <div class="breadcrumb" id="breadcrumb">
+                <span>Home</span>
+                <span class="breadcrumb-separator">›</span>
+                <span>Panoramica</span>
+            </div>
+            
+            <div class="status-indicator">
+                <div class="pulse"></div>
+                <span id="lastUpdate">Live</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <!-- Executive Summary -->
+        <section class="executive-summary fade-in">
+            <div class="summary-header">
+                <h1 class="summary-title">Dashboard Commerciale</h1>
+                <p class="summary-subtitle">Panoramica delle performance della rete agenti</p>
+            </div>
+
+            <div class="kpi-grid" id="kpiGrid">
+                <!-- KPI Cards popolate dinamicamente -->
+            </div>
+        </section>
+
+        <!-- Alerts & Notifications -->
+        <section class="alerts-section slide-up">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                        <path d="M12 9v4"/>
+                        <path d="m12 17 .01 0"/>
+                    </svg>
+                    Richiede Attenzione
+                </h2>
+                <button class="chart-control-btn" onclick="dismissAllAlerts()">
+                    Ignora Tutto
+                </button>
+            </div>
+            <div class="alerts-grid" id="alertsGrid">
+                <!-- Alert cards popolate dinamicamente -->
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions slide-up">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                    </svg>
+                    Azioni Rapide
+                </h2>
+            </div>
+            <div class="actions-grid">
+                <div class="action-card" onclick="navigateToView('agenti')">
+                    <div class="action-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                     </div>
-                    <span>Dashboard Commerciale</span>
+                    <h3 class="action-title">Gestisci Agenti</h3>
+                    <p class="action-description">Visualizza performance e dettagli agenti</p>
                 </div>
-                
-                <div class="status-bar">
-                    <div class="status-item">
-                        <div class="status-live"></div>
-                        <span id="lastUpdate">Caricamento...</span>
+
+                <div class="action-card" onclick="navigateToView('regioni')">
+                    <div class="action-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
                     </div>
-                    <div class="status-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <h3 class="action-title">Analisi Regionale</h3>
+                    <p class="action-description">Confronta performance per regione</p>
+                </div>
+
+                <div class="action-card" onclick="navigateToView('obiettivi')">
+                    <div class="action-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12,6 12,12 16,14"/>
+                            <circle cx="12" cy="12" r="6"/>
+                            <circle cx="12" cy="12" r="2"/>
                         </svg>
-                        <span id="currentTime"></span>
                     </div>
+                    <h3 class="action-title">Obiettivi</h3>
+                    <p class="action-description">Monitora il raggiungimento degli obiettivi</p>
+                </div>
+
+                <div class="action-card" onclick="navigateToView('report')">
+                    <div class="action-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10,9 9,9 8,9"/>
+                        </svg>
+                    </div>
+                    <h3 class="action-title">Report</h3>
+                    <p class="action-description">Genera report dettagliati</p>
                 </div>
             </div>
-        </header>
+        </section>
 
-        <main class="main-content">
-            <div class="tabs">
-                <button class="tab active" data-tab="overview">
+        <!-- Navigation per drill-down -->
+        <section class="slide-up">
+            <div class="nav-pills">
+                <button class="nav-pill active" data-view="overview" onclick="switchView('overview')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
                         <path d="M9 9h6v6H9z"/>
                     </svg>
                     Panoramica
                 </button>
-                <button class="tab" data-tab="agents">
+                <button class="nav-pill" data-view="performance" onclick="switchView('performance')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        <path d="M3 3v18h18"/>
+                        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
                     </svg>
-                    Agenti
+                    Performance
                 </button>
-                <button class="tab" data-tab="regions">
+                <button class="nav-pill" data-view="trends" onclick="switchView('trends')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
+                        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
                     </svg>
-                    Regioni
+                    Trend
                 </button>
             </div>
 
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>Caricamento dati...</p>
-            </div>
-
-            <div id="overview-content" class="tab-content" style="display: none;">
-                <div class="metrics-grid" id="kpiMetrics"></div>
-
-                <div class="charts-grid">
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('performance')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18h18"/>
-                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                                </svg>
-                                Performance Agenti
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container large">
-                                <canvas id="revenueChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('regions')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                </svg>
-                                Distribuzione Regionale
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="regionChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="advanced-charts-grid">
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('scatter')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="3"/>
-                                    <circle cx="19" cy="5" r="2"/>
-                                    <circle cx="5" cy="19" r="2"/>
-                                    <path d="M10.4 21.9a10 10 0 0 0 9.941-15.416"/>
-                                    <path d="M13.5 2.1a10 10 0 0 0-9.841 15.416"/>
-                                </svg>
-                                Efficienza Commerciale
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="scatterChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('trend')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18h18"/>
-                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                                </svg>
-                                Trend Mensile
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="trendChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('boxplot')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                    <path d="M9 9h6v6H9z"/>
-                                </svg>
-                                Distribuzione Performance
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="boxplotChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
+            <!-- Content Area -->
+            <div id="contentArea" class="chart-section">
+                <div class="chart-header">
+                    <h3 class="chart-title" id="chartTitle">Performance Generale</h3>
+                    <div class="chart-controls">
+                        <button class="chart-control-btn" onclick="refreshData()" title="Aggiorna dati">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
+                                <polyline points="23 4 23 10 17 10"/>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
                             </svg>
-                            Classifica Performance
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-container">
-                            <table class="table" id="performanceTable"></table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="agents-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="agentFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Agenti
-                        <span class="filter-count" id="agentFilterCount">Tutti</span>
-                    </button>
-                </div>
-                <div class="agent-grid" id="agentGrid"></div>
-            </div>
-
-            <div id="regions-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="regionFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Regioni
-                        <span class="filter-count" id="filterCount">Tutte</span>
-                    </button>
-                </div>
-                <div class="region-grid" id="regionGrid"></div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Modal Filtro Regioni -->
-    <div class="modal-overlay" id="regionFilterModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Filtro Regioni</h3>
-                <button class="modal-close" id="closeRegionFilter">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="filter-actions">
-                    <button class="filter-action-btn" id="selectAllRegions">Seleziona Tutte</button>
-                    <button class="filter-action-btn" id="deselectAllRegions">Deseleziona Tutte</button>
-                </div>
-                <div class="region-filter-list" id="regionFilterList">
-                    <!-- Lista regioni sarà popolata dinamicamente -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelRegionFilter">Annulla</button>
-                <button class="btn btn-primary" id="applyRegionFilter">Applica Filtro</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Filtro Agenti -->
-    <div class="modal-overlay" id="agentFilterModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Filtro Agenti</h3>
-                <button class="modal-close" id="closeAgentFilter">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="filter-actions">
-                    <button class="filter-action-btn" id="selectAllAgents">Seleziona Tutti</button>
-                    <button class="filter-action-btn" id="deselectAllAgents">Deseleziona Tutti</button>
-                    <button class="filter-action-btn" id="selectTopPerformers">Top Performer</button>
-                    <button class="filter-action-btn" id="selectLowPerformers">Performance Basse</button>
-                </div>
-                <div class="region-filter-list" id="agentFilterList">
-                    <!-- Lista agenti sarà popolata dinamicamente -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelAgentFilter">Annulla</button>
-                <button class="btn btn-primary" id="applyAgentFilter">Applica Filtro</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Dettaglio Regione -->
-    <div class="modal-overlay" id="regionDetailModal">
-        <div class="modal region-detail-modal">
-            <div class="region-detail-header">
-                <div class="region-detail-icon" id="regionDetailIcon">L</div>
-                <div class="region-detail-info">
-                    <h2 id="regionDetailName">Lazio</h2>
-                    <p id="regionDetailSummary">5 agenti attivi in 4 province</p>
-                </div>
-                <button class="modal-close" id="closeRegionDetail" style="color: white; position: absolute; top: 1rem; right: 1rem;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="region-detail-tabs">
-                <button class="region-detail-tab active" data-region-tab="overview">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <path d="M9 9h6v6H9z"/>
-                    </svg>
-                    Panoramica
-                </button>
-                <button class="region-detail-tab" data-region-tab="provinces">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    Province
-                </button>
-                <button class="region-detail-tab" data-region-tab="agents">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                    </svg>
-                    Agenti
-                </button>
-            </div>
-
-            <div class="region-detail-content">
-                <!-- Tab Overview -->
-                <div id="regionOverviewTab" class="region-detail-tab-content active">
-                    <div class="region-overview-grid" id="regionOverviewMetrics">
-                        <!-- Metriche popolate dinamicamente -->
-                    </div>
-                    
-                    <div class="performance-section">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Performance nel Tempo</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="regionPerformanceChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="top-performers">
-                            <h4>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-                                </svg>
-                                Top Performer
-                            </h4>
-                            <div id="regionTopPerformers">
-                                <!-- Top performers popolati dinamicamente -->
-                            </div>
-                        </div>
+                        </button>
+                        <button class="chart-control-btn" onclick="exportData()" title="Esporta dati">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                        </button>
+                        <button class="chart-control-btn" onclick="openFullscreen()" title="Schermo intero">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="m21 21-6-6m6 6v-4.8m0 4.8h-4.8"/>
+                                <path d="m3 16 6 6m-6-6v4.8m0-4.8h4.8"/>
+                                <path d="m21 7.2-6 6m6-6v4.8m0-4.8h-4.8"/>
+                                <path d="m3 7.2 6 6m-6-6v4.8m0-4.8h4.8"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-
-                <!-- Tab Province -->
-                <div id="regionProvincesTab" class="region-detail-tab-content">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Confronto Province</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="provincesComparisonChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="province-grid" id="provinceDetailGrid">
-                        <!-- Province cards popolate dinamicamente -->
-                    </div>
-                </div>
-
-                <!-- Tab Agenti -->
-                <div id="regionAgentsTab" class="region-detail-tab-content">
-                    <div class="agent-detail-grid" id="regionAgentGrid">
-                        <!-- Agenti cards popolate dinamicamente -->
+                <div class="chart-container" id="chartContainer">
+                    <canvas id="mainChart"></canvas>
+                    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                        <div class="spinner"></div>
+                        <div class="loading-text">Caricamento dati...</div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <!-- Modal Dettagli Grafici -->
-    <div class="modal-overlay" id="chartDetailsModal">
-        <div class="modal details-modal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="chartDetailsTitle">Dettagli Grafico</h3>
-                <button class="modal-close" id="closeChartDetails">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body details-modal-content" id="chartDetailsContent">
-                <!-- Contenuto popolato dinamicamente -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="closeChartDetailsBtn">Chiudi</button>
-            </div>
-        </div>
-    </div>
-
-    <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script> 
-    <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmf7cw2ev002p1032fkvqlkup'></zapier-interfaces-chatbot-embed>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
         
         let allData = [];
-        let currentTab = 'overview';
-        let charts = {};
-        let selectedRegions = new Set();
-        let availableRegions = new Map();
-        let tempSelectedRegions = new Set();
-        
-        // Variabili per filtro agenti
-        let selectedAgents = new Set();
-        let availableAgents = [];
-        let tempSelectedAgents = new Set();
+        let currentView = 'overview';
+        let mainChart = null;
 
-        // Variabili per modal dettaglio regione
-        let currentRegionData = null;
-        let currentRegionTab = 'overview';
-        let regionDetailCharts = {};
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Inizializzazione dashboard UX migliorata...');
+            loadData();
+            setInterval(loadData, 120000); // Auto-refresh ogni 2 minuti
+        });
 
-        // Mappa colori regioni - Palette pastello moderna
-        const regionColors = {
-            'Lazio': '#A8DADC',        // Azzurro pastello
-            'Sardegna': '#B8E6B8',     // Verde pastello
-            'Marche': '#FFD3A5',       // Arancione pastello
-            'Estero': '#FFB3BA',       // Rosa pastello
-            'Lombardia': '#C7B6FF',    // Viola pastello
-            'Emilia-Romagna': '#A5F3FC', // Ciano pastello
-            'Piemonte': '#F8BBD9',     // Rosa chiaro pastello
-            'Veneto': '#D4E6B5',       // Verde lime pastello
-            'Toscana': '#FFD4A3',      // Pesca pastello
-            'Campania': '#B5E7FF',     // Blu cielo pastello
-            'Sicilia': '#FFF2A5',      // Giallo pastello
-            'Puglia': '#A8F5E6',       // Turchese pastello
-            'Calabria': '#E0C3FC',     // Lavanda pastello
-            'Liguria': '#FFDFBA',      // Albicocca pastello
-            'Abruzzo': '#B3D7FF',      // Blu pastello
-            'Molise': '#DFC5FE',       // Viola chiaro pastello
-            'Basilicata': '#D6A2E8',   // Magenta pastello
-            'Umbria': '#A5D6A7',       // Verde menta pastello
-            '
+        // Data loading con migliori feedback
+        async function loadData() {
+            showLoading();
+            updateStatus('Caricamento...');
+            
+            try {
+                const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const csvText = await response.text();
+                allData = parseCSV(csvText);
+                
+                updateStatus('Live');
+                renderDashboard();
+                showToast('Dati aggiornati con successo', 'success');
+                
+            } catch (error) {
+                console.error('Errore caricamento:', error);
+                updateStatus('Errore');
+                showToast('Errore nel caricamento dei dati', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function parseCSV(csvText) {
+            const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
+            const agents = [];
+
+            sections.forEach(section => {
+                if (!section.trim()) return;
+
+                const agent = {
+                    codice: '', nome: '', periodo: '',
+                    obiettivi: [], clienti_provincia: [], vendite_cliente: [],
+                    categoria_riepilogo: [], ripartizione: [], totali: []
+                };
+
+                const lines = section.split('\n');
+                let headers = [];
+
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (!line || line.startsWith('##')) return;
+
+                    if (line.includes('Codice Agente:')) {
+                        agent.codice = line.split(':')[1]?.trim() || '';
+                    } else if (line.includes('Ragione Sociale:')) {
+                        agent.nome = line.split(':')[1]?.trim() || '';
+                    } else if (line.includes('Periodo:')) {
+                        agent.periodo = line.split(':')[1]?.trim() || '';
+                    }
+                    
+                    if (line.includes('Tipo_Dato,')) {
+                        headers = line.split(',').map(h => h.trim());
+                        return;
+                    }
+
+                    if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
+                        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+                        if (values.length >= headers.length) {
+                            const row = {};
+                            headers.forEach((header, index) => {
+                                let value = values[index] || '';
+                                
+                                if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
+                                     'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
+                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
+                                    value = parseFloat(value.replace(/"/g, '').replace(/'/g, '')) || 0;
+                                }
+                                row[header] = value;
+                            });
+
+                            switch (row.Tipo_Dato) {
+                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
+                                case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
+                                case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
+                                case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
+                                case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
+                                case 'TOTALE': agent.totali.push(row); break;
+                            }
+                        }
+                    }
+                });
+
+                if (agent.codice && agent.nome) {
+                    agents.push(agent);
+                }
+            });
+
+            return agents;
+        }
+
+        function renderDashboard() {
+            renderKPICards();
+            renderAlerts();
+            renderChart();
+        }
+
+        function renderKPICards() {
+            let totalRevenue = 0, totalPrevRevenue = 0, totalClients = 0, totalTargets = 0;
+            
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                if (general) {
+                    totalRevenue += general.Anno_Corrente || 0;
+                    totalPrevRevenue += general.Anno_Precedente || 0;
+                    totalClients += general.Clienti_Anno_Corrente || 0;
+                    totalTargets += general.Obiettivo || 0;
+                }
+            });
+
+            const growth = totalPrevRevenue > 0 ? 
+                ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
+            
+            const targetAchievement = totalTargets > 0 ? 
+                (totalRevenue / totalTargets * 100) : 0;
+
+            const kpis = [
+                {
+                    title: 'Fatturato Totale',
+                    value: formatCurrency(totalRevenue),
+                    change: growth,
+                    trend: 'vs anno precedente',
+                    icon: '€',
+                    type: 'primary'
+                },
+                {
+                    title: 'Crescita',
+                    value: `${growth.toFixed(1)}%`,
+                    change: growth,
+                    trend: 'performance annuale',
+                    icon: growth >= 0 ? '↗' : '↘',
+                    type: growth >= 10 ? 'success' : growth >= 0 ? 'warning' : 'danger'
+                },
+                {
+                    title: 'Obiettivi',
+                    value: `${targetAchievement.toFixed(1)}%`,
+                    change: targetAchievement - 100,
+                    trend: 'raggiungimento target',
+                    icon: '🎯',
+                    type: targetAchievement >= 100 ? 'success' : targetAchievement >= 80 ? 'warning' : 'danger'
+                },
+                {
+                    title: 'Clienti Attivi',
+                    value: totalClients.toLocaleString('it-IT'),
+                    change: null,
+                    trend: 'portafoglio totale',
+                    icon: '👥',
+                    type: 'primary'
+                }
+            ];
+
+            const kpiGrid = document.getElementById('kpiGrid');
+            if (kpiGrid) {
+                kpiGrid.innerHTML = kpis.map(kpi => `
+                    <div class="kpi-card ${kpi.type}">
+                        <div class="kpi-header">
+                            <div class="kpi-title">${kpi.title}</div>
+                            <div class="kpi-icon ${kpi.type}">${kpi.icon}</div>
+                        </div>
+                        <div class="kpi-value">${kpi.value}</div>
+                        ${kpi.change !== null ? `
+                            <div class="kpi-change ${kpi.change >= 0 ? 'positive' : 'negative'}">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    ${kpi.change >= 0 ? 
+                                        '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                        '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                    }
+                                </svg>
+                                ${kpi.change >= 0 ? '+' : ''}${kpi.change.toFixed(1)}%
+                            </div>
+                        ` : ''}
+                        <div class="kpi-trend">${kpi.trend}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderAlerts() {
+            const alerts = [];
+            
+            // Analizza i dati per identificare situazioni critiche
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                if (general) {
+                    const current = general.Anno_Corrente || 0;
+                    const previous = general.Anno_Precedente || 0;
+                    const target = general.Obiettivo || 0;
+                    const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                    const achievement = target > 0 ? (current / target * 100) : 0;
+
+                    // Performance critiche
+                    if (growth < -10) {
+                        alerts.push({
+                            type: 'critical',
+                            title: 'Performance Critica',
+                            description: `${agent.nome} ha una crescita negativa del ${growth.toFixed(1)}%`,
+                            action: `Visualizza dettagli agente`,
+                            time: 'ora',
+                            actionFn: `navigateToAgent('${agent.codice}')`
+                        });
+                    }
+
+                    // Obiettivi a rischio
+                    if (target > 0 && achievement < 60) {
+                        alerts.push({
+                            type: 'warning',
+                            title: 'Obiettivo a Rischio',
+                            description: `${agent.nome} è al ${achievement.toFixed(1)}% dell'obiettivo`,
+                            action: 'Intervieni ora',
+                            time: '2 ore fa',
+                            actionFn: `navigateToAgent('${agent.codice}')`
+                        });
+                    }
+                });
+
+            // Top performer
+            const topGrowth = Math.max(...allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                return previous > 0 ? ((current - previous) / previous * 100) : 0;
+            }));
+
+            if (topGrowth > 20) {
+                const topAgent = allData.find(agent => {
+                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                    const current = general?.Anno_Corrente || 0;
+                    const previous = general?.Anno_Precedente || 0;
+                    const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                    return growth === topGrowth;
+                });
+
+                alerts.push({
+                    type: 'success',
+                    title: 'Performance Eccellente',
+                    description: `${topAgent.nome} ha raggiunto una crescita del ${topGrowth.toFixed(1)}%`,
+                    action: 'Studia il caso',
+                    time: 'oggi',
+                    actionFn: `navigateToAgent('${topAgent.codice}')`
+                });
+            }
+
+            const alertsGrid = document.getElementById('alertsGrid');
+            if (alertsGrid) {
+                if (alerts.length === 0) {
+                    alertsGrid.innerHTML = `
+                        <div class="alert-card success">
+                            <div class="alert-icon success">✓</div>
+                            <div class="alert-content">
+                                <div class="alert-title">Tutto sotto controllo</div>
+                                <div class="alert-description">Non ci sono situazioni critiche che richiedono attenzione immediata</div>
+                            </div>
+                            <div class="alert-meta">ora</div>
+                        </div>
+                    `;
+                } else {
+                    alertsGrid.innerHTML = alerts.slice(0, 5).map(alert => `
+                        <div class="alert-card ${alert.type}">
+                            <div class="alert-icon ${alert.type}">
+                                ${alert.type === 'critical' ? '!' : alert.type === 'warning' ? '⚠' : '✓'}
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">${alert.title}</div>
+                                <div class="alert-description">${alert.description}</div>
+                                <div class="alert-action" onclick="${alert.actionFn}">${alert.action}</div>
+                            </div>
+                            <div class="alert-meta">${alert.time}</div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function renderChart() {
+            const canvas = document.getElementById('mainChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (mainChart) mainChart.destroy();
+
+            switch(currentView) {
+                case 'overview':
+                    renderOverviewChart(ctx);
+                    break;
+                case 'performance':
+                    renderPerformanceChart(ctx);
+                    break;
+                case 'trends':
+                    renderTrendsChart(ctx);
+                    break;
+            }
+        }
+
+        function renderOverviewChart(ctx) {
+            const agentData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                return {
+                    name: agent.nome.split(' ')[0],
+                    current: general?.Anno_Corrente || 0,
+                    previous: general?.Anno_Precedente || 0
+                };
+            }).sort((a, b) => b.current - a.current).slice(0, 10);
+
+            mainChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agentData.map(a => a.name),
+                    datasets: [
+                        {
+                            label: '2024',
+                            data: agentData.map(a => a.previous),
+                            backgroundColor: '#E5E7EB',
+                            borderRadius: 4
+                        },
+                        {
+                            label: '2025',
+                            data: agentData.map(a => a.current),
+                            backgroundColor: '#7C93C3',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'top',
+                            align: 'end'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: value => formatCurrency(value) }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        function renderPerformanceChart(ctx) {
+            const performanceData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                
+                return {
+                    name: agent.nome.split(' ')[0],
+                    growth: growth,
+                    current: current
+                };
+            }).sort((a, b) => b.growth - a.growth);
+
+            mainChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Performance Agenti',
+                        data: performanceData.map(item => ({
+                            x: item.current,
+                            y: item.growth,
+                            label: item.name
+                        })),
+                        backgroundColor: performanceData.map(item => 
+                            item.growth >= 10 ? '#10B981' : 
+                            item.growth >= 0 ? '#F59E0B' : '#EF4444'
+                        ),
+                        pointRadius: 8,
+                        pointHoverRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return performanceData[context[0].dataIndex].name;
+                                },
+                                label: function(context) {
+                                    return [
+                                        `Fatturato: ${formatCurrency(context.parsed.x)}`,
+                                        `Crescita: ${context.parsed.y.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Fatturato (€)'
+                            },
+                            ticks: {
+                                callback: value => formatCurrency(value)
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Crescita (%)'
+                            },
+                            ticks: {
+                                callback: value => `${value}%`
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1200,
+                        easing: 'easeOutBack'
+                    }
+                }
+            });
+        }
+
+        function renderTrendsChart(ctx) {
+            // Simulazione dati mensili
+            const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+            const currentYear = new Date().getFullYear();
+            
+            let totalRevenue = 0;
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                totalRevenue += general?.Anno_Corrente || 0;
+            });
+
+            const monthlyRevenue = months.map((month, index) => {
+                const baseValue = totalRevenue / 12;
+                const seasonality = Math.sin(index * 0.5) * 0.2;
+                const trend = index * 0.05;
+                return baseValue * (1 + seasonality + trend + (Math.random() - 0.5) * 0.1);
+            });
+
+            const monthlyTarget = months.map(() => totalRevenue / 12 * 1.1);
+
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Fatturato Effettivo',
+                            data: monthlyRevenue,
+                            borderColor: '#7C93C3',
+                            backgroundColor: 'rgba(124, 147, 195, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Target',
+                            data: monthlyTarget,
+                            borderColor: '#10B981',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'top',
+                            align: 'end'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: value => formatCurrency(value) }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutCubic'
+                    }
+                }
+            });
+        }
+
+        // Navigation functions
+        function switchView(view) {
+            currentView = view;
+            
+            // Update nav pills
+            document.querySelectorAll('.nav-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+            
+            // Update breadcrumb
+            updateBreadcrumb(view);
+            
+            // Update chart title
+            const titles = {
+                'overview': 'Performance Generale',
+                'performance': 'Analisi Performance',
+                'trends': 'Andamento Temporale'
+            };
+            document.getElementById('chartTitle').textContent = titles[view];
+            
+            // Re-render chart
+            renderChart();
+        }
+
+        function navigateToView(section) {
+            showToast(`Navigazione a ${section} - Funzionalità in sviluppo`, 'success');
+        }
+
+        function navigateToAgent(agentCode) {
+            showToast(`Apertura dettagli agente ${agentCode} - Funzionalità in sviluppo`, 'success');
+        }
+
+        function updateBreadcrumb(view) {
+            const viewNames = {
+                'overview': 'Panoramica',
+                'performance': 'Performance',
+                'trends': 'Trend'
+            };
+            
+            document.getElementById('breadcrumb').innerHTML = `
+                <span>Home</span>
+                <span class="breadcrumb-separator">›</span>
+                <span>${viewNames[view]}</span>
+            `;
+        }
+
+        // Utility functions
+        function formatCurrency(value) {
+            if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
+            if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
+            return `€${Math.round(value).toLocaleString('it-IT')}`;
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function updateStatus(text) {
+            document.getElementById('lastUpdate').textContent = text;
+        }
+
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div>${type === 'success' ? '✓' : '⚠'}</div>
+                    <div>${message}</div>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toastContainer.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // Control functions
+        function refreshData() {
+            loadData();
+        }
+
+        function exportData() {
+            showToast('Export in corso...', 'success');
+        }
+
+        function openFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        }
+
+        function dismissAllAlerts() {
+            document.getElementById('alertsGrid').innerHTML = `
+                <div class="alert-card success">
+                    <div class="alert-icon success">✓</div>
+                    <div class="alert-content">
+                        <div class="alert-title">Tutti gli alert sono stati ignorati</div>
+                        <div class="alert-description">Sarai notificato di nuove situazioni che richiedono attenzione</div>
+                    </div>
+                    <div class="alert-meta">ora</div>
+                </div>
+            `;
+            showToast('Tutti gli alert sono stati ignorati', 'success');
+        }
+    </script>
+</body>
+</html>
