@@ -240,7 +240,7 @@
         }
 
         .card-header {
-            padding: 2rem 2rem 0; /* Aumentato padding */
+            padding: 2rem 2rem 0;
         }
 
         .card-title {
@@ -255,38 +255,37 @@
         }
 
         .card-body {
-            padding: 2rem; /* Aumentato padding */
+            padding: 2rem;
         }
 
         /* KPI Cards con padding migliorati */
         .metrics-grid .card {
-            padding: 0; /* Reset per gestire internamente */
+            padding: 0;
         }
 
         .metrics-grid .card-body {
-            padding: 2.5rem 2rem; /* Padding generoso per KPI */
+            padding: 2.5rem 2rem;
         }
 
         .metric-value {
             font-size: 2.5rem;
             font-weight: 700;
             color: var(--text);
-            margin: 0.75rem 0; /* Aumentato margine */
+            margin: 0.75rem 0;
         }
 
         .metric-change {
             display: flex;
             align-items: center;
-            gap: 0.5rem; /* Aumentato gap */
+            gap: 0.5rem;
             font-size: 0.875rem;
             font-weight: 500;
-            margin-top: 0.75rem; /* Aggiunto margine superiore */
+            margin-top: 0.75rem;
         }
 
         .metric-change.positive { color: var(--success); }
         .metric-change.negative { color: var(--danger); }
 
-        /* Previous value styling per confronto anno precedente */
         .metric-previous {
             font-size: 0.75rem;
             color: var(--text-muted);
@@ -316,13 +315,13 @@
         .region-header {
             display: flex;
             align-items: center;
-            gap: 1rem; /* Aumentato gap */
-            margin-bottom: 1.5rem; /* Aumentato margine */
-            padding: 2rem 2rem 0; /* Aggiunto padding */
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 2rem 2rem 0;
         }
 
         .region-icon {
-            width: 48px; /* Aumentata dimensione */
+            width: 48px;
             height: 48px;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             border-radius: var(--radius);
@@ -331,12 +330,12 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 1.125rem; /* Aumentato font */
+            font-size: 1.125rem;
         }
 
         .region-info h3 {
             font-weight: 600;
-            font-size: 1.25rem; /* Aumentato font */
+            font-size: 1.25rem;
             margin-bottom: 0.25rem;
         }
 
@@ -348,20 +347,20 @@
         .region-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.5rem; /* Aumentato gap */
-            margin: 1.5rem 0; /* Aumentato margine */
-            padding: 0 2rem; /* Aggiunto padding laterale */
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+            padding: 0 2rem;
         }
 
         .region-stat { 
             text-align: center;
-            padding: 1rem; /* Aggiunto padding interno */
+            padding: 1rem;
             background: var(--surface-2);
             border-radius: var(--radius);
         }
 
         .region-stat-value {
-            font-size: 1.75rem; /* Aumentato font */
+            font-size: 1.75rem;
             font-weight: 700;
             color: var(--primary);
             margin-bottom: 0.5rem;
@@ -378,12 +377,12 @@
         .agent-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
-            padding: 2rem; /* Aumentato padding */
+            padding: 2rem;
         }
 
         .agent-name {
             font-weight: 600;
-            font-size: 1.25rem; /* Aumentato font */
+            font-size: 1.25rem;
             margin-bottom: 0.5rem;
         }
 
@@ -393,25 +392,25 @@
         }
 
         .agent-body { 
-            padding: 2rem; /* Aumentato padding */
+            padding: 2rem;
         }
 
         .agent-metrics {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.5rem; /* Aumentato gap */
+            gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
 
         .agent-metric { 
             text-align: center;
-            padding: 1.25rem; /* Aggiunto padding */
+            padding: 1.25rem;
             background: var(--surface-2);
             border-radius: var(--radius);
         }
 
         .agent-metric-value {
-            font-size: 1.5rem; /* Aumentato font */
+            font-size: 1.5rem;
             font-weight: 600;
             color: var(--text);
             margin-bottom: 0.5rem;
@@ -424,11 +423,6 @@
             letter-spacing: 0.05em;
         }
 
-        /* Province detail styling */
-        .province-grid div, .region-detail-content div {
-            padding: 2rem; /* Padding consistente */
-        }
-
         /* Progress bar migliorata */
         .progress-bar {
             width: 100%;
@@ -436,7 +430,7 @@
             background: var(--surface-3);
             border-radius: 4px;
             overflow: hidden;
-            margin: 1rem 0; /* Aumentato margine */
+            margin: 1rem 0;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
         }
 
@@ -469,10 +463,32 @@
             justify-content: space-between;
             font-size: 0.75rem;
             color: var(--text-light);
-            margin-top: 0.75rem; /* Aumentato margine */
+            margin-top: 0.75rem;
         }
 
-        /* Resto degli stili esistenti... */
+        /* Colori per i badge di stato dell'obiettivo */
+        .objective-excellent { color: var(--success) !important; }
+        .objective-good { color: var(--warning) !important; }
+        .objective-warning { color: var(--danger) !important; }
+        .objective-undefined { color: var(--text-muted) !important; }
+
+        /* Progress bar colorate per stato obiettivo */
+        .progress-fill.excellent {
+            background: linear-gradient(90deg, var(--success), #059669);
+        }
+
+        .progress-fill.good {
+            background: linear-gradient(90deg, var(--warning), #d97706);
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, var(--danger), #dc2626);
+        }
+
+        .progress-fill.undefined {
+            background: linear-gradient(90deg, var(--text-muted), #64748b);
+        }
+
         .filter-button {
             display: flex;
             align-items: center;
@@ -525,13 +541,13 @@
         }
 
         .region-detail-button {
-            width: 100%;
+            width: calc(100% - 4rem);
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
             border: none;
             border-radius: var(--radius);
-            padding: 1rem 1.25rem; /* Aumentato padding */
-            margin: 1.5rem 2rem; /* Aggiunto margine e padding laterale */
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 2rem;
             cursor: pointer;
             font-weight: 500;
             font-size: 0.875rem;
@@ -602,7 +618,7 @@
             .region-header { padding: 1.25rem 1.25rem 0; }
             .region-stats { padding: 0 1.25rem; }
             .agent-header, .agent-body { padding: 1.25rem; }
-            .region-detail-button { margin: 1.25rem; }
+            .region-detail-button { margin: 1.25rem; width: calc(100% - 2.5rem); }
         }
 
         /* Grids */
@@ -797,7 +813,75 @@
             transform: scale(1);
         }
 
-        /* Tutti gli altri stili esistenti per modal, dettagli, ecc. rimangono invariati */
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--surface-3);
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: var(--surface-3);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
     </style>
 </head>
 <body>
@@ -1855,6 +1939,27 @@
                 const mainRegion = agentRegions[0] || 'Generale';
                 const regionColor = getRegionColor(mainRegion);
 
+                // Determina il colore e la classe della progress bar basata sulla performance
+                let progressClass = 'undefined';
+                let statusColor = 'var(--text-muted)';
+                let statusText = 'Da definire';
+                
+                if (target > 0) {
+                    if (progress >= 100) {
+                        progressClass = 'excellent';
+                        statusColor = 'var(--success)';
+                        statusText = `${Math.round(progress)}% - Eccellente!`;
+                    } else if (progress >= 80) {
+                        progressClass = 'good';
+                        statusColor = 'var(--warning)';
+                        statusText = `${Math.round(progress)}% - Buono`;
+                    } else {
+                        progressClass = 'warning';
+                        statusColor = 'var(--danger)';
+                        statusText = `${Math.round(progress)}% - Attenzione`;
+                    }
+                }
+
                 // Top performing province
                 let topProvince = null;
                 let topProvinceRevenue = 0;
@@ -1927,20 +2032,21 @@
                             <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 1rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                                     <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Obiettivo 2025</span>
-                                    <span style="font-size: 0.875rem; font-weight: 600; color: ${target > 0 ? (progress >= 100 ? 'var(--success)' : progress >= 80 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)'};">
-                                        ${target > 0 ? Math.round(progress) + '%' : 'N/A'}
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: ${statusColor};">
+                                        ${statusText}
                                     </span>
                                 </div>
                                 <div style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">
-                                    ${target > 0 ? formatCurrency(target) : 'Obiettivo non definito'}
+                                    ${objectiveText}
                                 </div>
+                                <!-- Progress bar sempre presente -->
                                 <div class="progress-bar" style="margin: 0.5rem 0;">
-                                    <div class="progress-fill" style="width: ${target > 0 ? Math.min(progress, 100) : 0}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
+                                    <div class="progress-fill ${progressClass}" style="width: ${progressWidth}%;"></div>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-light);">
                                     <span>Raggiunto: ${formatCurrency(current)}</span>
                                     <span>
-                                        ${target > 0 ? 
+                                        ${hasObjective && target > 0 ? 
                                             (remaining > 0 ? `Mancano: ${formatCurrency(remaining)}` : 'Obiettivo raggiunto!') : 
                                             'Da definire'
                                         }
@@ -2021,7 +2127,7 @@
                             </div>
                         </div>
                         
-                        <button class="region-detail-button">
+                        <button class="region-detail-button" onclick="openRegionDetailModal('${region.name}')">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14"/>
                                 <path d="m12 5 7 7-7 7"/>
@@ -2067,7 +2173,7 @@
             }
         });
 
-        // Funzioni per gestire i modali delle regioni
+        // Funzioni per gestire i modali delle regioni - CORRETTE
         function openRegionDetailModal(regionName) {
             const region = availableRegions.get(regionName);
             if (!region) {
