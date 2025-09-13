@@ -37,15 +37,33 @@
             line-height: 1.6;
         }
 
-        .error-container {
-            background: var(--danger);
-            color: white;
-            padding: 1rem;
-            margin: 1rem;
+        /* Loading States */
+        .chart-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
             border-radius: var(--radius);
-            display: none;
+            height: 300px;
         }
 
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .error-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--danger);
+            background: rgba(255, 179, 186, 0.1);
+            border-radius: var(--radius);
+            border: 1px dashed var(--danger);
+        }
+
+        /* Existing styles continue... */
         .dashboard {
             min-height: 100vh;
             display: flex;
@@ -135,6 +153,7 @@
             background: var(--surface-3);
             border-radius: var(--radius-lg);
             width: fit-content;
+            role: tablist;
         }
 
         .tab {
@@ -150,6 +169,8 @@
             font-size: 0.875rem;
             color: var(--text-muted);
             transition: all 0.2s ease;
+            role: tab;
+            tabindex: -1;
         }
 
         .tab:hover {
@@ -161,6 +182,12 @@
             background: var(--surface);
             color: var(--primary);
             box-shadow: var(--shadow);
+            tabindex: 0;
+        }
+
+        .tab:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
 
         .metrics-grid {
@@ -173,13 +200,6 @@
         .charts-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .advanced-charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -198,91 +218,9 @@
             border-color: var(--primary);
         }
 
-        .card-header {
-            padding: 1.5rem 1.5rem 0;
+        .card[aria-busy="true"] {
+            pointer-events: none;
         }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .metric-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 0.5rem 0;
-        }
-
-        .metric-change {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .metric-change.positive { color: #4A7C59; }
-        .metric-change.negative { color: #8B4A4A; }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            padding: 1rem 0;
-        }
-
-        .chart-container.large { height: 400px; }
-
-        .table-container { overflow-x: auto; }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th,
-        .table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .table th {
-            background: var(--surface-2);
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .table td { font-size: 0.875rem; }
-
-        .table-row { transition: background-color 0.2s ease; }
-        .table-row:hover { background: var(--surface-2); }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .badge.success { background: rgba(168, 230, 161, 0.2); color: #4A7C59; }
-        .badge.warning { background: rgba(255, 211, 165, 0.2); color: #8B5A2B; }
-        .badge.danger { background: rgba(255, 179, 186, 0.2); color: #8B4A4A; }
 
         .loading {
             display: flex;
@@ -308,192 +246,91 @@
             100% { transform: rotate(360deg); }
         }
 
-        .region-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
-        .region-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            transition: all 0.2s ease;
+        /* Focus indicators */
+        button:focus-visible,
+        .card:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
 
-        .region-card:hover {
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
-            border-color: var(--primary);
+        /* Reduced motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
 
-        .region-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+        /* Lazy loading placeholders */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            padding: 1rem 0;
         }
 
-        .region-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        .chart-container.large { height: 400px; }
+
+        .chart-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Error boundaries */
+        .error-boundary {
+            padding: 2rem;
+            background: rgba(255, 179, 186, 0.1);
+            border: 1px solid var(--danger);
             border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
+            text-align: center;
         }
 
-        .region-info h3 {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .region-info p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        .region-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .region-stat { text-align: center; }
-
-        .region-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .region-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .agent-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .agent-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .agent-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-4px);
-        }
-
-        .agent-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 1.5rem;
-        }
-
-        .agent-name {
-            font-weight: 600;
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .agent-code {
-            opacity: 0.8;
-            font-size: 0.875rem;
-        }
-
-        .agent-body { padding: 1.5rem; }
-
-        .agent-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+        .error-boundary h3 {
+            color: var(--danger);
             margin-bottom: 1rem;
         }
 
-        .agent-metric { text-align: center; }
-
-        .agent-metric-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .agent-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: var(--surface-3);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 0.5rem 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            border-radius: 3px;
-            transition: width 0.6s ease;
-        }
-
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-light);
-        }
-
-        .filter-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .filter-button {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
+        .retry-btn {
             background: var(--primary);
             color: white;
             border: none;
+            padding: 0.75rem 1.5rem;
             border-radius: var(--radius);
             cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
+            margin-top: 1rem;
         }
 
-        .filter-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
+        /* Performance optimizations */
+        .virtualized-container {
+            height: 400px;
+            overflow-y: auto;
         }
 
-        .filter-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
+        .virtual-item {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
         }
 
+        /* Rest of existing styles... */
         @media (max-width: 1024px) {
             .charts-grid { grid-template-columns: 1fr; }
             .main-content, .header { padding: 1rem; }
@@ -514,22 +351,18 @@
                 justify-content: center;
                 padding: 0.75rem 1rem;
             }
-            .metrics-grid,
-            .region-grid,
-            .agent-grid {
+            .metrics-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="error-container" id="errorContainer"></div>
-    
-    <div class="dashboard">
-        <header class="header">
+    <div class="dashboard" role="application" aria-label="Dashboard Commerciale">
+        <header class="header" role="banner">
             <div class="header-content">
                 <div class="logo">
-                    <div class="logo-icon">
+                    <div class="logo-icon" aria-hidden="true">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 3v18h18"/>
                             <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
@@ -538,33 +371,33 @@
                     <span>Dashboard Commerciale</span>
                 </div>
                 
-                <div class="status-bar">
+                <div class="status-bar" role="status" aria-live="polite">
                     <div class="status-item">
-                        <div class="status-live"></div>
-                        <span id="lastUpdate">Inizializzazione...</span>
+                        <div class="status-live" aria-hidden="true"></div>
+                        <span id="lastUpdate">Caricamento...</span>
                     </div>
                     <div class="status-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <circle cx="12" cy="12" r="10"/>
                             <polyline points="12,6 12,12 16,14"/>
                         </svg>
-                        <span id="currentTime">--:--</span>
+                        <span id="currentTime"></span>
                     </div>
                 </div>
             </div>
         </header>
 
-        <main class="main-content">
-            <div class="tabs">
-                <button class="tab active" data-tab="overview">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <main class="main-content" role="main">
+            <div class="tabs" role="tablist" aria-label="Dashboard Sections">
+                <button class="tab active" data-tab="overview" role="tab" aria-selected="true" aria-controls="overview-content">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
                         <path d="M9 9h6v6H9z"/>
                     </svg>
                     Panoramica
                 </button>
-                <button class="tab" data-tab="agents">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="tab" data-tab="agents" role="tab" aria-selected="false" aria-controls="agents-content">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                         <circle cx="9" cy="7" r="4"/>
                         <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
@@ -572,8 +405,8 @@
                     </svg>
                     Agenti
                 </button>
-                <button class="tab" data-tab="regions">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="tab" data-tab="regions" role="tab" aria-selected="false" aria-controls="regions-content">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                         <circle cx="12" cy="10" r="3"/>
                     </svg>
@@ -581,777 +414,593 @@
                 </button>
             </div>
 
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
+            <div id="loading" class="loading" aria-live="polite" aria-label="Caricamento dati in corso">
+                <div class="spinner" role="status" aria-label="Caricamento"></div>
                 <p>Caricamento dati...</p>
             </div>
 
-            <div id="overview-content" class="tab-content" style="display: none;">
-                <div class="metrics-grid" id="kpiMetrics"></div>
+            <div id="overview-content" class="tab-content" style="display: none;" role="tabpanel" aria-labelledby="overview-tab">
+                <div class="metrics-grid" id="kpiMetrics" role="region" aria-label="Metriche chiave di performance"></div>
 
                 <div class="charts-grid">
-                    <div class="card" style="position: relative;">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18h18"/>
-                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                                </svg>
-                                Performance Agenti
-                            </h3>
-                        </div>
+                    <div class="card" aria-label="Grafico performance agenti">
                         <div class="card-body">
-                            <div class="chart-container large">
-                                <canvas id="revenueChart"></canvas>
+                            <h3>Performance Agenti</h3>
+                            <div class="chart-container large" id="revenueChartContainer">
+                                <canvas id="revenueChart" aria-label="Confronto performance agenti 2024 vs 2025"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card" style="position: relative;">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                </svg>
-                                Distribuzione Regionale
-                            </h3>
-                        </div>
+                    <div class="card" aria-label="Distribuzione per regione">
                         <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="regionChart"></canvas>
+                            <h3>Distribuzione Regionale</h3>
+                            <div class="chart-container" id="regionChartContainer">
+                                <canvas id="regionChart" aria-label="Distribuzione fatturato per regione"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="advanced-charts-grid">
-                    <div class="card" style="position: relative;">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="3"/>
-                                    <circle cx="19" cy="5" r="2"/>
-                                    <circle cx="5" cy="19" r="2"/>
-                                </svg>
-                                Efficienza Commerciale
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="scatterChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18l5-3 4 3 5-3 4 3V3l-4 3-5-3-4 3-5-3z"/>
-                                </svg>
-                                Funnel Obiettivi
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="funnelChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                            </svg>
-                            Classifica Performance
-                        </h3>
-                    </div>
+                <div class="card" aria-label="Tabella performance completa">
                     <div class="card-body">
+                        <h3>Classifica Performance</h3>
                         <div class="table-container">
-                            <table class="table" id="performanceTable"></table>
+                            <table class="table" id="performanceTable" role="table" aria-label="Classifica performance agenti">
+                                <!-- Populated dynamically -->
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="agents-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="agentFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Agenti
-                        <span class="filter-count" id="agentFilterCount">Tutti</span>
-                    </button>
-                </div>
-                <div class="agent-grid" id="agentGrid"></div>
+            <div id="agents-content" class="tab-content" style="display: none;" role="tabpanel" aria-labelledby="agents-tab">
+                <div class="agent-grid" id="agentGrid" role="region" aria-label="Griglia agenti"></div>
             </div>
 
-            <div id="regions-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="regionFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Regioni
-                        <span class="filter-count" id="filterCount">Tutte</span>
-                    </button>
-                </div>
-                <div class="region-grid" id="regionGrid"></div>
+            <div id="regions-content" class="tab-content" style="display: none;" role="tabpanel" aria-labelledby="regions-tab">
+                <div class="region-grid" id="regionGrid" role="region" aria-label="Griglia regioni"></div>
             </div>
         </main>
     </div>
 
     <script>
-        class DashboardManager {
+        'use strict';
+
+        // Enhanced Configuration
+        const CONFIG = {
+            CSV_URL: 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv',
+            CACHE_DURATION: 120000, // 2 minutes
+            UPDATE_INTERVAL: 120000,
+            RETRY_ATTEMPTS: 3,
+            RETRY_DELAY: 1000,
+            LAZY_LOAD_THRESHOLD: 100, // ms
+            PERFORMANCE_MONITORING: true
+        };
+
+        // Enhanced State Management
+        class DashboardState {
             constructor() {
-                this.CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
-                this.allData = [];
-                this.charts = new Map();
-                this.eventListeners = new Map();
-                this.lastUpdateTime = null;
-                this.retryCount = 0;
-                this.maxRetries = 3;
-                this.currentTab = 'overview';
-                
-                // State for filters
-                this.selectedRegions = new Set();
-                this.availableRegions = new Map();
-                this.selectedAgents = new Set();
-                this.availableAgents = [];
-                
-                // Region colors
-                this.regionColors = {
-                    'Lazio': '#A8DADC',        
-                    'Sardegna': '#B8E6B8',     
-                    'Marche': '#FFD3A5',       
-                    'Estero': '#FFB3BA',       
-                    'Lombardia': '#C7B6FF',    
-                    'Emilia-Romagna': '#A5F3FC',
-                    'Piemonte': '#F8BBD9',     
-                    'Veneto': '#D4E6B5',       
-                    'Toscana': '#FFD4A3',      
-                    'Campania': '#B5E7FF',     
-                    'Sicilia': '#FFF2A5',      
-                    'Puglia': '#A8F5E6',       
-                    'Calabria': '#E0C3FC',     
-                    'Liguria': '#FFDFBA',      
-                    'Abruzzo': '#B3D7FF',      
-                    'Molise': '#DFC5FE',       
-                    'Basilicata': '#D6A2E8',   
-                    'Umbria': '#A5D6A7',       
-                    'Valle d\'Aosta': '#FFABAB',
-                    'Trentino-Alto Adige': '#D1C4E9',
-                    'Friuli-Venezia Giulia': '#F8BBE6'
-                };
-                
-                this.init();
+                this.data = [];
+                this.cache = new Map();
+                this.observers = new Map();
+                this.errors = new Map();
+                this.loadingStates = new Set();
+                this.performance = new Map();
             }
 
-            // Inizializzazione sicura
-            init() {
-                try {
-                    this.setupEventListeners();
-                    this.startClock();
-                    this.loadData();
-                    this.setupAutoRefresh();
-                } catch (error) {
-                    this.handleError('Errore durante l\'inizializzazione', error);
+            subscribe(key, callback) {
+                if (!this.observers.has(key)) {
+                    this.observers.set(key, new Set());
                 }
+                this.observers.get(key).add(callback);
             }
 
-            // Gestione migliorata degli errori
-            handleError(message, error = null) {
-                console.error(message, error);
-                const errorContainer = document.getElementById('errorContainer');
-                const lastUpdate = document.getElementById('lastUpdate');
-                
-                if (errorContainer) {
-                    errorContainer.textContent = `${message}: ${error?.message || 'Errore sconosciuto'}`;
-                    errorContainer.style.display = 'block';
-                }
-                
-                if (lastUpdate) {
-                    lastUpdate.textContent = 'Errore caricamento';
-                    lastUpdate.style.color = 'var(--danger)';
-                }
-            }
-
-            // Parsing sicuro dei numeri
-            parseNumber(value) {
-                try {
-                    if (value == null) return 0;
-                    
-                    if (typeof value === 'number' && !isNaN(value) && isFinite(value)) {
-                        return value;
-                    }
-                    
-                    if (typeof value === 'string') {
-                        const cleaned = value.trim()
-                            .replace(/["']/g, '')
-                            .replace(/[^\d.,-]/g, '')
-                            .replace(/,/g, '.');
-                        
-                        if (!cleaned) return 0;
-                        
-                        const parsed = parseFloat(cleaned);
-                        return (!isNaN(parsed) && isFinite(parsed)) ? parsed : 0;
-                    }
-                    
-                    return 0;
-                } catch (error) {
-                    console.warn('Errore parsing numero:', value, error);
-                    return 0;
-                }
-            }
-
-            // Caricamento dati con fallback multipli per CORS
-            async loadData() {
-                // Se abbiamo già provato tutti gli URL, mostra errore
-                if (this.currentUrlIndex >= this.CSV_URLS.length) {
-                    this.handleError('Impossibile caricare i dati da tutte le fonti disponibili. Verificare la connessione o contattare l\'amministratore.');
-                    return;
-                }
-
-                const currentUrl = this.CSV_URLS[this.currentUrlIndex];
-                
-                try {
-                    this.updateStatus(`Caricamento in corso... (fonte ${this.currentUrlIndex + 1}/${this.CSV_URLS.length})`);
-                    
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 15000); // Ridotto timeout per fallback più veloce
-                    
-                    const headers = {
-                        'Cache-Control': 'no-cache'
-                    };
-                    
-                    // Per CORS proxy, non aggiungere headers che causano preflight
-                    if (!currentUrl.includes('cors-anywhere') && !currentUrl.includes('allorigins')) {
-                        headers['Accept'] = 'text/csv,text/plain,*/*';
-                    }
-                    
-                    const response = await fetch(`${currentUrl}?t=${Date.now()}`, {
-                        signal: controller.signal,
-                        headers,
-                        mode: currentUrl.startsWith('./') ? 'same-origin' : 'cors'
-                    });
-                    
-                    clearTimeout(timeoutId);
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    const csvText = await response.text();
-                    
-                    if (!csvText || csvText.trim().length === 0) {
-                        throw new Error('File CSV vuoto o non valido');
-                    }
-                    
-                    // Test se i dati sembrano essere CSV validi
-                    if (!csvText.includes('DATI STATISTICHE AGENTE') && !csvText.includes('Tipo_Dato')) {
-                        throw new Error('Formato dati non riconosciuto');
-                    }
-                    
-                    this.allData = this.parseCSVSafely(csvText);
-                    
-                    if (this.allData.length === 0) {
-                        throw new Error('Nessun dato valido trovato nel CSV');
-                    }
-                    
-                    this.lastUpdateTime = new Date();
-                    this.retryCount = 0;
-                    this.currentUrlIndex = 0; // Reset per prossimi caricamenti
-                    this.updateStatus(`Aggiornato alle ${this.lastUpdateTime.toLocaleTimeString('it-IT')} (fonte: ${this.getSourceName(currentUrl)})`);
-                    this.renderDashboard();
-                    this.hideError();
-                    
-                } catch (error) {
-                    console.warn(`Errore con fonte ${this.currentUrlIndex + 1}: ${error.message}`);
-                    
-                    // Prova la prossima fonte
-                    this.currentUrlIndex++;
-                    
-                    if (this.currentUrlIndex < this.CSV_URLS.length) {
-                        console.log(`Tentando fonte ${this.currentUrlIndex + 1}...`);
-                        setTimeout(() => this.loadData(), 1000); // Breve pausa prima di provare la prossima fonte
-                    } else {
-                        // Tutte le fonti fallite, usa i dati demo
-                        this.handleLoadError(error);
-                    }
-                }
-            }
-
-            getSourceName(url) {
-                if (url.startsWith('./')) return 'File Locale';
-                if (url.includes('cors-anywhere')) return 'Proxy CORS 1';
-                if (url.includes('allorigins')) return 'Proxy CORS 2';
-                return 'GitHub';
-            }
-
-            // Gestione errori con dati demo
-            handleLoadError(error) {
-                this.retryCount++;
-                
-                if (error.name === 'AbortError') {
-                    this.handleError('Timeout durante il caricamento dei dati');
-                } else if (this.retryCount <= this.maxRetries) {
-                    const retryDelay = Math.min(1000 * Math.pow(2, this.retryCount), 10000);
-                    this.updateStatus(`Errore caricamento, riprovo tra ${retryDelay/1000}s...`);
-                    
-                    setTimeout(() => {
-                        this.currentUrlIndex = 0; // Ricomincia dal primo URL
-                        this.loadData();
-                    }, retryDelay);
-                } else {
-                    // Carica dati demo per permettere il test della dashboard
-                    this.loadDemoData();
-                }
-            }
-
-            // Carica dati demo per test
-            loadDemoData() {
-                console.log('Caricamento dati demo per test della dashboard...');
-                
-                this.allData = this.generateDemoData();
-                this.lastUpdateTime = new Date();
-                this.updateStatus(`Dati demo caricati alle ${this.lastUpdateTime.toLocaleTimeString('it-IT')} - Verificare configurazione CSV`);
-                this.renderDashboard();
-                
-                // Mostra avviso dati demo
-                const errorContainer = document.getElementById('errorContainer');
-                if (errorContainer) {
-                    errorContainer.style.background = 'var(--warning)';
-                    errorContainer.style.color = '#8B5A2B';
-                    errorContainer.innerHTML = `
-                        <strong>⚠️ Modalità Demo Attiva</strong><br>
-                        Non è stato possibile caricare i dati reali. La dashboard sta usando dati di esempio per la dimostrazione.<br>
-                        <small>Verifica: 1) File CSV presente nel repository 2) Connessione internet 3) Configurazione CORS</small>
-                    `;
-                    errorContainer.style.display = 'block';
-                }
-            }
-
-            // Genera dati demo realistici
-            generateDemoData() {
-                const demoAgents = [
-                    { codice: 'AG001', nome: 'Mario Rossi', regioni: ['Lazio'] },
-                    { codice: 'AG002', nome: 'Giulia Verdi', regioni: ['Lombardia'] },
-                    { codice: 'AG003', nome: 'Francesco Bianchi', regioni: ['Campania'] },
-                    { codice: 'AG004', nome: 'Sara Neri', regioni: ['Veneto'] },
-                    { codice: 'AG005', nome: 'Antonio Gialli', regioni: ['Sicilia'] },
-                    { codice: 'AG006', nome: 'Elena Blu', regioni: ['Emilia-Romagna'] },
-                    { codice: 'AG007', nome: 'Marco Viola', regioni: ['Toscana'] },
-                    { codice: 'AG008', nome: 'Chiara Rosa', regioni: ['Piemonte'] }
-                ];
-
-                return demoAgents.map(agent => ({
-                    codice: agent.codice,
-                    nome: agent.nome,
-                    periodo: '2025',
-                    obiettivi: [{
-                        Tipo_Dato: 'OBIETTIVI',
-                        Provincia: 'Generale',
-                        Anno_Precedente: Math.floor(Math.random() * 500000) + 300000,
-                        Anno_Corrente: Math.floor(Math.random() * 600000) + 400000,
-                        Obiettivo: Math.floor(Math.random() * 700000) + 500000,
-                        Clienti_Anno_Precedente: Math.floor(Math.random() * 50) + 20,
-                        Clienti_Anno_Corrente: Math.floor(Math.random() * 60) + 25
-                    }],
-                    clienti_provincia: agent.regioni.map(regione => {
-                        const province = this.getProvincesForRegion(regione);
-                        return province.map(prov => ({
-                            Tipo_Dato: 'CLIENTI_PROVINCIA',
-                            Provincia: prov,
-                            Fatturato: Math.floor(Math.random() * 200000) + 50000,
-                            Clienti_Serviti: Math.floor(Math.random() * 30) + 10
-                        }));
-                    }).flat(),
-                    vendite_cliente: [],
-                    categoria_riepilogo: [],
-                    ripartizione: [],
-                    totali: []
-                }));
-            }
-
-            // Ottieni province per regione (versione semplificata per demo)
-            getProvincesForRegion(regione) {
-                const regionMap = {
-                    'Lazio': ['RM', 'LT'],
-                    'Lombardia': ['MI', 'BG'],
-                    'Campania': ['NA', 'SA'],
-                    'Veneto': ['VE', 'VR'],
-                    'Sicilia': ['PA', 'CT'],
-                    'Emilia-Romagna': ['BO', 'MO'],
-                    'Toscana': ['FI', 'PI'],
-                    'Piemonte': ['TO', 'AL']
-                };
-                return regionMap[regione] || ['XX'];
-            }
-
-            // Parsing CSV più robusto
-            parseCSVSafely(csvText) {
-                try {
-                    const agents = [];
-                    const sections = csvText.split(/\n#\s*DATI\s+STATISTICHE\s+AGENTE/i);
-                    
-                    if (sections.length < 2) {
-                        throw new Error('Formato CSV non riconosciuto');
-                    }
-                    
-                    sections.forEach((section, index) => {
-                        if (index === 0 || !section.trim()) return;
-                        
+            notify(key, data) {
+                if (this.observers.has(key)) {
+                    this.observers.get(key).forEach(callback => {
                         try {
-                            const agent = this.parseAgentSection(section);
-                            if (agent.codice && agent.nome) {
-                                agents.push(agent);
-                            }
+                            callback(data);
                         } catch (error) {
-                            console.warn(`Errore parsing sezione agente ${index}:`, error);
+                            console.error(`Observer error for ${key}:`, error);
                         }
                     });
-                    
-                    return agents;
-                } catch (error) {
-                    throw new Error(`Errore parsing CSV: ${error.message}`);
                 }
             }
 
-            // Parsing sezione agente più sicuro
-            parseAgentSection(section) {
+            setLoading(key, isLoading) {
+                if (isLoading) {
+                    this.loadingStates.add(key);
+                } else {
+                    this.loadingStates.delete(key);
+                }
+                this.notify('loading', { key, isLoading });
+            }
+
+            setError(key, error) {
+                if (error) {
+                    this.errors.set(key, error);
+                } else {
+                    this.errors.delete(key);
+                }
+                this.notify('error', { key, error });
+            }
+
+            measurePerformance(key, fn) {
+                if (!CONFIG.PERFORMANCE_MONITORING) return fn();
+                
+                const start = performance.now();
+                const result = fn();
+                const end = performance.now();
+                
+                this.performance.set(key, end - start);
+                if (end - start > 100) {
+                    console.warn(`Performance warning: ${key} took ${(end - start).toFixed(2)}ms`);
+                }
+                
+                return result;
+            }
+        }
+
+        // Enhanced Cache with TTL
+        class EnhancedCache {
+            constructor(ttl = CONFIG.CACHE_DURATION) {
+                this.cache = new Map();
+                this.ttl = ttl;
+            }
+
+            set(key, value) {
+                this.cache.set(key, {
+                    value,
+                    timestamp: Date.now(),
+                    hits: 0
+                });
+            }
+
+            get(key) {
+                const item = this.cache.get(key);
+                if (!item) return null;
+                
+                if (Date.now() - item.timestamp > this.ttl) {
+                    this.cache.delete(key);
+                    return null;
+                }
+                
+                item.hits++;
+                return item.value;
+            }
+
+            clear() {
+                this.cache.clear();
+            }
+
+            getStats() {
+                return {
+                    size: this.cache.size,
+                    items: Array.from(this.cache.entries()).map(([key, item]) => ({
+                        key,
+                        age: Date.now() - item.timestamp,
+                        hits: item.hits
+                    }))
+                };
+            }
+        }
+
+        // Enhanced Error Handling
+        class ErrorHandler {
+            constructor() {
+                this.errorCounts = new Map();
+                this.setupGlobalHandlers();
+            }
+
+            setupGlobalHandlers() {
+                window.addEventListener('error', (e) => {
+                    this.logError('global', e.error || e.message);
+                });
+
+                window.addEventListener('unhandledrejection', (e) => {
+                    this.logError('promise', e.reason);
+                });
+            }
+
+            async withRetry(operation, maxAttempts = CONFIG.RETRY_ATTEMPTS, delay = CONFIG.RETRY_DELAY) {
+                for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                    try {
+                        return await operation();
+                    } catch (error) {
+                        if (attempt === maxAttempts) {
+                            throw error;
+                        }
+                        console.warn(`Attempt ${attempt} failed, retrying in ${delay}ms:`, error);
+                        await this.sleep(delay * attempt);
+                    }
+                }
+            }
+
+            logError(context, error) {
+                const key = `${context}_${error.name || 'unknown'}`;
+                const count = this.errorCounts.get(key) || 0;
+                this.errorCounts.set(key, count + 1);
+                
+                console.error(`[${context}] Error (occurrence ${count + 1}):`, error);
+                
+                // Only show user notification for new errors
+                if (count === 0) {
+                    this.showErrorToUser(context, error);
+                }
+            }
+
+            showErrorToUser(context, error) {
+                const message = `Errore in ${context}: ${error.message || error}`;
+                this.createErrorNotification(message);
+            }
+
+            createErrorNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'error-notification';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--danger);
+                    color: white;
+                    padding: 1rem;
+                    border-radius: var(--radius);
+                    max-width: 300px;
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
+                `;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 5000);
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // CSV Processing with chunked processing for performance
+        class CSVProcessor {
+            constructor() {
+                this.isProcessing = false;
+            }
+
+            async processCSV(csvText) {
+                if (this.isProcessing) {
+                    throw new Error('CSV processing already in progress');
+                }
+
+                this.isProcessing = true;
+                
+                try {
+                    // Use requestIdleCallback for non-blocking processing
+                    return await this.processWithIdleCallback(csvText);
+                } finally {
+                    this.isProcessing = false;
+                }
+            }
+
+            processWithIdleCallback(csvText) {
+                return new Promise((resolve, reject) => {
+                    const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
+                    const agents = [];
+                    let currentIndex = 0;
+
+                    const processChunk = (deadline) => {
+                        try {
+                            while (currentIndex < sections.length && deadline.timeRemaining() > 0) {
+                                const section = sections[currentIndex++];
+                                if (!section.trim()) continue;
+
+                                const agent = this.parseSection(section);
+                                if (agent && agent.codice && agent.nome) {
+                                    agents.push(agent);
+                                }
+                            }
+
+                            if (currentIndex < sections.length) {
+                                // More work to do, schedule next chunk
+                                this.scheduleIdleCallback(processChunk);
+                            } else {
+                                // Processing complete
+                                resolve(agents);
+                            }
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+
+                    this.scheduleIdleCallback(processChunk);
+                });
+            }
+
+            parseSection(section) {
                 const agent = {
-                    codice: '', 
-                    nome: '', 
-                    periodo: '',
-                    obiettivi: [], 
-                    clienti_provincia: [], 
-                    vendite_cliente: [],
-                    categoria_riepilogo: [], 
-                    ripartizione: [], 
-                    totali: []
+                    codice: '', nome: '', periodo: '',
+                    obiettivi: [], clienti_provincia: [], vendite_cliente: [],
+                    categoria_riepilogo: [], ripartizione: [], totali: []
                 };
 
-                const lines = section.split('\n').map(line => line.trim()).filter(line => line);
+                const lines = section.split('\n');
                 let headers = [];
 
                 lines.forEach(line => {
-                    try {
-                        if (line.includes('Codice Agente:')) {
-                            agent.codice = this.extractValue(line, 'Codice Agente:');
-                        } else if (line.includes('Ragione Sociale:')) {
-                            agent.nome = this.extractValue(line, 'Ragione Sociale:');
-                        } else if (line.includes('Periodo:')) {
-                            agent.periodo = this.extractValue(line, 'Periodo:');
-                        }
-                        
-                        if (line.includes('Tipo_Dato,') || line.includes('Tipo_Dato;')) {
-                            headers = line.split(/[,;]/).map(h => h.trim());
-                            return;
-                        }
+                    line = line.trim();
+                    if (!line || line.startsWith('##')) return;
 
-                        if (headers.length > 0 && (line.includes(',') || line.includes(';')) && !line.startsWith('#')) {
-                            const values = line.split(/[,;]/).map(v => v.trim().replace(/['"]/g, ''));
-                            
-                            if (values.length >= headers.length) {
-                                const row = this.createDataRow(headers, values);
-                                this.categorizeData(agent, row);
+                    if (line.includes('Codice Agente:')) {
+                        agent.codice = line.split(':')[1]?.trim() || '';
+                    } else if (line.includes('Ragione Sociale:')) {
+                        agent.nome = line.split(':')[1]?.trim() || '';
+                    } else if (line.includes('Periodo:')) {
+                        agent.periodo = line.split(':')[1]?.trim() || '';
+                    }
+                    
+                    if (line.includes('Tipo_Dato,')) {
+                        headers = line.split(',').map(h => h.trim());
+                        return;
+                    }
+
+                    if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
+                        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+                        if (values.length >= headers.length) {
+                            const row = {};
+                            headers.forEach((header, index) => {
+                                let value = values[index] || '';
+                                
+                                if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
+                                     'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
+                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
+                                    value = parseFloat(value.replace(/[^\d.-]/g, '')) || 0;
+                                }
+                                row[header] = value;
+                            });
+
+                            switch (row.Tipo_Dato) {
+                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
+                                case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
+                                case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
+                                case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
+                                case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
+                                case 'TOTALE': agent.totali.push(row); break;
                             }
                         }
-                    } catch (error) {
-                        console.warn('Errore parsing riga:', line, error);
                     }
                 });
 
                 return agent;
             }
 
-            // Utility methods
-            extractValue(line, prefix) {
-                try {
-                    const parts = line.split(prefix);
-                    return parts.length > 1 ? parts[1].trim() : '';
-                } catch (error) {
-                    console.warn('Errore estrazione valore:', line, error);
-                    return '';
+            scheduleIdleCallback(callback) {
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(callback, { timeout: 50 });
+                } else {
+                    // Fallback for browsers without requestIdleCallback
+                    setTimeout(() => callback({ timeRemaining: () => 16 }), 0);
                 }
             }
 
-            createDataRow(headers, values) {
-                const row = {};
-                const numericFields = [
-                    'Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
-                    'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
-                    'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'
-                ];
-                
-                headers.forEach((header, index) => {
-                    let value = values[index] || '';
-                    
-                    if (numericFields.includes(header)) {
-                        value = this.parseNumber(value);
+            destroy() {
+                this.isProcessing = false;
+            }
+        }
+
+        // Lazy Loading Manager
+        class LazyLoader {
+            constructor() {
+                this.observer = new IntersectionObserver(
+                    this.handleIntersection.bind(this),
+                    { threshold: 0.1 }
+                );
+                this.pendingLoads = new Map();
+            }
+
+            observe(element, loadFunction) {
+                element.dataset.lazyLoad = 'pending';
+                this.pendingLoads.set(element, loadFunction);
+                this.observer.observe(element);
+            }
+
+            handleIntersection(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const element = entry.target;
+                        const loadFunction = this.pendingLoads.get(element);
+                        
+                        if (loadFunction && element.dataset.lazyLoad === 'pending') {
+                            element.dataset.lazyLoad = 'loading';
+                            
+                            setTimeout(() => {
+                                try {
+                                    loadFunction();
+                                    element.dataset.lazyLoad = 'loaded';
+                                } catch (error) {
+                                    element.dataset.lazyLoad = 'error';
+                                    console.error('Lazy load error:', error);
+                                }
+                            }, CONFIG.LAZY_LOAD_THRESHOLD);
+
+                            this.observer.unobserve(element);
+                            this.pendingLoads.delete(element);
+                        }
                     }
-                    
-                    row[header] = value;
                 });
-
-                return row;
             }
 
-            categorizeData(agent, row) {
-                const category = row.Tipo_Dato;
-                if (!category) return;
+            destroy() {
+                this.observer.disconnect();
+                this.pendingLoads.clear();
+            }
+        }
+
+        // Main Application Class
+        class Dashboard {
+            constructor() {
+                this.state = new DashboardState();
+                this.cache = new EnhancedCache();
+                this.errorHandler = new ErrorHandler();
+                this.csvProcessor = new CSVProcessor();
+                this.lazyLoader = new LazyLoader();
+                this.charts = {};
+                this.currentTab = 'overview';
+                this.updateInterval = null;
                 
-                const categoryMap = {
-                    'OBIETTIVI': 'obiettivi',
-                    'CLIENTI_PROVINCIA': 'clienti_provincia',
-                    'VENDITE_CLIENTE': 'vendite_cliente',
-                    'CATEGORIA_RIEPILOGO': 'categoria_riepilogo',
-                    'RIPARTIZIONE': 'ripartizione',
-                    'TOTALE': 'totali'
-                };
-                
-                const targetCategory = categoryMap[category];
-                if (targetCategory && agent[targetCategory]) {
-                    agent[targetCategory].push(row);
+                this.init();
+            }
+
+            async init() {
+                try {
+                    this.setupEventListeners();
+                    this.setupPerformanceMonitoring();
+                    await this.loadInitialData();
+                    this.startAutoUpdate();
+                } catch (error) {
+                    this.errorHandler.logError('init', error);
                 }
             }
 
-            // Region utilities
-            getRegionFromProvince(prov) {
-                const map = {
-                    'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
-                    'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
-                    'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
-                    'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'PC': 'Emilia-Romagna', 'BO': 'Emilia-Romagna', 'MO': 'Emilia-Romagna', 'RE': 'Emilia-Romagna', 'PR': 'Emilia-Romagna', 'FE': 'Emilia-Romagna', 'FC': 'Emilia-Romagna',
-                    'CR': 'Lombardia', 'LO': 'Lombardia', 'MI': 'Lombardia', 'BG': 'Lombardia', 'BS': 'Lombardia', 'CO': 'Lombardia', 'MN': 'Lombardia', 'PV': 'Lombardia', 'SO': 'Lombardia', 'VA': 'Lombardia', 'LC': 'Lombardia', 'MB': 'Lombardia',
-                    // ... altri mapping delle province
-                    'ALB': 'Estero'
-                };
-                return map[prov] || prov;
-            }
-
-            getRegionColor(regionName) {
-                return this.regionColors[regionName] || '#64748b';
-            }
-
-            // Setup event listeners con cleanup
             setupEventListeners() {
-                this.cleanupEventListeners();
-                
-                const tabs = document.querySelectorAll('.tab');
-                tabs.forEach(tab => {
-                    const handler = (e) => this.handleTabClick(e);
-                    tab.addEventListener('click', handler);
-                    this.eventListeners.set(tab, handler);
+                // Tab navigation with keyboard support
+                document.querySelectorAll('.tab').forEach((tab, index) => {
+                    tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+                    tab.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.switchTab(tab.dataset.tab);
+                        }
+                        // Arrow key navigation
+                        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                            e.preventDefault();
+                            const tabs = Array.from(document.querySelectorAll('.tab'));
+                            const currentIndex = tabs.indexOf(e.target);
+                            const nextIndex = e.key === 'ArrowRight' 
+                                ? (currentIndex + 1) % tabs.length
+                                : (currentIndex - 1 + tabs.length) % tabs.length;
+                            tabs[nextIndex].focus();
+                        }
+                    });
                 });
 
-                const keyHandler = (e) => this.handleKeyboard(e);
-                document.addEventListener('keydown', keyHandler);
-                this.eventListeners.set(document, keyHandler);
+                // Clock updates
+                this.updateClock();
+                setInterval(() => this.updateClock(), 1000);
 
-                const resizeHandler = () => this.handleResize();
-                window.addEventListener('resize', resizeHandler);
-                this.eventListeners.set(window, resizeHandler);
-            }
-
-            cleanupEventListeners() {
-                this.eventListeners.forEach((handler, element) => {
-                    if (element === document) {
-                        document.removeEventListener('keydown', handler);
-                    } else if (element === window) {
-                        window.removeEventListener('resize', handler);
+                // Window events
+                window.addEventListener('beforeunload', () => this.cleanup());
+                window.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        this.pauseUpdates();
                     } else {
-                        element.removeEventListener('click', handler);
+                        this.resumeUpdates();
                     }
                 });
-                this.eventListeners.clear();
             }
 
-            handleTabClick(event) {
-                try {
-                    const tab = event.currentTarget;
-                    const tabId = tab.dataset.tab;
-                    
-                    if (!tabId) return;
-                    
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.style.display = 'none';
+            setupPerformanceMonitoring() {
+                if (!CONFIG.PERFORMANCE_MONITORING) return;
+
+                // Monitor long tasks
+                if ('PerformanceObserver' in window) {
+                    const observer = new PerformanceObserver((list) => {
+                        list.getEntries().forEach((entry) => {
+                            if (entry.duration > 50) {
+                                console.warn('Long task detected:', entry.duration.toFixed(2), 'ms');
+                            }
+                        });
                     });
-                    
-                    const targetContent = document.getElementById(`${tabId}-content`);
-                    if (targetContent) {
-                        targetContent.style.display = 'block';
-                    }
-                    
-                    this.currentTab = tabId;
-                    setTimeout(() => this.resizeCharts(), 100);
-                    
-                } catch (error) {
-                    console.error('Errore cambio tab:', error);
+                    observer.observe({ entryTypes: ['longtask'] });
                 }
             }
 
-            handleKeyboard(event) {
+            async loadInitialData() {
+                const cachedData = this.cache.get('dashboard-data');
+                if (cachedData) {
+                    this.processData(cachedData);
+                    return;
+                }
+
+                await this.fetchData();
+            }
+
+            async fetchData() {
+                this.state.setLoading('data', true);
+                this.updateLoadingStatus('Caricamento dati...');
+
                 try {
-                    if (event.key === 'F5' && event.ctrlKey) {
-                        event.preventDefault();
-                        this.loadData();
-                    }
-                } catch (error) {
-                    console.error('Errore gestione keyboard:', error);
-                }
-            }
-
-            handleResize() {
-                try {
-                    this.resizeCharts();
-                } catch (error) {
-                    console.error('Errore resize:', error);
-                }
-            }
-
-            resizeCharts() {
-                this.charts.forEach(chart => {
-                    try {
-                        if (chart && typeof chart.resize === 'function') {
-                            chart.resize();
-                        }
-                    } catch (error) {
-                        console.warn('Errore resize chart:', error);
-                    }
-                });
-            }
-
-            startClock() {
-                const updateClock = () => {
-                    try {
-                        const clockElement = document.getElementById('currentTime');
-                        if (clockElement) {
-                            clockElement.textContent = new Date().toLocaleTimeString('it-IT', { 
-                                hour: '2-digit', 
-                                minute: '2-digit' 
-                            });
-                        }
-                    } catch (error) {
-                        console.warn('Errore aggiornamento clock:', error);
-                    }
-                };
-                
-                updateClock();
-                setInterval(updateClock, 1000);
-            }
-
-            setupAutoRefresh() {
-                setInterval(() => {
-                    if (document.visibilityState === 'visible') {
-                        this.loadData();
-                    }
-                }, 120000);
-            }
-
-            updateStatus(message) {
-                const lastUpdate = document.getElementById('lastUpdate');
-                if (lastUpdate) {
-                    lastUpdate.textContent = message;
-                    lastUpdate.style.color = '';
-                }
-            }
-
-            hideError() {
-                const errorContainer = document.getElementById('errorContainer');
-                if (errorContainer) {
-                    errorContainer.style.display = 'none';
-                }
-            }
-
-            // Populate data
-            populateAvailableRegions() {
-                this.availableRegions.clear();
-                
-                this.allData.forEach(agent => {
-                    agent.clienti_provincia.forEach(prov => {
-                        const regionName = this.getRegionFromProvince(prov.Provincia);
-                        
-                        if (!this.availableRegions.has(regionName)) {
-                            this.availableRegions.set(regionName, {
-                                name: regionName,
-                                revenue: 0,
-                                clients: 0,
-                                agents: new Set(),
-                                provinces: new Set()
-                            });
-                        }
-                        
-                        const region = this.availableRegions.get(regionName);
-                        region.revenue += prov.Fatturato || 0;
-                        region.clients += prov.Clienti_Serviti || 0;
-                        region.agents.add(agent.codice);
-                        region.provinces.add(prov.Provincia);
+                    const response = await this.errorHandler.withRetry(async () => {
+                        const res = await fetch(`${CONFIG.CSV_URL}?t=${Date.now()}`);
+                        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                        return res;
                     });
+
+                    const csvText = await response.text();
+                    const data = await this.csvProcessor.processCSV(csvText);
+                    
+                    this.cache.set('dashboard-data', data);
+                    this.processData(data);
+                    
+                    this.updateLoadingStatus(`Aggiornato alle ${new Date().toLocaleTimeString('it-IT')}`);
+                    this.state.setError('data', null);
+                    
+                } catch (error) {
+                    this.errorHandler.logError('data-fetch', error);
+                    this.state.setError('data', error);
+                    this.updateLoadingStatus('Errore caricamento', true);
+                } finally {
+                    this.state.setLoading('data', false);
+                }
+            }
+
+            processData(data) {
+                this.state.measurePerformance('data-processing', () => {
+                    this.state.data = data;
+                    this.hideLoading();
+                    this.renderDashboard();
                 });
             }
 
-            populateAvailableAgents() {
-                this.availableAgents = this.allData.map(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    const current = general?.Anno_Corrente || 0;
-                    const previous = general?.Anno_Precedente || 0;
-                    const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                    const clients = general?.Clienti_Anno_Corrente || 0;
-                    
-                    const regions = [...new Set(agent.clienti_provincia.map(prov => this.getRegionFromProvince(prov.Provincia)))];
-                    
-                    let status = 'Critico';
-                    if (growth >= 10) status = 'Ottimo';
-                    else if (growth >= 0) status = 'Buono';
-                    
-                    return {
-                        codice: agent.codice,
-                        nome: agent.nome,
-                        current,
-                        previous,
-                        growth,
-                        clients,
-                        status,
-                        regions
-                    };
-                }).sort((a, b) => b.current - a.current);
-            }
-
-            // Render methods
             renderDashboard() {
-                try {
-                    const loadingElement = document.getElementById('loading');
-                    const overviewElement = document.getElementById('overview-content');
-                    
-                    if (loadingElement) loadingElement.style.display = 'none';
-                    if (overviewElement) overviewElement.style.display = 'block';
-                    
-                    this.populateAvailableRegions();
-                    this.populateAvailableAgents();
+                this.state.measurePerformance('dashboard-render', () => {
                     this.renderKPIMetrics();
                     this.renderCharts();
                     this.renderPerformanceTable();
-                    this.renderAgentCards();
-                    this.renderRegionCards();
-                    
-                } catch (error) {
-                    this.handleError('Errore durante il rendering della dashboard', error);
-                }
+                });
             }
 
             renderKPIMetrics() {
+                const container = document.getElementById('kpiMetrics');
+                if (!container) return;
+
+                const metrics = this.calculateKPIMetrics();
+                
+                container.innerHTML = metrics.map(metric => `
+                    <div class="card" role="article" aria-labelledby="metric-${metric.id}">
+                        <div class="card-body">
+                            <h4 id="metric-${metric.id}" class="card-title">${metric.title}</h4>
+                            <div class="metric-value" aria-describedby="metric-${metric.id}-desc">${metric.value}</div>
+                            ${metric.change !== null ? `
+                                <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}" id="metric-${metric.id}-desc">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        ${metric.change >= 0 ? 
+                                            '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                            '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                        }
+                                    </svg>
+                                    ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
+                                    <span class="sr-only">${metric.change >= 0 ? 'in crescita' : 'in calo'}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            calculateKPIMetrics() {
                 let totalRevenue = 0, totalPrevRevenue = 0, totalClients = 0;
                 
-                this.allData.forEach(agent => {
+                this.state.data.forEach(agent => {
                     const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
                     if (general) {
                         totalRevenue += general.Anno_Corrente || 0;
@@ -1363,568 +1012,369 @@
                 const growth = totalPrevRevenue > 0 ? 
                     ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
 
-                const metrics = [
-                    { title: 'Fatturato Totale', value: this.formatCurrency(totalRevenue), change: growth },
-                    { title: 'Clienti Attivi', value: totalClients.toLocaleString('it-IT'), change: null },
-                    { title: 'Agenti Attivi', value: this.allData.length.toString(), change: null },
-                    { title: 'Crescita Media', value: `${growth.toFixed(1)}%`, change: growth }
+                return [
+                    { id: 'revenue', title: 'Fatturato Totale', value: this.formatCurrency(totalRevenue), change: growth },
+                    { id: 'clients', title: 'Clienti Attivi', value: totalClients.toLocaleString('it-IT'), change: null },
+                    { id: 'agents', title: 'Agenti Attivi', value: this.state.data.length.toString(), change: null },
+                    { id: 'growth', title: 'Crescita Media', value: `${growth.toFixed(1)}%`, change: growth }
                 ];
-
-                const kpiElement = document.getElementById('kpiMetrics');
-                if (kpiElement) {
-                    kpiElement.innerHTML = metrics.map(metric => `
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="card-title">${metric.title}</div>
-                                <div class="metric-value">${metric.value}</div>
-                                ${metric.change !== null ? `
-                                    <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            ${metric.change >= 0 ? 
-                                                '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                                '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                            }
-                                        </svg>
-                                        ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `).join('');
-                }
             }
 
             renderCharts() {
-                this.renderRevenueChart();
-                this.renderRegionChart();
-                this.renderScatterChart();
-                this.renderFunnelChart();
+                // Lazy load charts for better performance
+                const revenueContainer = document.getElementById('revenueChartContainer');
+                const regionContainer = document.getElementById('regionChartContainer');
+
+                if (revenueContainer) {
+                    this.lazyLoader.observe(revenueContainer, () => this.renderRevenueChart());
+                }
+
+                if (regionContainer) {
+                    this.lazyLoader.observe(regionContainer, () => this.renderRegionChart());
+                }
             }
 
             renderRevenueChart() {
                 const canvas = document.getElementById('revenueChart');
                 if (!canvas) return;
-                
-                const ctx = canvas.getContext('2d');
-                
-                if (this.charts.has('revenue')) {
-                    this.charts.get('revenue').destroy();
-                }
 
-                if (!this.allData || !Array.isArray(this.allData) || this.allData.length === 0) {
-                    // Render empty chart
-                    const chart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: [],
-                            datasets: []
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false }
-                            }
-                        }
-                    });
-                    this.charts.set('revenue', chart);
-                    return;
-                }
-
-                const agentData = this.allData
-                    .map(agent => {
-                        if (!agent || !agent.obiettivi || !Array.isArray(agent.obiettivi)) {
-                            return null;
-                        }
+                this.state.measurePerformance('revenue-chart', () => {
+                    try {
+                        const ctx = canvas.getContext('2d');
                         
-                        const general = agent.obiettivi.find(o => o && o.Provincia === 'Generale');
-                        return {
-                            name: agent.nome ? agent.nome.split(' ')[0] : 'Agente',
-                            current: general?.Anno_Corrente || 0,
-                            previous: general?.Anno_Precedente || 0
-                        };
-                    })
-                    .filter(item => item !== null)
-                    .sort((a, b) => b.current - a.current)
-                    .slice(0, 8);
+                        if (this.charts.revenue) {
+                            this.charts.revenue.destroy();
+                        }
 
-                const chart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: agentData.map(a => a.name),
-                        datasets: [
-                            {
-                                label: '2024',
-                                data: agentData.map(a => a.previous),
-                                backgroundColor: '#E1E7F0',
-                                borderRadius: 4
+                        const agentData = this.state.data.map(agent => {
+                            const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                            return {
+                                name: agent.nome.split(' ')[0],
+                                current: general?.Anno_Corrente || 0,
+                                previous: general?.Anno_Precedente || 0
+                            };
+                        }).sort((a, b) => b.current - a.current).slice(0, 8);
+
+                        this.charts.revenue = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: agentData.map(a => a.name),
+                                datasets: [
+                                    {
+                                        label: '2024',
+                                        data: agentData.map(a => a.previous),
+                                        backgroundColor: '#E1E7F0',
+                                        borderRadius: 4
+                                    },
+                                    {
+                                        label: '2025',
+                                        data: agentData.map(a => a.current),
+                                        backgroundColor: '#7C93C3',
+                                        borderRadius: 4
+                                    }
+                                ]
                             },
-                            {
-                                label: '2025',
-                                data: agentData.map(a => a.current),
-                                backgroundColor: '#7C93C3',
-                                borderRadius: 4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { callback: value => this.formatCurrency(value) }
-                            }
-                        },
-                        plugins: {
-                            legend: { position: 'top' },
-                            tooltip: {
-                                callbacks: {
-                                    label: context => `${context.dataset.label}: ${this.formatCurrency(context.parsed.y)}`
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { callback: value => this.formatCurrency(value) }
+                                    }
+                                },
+                                plugins: {
+                                    legend: { position: 'top' },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: context => `${context.dataset.label}: ${this.formatCurrency(context.parsed.y)}`
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        });
+                    } catch (error) {
+                        this.errorHandler.logError('revenue-chart', error);
+                        this.showChartError(canvas.parentElement);
                     }
                 });
-                
-                this.charts.set('revenue', chart);
             }
 
             renderRegionChart() {
                 const canvas = document.getElementById('regionChart');
                 if (!canvas) return;
-                
-                const ctx = canvas.getContext('2d');
-                
-                if (this.charts.has('region')) {
-                    this.charts.get('region').destroy();
-                }
+
+                this.state.measurePerformance('region-chart', () => {
+                    try {
+                        const ctx = canvas.getContext('2d');
+                        
+                        if (this.charts.region) {
+                            this.charts.region.destroy();
+                        }
+
+                        const regionData = this.calculateRegionData();
+
+                        this.charts.region = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: regionData.labels,
+                                datasets: [{
+                                    data: regionData.data,
+                                    backgroundColor: regionData.colors,
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { position: 'bottom' },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: context => `${context.label}: ${this.formatCurrency(context.parsed)}`
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } catch (error) {
+                        this.errorHandler.logError('region-chart', error);
+                        this.showChartError(canvas.parentElement);
+                    }
+                });
+            }
+
+            calculateRegionData() {
+                const regionMap = {
+                    'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
+                    'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
+                    'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna'
+                    // ... other mappings
+                };
+
+                const regionColors = {
+                    'Lazio': '#A8DADC',
+                    'Sardegna': '#B8E6B8',
+                    'Marche': '#FFD3A5'
+                    // ... other colors
+                };
 
                 const regionData = {};
-                this.allData.forEach(agent => {
+                this.state.data.forEach(agent => {
                     agent.clienti_provincia.forEach(prov => {
-                        const regionName = this.getRegionFromProvince(prov.Provincia);
+                        const regionName = regionMap[prov.Provincia] || prov.Provincia;
                         regionData[regionName] = (regionData[regionName] || 0) + (prov.Fatturato || 0);
                     });
                 });
 
-                const labels = Object.keys(regionData);
-                const data = Object.values(regionData);
-                const colors = labels.map(label => this.getRegionColor(label));
+                return {
+                    labels: Object.keys(regionData),
+                    data: Object.values(regionData),
+                    colors: Object.keys(regionData).map(label => regionColors[label] || '#64748b')
+                };
+            }
 
-                const chart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels,
-                        datasets: [{
-                            data,
-                            backgroundColor: colors,
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom' },
-                            tooltip: {
-                                callbacks: {
-                                    label: context => `${context.label}: ${this.formatCurrency(context.parsed)}`
-                                }
-                            }
-                        }
+            renderPerformanceTable() {
+                const table = document.getElementById('performanceTable');
+                if (!table) return;
+
+                this.state.measurePerformance('performance-table', () => {
+                    try {
+                        const agentPerformance = this.state.data.map(agent => {
+                            const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                            const current = general?.Anno_Corrente || 0;
+                            const previous = general?.Anno_Precedente || 0;
+                            const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                            const clients = general?.Clienti_Anno_Corrente || 0;
+                            
+                            return { agent, current, previous, growth, clients };
+                        }).sort((a, b) => b.current - a.current);
+
+                        table.innerHTML = `
+                            <thead>
+                                <tr>
+                                    <th scope="col">Agente</th>
+                                    <th scope="col">Fatturato 2025</th>
+                                    <th scope="col">Crescita</th>
+                                    <th scope="col">Clienti</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${agentPerformance.map((item, index) => `
+                                    <tr class="table-row" role="row">
+                                        <td>
+                                            <strong>${this.escapeHtml(item.agent.nome)}</strong><br>
+                                            <small style="color: var(--text-muted);">${this.escapeHtml(item.agent.codice)}</small>
+                                        </td>
+                                        <td><strong>${this.formatCurrency(item.current)}</strong></td>
+                                        <td>
+                                            <span class="badge ${item.growth >= 0 ? 'success' : 'danger'}" role="status" aria-label="Crescita ${item.growth.toFixed(1)} percento">
+                                                ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%
+                                            </span>
+                                        </td>
+                                        <td>${item.clients}</td>
+                                        <td>
+                                            <span class="badge ${item.growth >= 10 ? 'success' : item.growth >= 0 ? 'warning' : 'danger'}" role="status">
+                                                ${item.growth >= 10 ? 'Ottimo' : item.growth >= 0 ? 'Buono' : 'Critico'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        `;
+                    } catch (error) {
+                        this.errorHandler.logError('performance-table', error);
+                        table.innerHTML = '<tbody><tr><td colspan="5" class="error-state">Errore nel caricamento della tabella</td></tr></tbody>';
                     }
                 });
-                
-                this.charts.set('region', chart);
             }
 
-            renderScatterChart() {
-                const canvas = document.getElementById('scatterChart');
-                if (!canvas) return;
-                
-                const ctx = canvas.getContext('2d');
-                
-                if (this.charts.has('scatter')) {
-                    this.charts.get('scatter').destroy();
-                }
+            switchTab(tabId) {
+                try {
+                    // Update ARIA attributes
+                    document.querySelectorAll('.tab').forEach(tab => {
+                        const isActive = tab.dataset.tab === tabId;
+                        tab.classList.toggle('active', isActive);
+                        tab.setAttribute('aria-selected', isActive);
+                        tab.setAttribute('tabindex', isActive ? '0' : '-1');
+                    });
 
-                const scatterData = this.allData.map(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    const current = general?.Anno_Corrente || 0;
-                    const clients = general?.Clienti_Anno_Corrente || 0;
-                    const previous = general?.Anno_Precedente || 0;
-                    const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                    
-                    const agentRegions = [...new Set(agent.clienti_provincia.map(prov => this.getRegionFromProvince(prov.Provincia)))];
-                    const mainRegion = agentRegions[0] || 'Generale';
-                    const color = this.getRegionColor(mainRegion);
-                    
-                    return {
-                        x: clients,
-                        y: current,
-                        label: agent.nome.split(' ')[0],
-                        backgroundColor: color + '80',
-                        borderColor: color,
-                        growth: growth,
-                        efficiency: clients > 0 ? current / clients : 0
-                    };
-                }).filter(item => item.x > 0 && item.y > 0);
+                    // Show/hide content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.style.display = 'none';
+                        content.setAttribute('aria-hidden', 'true');
+                    });
 
-                const chart = new Chart(ctx, {
-                    type: 'scatter',
-                    data: {
-                        datasets: [{
-                            label: 'Agenti',
-                            data: scatterData,
-                            backgroundColor: scatterData.map(item => item.backgroundColor),
-                            borderColor: scatterData.map(item => item.borderColor),
-                            borderWidth: 2,
-                            pointRadius: 8,
-                            pointHoverRadius: 12
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    title: function(context) {
-                                        const point = scatterData[context[0].dataIndex];
-                                        return point.label;
-                                    },
-                                    label: function(context) {
-                                        const point = scatterData[context.dataIndex];
-                                        return [
-                                            `Fatturato: ${dashboardManager.formatCurrency(point.y)}`,
-                                            `Clienti: ${point.x}`,
-                                            `Efficienza: ${dashboardManager.formatCurrency(point.efficiency)}/cliente`,
-                                            `Crescita: ${point.growth.toFixed(1)}%`
-                                        ];
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Numero Clienti'
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Fatturato (€)'
-                                },
-                                ticks: {
-                                    callback: value => this.formatCurrency(value)
-                                }
-                            }
-                        }
+                    const targetContent = document.getElementById(`${tabId}-content`);
+                    if (targetContent) {
+                        targetContent.style.display = 'block';
+                        targetContent.setAttribute('aria-hidden', 'false');
                     }
-                });
-                
-                this.charts.set('scatter', chart);
-            }
 
-            renderFunnelChart() {
-                const canvas = document.getElementById('funnelChart');
-                if (!canvas) return;
-                
-                const ctx = canvas.getContext('2d');
-                
-                if (this.charts.has('funnel')) {
-                    this.charts.get('funnel').destroy();
+                    this.currentTab = tabId;
+
+                    // Refresh charts after tab switch
+                    setTimeout(() => {
+                        Object.values(this.charts).forEach(chart => {
+                            if (chart && typeof chart.resize === 'function') {
+                                chart.resize();
+                            }
+                        });
+                    }, 100);
+
+                } catch (error) {
+                    this.errorHandler.logError('tab-switch', error);
                 }
-
-                let critici = 0, rischio = 0, buoni = 0, ottimi = 0, totalAgents = 0;
-                
-                this.allData.forEach(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    const current = general?.Anno_Corrente || 0;
-                    const target = general?.Obiettivo || 0;
-                    const progress = target > 0 ? (current / target * 100) : 0;
-
-                    const agentRegions = [...new Set(agent.clienti_provincia.map(prov => this.getRegionFromProvince(prov.Provincia)))];
-                    const mainRegion = agentRegions[0] || 'Generale';
-                    const regionColor = this.getRegionColor(mainRegion);
-
-                    return `
-                        <div class="agent-card">
-                            <div class="agent-header" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">
-                                <div class="agent-name">${agent.nome}</div>
-                                <div class="agent-code">${agent.codice}</div>
-                            </div>
-                            <div class="agent-body">
-                                <div class="agent-metrics">
-                                    <div class="agent-metric">
-                                        <div class="agent-metric-value">${this.formatCurrency(current)}</div>
-                                        <div class="agent-metric-label">Fatturato 2025</div>
-                                    </div>
-                                    <div class="agent-metric">
-                                        <div class="agent-metric-value">${clients}</div>
-                                        <div class="agent-metric-label">Clienti</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        ${growth >= 0 ? 
-                                            '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                            '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                        }
-                                    </svg>
-                                    ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
-                                </div>
-
-                                <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
-                                    <strong>Regioni:</strong> ${agentRegions.join(', ')}
-                                </div>
-
-                                ${target > 0 ? `
-                                    <div style="margin-top: 1rem;">
-                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
-                                            <span>Obiettivo</span>
-                                            <span>${Math.round(progress)}%</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
-                                        </div>
-                                        <div class="progress-text">
-                                            <span>${this.formatCurrency(current)}</span>
-                                            <span>${this.formatCurrency(target)}</span>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
             }
 
-            renderRegionCards() {
-                const regionGridElement = document.getElementById('regionGrid');
-                if (!regionGridElement) return;
-                
-                const filteredRegions = Array.from(this.availableRegions.values()).filter(region => {
-                    return this.selectedRegions.size === 0 || this.selectedRegions.has(region.name);
-                });
-
-                regionGridElement.innerHTML = filteredRegions.map(region => {
-                    const regionColor = this.getRegionColor(region.name);
-                    
-                    return `
-                        <div class="region-card">
-                            <div class="region-header">
-                                <div class="region-icon" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">${region.name.charAt(0)}</div>
-                                <div class="region-info">
-                                    <h3>${region.name}</h3>
-                                    <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
-                                </div>
-                            </div>
-                            <div class="region-stats">
-                                <div class="region-stat">
-                                    <div class="region-stat-value">${this.formatCurrency(region.revenue)}</div>
-                                    <div class="region-stat-label">Fatturato</div>
-                                </div>
-                                <div class="region-stat">
-                                    <div class="region-stat-value">${region.clients}</div>
-                                    <div class="region-stat-label">Clienti</div>
-                                </div>
-                            </div>
-                            <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
-                                Province: ${Array.from(region.provinces).join(', ')}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+            updateClock() {
+                const clockElement = document.getElementById('currentTime');
+                if (clockElement) {
+                    clockElement.textContent = new Date().toLocaleTimeString('it-IT', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+                }
             }
 
-            // Format currency
+            updateLoadingStatus(text, isError = false) {
+                const lastUpdateElement = document.getElementById('lastUpdate');
+                if (lastUpdateElement) {
+                    lastUpdateElement.textContent = text;
+                    lastUpdateElement.style.color = isError ? 'var(--danger)' : '';
+                }
+            }
+
+            hideLoading() {
+                const loadingElement = document.getElementById('loading');
+                const overviewElement = document.getElementById('overview-content');
+                
+                if (loadingElement) loadingElement.style.display = 'none';
+                if (overviewElement) overviewElement.style.display = 'block';
+            }
+
+            showChartError(container) {
+                container.innerHTML = `
+                    <div class="error-state" role="alert">
+                        <h3>Errore nel caricamento del grafico</h3>
+                        <p>Si è verificato un problema durante il caricamento dei dati.</p>
+                        <button class="retry-btn" onclick="window.location.reload()">Ricarica Pagina</button>
+                    </div>
+                `;
+            }
+
+            startAutoUpdate() {
+                this.updateInterval = setInterval(() => {
+                    if (!document.hidden) {
+                        this.fetchData();
+                    }
+                }, CONFIG.UPDATE_INTERVAL);
+            }
+
+            pauseUpdates() {
+                if (this.updateInterval) {
+                    clearInterval(this.updateInterval);
+                    this.updateInterval = null;
+                }
+            }
+
+            resumeUpdates() {
+                if (!this.updateInterval) {
+                    this.startAutoUpdate();
+                }
+            }
+
             formatCurrency(value) {
+                if (typeof value !== 'number' || isNaN(value)) return '€0';
                 if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
                 if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
                 return `€${value.toLocaleString('it-IT')}`;
             }
 
-            // Destroy charts safely
-            destroyCharts() {
-                this.charts.forEach((chart, key) => {
-                    try {
-                        if (chart && typeof chart.destroy === 'function') {
-                            chart.destroy();
-                        }
-                    } catch (error) {
-                        console.warn(`Errore distruzione chart ${key}:`, error);
-                    }
-                });
-                this.charts.clear();
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
             }
 
-            // Cleanup on page unload
             cleanup() {
-                this.cleanupEventListeners();
-                this.destroyCharts();
+                this.pauseUpdates();
+                Object.values(this.charts).forEach(chart => {
+                    if (chart && typeof chart.destroy === 'function') {
+                        chart.destroy();
+                    }
+                });
+                this.csvProcessor.destroy();
+                this.lazyLoader.destroy();
+                this.cache.clear();
             }
         }
 
-        // Initialize dashboard when DOM is ready
-        let dashboardManager = null;
-
+        // Initialize Dashboard when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             try {
-                dashboardManager = new DashboardManager();
+                window.dashboard = new Dashboard();
             } catch (error) {
-                console.error('Errore inizializzazione dashboard:', error);
+                console.error('Failed to initialize dashboard:', error);
                 
-                const errorContainer = document.getElementById('errorContainer');
-                if (errorContainer) {
-                    errorContainer.textContent = `Errore critico: ${error.message}`;
-                    errorContainer.style.display = 'block';
-                }
+                // Show fallback UI
+                document.body.innerHTML = `
+                    <div class="error-boundary" role="alert">
+                        <h1>Errore di inizializzazione</h1>
+                        <p>Si è verificato un errore durante l'avvio del dashboard.</p>
+                        <button class="retry-btn" onclick="window.location.reload()">Ricarica Pagina</button>
+                    </div>
+                `;
             }
         });
 
         // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
-            if (dashboardManager) {
-                dashboardManager.cleanup();
+            if (window.dashboard) {
+                window.dashboard.cleanup();
             }
-        });
-
-        // Global error handlers
-        window.addEventListener('error', (event) => {
-            console.error('Errore globale:', event.error);
-        });
-
-        window.addEventListener('unhandledrejection', (event) => {
-            console.error('Promise rejection non gestita:', event.reason);
         });
     </script>
 </body>
-</html>?.Obiettivo || 0;
-                    
-                    if (target > 0) {
-                        totalAgents++;
-                        const achievement = (current / target) * 100;
-                        
-                        if (achievement >= 100) ottimi++;
-                        else if (achievement >= 80) buoni++;
-                        else if (achievement >= 60) rischio++;
-                        else critici++;
-                    }
-                });
-
-                const funnelData = [
-                    { label: 'Sotto 60%', value: critici, color: '#FFB3BA', percentage: (critici/totalAgents*100).toFixed(1) },
-                    { label: '60-79%', value: rischio, color: '#FFD3A5', percentage: (rischio/totalAgents*100).toFixed(1) },
-                    { label: '80-99%', value: buoni, color: '#A5F3FC', percentage: (buoni/totalAgents*100).toFixed(1) },
-                    { label: '100%+', value: ottimi, color: '#A8E6A1', percentage: (ottimi/totalAgents*100).toFixed(1) }
-                ];
-
-                const chart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: funnelData.map(item => `${item.label} (${item.percentage}%)`),
-                        datasets: [{
-                            data: funnelData.map(item => item.value),
-                            backgroundColor: funnelData.map(item => item.color),
-                            borderWidth: 0,
-                            cutout: '50%'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { 
-                                position: 'bottom',
-                                labels: {
-                                    usePointStyle: true,
-                                    padding: 15
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const item = funnelData[context.dataIndex];
-                                        return `${item.label}: ${item.value} agenti (${item.percentage}%)`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                this.charts.set('funnel', chart);
-            }
-
-            renderPerformanceTable() {
-                const tableElement = document.getElementById('performanceTable');
-                if (!tableElement) return;
-                
-                const agentPerformance = this.allData.map(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    const current = general?.Anno_Corrente || 0;
-                    const previous = general?.Anno_Precedente || 0;
-                    const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                    const clients = general?.Clienti_Anno_Corrente || 0;
-                    
-                    return { agent, current, previous, growth, clients };
-                }).sort((a, b) => b.current - a.current);
-
-                tableElement.innerHTML = `
-                    <thead>
-                        <tr>
-                            <th>Agente</th>
-                            <th>Fatturato 2025</th>
-                            <th>Crescita</th>
-                            <th>Clienti</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${agentPerformance.map(item => `
-                            <tr class="table-row">
-                                <td>
-                                    <strong>${item.agent.nome}</strong><br>
-                                    <small style="color: var(--text-muted);">${item.agent.codice}</small>
-                                </td>
-                                <td><strong>${this.formatCurrency(item.current)}</strong></td>
-                                <td>
-                                    <span class="badge ${item.growth >= 0 ? 'success' : 'danger'}">
-                                        ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%
-                                    </span>
-                                </td>
-                                <td>${item.clients}</td>
-                                <td>
-                                    <span class="badge ${item.growth >= 10 ? 'success' : item.growth >= 0 ? 'warning' : 'danger'}">
-                                        ${item.growth >= 10 ? 'Ottimo' : item.growth >= 0 ? 'Buono' : 'Critico'}
-                                    </span>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                `;
-            }
-
-            renderAgentCards() {
-                const agentGridElement = document.getElementById('agentGrid');
-                if (!agentGridElement) return;
-                
-                const filteredAgents = this.allData.filter(agent => {
-                    return this.selectedAgents.size === 0 || this.selectedAgents.has(agent.codice);
-                });
-                
-                agentGridElement.innerHTML = filteredAgents.map(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    const current = general?.Anno_Corrente || 0;
-                    const previous = general?.Anno_Precedente || 0;
-                    const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                    const clients = general?.Clienti_Anno_Corrente || 0;
-                    const target = general
+</html>
