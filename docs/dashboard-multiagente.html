@@ -1,4 +1,376 @@
-<!DOCTYPE html>
+function renderFullscreenChart(chartType) {
+            const canvas = document.getElementById('fullscreenChartCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (fullscreenChart) {
+                fullscreenChart.destroy();
+            }
+            
+            switch(chartType) {
+                case 'revenue':
+                    renderFullscreenRevenueChart(ctx);
+                    break;
+                case 'region':
+                    renderFullscreenRegionChart(ctx);
+                    break;
+                case 'scatter':
+                    renderFullscreenScatterChart(ctx);
+                    break;
+                case 'funnel':
+                    renderFullscreenFunnelChart(ctx);
+                    break;
+                case 'boxplot':
+                    renderFullscreenBoxplotChart(ctx);
+                    break;
+            }
+        }
+
+        function renderFullscreenRevenueChart(ctx) {
+            const agentData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                return {
+                    name: agent.nome,
+                    shortName: agent.nome.split(' ')[0],
+                    current: general?.Anno_Corrente || 0,
+                    previous: general?.Anno_Precedente || 0,
+                    codice: agent.codice,
+                    clients: general?.Clienti_Anno_Corrente || 0
+                };
+            }).sort((a, b) => b.current - a.current);
+
+            currentFullscreenData = agentData;
+
+            fullscreenChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agentData.map(a => a.shortName),
+                    datasets: [
+                        {
+                            label: '2024',
+                            data: agentData.map(a => a.previous),
+                            backgroundColor: '#cbd5e1',
+                            borderRadius: 4
+                        },
+                        {
+                            label: '2025',
+                            data: agentData.map(a => a.current),
+                            backgroundColor: '#2563eb',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                callback: value => formatCurrency(value),
+                                font: { size: 14 }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Fatturato (€)',
+                                font: { size: 16, weight: 'bold' }
+                            }
+                        },
+                        x: {
+                            ticks: { font: { size: 14 } },
+                            title: {
+                                display: true,
+                                text: 'Agenti',
+                                font: { size: 16, weight: 'bold' }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { 
+                            position: 'top',
+                            labels: { font: { size: 16 } }
+                        },
+                        tooltip: {
+                            titleFont: { size: 16 },
+                            bodyFont: { size: 14 },
+                            callbacks: {
+                                title: function(context) {
+                                    const dataIndex = context[0].dataIndex;
+                                    return agentData[dataIndex].name;
+                                },
+                                label: function(context) {
+                                    const agent = agentData[context.dataIndex];
+                                    return [
+                                        `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`,
+                                        `Codice: ${agent.codice}`,
+                                        `Clienti: ${agent.clients}`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderFullscreenRegionChart(ctx) {
+            const regionData = {};
+            const regionDetails = {};
+            
+            allData.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    const regionName = getRegionFromProvince(prov.Provincia);
+                    if (!regionData[regionName]) {
+                        regionData[regionName] = 0;
+                        regionDetails[regionName] = { 
+                            agents: new Set(), 
+                            provinces: new Set(),
+                            clients: 0 
+                        };
+                    }
+                    regionData[regionName] += (prov.Fatturato || 0);
+                    regionDetails[regionName].agents.add(agent.nome);
+                    regionDetails[regionName].provinces.add(prov.Provincia);
+                    regionDetails[regionName].clients += (prov.Clienti_Serviti || 0);
+                });
+            });
+
+            const sortedRegions = Object.entries(regionData)
+                .sort(([,a], [,b]) => b - a)
+                .map(([name, value]) => ({
+                    name,
+                    value,
+                    details: regionDetails[name]
+                }));
+
+            currentFullscreenData = sortedRegions;
+
+            const labels = sortedRegions.map(r => r.name);
+            const data = sortedRegions.map(r => r.value);
+            const colors = labels.map(label => getRegionColor(label));
+
+            fullscreenChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: colors,
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'right',
+                            labels: { 
+                                font: { size: 14 },
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            titleFont: { size: 16 },
+                            bodyFont: { size: 14 },
+                            callbacks: {
+                                label: function(context) {
+                                    const region = sortedRegions[context.dataIndex];
+                                    const percentage = ((region.value / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                                    return [
+                                        `${region.name}: ${formatCurrency(region.value)} (${percentage}%)`,
+                                        `Agenti: ${region.details.agents.size}`,
+                                        `Province: ${region.details.provinces.size}`,
+                                        `Clienti: ${region.details.clients}`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderFullscreenScatterChart(ctx) {
+            const scatterData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                
+                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                const mainRegion = agentRegions[0] || 'Generale';
+                const color = getRegionColor(mainRegion);
+                
+                return {
+                    x: clients,
+                    y: current,
+                    label: agent.nome,
+                    backgroundColor: color + '80',
+                    borderColor: color,
+                    growth: growth,
+                    efficiency: clients > 0 ? current / clients : 0,
+                    codice: agent.codice,
+                    region: mainRegion
+                };
+            }).filter(item => item.x > 0 && item.y > 0);
+
+            currentFullscreenData = scatterData;
+
+            fullscreenChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Agenti',
+                        data: scatterData,
+                        backgroundColor: scatterData.map(item => item.backgroundColor),
+                        borderColor: scatterData.map(item => item.borderColor),
+                        borderWidth: 3,
+                        pointRadius: 12,
+                        pointHoverRadius: 16
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            titleFont: { size: 16 },
+                            bodyFont: { size: 14 },
+                            callbacks: {
+                                title: function(context) {
+                                    const point = scatterData[context[0].dataIndex];
+                                    return point.label;
+                                },
+                                label: function(context) {
+                                    const point = scatterData[context.dataIndex];
+                                    return [
+                                        `Codice: ${point.codice}`,
+                                        `Regione: ${point.region}`,
+                                        `Fatturato: ${formatCurrency(point.y)}`,
+                                        `Clienti: ${point.x}`,
+                                        `Efficienza: ${formatCurrency(point.efficiency)}/cliente`,
+                                        `Crescita: ${point.growth.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Numero Clienti',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: { font: { size: 14 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Fatturato (€)',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            ticks: {
+                                callback: value => formatCurrency(value),
+                                font: { size: 14 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderFullscreenFunnelChart(ctx) {
+            let critici = 0, rischio = 0, buoni = 0, ottimi = 0, totalAgents = 0;
+            const agentsByCategory = { critici: [], rischio: [], buoni: [], ottimi: [] };
+            
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const target = general?.Obiettivo || 0;
+                
+                if (current > 0) {
+                    totalAgents++;
+                    
+                    let category = 'critici';
+                    if (target > 0) {
+                        const achievement = (current / target) * 100;
+                        if (achievement >= 100) { ottimi++; category = 'ottimi'; }
+                        else if (achievement >= 80) { buoni++; category = 'buoni'; }
+                        else if (achievement >= 60) { rischio++; category = 'rischio'; }
+                        else { critici++; category = 'critici'; }
+                    } else {
+                        const previous = general?.Anno_Precedente || 0;
+                        const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                        
+                        if (growth >= 20) { ottimi++; category = 'ottimi'; }
+                        else if (growth >= 10) { buoni++; category = 'buoni'; }
+                        else if (growth >= 0) { rischio++; category = 'rischio'; }
+                        else { critici++; category = 'critici'; }
+                    }
+                    
+                    agentsByCategory[category].push({
+                        nome: agent.nome,
+                        codice: agent.codice,
+                        current: current,
+                        target: target
+                    });
+                }
+            });
+
+            if (totalAgents === 0) {
+                totalAgents = allData.length;
+                critici = Math.floor(totalAgents * 0.2);
+                rischio = Math.floor(totalAgents * 0.3);
+                buoni = Math.floor(totalAgents * 0.3);
+                ottimi = totalAgents - critici - rischio - buoni;
+            }
+
+            const funnelData = [
+                { 
+                    label: 'Critici', 
+                    value: critici, 
+                    color: '#dc2626', 
+                    percentage: totalAgents > 0 ? (critici/totalAgents*100).toFixed(1) : '0',
+                    agents: agentsByCategory.critici
+                },
+                { 
+                    label: 'A Rischio', 
+                    value: rischio, 
+                    color: '#f59e0b', 
+                    percentage: totalAgents > 0 ? (rischio/totalAgents*100).toFixed(1) : '0',
+                    agents: agentsByCategory.rischio
+                },
+                { 
+                    label: 'Buoni', 
+                    value: buoni, 
+                    color: '#06b6d4', 
+                    percentage: totalAgents > 0 ? (buoni/totalAgents*100).toFixed(1) : '0',
+                    agents: agentsByCategory.buoni
+                },
+                { 
+                    label: 'Eccellenti', 
+                    value: ottimi, 
+                    color: '#10b981', 
+                    percentage: totalAgents > 0 ? (ottimi/totalAgents*100).toFixed(1) : '0',
+                    agents: agentsByCategory.ottimi
+                }
+            ];
+
+            currentFullscreenData = funnelData;
+
+            fullscreenChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: funnelData<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -173,6 +545,173 @@
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
+        }
+
+        .chart-fullscreen-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s ease;
+            z-index: 10;
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover .chart-fullscreen-btn {
+            opacity: 1;
+        }
+
+        .chart-fullscreen-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .fullscreen-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .fullscreen-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .fullscreen-header {
+            background: var(--surface);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .fullscreen-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .fullscreen-close {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .fullscreen-close:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .fullscreen-content {
+            flex: 1;
+            background: var(--surface);
+            margin: 1rem;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fullscreen-chart-container {
+            width: 100%;
+            height: calc(100vh - 200px);
+            position: relative;
+        }
+
+        .fullscreen-controls {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 20;
+        }
+
+        .fullscreen-control-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .fullscreen-control-btn:hover,
+        .fullscreen-control-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .agent-labels-list {
+            position: absolute;
+            top: 4rem;
+            left: 1rem;
+            right: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 30;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .agent-labels-list.show {
+            display: block;
+        }
+
+        .agent-label-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+
+        .agent-label-item:last-child {
+            border-bottom: none;
+        }
+
+        .agent-label-name {
+            font-weight: 500;
+        }
+
+        .agent-label-value {
+            color: var(--text-muted);
+            font-size: 0.75rem;
         }
 
         .card {
@@ -985,7 +1524,6 @@
 
         @media (max-width: 1024px) {
             .charts-grid { grid-template-columns: 1fr; }
-            .charts-row { grid-template-columns: 1fr; }
             .main-content, .header { padding: 1rem; }
             .performance-section { grid-template-columns: 1fr; }
             .region-detail-modal { max-width: 95%; }
@@ -1101,7 +1639,15 @@
                                 Performance Agenti
                             </h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="position: relative;">
+                            <button class="chart-fullscreen-btn" onclick="openFullscreenChart('revenue', 'Performance Agenti')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+                                    <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+                                    <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+                                    <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+                                </svg>
+                            </button>
                             <div class="chart-container large">
                                 <canvas id="revenueChart"></canvas>
                             </div>
@@ -1117,7 +1663,15 @@
                                 Distribuzione Regionale
                             </h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="position: relative;">
+                            <button class="chart-fullscreen-btn" onclick="openFullscreenChart('region', 'Distribuzione Regionale')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+                                    <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+                                    <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+                                    <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+                                </svg>
+                            </button>
                             <div class="chart-container">
                                 <canvas id="regionChart"></canvas>
                             </div>
@@ -1139,7 +1693,15 @@
                                 Efficienza Commerciale
                             </h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="position: relative;">
+                            <button class="chart-fullscreen-btn" onclick="openFullscreenChart('scatter', 'Efficienza Commerciale')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+                                    <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+                                    <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+                                    <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+                                </svg>
+                            </button>
                             <div class="chart-container">
                                 <canvas id="scatterChart"></canvas>
                             </div>
@@ -1155,7 +1717,15 @@
                                 Funnel Obiettivi
                             </h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="position: relative;">
+                            <button class="chart-fullscreen-btn" onclick="openFullscreenChart('funnel', 'Funnel Obiettivi')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+                                    <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+                                    <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+                                    <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+                                </svg>
+                            </button>
                             <div class="chart-container">
                                 <canvas id="funnelChart"></canvas>
                             </div>
@@ -1172,7 +1742,15 @@
                                 Distribuzione Performance
                             </h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="position: relative;">
+                            <button class="chart-fullscreen-btn" onclick="openFullscreenChart('boxplot', 'Distribuzione Performance')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+                                    <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+                                    <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+                                    <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+                                </svg>
+                            </button>
                             <div class="chart-container">
                                 <canvas id="boxplotChart"></canvas>
                             </div>
@@ -1381,6 +1959,61 @@
         </div>
     </div>
 
+    <!-- Modal Fullscreen per Grafici -->
+    <div class="fullscreen-modal" id="fullscreenModal">
+        <div class="fullscreen-header">
+            <h2 class="fullscreen-title" id="fullscreenTitle">Grafico</h2>
+            <button class="fullscreen-close" onclick="closeFullscreenChart()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Chiudi
+            </button>
+        </div>
+        <div class="fullscreen-content">
+            <div class="fullscreen-controls">
+                <button class="fullscreen-control-btn" id="showDataBtn" onclick="toggleAgentLabels()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11H1l6-6 6 6Z"/>
+                        <path d="M15 11h8l-6-6-6 6Z"/>
+                    </svg>
+                    Mostra Dati
+                </button>
+                <button class="fullscreen-control-btn" id="zoomBtn" onclick="toggleZoom()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                        <path d="M11 8v6"/>
+                        <path d="M8 11h6"/>
+                    </svg>
+                    Zoom
+                </button>
+                <button class="fullscreen-control-btn" id="exportBtn" onclick="exportChart()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7,10 12,15 17,10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Esporta
+                </button>
+            </div>
+            
+            <div class="agent-labels-list" id="agentLabelsList">
+                <div id="agentLabelsContent">
+                    <!-- Contenuto dinamico -->
+                </div>
+            </div>
+            
+            <div class="fullscreen-chart-container">
+                <canvas id="fullscreenChartCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
+    <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmf7cw2ev002p1032fkvqlkup'></zapier-interfaces-chatbot-embed>
+
     <script>
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
         
@@ -1400,6 +2033,13 @@
         let currentRegionData = null;
         let currentRegionTab = 'overview';
         let regionDetailCharts = {};
+
+        // Variabili per fullscreen modal
+        let fullscreenChart = null;
+        let currentFullscreenType = null;
+        let currentFullscreenData = null;
+        let showingAgentLabels = false;
+        let chartZoomed = false;
 
         // Mappa colori regioni
         const regionColors = {
@@ -1431,1727 +2071,4 @@
             if (typeof value !== 'string') return 0;
             
             let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
-            if (!clean || clean === '') return 0;
-            
-            return parseFloat(clean) || 0;
-        }
-
-        function updateClock() {
-            const clockElement = document.getElementById('currentTime');
-            if (clockElement) {
-                clockElement.textContent = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-            }
-        }
-
-        function initializeTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            
-            tabs.forEach(tab => {
-                if (tab && typeof tab.addEventListener === 'function') {
-                    tab.addEventListener('click', () => {
-                        const tabId = tab.dataset.tab;
-                        
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        
-                        document.querySelectorAll('.tab-content').forEach(content => {
-                            content.style.display = 'none';
-                        });
-                        
-                        const targetContent = document.getElementById(`${tabId}-content`);
-                        if (targetContent) targetContent.style.display = 'block';
-                        
-                        currentTab = tabId;
-                        
-                        setTimeout(() => {
-                            Object.values(charts).forEach(chart => {
-                                if (chart && typeof chart.resize === 'function') {
-                                    chart.resize();
-                                }
-                            });
-                        }, 100);
-                    });
-                }
-            });
-        }
-
-        async function loadData() {
-            try {
-                const lastUpdateElement = document.getElementById('lastUpdate');
-                if (lastUpdateElement) {
-                    lastUpdateElement.textContent = 'Caricamento...';
-                }
-                
-                const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const csvText = await response.text();
-                allData = parseCSV(csvText);
-                
-                if (lastUpdateElement) {
-                    lastUpdateElement.textContent = `Aggiornato alle ${new Date().toLocaleTimeString('it-IT')}`;
-                }
-                
-                renderDashboard();
-                
-            } catch (error) {
-                console.error('Errore caricamento:', error);
-                const lastUpdateElement = document.getElementById('lastUpdate');
-                if (lastUpdateElement) {
-                    lastUpdateElement.textContent = 'Errore caricamento';
-                    lastUpdateElement.style.color = 'var(--danger)';
-                }
-            }
-        }
-
-        function parseCSV(csvText) {
-            const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
-            const agents = [];
-
-            sections.forEach(section => {
-                if (!section.trim()) return;
-
-                const agent = {
-                    codice: '', nome: '', periodo: '',
-                    obiettivi: [], clienti_provincia: [], vendite_cliente: [],
-                    categoria_riepilogo: [], ripartizione: [], totali: []
-                };
-
-                const lines = section.split('\n');
-                let headers = [];
-
-                lines.forEach(line => {
-                    line = line.trim();
-                    if (!line || line.startsWith('##')) return;
-
-                    if (line.includes('Codice Agente:')) {
-                        agent.codice = line.split(':')[1]?.trim() || '';
-                    } else if (line.includes('Ragione Sociale:')) {
-                        agent.nome = line.split(':')[1]?.trim() || '';
-                    } else if (line.includes('Periodo:')) {
-                        agent.periodo = line.split(':')[1]?.trim() || '';
-                    }
-                    
-                    if (line.includes('Tipo_Dato,')) {
-                        headers = line.split(',').map(h => h.trim());
-                        return;
-                    }
-
-                    if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
-                        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-                        if (values.length >= headers.length) {
-                            const row = {};
-                            headers.forEach((header, index) => {
-                                let value = values[index] || '';
-                                
-                                if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
-                                     'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
-                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
-                                    value = parseNumber(value);
-                                }
-                                row[header] = value;
-                            });
-
-                            switch (row.Tipo_Dato) {
-                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
-                                case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
-                                case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
-                                case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
-                                case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
-                                case 'TOTALE': agent.totali.push(row); break;
-                            }
-                        }
-                    }
-                });
-
-                if (agent.codice && agent.nome) {
-                    agents.push(agent);
-                }
-            });
-
-            return agents;
-        }
-
-        function getRegionFromProvince(prov) {
-            const map = {
-                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
-                'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
-                'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
-                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'PC': 'Emilia-Romagna', 'BO': 'Emilia-Romagna', 'MO': 'Emilia-Romagna', 'RE': 'Emilia-Romagna', 'PR': 'Emilia-Romagna', 'FE': 'Emilia-Romagna', 'FC': 'Emilia-Romagna',
-                'CR': 'Lombardia', 'LO': 'Lombardia', 'MI': 'Lombardia', 'BG': 'Lombardia', 'BS': 'Lombardia', 'CO': 'Lombardia', 'MN': 'Lombardia', 'PV': 'Lombardia', 'SO': 'Lombardia', 'VA': 'Lombardia', 'LC': 'Lombardia', 'MB': 'Lombardia',
-                'TO': 'Piemonte', 'AL': 'Piemonte', 'AT': 'Piemonte', 'BI': 'Piemonte', 'CN': 'Piemonte', 'NO': 'Piemonte', 'VB': 'Piemonte', 'VC': 'Piemonte',
-                'VE': 'Veneto', 'VR': 'Veneto', 'VI': 'Veneto', 'PD': 'Veneto', 'TV': 'Veneto', 'BL': 'Veneto', 'RO': 'Veneto',
-                'FI': 'Toscana', 'PI': 'Toscana', 'SI': 'Toscana', 'AR': 'Toscana', 'GR': 'Toscana', 'LI': 'Toscana', 'LU': 'Toscana', 'MS': 'Toscana', 'PT': 'Toscana', 'PO': 'Toscana',
-                'NA': 'Campania', 'AV': 'Campania', 'BN': 'Campania', 'CE': 'Campania', 'SA': 'Campania',
-                'PA': 'Sicilia', 'CT': 'Sicilia', 'ME': 'Sicilia', 'AG': 'Sicilia', 'CL': 'Sicilia', 'EN': 'Sicilia', 'RG': 'Sicilia', 'SR': 'Sicilia', 'TP': 'Sicilia',
-                'BA': 'Puglia', 'BR': 'Puglia', 'FG': 'Puglia', 'LE': 'Puglia', 'TA': 'Puglia', 'BT': 'Puglia',
-                'CZ': 'Calabria', 'CS': 'Calabria', 'KR': 'Calabria', 'RC': 'Calabria', 'VV': 'Calabria',
-                'GE': 'Liguria', 'IM': 'Liguria', 'LA': 'Liguria', 'SV': 'Liguria',
-                'AQ': 'Abruzzo', 'CH': 'Abruzzo', 'PE': 'Abruzzo', 'TE': 'Abruzzo',
-                'CB': 'Molise', 'IS': 'Molise',
-                'MT': 'Basilicata', 'PZ': 'Basilicata',
-                'PG': 'Umbria', 'TR': 'Umbria',
-                'AO': 'Valle d\'Aosta',
-                'TN': 'Trentino-Alto Adige', 'BZ': 'Trentino-Alto Adige',
-                'UD': 'Friuli-Venezia Giulia', 'PN': 'Friuli-Venezia Giulia', 'GO': 'Friuli-Venezia Giulia', 'TS': 'Friuli-Venezia Giulia',
-                'ALB': 'Estero'
-            };
-            return map[prov] || prov;
-        }
-
-        function getRegionColor(regionName) {
-            return regionColors[regionName] || '#64748b';
-        }
-
-        function populateAvailableRegions() {
-            availableRegions.clear();
-            
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    
-                    if (!availableRegions.has(regionName)) {
-                        availableRegions.set(regionName, {
-                            name: regionName,
-                            revenue: 0,
-                            clients: 0,
-                            agents: new Set(),
-                            provinces: new Set()
-                        });
-                    }
-                    
-                    const region = availableRegions.get(regionName);
-                    region.revenue += prov.Fatturato || 0;
-                    region.clients += prov.Clienti_Serviti || 0;
-                    region.agents.add(agent.codice);
-                    region.provinces.add(prov.Provincia);
-                });
-            });
-        }
-
-        function populateAvailableAgents() {
-            availableAgents = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                
-                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                
-                let status = 'Critico';
-                if (growth >= 10) status = 'Ottimo';
-                else if (growth >= 0) status = 'Buono';
-                
-                return {
-                    codice: agent.codice,
-                    nome: agent.nome,
-                    current,
-                    previous,
-                    growth,
-                    clients,
-                    status,
-                    regions
-                };
-            }).sort((a, b) => b.current - a.current);
-        }
-
-        function updateFilterButtonText() {
-            const filterCount = document.getElementById('filterCount');
-            if (!filterCount) return;
-            
-            const totalRegions = availableRegions.size;
-            
-            if (selectedRegions.size === 0) {
-                filterCount.textContent = 'Tutte';
-            } else if (selectedRegions.size === totalRegions) {
-                filterCount.textContent = 'Tutte';
-            } else {
-                filterCount.textContent = `${selectedRegions.size}/${totalRegions}`;
-            }
-        }
-
-        function updateAgentFilterButtonText() {
-            const filterCount = document.getElementById('agentFilterCount');
-            if (!filterCount) return;
-            
-            const totalAgents = availableAgents.length;
-            
-            if (selectedAgents.size === 0) {
-                filterCount.textContent = 'Tutti';
-            } else if (selectedAgents.size === totalAgents) {
-                filterCount.textContent = 'Tutti';
-            } else {
-                filterCount.textContent = `${selectedAgents.size}/${totalAgents}`;
-            }
-        }
-
-        function openRegionFilterModal() {
-            tempSelectedRegions = new Set(selectedRegions);
-            
-            const filterList = document.getElementById('regionFilterList');
-            if (!filterList) return;
-            
-            filterList.innerHTML = '';
-            
-            Array.from(availableRegions.values())
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .forEach(region => {
-                    const isSelected = tempSelectedRegions.has(region.name);
-                    
-                    const item = document.createElement('div');
-                    item.className = 'region-filter-item';
-                    item.innerHTML = `
-                        <input type="checkbox" 
-                               class="region-checkbox" 
-                               id="region-${region.name}" 
-                               ${isSelected ? 'checked' : ''}
-                               data-region="${region.name}">
-                        <div class="region-filter-info">
-                            <div class="region-filter-name">${region.name}</div>
-                            <div class="region-filter-stats">
-                                ${formatCurrency(region.revenue)} • ${region.clients} clienti • ${region.agents.size} agenti
-                            </div>
-                        </div>
-                    `;
-                    
-                    const checkbox = item.querySelector('.region-checkbox');
-                    if (checkbox) {
-                        checkbox.addEventListener('change', (e) => {
-                            if (e.target.checked) {
-                                tempSelectedRegions.add(region.name);
-                            } else {
-                                tempSelectedRegions.delete(region.name);
-                            }
-                        });
-                    }
-                    
-                    filterList.appendChild(item);
-                });
-            
-            const modal = document.getElementById('regionFilterModal');
-            if (modal) {
-                modal.classList.add('show');
-            }
-        }
-
-        function closeRegionFilterModal() {
-            const modal = document.getElementById('regionFilterModal');
-            if (modal) {
-                modal.classList.remove('show');
-            }
-        }
-
-        function applyRegionFilter() {
-            selectedRegions = new Set(tempSelectedRegions);
-            renderRegionCards();
-            updateFilterButtonText();
-            closeRegionFilterModal();
-        }
-
-        function selectAllRegions() {
-            tempSelectedRegions.clear();
-            availableRegions.forEach((region, name) => {
-                tempSelectedRegions.add(name);
-            });
-            
-            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
-                checkbox.checked = true;
-            });
-        }
-
-        function deselectAllRegions() {
-            tempSelectedRegions.clear();
-            
-            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-        }
-
-        function openAgentFilterModal() {
-            tempSelectedAgents = new Set(selectedAgents);
-            
-            const filterList = document.getElementById('agentFilterList');
-            if (!filterList) return;
-            
-            filterList.innerHTML = '';
-            
-            availableAgents.forEach((agent, index) => {
-                const isSelected = tempSelectedAgents.has(agent.codice);
-                
-                const item = document.createElement('div');
-                item.className = 'region-filter-item';
-                item.innerHTML = `
-                    <input type="checkbox" 
-                           class="region-checkbox" 
-                           id="agent-${agent.codice}" 
-                           ${isSelected ? 'checked' : ''}
-                           data-agent="${agent.codice}">
-                    <div class="region-filter-info">
-                        <div class="region-filter-name">${agent.nome}</div>
-                        <div class="region-filter-stats">
-                            ${formatCurrency(agent.current)} • ${agent.clients} clienti • ${agent.growth.toFixed(1)}% crescita
-                        </div>
-                        <div class="region-filter-stats">
-                            <span class="badge ${agent.growth >= 10 ? 'success' : agent.growth >= 0 ? 'warning' : 'danger'}" style="margin-top: 0.25rem;">
-                                ${agent.status}
-                            </span>
-                            <span style="font-size: 0.65rem; margin-left: 0.5rem; color: var(--text-muted);">
-                                ${agent.regions.join(', ')}
-                            </span>
-                        </div>
-                    </div>
-                `;
-                
-                const checkbox = item.querySelector('.region-checkbox');
-                if (checkbox) {
-                    checkbox.addEventListener('change', (e) => {
-                        if (e.target.checked) {
-                            tempSelectedAgents.add(agent.codice);
-                        } else {
-                            tempSelectedAgents.delete(agent.codice);
-                        }
-                    });
-                }
-                
-                filterList.appendChild(item);
-            });
-            
-            const modal = document.getElementById('agentFilterModal');
-            if (modal) {
-                modal.classList.add('show');
-            }
-        }
-
-        function closeAgentFilterModal() {
-            const modal = document.getElementById('agentFilterModal');
-            if (modal) {
-                modal.classList.remove('show');
-            }
-        }
-
-        function applyAgentFilter() {
-            selectedAgents = new Set(tempSelectedAgents);
-            renderAgentCards();
-            updateAgentFilterButtonText();
-            closeAgentFilterModal();
-        }
-
-        function selectAllAgents() {
-            tempSelectedAgents.clear();
-            availableAgents.forEach(agent => {
-                tempSelectedAgents.add(agent.codice);
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                checkbox.checked = true;
-            });
-        }
-
-        function deselectAllAgents() {
-            tempSelectedAgents.clear();
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-        }
-
-        function selectTopPerformers() {
-            tempSelectedAgents.clear();
-            
-            availableAgents.forEach(agent => {
-                if (agent.growth >= 10) {
-                    tempSelectedAgents.add(agent.codice);
-                }
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                const agentCode = checkbox.dataset.agent;
-                const agent = availableAgents.find(a => a.codice === agentCode);
-                checkbox.checked = agent && agent.growth >= 10;
-            });
-        }
-
-        function selectLowPerformers() {
-            tempSelectedAgents.clear();
-            
-            availableAgents.forEach(agent => {
-                if (agent.growth < 0) {
-                    tempSelectedAgents.add(agent.codice);
-                }
-            });
-            
-            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
-                const agentCode = checkbox.dataset.agent;
-                const agent = availableAgents.find(a => a.codice === agentCode);
-                checkbox.checked = agent && agent.growth < 0;
-            });
-        }
-
-        function initializeRegionFilter() {
-            const regionFilterBtn = document.getElementById('regionFilterBtn');
-            const closeRegionFilter = document.getElementById('closeRegionFilter');
-            const cancelRegionFilter = document.getElementById('cancelRegionFilter');
-            const applyRegionFilterBtn = document.getElementById('applyRegionFilter');
-            const selectAllRegionsBtn = document.getElementById('selectAllRegions');
-            const deselectAllRegionsBtn = document.getElementById('deselectAllRegions');
-            const regionFilterModal = document.getElementById('regionFilterModal');
-
-            if (regionFilterBtn) {
-                regionFilterBtn.addEventListener('click', openRegionFilterModal);
-            }
-            
-            if (closeRegionFilter) {
-                closeRegionFilter.addEventListener('click', closeRegionFilterModal);
-            }
-            
-            if (cancelRegionFilter) {
-                cancelRegionFilter.addEventListener('click', closeRegionFilterModal);
-            }
-            
-            if (applyRegionFilterBtn) {
-                applyRegionFilterBtn.addEventListener('click', applyRegionFilter);
-            }
-            
-            if (selectAllRegionsBtn) {
-                selectAllRegionsBtn.addEventListener('click', selectAllRegions);
-            }
-            
-            if (deselectAllRegionsBtn) {
-                deselectAllRegionsBtn.addEventListener('click', deselectAllRegions);
-            }
-            
-            if (regionFilterModal) {
-                regionFilterModal.addEventListener('click', (e) => {
-                    if (e.target.id === 'regionFilterModal') {
-                        closeRegionFilterModal();
-                    }
-                });
-            }
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && regionFilterModal && regionFilterModal.classList.contains('show')) {
-                    closeRegionFilterModal();
-                }
-            });
-        }
-
-        function initializeAgentFilter() {
-            const agentFilterBtn = document.getElementById('agentFilterBtn');
-            const closeAgentFilter = document.getElementById('closeAgentFilter');
-            const cancelAgentFilter = document.getElementById('cancelAgentFilter');
-            const applyAgentFilterBtn = document.getElementById('applyAgentFilter');
-            const selectAllAgentsBtn = document.getElementById('selectAllAgents');
-            const deselectAllAgentsBtn = document.getElementById('deselectAllAgents');
-            const selectTopPerformersBtn = document.getElementById('selectTopPerformers');
-            const selectLowPerformersBtn = document.getElementById('selectLowPerformers');
-            const agentFilterModal = document.getElementById('agentFilterModal');
-
-            if (agentFilterBtn) {
-                agentFilterBtn.addEventListener('click', openAgentFilterModal);
-            }
-            
-            if (closeAgentFilter) {
-                closeAgentFilter.addEventListener('click', closeAgentFilterModal);
-            }
-            
-            if (cancelAgentFilter) {
-                cancelAgentFilter.addEventListener('click', closeAgentFilterModal);
-            }
-            
-            if (applyAgentFilterBtn) {
-                applyAgentFilterBtn.addEventListener('click', applyAgentFilter);
-            }
-            
-            if (selectAllAgentsBtn) {
-                selectAllAgentsBtn.addEventListener('click', selectAllAgents);
-            }
-            
-            if (deselectAllAgentsBtn) {
-                deselectAllAgentsBtn.addEventListener('click', deselectAllAgents);
-            }
-            
-            if (selectTopPerformersBtn) {
-                selectTopPerformersBtn.addEventListener('click', selectTopPerformers);
-            }
-            
-            if (selectLowPerformersBtn) {
-                selectLowPerformersBtn.addEventListener('click', selectLowPerformers);
-            }
-            
-            if (agentFilterModal) {
-                agentFilterModal.addEventListener('click', (e) => {
-                    if (e.target.id === 'agentFilterModal') {
-                        closeAgentFilterModal();
-                    }
-                });
-            }
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && agentFilterModal && agentFilterModal.classList.contains('show')) {
-                    closeAgentFilterModal();
-                }
-            });
-        }
-
-        function initializeRegionDetailModal() {
-            console.log('Inizializzazione modal dettaglio regione...');
-            
-            const regionTabs = document.querySelectorAll('.region-detail-tab');
-            regionTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.dataset.regionTab;
-                    switchRegionTab(tabId);
-                });
-            });
-
-            const closeBtn = document.getElementById('closeRegionDetail');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeRegionDetailModal);
-            }
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    const modal = document.getElementById('regionDetailModal');
-                    if (modal && modal.classList.contains('show')) {
-                        closeRegionDetailModal();
-                    }
-                }
-            });
-
-            const modal = document.getElementById('regionDetailModal');
-            if (modal) {
-                modal.addEventListener('click', (e) => {
-                    if (e.target.id === 'regionDetailModal') {
-                        closeRegionDetailModal();
-                    }
-                });
-            }
-        }
-
-        function openRegionDetailModal(regionName) {
-            const region = availableRegions.get(regionName);
-            if (!region) return;
-
-            currentRegionData = region;
-            const regionColor = getRegionColor(regionName);
-            
-            const icon = document.getElementById('regionDetailIcon');
-            const name = document.getElementById('regionDetailName');
-            const summary = document.getElementById('regionDetailSummary');
-            const header = document.querySelector('.region-detail-header');
-            
-            if (icon) icon.textContent = region.name.charAt(0);
-            if (name) name.textContent = region.name;
-            if (summary) {
-                summary.textContent = `${region.agents.size} agenti attivi in ${region.provinces.size} province`;
-            }
-            if (header) {
-                header.style.background = `linear-gradient(135deg, ${regionColor}, ${regionColor}dd)`;
-            }
-
-            const modal = document.getElementById('regionDetailModal');
-            if (modal) {
-                modal.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            }
-
-            switchRegionTab('overview');
-        }
-
-        function closeRegionDetailModal() {
-            const modal = document.getElementById('regionDetailModal');
-            if (modal) {
-                modal.classList.remove('show');
-                document.body.style.overflow = '';
-            }
-
-            Object.values(regionDetailCharts).forEach(chart => {
-                if (chart && typeof chart.destroy === 'function') {
-                    chart.destroy();
-                }
-            });
-            regionDetailCharts = {};
-            currentRegionData = null;
-        }
-
-        function switchRegionTab(tabId) {
-            document.querySelectorAll('.region-detail-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.region-detail-tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-
-            const activeTab = document.querySelector(`[data-region-tab="${tabId}"]`);
-            const activeContent = document.getElementById(`region${tabId.charAt(0).toUpperCase() + tabId.slice(1)}Tab`);
-            
-            if (activeTab) activeTab.classList.add('active');
-            if (activeContent) activeContent.classList.add('active');
-
-            currentRegionTab = tabId;
-
-            setTimeout(() => {
-                switch(tabId) {
-                    case 'overview':
-                        renderRegionOverview();
-                        break;
-                    case 'provinces':
-                        renderRegionProvinces();
-                        break;
-                    case 'agents':
-                        renderRegionAgents();
-                        break;
-                }
-            }, 100);
-        }
-
-        function renderRegionOverview() {
-            if (!currentRegionData) return;
-
-            const regionAgents = allData.filter(agent => 
-                agent.clienti_provincia.some(prov => 
-                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
-                )
-            );
-
-            let totalPrevious = 0;
-            regionAgents.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
-                        totalPrevious += (prov.Fatturato || 0) * 0.85;
-                    }
-                });
-            });
-
-            const growth = totalPrevious > 0 ? 
-                ((currentRegionData.revenue - totalPrevious) / totalPrevious * 100) : 0;
-
-            const metricsContainer = document.getElementById('regionOverviewMetrics');
-            if (metricsContainer) {
-                metricsContainer.innerHTML = `
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${formatCurrency(currentRegionData.revenue)}</div>
-                        <div class="region-overview-label">Fatturato Totale</div>
-                        <div class="region-overview-change ${growth >= 0 ? 'positive' : 'negative'}">
-                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%
-                        </div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${currentRegionData.clients}</div>
-                        <div class="region-overview-label">Clienti Attivi</div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${currentRegionData.agents.size}</div>
-                        <div class="region-overview-label">Agenti</div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${currentRegionData.provinces.size}</div>
-                        <div class="region-overview-label">Province</div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${formatCurrency(currentRegionData.revenue / currentRegionData.agents.size)}</div>
-                        <div class="region-overview-label">Media per Agente</div>
-                    </div>
-                    <div class="region-overview-card">
-                        <div class="region-overview-value">${Math.round(currentRegionData.clients / currentRegionData.agents.size)}</div>
-                        <div class="region-overview-label">Clienti per Agente</div>
-                    </div>
-                `;
-            }
-
-            renderRegionPerformanceChart();
-            renderRegionTopPerformers();
-        }
-
-        function renderRegionPerformanceChart() {
-            const canvas = document.getElementById('regionPerformanceChart');
-            if (!canvas) return;
-
-            const ctx = canvas.getContext('2d');
-            
-            if (regionDetailCharts.performance) {
-                regionDetailCharts.performance.destroy();
-            }
-
-            const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
-            const monthlyData = months.map((month, index) => {
-                const baseValue = currentRegionData.revenue / 12;
-                const variation = (Math.sin(index * 0.5) + Math.random() * 0.3) * baseValue * 0.2;
-                return Math.max(0, baseValue + variation);
-            });
-
-            regionDetailCharts.performance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [{
-                        label: 'Fatturato Mensile',
-                        data: monthlyData,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: context => formatCurrency(context.parsed.y)
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { callback: value => formatCurrency(value) }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderRegionTopPerformers() {
-            const container = document.getElementById('regionTopPerformers');
-            if (!container) return;
-
-            const regionAgents = allData.filter(agent => 
-                agent.clienti_provincia.some(prov => 
-                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
-                )
-            );
-
-            const performers = regionAgents.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                
-                return { agent, current, growth };
-            }).sort((a, b) => b.current - a.current).slice(0, 5);
-
-            container.innerHTML = performers.map((performer, index) => `
-                <div class="performer-item">
-                    <div class="performer-rank">${index + 1}</div>
-                    <div class="performer-info">
-                        <div class="performer-name">${performer.agent.nome}</div>
-                        <div class="performer-value">${formatCurrency(performer.current)}</div>
-                    </div>
-                    <div class="performer-change ${performer.growth >= 0 ? 'positive' : 'negative'}">
-                        ${performer.growth >= 0 ? '+' : ''}${performer.growth.toFixed(1)}%
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderRegionProvinces() {
-            if (!currentRegionData) return;
-
-            const canvas = document.getElementById('provincesComparisonChart');
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                
-                if (regionDetailCharts.provinces) {
-                    regionDetailCharts.provinces.destroy();
-                }
-
-                const provinceData = {};
-                allData.forEach(agent => {
-                    agent.clienti_provincia.forEach(prov => {
-                        if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
-                            if (!provinceData[prov.Provincia]) {
-                                provinceData[prov.Provincia] = { revenue: 0, clients: 0 };
-                            }
-                            provinceData[prov.Provincia].revenue += prov.Fatturato || 0;
-                            provinceData[prov.Provincia].clients += prov.Clienti_Serviti || 0;
-                        }
-                    });
-                });
-
-                const labels = Object.keys(provinceData);
-                const data = Object.values(provinceData).map(p => p.revenue);
-                
-                regionDetailCharts.provinces = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Fatturato per Provincia',
-                            data,
-                            backgroundColor: '#2563eb',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: context => formatCurrency(context.parsed.y)
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { callback: value => formatCurrency(value) }
-                            }
-                        }
-                    }
-                });
-            }
-
-            const container = document.getElementById('provinceDetailGrid');
-            if (container) {
-                const provinceData = {};
-                allData.forEach(agent => {
-                    agent.clienti_provincia.forEach(prov => {
-                        if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
-                            if (!provinceData[prov.Provincia]) {
-                                provinceData[prov.Provincia] = { 
-                                    revenue: 0, 
-                                    clients: 0, 
-                                    agents: new Set() 
-                                };
-                            }
-                            provinceData[prov.Provincia].revenue += prov.Fatturato || 0;
-                            provinceData[prov.Provincia].clients += prov.Clienti_Serviti || 0;
-                            provinceData[prov.Provincia].agents.add(agent.codice);
-                        }
-                    });
-                });
-
-                container.innerHTML = Object.entries(provinceData).map(([provincia, data]) => {
-                    const avgRevenue = currentRegionData.revenue / currentRegionData.provinces.size;
-                    const performance = data.revenue >= avgRevenue ? 'success' : 
-                                      data.revenue >= avgRevenue * 0.8 ? 'warning' : 'danger';
-                    
-                    return `
-                        <div class="province-card">
-                            <div class="province-header">
-                                <div class="province-name">${provincia}</div>
-                                <div class="province-badge badge ${performance}">
-                                    ${performance === 'success' ? 'Top' : performance === 'warning' ? 'Medio' : 'Basso'}
-                                </div>
-                            </div>
-                            <div class="province-metrics">
-                                <div class="province-metric">
-                                    <div class="province-metric-value">${formatCurrency(data.revenue)}</div>
-                                    <div class="province-metric-label">Fatturato</div>
-                                </div>
-                                <div class="province-metric">
-                                    <div class="province-metric-value">${data.clients}</div>
-                                    <div class="province-metric-label">Clienti</div>
-                                </div>
-                                <div class="province-metric">
-                                    <div class="province-metric-value">${data.agents.size}</div>
-                                    <div class="province-metric-label">Agenti</div>
-                                </div>
-                                <div class="province-metric">
-                                    <div class="province-metric-value">${formatCurrency(data.revenue / data.agents.size)}</div>
-                                    <div class="province-metric-label">Media/Agente</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-        }
-
-        function renderRegionAgents() {
-            if (!currentRegionData) return;
-
-            const container = document.getElementById('regionAgentGrid');
-            if (!container) return;
-
-            const regionAgents = allData.filter(agent => 
-                agent.clienti_provincia.some(prov => 
-                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
-                )
-            );
-
-            container.innerHTML = regionAgents.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                
-                const regionRevenue = agent.clienti_provincia
-                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
-                    .reduce((sum, prov) => sum + (prov.Fatturato || 0), 0);
-                    
-                const regionClients = agent.clienti_provincia
-                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
-                    .reduce((sum, prov) => sum + (prov.Clienti_Serviti || 0), 0);
-
-                const agentProvinces = agent.clienti_provincia
-                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
-                    .map(prov => prov.Provincia);
-
-                return `
-                    <div class="agent-detail-card">
-                        <div class="agent-detail-header">
-                            <div class="agent-avatar">${agent.nome.split(' ').map(n => n.charAt(0)).join('')}</div>
-                            <div class="agent-detail-info">
-                                <h4>${agent.nome}</h4>
-                                <p>${agent.codice} • ${agentProvinces.join(', ')}</p>
-                            </div>
-                        </div>
-                        <div class="agent-detail-metrics">
-                            <div class="agent-detail-metric">
-                                <div class="agent-detail-metric-value">${formatCurrency(regionRevenue)}</div>
-                                <div class="agent-detail-metric-label">Fatturato Regione</div>
-                            </div>
-                            <div class="agent-detail-metric">
-                                <div class="agent-detail-metric-value">${regionClients}</div>
-                                <div class="agent-detail-metric-label">Clienti Regione</div>
-                            </div>
-                            <div class="agent-detail-metric">
-                                <div class="agent-detail-metric-value">${formatCurrency(current)}</div>
-                                <div class="agent-detail-metric-label">Totale Agente</div>
-                            </div>
-                        </div>
-                        <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                ${growth >= 0 ? 
-                                    '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                    '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                }
-                            </svg>
-                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% crescita totale
-                        </div>
-                        <div style="margin-top: 0.75rem;">
-                            <span class="badge ${growth >= 10 ? 'success' : growth >= 0 ? 'warning' : 'danger'}">
-                                ${growth >= 10 ? 'Top Performer' : growth >= 0 ? 'Performance Buona' : 'Necessita Attenzione'}
-                            </span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderDashboard() {
-            const loadingElement = document.getElementById('loading');
-            const overviewElement = document.getElementById('overview-content');
-            
-            if (loadingElement) loadingElement.style.display = 'none';
-            if (overviewElement) overviewElement.style.display = 'block';
-            
-            populateAvailableRegions();
-            populateAvailableAgents();
-            renderKPIMetrics();
-            renderCharts();
-            renderPerformanceTable();
-            renderAgentCards();
-            renderRegionCards();
-            updateFilterButtonText();
-            updateAgentFilterButtonText();
-        }
-
-        function renderKPIMetrics() {
-            let totalRevenue = 0, totalPrevRevenue = 0, totalClients = 0;
-            
-            allData.forEach(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                if (general) {
-                    totalRevenue += general.Anno_Corrente || 0;
-                    totalPrevRevenue += general.Anno_Precedente || 0;
-                    totalClients += general.Clienti_Anno_Corrente || 0;
-                }
-            });
-
-            const growth = totalPrevRevenue > 0 ? 
-                ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
-
-            const metrics = [
-                { title: 'Fatturato Totale', value: formatCurrency(totalRevenue), change: growth },
-                { title: 'Clienti Attivi', value: totalClients.toLocaleString('it-IT'), change: null },
-                { title: 'Agenti Attivi', value: allData.length.toString(), change: null },
-                { title: 'Crescita Media', value: `${growth.toFixed(1)}%`, change: growth }
-            ];
-
-            const kpiElement = document.getElementById('kpiMetrics');
-            if (kpiElement) {
-                kpiElement.innerHTML = metrics.map(metric => `
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="card-title">${metric.title}</div>
-                            <div class="metric-value">${metric.value}</div>
-                            ${metric.change !== null ? `
-                                <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        ${metric.change >= 0 ? 
-                                            '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                            '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                        }
-                                    </svg>
-                                    ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function renderCharts() {
-            renderRevenueChart();
-            renderRegionChart();
-            renderScatterChart();
-            renderFunnelChart();
-            renderBoxplotChart();
-        }
-
-        function renderRevenueChart() {
-            const canvas = document.getElementById('revenueChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.revenue) charts.revenue.destroy();
-
-            const agentData = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                return {
-                    name: agent.nome.split(' ')[0],
-                    current: general?.Anno_Corrente || 0,
-                    previous: general?.Anno_Precedente || 0
-                };
-            }).sort((a, b) => b.current - a.current).slice(0, 8);
-
-            charts.revenue = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: agentData.map(a => a.name),
-                    datasets: [
-                        {
-                            label: '2024',
-                            data: agentData.map(a => a.previous),
-                            backgroundColor: '#cbd5e1',
-                            borderRadius: 4
-                        },
-                        {
-                            label: '2025',
-                            data: agentData.map(a => a.current),
-                            backgroundColor: '#2563eb',
-                            borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { callback: value => formatCurrency(value) }
-                        }
-                    },
-                    plugins: {
-                        legend: { position: 'top' },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderRegionChart() {
-            const canvas = document.getElementById('regionChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.region) charts.region.destroy();
-
-            const regionData = {};
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    regionData[regionName] = (regionData[regionName] || 0) + (prov.Fatturato || 0);
-                });
-            });
-
-            const labels = Object.keys(regionData);
-            const data = Object.values(regionData);
-            const colors = labels.map(label => getRegionColor(label));
-
-            charts.region = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data,
-                        backgroundColor: colors,
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `${context.label}: ${formatCurrency(context.parsed)}`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderScatterChart() {
-            const canvas = document.getElementById('scatterChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.scatter) charts.scatter.destroy();
-
-            const scatterData = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                
-                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                const mainRegion = agentRegions[0] || 'Generale';
-                const color = getRegionColor(mainRegion);
-                
-                return {
-                    x: clients,
-                    y: current,
-                    label: agent.nome.split(' ')[0],
-                    backgroundColor: color + '80',
-                    borderColor: color,
-                    growth: growth,
-                    efficiency: clients > 0 ? current / clients : 0
-                };
-            }).filter(item => item.x > 0 && item.y > 0);
-
-            charts.scatter = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Agenti',
-                        data: scatterData,
-                        backgroundColor: scatterData.map(item => item.backgroundColor),
-                        borderColor: scatterData.map(item => item.borderColor),
-                        borderWidth: 2,
-                        pointRadius: 8,
-                        pointHoverRadius: 12
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    const point = scatterData[context[0].dataIndex];
-                                    return point.label;
-                                },
-                                label: function(context) {
-                                    const point = scatterData[context.dataIndex];
-                                    return [
-                                        `Fatturato: ${formatCurrency(point.y)}`,
-                                        `Clienti: ${point.x}`,
-                                        `Efficienza: ${formatCurrency(point.efficiency)}/cliente`,
-                                        `Crescita: ${point.growth.toFixed(1)}%`
-                                    ];
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Numero Clienti'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Fatturato (€)'
-                            },
-                            ticks: {
-                                callback: value => formatCurrency(value)
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderFunnelChart() {
-            const canvas = document.getElementById('funnelChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.funnel) charts.funnel.destroy();
-
-            let critici = 0, rischio = 0, buoni = 0, ottimi = 0, totalAgents = 0;
-            
-            allData.forEach(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const target = general?.Obiettivo || 0;
-                
-                // Debug log per verificare i dati
-                console.log(`Agente: ${agent.nome}, Current: ${current}, Target: ${target}`);
-                
-                if (current > 0) { // Usa current invece di target per includere tutti gli agenti con fatturato
-                    totalAgents++;
-                    
-                    if (target > 0) {
-                        const achievement = (current / target) * 100;
-                        
-                        if (achievement >= 100) ottimi++;
-                        else if (achievement >= 80) buoni++;
-                        else if (achievement >= 60) rischio++;
-                        else critici++;
-                    } else {
-                        // Agenti senza obiettivo definito - classifica per crescita
-                        const previous = general?.Anno_Precedente || 0;
-                        const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                        
-                        if (growth >= 20) ottimi++;
-                        else if (growth >= 10) buoni++;
-                        else if (growth >= 0) rischio++;
-                        else critici++;
-                    }
-                }
-            });
-
-            console.log(`Totale agenti: ${totalAgents}, Critici: ${critici}, Rischio: ${rischio}, Buoni: ${buoni}, Ottimi: ${ottimi}`);
-
-            // Se non ci sono agenti con dati, usa dati di esempio
-            if (totalAgents === 0) {
-                totalAgents = allData.length;
-                critici = Math.floor(totalAgents * 0.2);
-                rischio = Math.floor(totalAgents * 0.3);
-                buoni = Math.floor(totalAgents * 0.3);
-                ottimi = totalAgents - critici - rischio - buoni;
-            }
-
-            const funnelData = [
-                { 
-                    label: 'Critici', 
-                    value: critici, 
-                    color: '#dc2626', 
-                    percentage: totalAgents > 0 ? (critici/totalAgents*100).toFixed(1) : '0'
-                },
-                { 
-                    label: 'A Rischio', 
-                    value: rischio, 
-                    color: '#f59e0b', 
-                    percentage: totalAgents > 0 ? (rischio/totalAgents*100).toFixed(1) : '0'
-                },
-                { 
-                    label: 'Buoni', 
-                    value: buoni, 
-                    color: '#06b6d4', 
-                    percentage: totalAgents > 0 ? (buoni/totalAgents*100).toFixed(1) : '0'
-                },
-                { 
-                    label: 'Eccellenti', 
-                    value: ottimi, 
-                    color: '#10b981', 
-                    percentage: totalAgents > 0 ? (ottimi/totalAgents*100).toFixed(1) : '0'
-                }
-            ];
-
-            charts.funnel = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: funnelData.map(item => `${item.label} (${item.percentage}%)`),
-                    datasets: [{
-                        data: funnelData.map(item => item.value),
-                        backgroundColor: funnelData.map(item => item.color),
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        cutout: '45%'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { 
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 15,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const item = funnelData[context.dataIndex];
-                                    return `${item.label}: ${item.value} agenti (${item.percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        animateRotate: true,
-                        duration: 1000
-                    }
-                }
-            });
-        }
-
-        function renderBoxplotChart() {
-            const canvas = document.getElementById('boxplotChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.boxplot) charts.boxplot.destroy();
-
-            const regionPerformance = {};
-            
-            allData.forEach(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                
-                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                const mainRegion = agentRegions[0] || 'Generale';
-                
-                if (!regionPerformance[mainRegion]) {
-                    regionPerformance[mainRegion] = [];
-                }
-                regionPerformance[mainRegion].push(growth);
-            });
-
-            const boxplotData = Object.entries(regionPerformance).map(([region, growths]) => {
-                const sorted = growths.sort((a, b) => a - b);
-                const len = sorted.length;
-                const q1 = sorted[Math.floor(len * 0.25)];
-                const median = sorted[Math.floor(len * 0.5)];
-                const q3 = sorted[Math.floor(len * 0.75)];
-                const min = sorted[0];
-                const max = sorted[len - 1];
-                
-                return {
-                    label: region,
-                    min: min,
-                    q1: q1,
-                    median: median,
-                    q3: q3,
-                    max: max,
-                    color: getRegionColor(region)
-                };
-            });
-
-            const labels = boxplotData.map(item => item.label);
-            const medians = boxplotData.map(item => item.median);
-            const colors = boxplotData.map(item => item.color);
-
-            charts.boxplot = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Crescita Mediana (%)',
-                        data: medians,
-                        backgroundColor: colors.map(color => color + '60'),
-                        borderColor: colors,
-                        borderWidth: 2,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    return `Regione: ${context[0].label}`;
-                                },
-                                label: function(context) {
-                                    const region = boxplotData[context.dataIndex];
-                                    return [
-                                        `Mediana: ${region.median.toFixed(1)}%`,
-                                        `Min: ${region.min.toFixed(1)}%`,
-                                        `Max: ${region.max.toFixed(1)}%`,
-                                        `Q1: ${region.q1.toFixed(1)}%`,
-                                        `Q3: ${region.q3.toFixed(1)}%`
-                                    ];
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Regioni'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Crescita (%)'
-                            },
-                            ticks: {
-                                callback: value => `${value.toFixed(0)}%`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderPerformanceTable() {
-            const tableElement = document.getElementById('performanceTable');
-            if (!tableElement) return;
-            
-            const agentPerformance = allData.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                
-                return { agent, current, previous, growth, clients };
-            }).sort((a, b) => b.current - a.current);
-
-            tableElement.innerHTML = `
-                <thead>
-                    <tr>
-                        <th>Agente</th>
-                        <th>Fatturato 2025</th>
-                        <th>Crescita</th>
-                        <th>Clienti</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${agentPerformance.map(item => `
-                        <tr class="table-row">
-                            <td>
-                                <strong>${item.agent.nome}</strong><br>
-                                <small style="color: var(--text-muted);">${item.agent.codice}</small>
-                            </td>
-                            <td><strong>${formatCurrency(item.current)}</strong></td>
-                            <td>
-                                <span class="badge ${item.growth >= 0 ? 'success' : 'danger'}">
-                                    ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%
-                                </span>
-                            </td>
-                            <td>${item.clients}</td>
-                            <td>
-                                <span class="badge ${item.growth >= 10 ? 'success' : item.growth >= 0 ? 'warning' : 'danger'}">
-                                    ${item.growth >= 10 ? 'Ottimo' : item.growth >= 0 ? 'Buono' : 'Critico'}
-                                </span>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            `;
-        }
-
-        function renderAgentCards() {
-            const agentGridElement = document.getElementById('agentGrid');
-            if (!agentGridElement) return;
-            
-            const filteredAgents = allData.filter(agent => {
-                return selectedAgents.size === 0 || selectedAgents.has(agent.codice);
-            });
-            
-            agentGridElement.innerHTML = filteredAgents.map(agent => {
-                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                const current = general?.Anno_Corrente || 0;
-                const previous = general?.Anno_Precedente || 0;
-                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                const clients = general?.Clienti_Anno_Corrente || 0;
-                const target = general?.Obiettivo || 0;
-                const progress = target > 0 ? (current / target * 100) : 0;
-
-                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                const mainRegion = agentRegions[0] || 'Generale';
-                const regionColor = getRegionColor(mainRegion);
-
-                return `
-                    <div class="agent-card">
-                        <div class="agent-header" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">
-                            <div class="agent-name">${agent.nome}</div>
-                            <div class="agent-code">${agent.codice}</div>
-                        </div>
-                        <div class="agent-body">
-                            <div class="agent-metrics">
-                                <div class="agent-metric">
-                                    <div class="agent-metric-value">${formatCurrency(current)}</div>
-                                    <div class="agent-metric-label">Fatturato 2025</div>
-                                </div>
-                                <div class="agent-metric">
-                                    <div class="agent-metric-value">${clients}</div>
-                                    <div class="agent-metric-label">Clienti</div>
-                                </div>
-                            </div>
-                            
-                            <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    ${growth >= 0 ? 
-                                        '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                        '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                    }
-                                </svg>
-                                ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
-                            </div>
-
-                            <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
-                                <strong>Regioni:</strong> ${agentRegions.join(', ')}
-                            </div>
-
-                            ${target > 0 ? `
-                                <div style="margin-top: 1rem;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
-                                        <span>Obiettivo</span>
-                                        <span>${Math.round(progress)}%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
-                                    </div>
-                                    <div class="progress-text">
-                                        <span>${formatCurrency(current)}</span>
-                                        <span>${formatCurrency(target)}</span>
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderRegionCards() {
-            const regionGridElement = document.getElementById('regionGrid');
-            if (!regionGridElement) return;
-            
-            const filteredRegions = Array.from(availableRegions.values()).filter(region => {
-                return selectedRegions.size === 0 || selectedRegions.has(region.name);
-            });
-
-            regionGridElement.innerHTML = filteredRegions.map(region => {
-                const regionColor = getRegionColor(region.name);
-                
-                return `
-                    <div class="region-card">
-                        <div class="region-header">
-                            <div class="region-icon" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">${region.name.charAt(0)}</div>
-                            <div class="region-info">
-                                <h3>${region.name}</h3>
-                                <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
-                            </div>
-                        </div>
-                        <div class="region-stats">
-                            <div class="region-stat">
-                                <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
-                                <div class="region-stat-label">Fatturato</div>
-                            </div>
-                            <div class="region-stat">
-                                <div class="region-stat-value">${region.clients}</div>
-                                <div class="region-stat-label">Clienti</div>
-                            </div>
-                        </div>
-                        <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
-                            Province: ${Array.from(region.provinces).join(', ')}
-                        </div>
-                        <button class="region-detail-button" onclick="openRegionDetailModal('${region.name}')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14"/>
-                                <path d="m12 5 7 7-7 7"/>
-                            </svg>
-                            Visualizza Dettagli
-                        </button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function formatCurrency(value) {
-            if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
-            if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
-            return `€${value.toLocaleString('it-IT')}`;
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Inizializzazione dashboard...');
-            
-            try {
-                initializeTabs();
-                console.log('Tabs inizializzati');
-            } catch (error) {
-                console.error('Errore tabs:', error);
-            }
-            
-            try {
-                updateClock();
-                setInterval(updateClock, 1000);
-                console.log('Clock inizializzato');
-            } catch (error) {
-                console.error('Errore clock:', error);
-            }
-            
-            try {
-                loadData();
-                setInterval(loadData, 120000);
-                console.log('Caricamento dati avviato');
-            } catch (error) {
-                console.error('Errore caricamento dati:', error);
-            }
-            
-            setTimeout(() => {
-                try {
-                    initializeRegionFilter();
-                    console.log('Filtro regioni inizializzato');
-                } catch (error) {
-                    console.error('Errore inizializzazione filtro regioni:', error);
-                }
-                
-                try {
-                    initializeAgentFilter();
-                    console.log('Filtro agenti inizializzato');
-                } catch (error) {
-                    console.error('Errore inizializzazione filtro agenti:', error);
-                }
-                
-                try {
-                    initializeRegionDetailModal();
-                    console.log('Modal dettaglio regione inizializzato');
-                } catch (error) {
-                    console.error('Errore inizializzazione modal regione:', error);
-                }
-            }, 500);
-        });
-    </script>
-</body>
-</html>
+            if (!clean || clean === '') return
