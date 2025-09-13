@@ -168,6 +168,13 @@
             margin-bottom: 2rem;
         }
 
+        .advanced-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
         .card {
             background: var(--surface);
             border-radius: var(--radius-lg);
@@ -467,7 +474,6 @@
             color: var(--text-light);
         }
 
-        /* Filtro Styles */
         .filter-container {
             display: flex;
             align-items: center;
@@ -539,7 +545,6 @@
             transform: scale(1);
         }
 
-        /* Modal Dettaglio Regione - Più Grande */
         .region-detail-modal {
             width: 95%;
             max-width: 1200px;
@@ -682,7 +687,6 @@
             background: var(--primary-dark);
         }
 
-        /* NUOVO: Styles per Modal Dettaglio Regione */
         .region-detail-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
@@ -1115,6 +1119,61 @@
                         <div class="card-body">
                             <div class="chart-container">
                                 <canvas id="regionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="advanced-charts-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <circle cx="19" cy="5" r="2"/>
+                                    <circle cx="5" cy="19" r="2"/>
+                                    <path d="M10.4 21.9a10 10 0 0 0 9.941-15.416"/>
+                                    <path d="M13.5 2.1a10 10 0 0 0-9.841 15.416"/>
+                                </svg>
+                                Efficienza Commerciale
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="scatterChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18l5-3 4 3 5-3 4 3V3l-4 3-5-3-4 3-5-3z"/>
+                                </svg>
+                                Funnel Obiettivi
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="funnelChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    <path d="M9 9h6v6H9z"/>
+                                </svg>
+                                Distribuzione Performance
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="boxplotChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -1934,11 +1993,9 @@
             });
         }
 
-        // Funzioni per modal dettaglio regione
         function initializeRegionDetailModal() {
             console.log('Inizializzazione modal dettaglio regione...');
             
-            // Event listeners per i tab del modal
             const regionTabs = document.querySelectorAll('.region-detail-tab');
             regionTabs.forEach(tab => {
                 tab.addEventListener('click', () => {
@@ -1947,13 +2004,11 @@
                 });
             });
 
-            // Event listener per chiusura modal
             const closeBtn = document.getElementById('closeRegionDetail');
             if (closeBtn) {
                 closeBtn.addEventListener('click', closeRegionDetailModal);
             }
 
-            // Chiusura con ESC
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     const modal = document.getElementById('regionDetailModal');
@@ -1963,7 +2018,6 @@
                 }
             });
 
-            // Chiusura cliccando fuori dal modal
             const modal = document.getElementById('regionDetailModal');
             if (modal) {
                 modal.addEventListener('click', (e) => {
@@ -1981,7 +2035,6 @@
             currentRegionData = region;
             const regionColor = getRegionColor(regionName);
             
-            // Aggiorna header del modal
             const icon = document.getElementById('regionDetailIcon');
             const name = document.getElementById('regionDetailName');
             const summary = document.getElementById('regionDetailSummary');
@@ -1996,14 +2049,12 @@
                 header.style.background = `linear-gradient(135deg, ${regionColor}, ${regionColor}dd)`;
             }
 
-            // Mostra modal
             const modal = document.getElementById('regionDetailModal');
             if (modal) {
                 modal.classList.add('show');
                 document.body.style.overflow = 'hidden';
             }
 
-            // Carica contenuti del tab attivo
             switchRegionTab('overview');
         }
 
@@ -2014,7 +2065,6 @@
                 document.body.style.overflow = '';
             }
 
-            // Pulisci charts
             Object.values(regionDetailCharts).forEach(chart => {
                 if (chart && typeof chart.destroy === 'function') {
                     chart.destroy();
@@ -2025,7 +2075,6 @@
         }
 
         function switchRegionTab(tabId) {
-            // Aggiorna tab attivi
             document.querySelectorAll('.region-detail-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -2041,7 +2090,6 @@
 
             currentRegionTab = tabId;
 
-            // Carica contenuti specifici del tab
             setTimeout(() => {
                 switch(tabId) {
                     case 'overview':
@@ -2060,7 +2108,6 @@
         function renderRegionOverview() {
             if (!currentRegionData) return;
 
-            // Calcola metriche regionali
             const regionAgents = allData.filter(agent => 
                 agent.clienti_provincia.some(prov => 
                     getRegionFromProvince(prov.Provincia) === currentRegionData.name
@@ -2071,7 +2118,6 @@
             regionAgents.forEach(agent => {
                 agent.clienti_provincia.forEach(prov => {
                     if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
-                        // Simula dato anno precedente
                         totalPrevious += (prov.Fatturato || 0) * 0.85;
                     }
                 });
@@ -2080,7 +2126,6 @@
             const growth = totalPrevious > 0 ? 
                 ((currentRegionData.revenue - totalPrevious) / totalPrevious * 100) : 0;
 
-            // Popola metriche overview
             const metricsContainer = document.getElementById('regionOverviewMetrics');
             if (metricsContainer) {
                 metricsContainer.innerHTML = `
@@ -2114,10 +2159,7 @@
                 `;
             }
 
-            // Render performance chart
             renderRegionPerformanceChart();
-            
-            // Render top performers
             renderRegionTopPerformers();
         }
 
@@ -2131,7 +2173,6 @@
                 regionDetailCharts.performance.destroy();
             }
 
-            // Simula dati mensili
             const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
             const monthlyData = months.map((month, index) => {
                 const baseValue = currentRegionData.revenue / 12;
@@ -2209,7 +2250,6 @@
         function renderRegionProvinces() {
             if (!currentRegionData) return;
 
-            // Render provinces comparison chart
             const canvas = document.getElementById('provincesComparisonChart');
             if (canvas) {
                 const ctx = canvas.getContext('2d');
@@ -2266,7 +2306,6 @@
                 });
             }
 
-            // Render province cards
             const container = document.getElementById('provinceDetailGrid');
             if (container) {
                 const provinceData = {};
@@ -2343,7 +2382,6 @@
                 const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
                 const clients = general?.Clienti_Anno_Corrente || 0;
                 
-                // Calcola fatturato specifico per questa regione
                 const regionRevenue = agent.clienti_provincia
                     .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
                     .reduce((sum, prov) => sum + (prov.Fatturato || 0), 0);
@@ -2465,6 +2503,9 @@
         function renderCharts() {
             renderRevenueChart();
             renderRegionChart();
+            renderScatterChart();
+            renderFunnelChart();
+            renderBoxplotChart();
         }
 
         function renderRevenueChart() {
@@ -2569,7 +2610,6 @@
             });
         }
 
-        // Nuovi grafici avanzati
         function renderScatterChart() {
             const canvas = document.getElementById('scatterChart');
             if (!canvas) return;
@@ -2585,7 +2625,6 @@
                 const previous = general?.Anno_Precedente || 0;
                 const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
                 
-                // Calcola regione principale per il colore
                 const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
                 const mainRegion = agentRegions[0] || 'Generale';
                 const color = getRegionColor(mainRegion);
@@ -2594,12 +2633,12 @@
                     x: clients,
                     y: current,
                     label: agent.nome.split(' ')[0],
-                    backgroundColor: color + '80', // Aggiungi trasparenza
+                    backgroundColor: color + '80',
                     borderColor: color,
                     growth: growth,
                     efficiency: clients > 0 ? current / clients : 0
                 };
-            }).filter(item => item.x > 0 && item.y > 0); // Filtra agenti senza dati
+            }).filter(item => item.x > 0 && item.y > 0);
 
             charts.scatter = new Chart(ctx, {
                 type: 'scatter',
@@ -2668,7 +2707,6 @@
             
             if (charts.funnel) charts.funnel.destroy();
 
-            // Calcola distribuzione obiettivi
             let critici = 0, rischio = 0, buoni = 0, ottimi = 0, totalAgents = 0;
             
             allData.forEach(agent => {
@@ -2737,7 +2775,6 @@
             
             if (charts.boxplot) charts.boxplot.destroy();
 
-            // Raggruppa dati per regione
             const regionPerformance = {};
             
             allData.forEach(agent => {
@@ -2746,7 +2783,6 @@
                 const previous = general?.Anno_Precedente || 0;
                 const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
                 
-                // Trova regione principale
                 const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
                 const mainRegion = agentRegions[0] || 'Generale';
                 
@@ -2756,7 +2792,6 @@
                 regionPerformance[mainRegion].push(growth);
             });
 
-            // Calcola statistiche per ogni regione
             const boxplotData = Object.entries(regionPerformance).map(([region, growths]) => {
                 const sorted = growths.sort((a, b) => a - b);
                 const len = sorted.length;
@@ -2777,7 +2812,6 @@
                 };
             });
 
-            // Simula box plot con bar chart
             const labels = boxplotData.map(item => item.label);
             const medians = boxplotData.map(item => item.median);
             const colors = boxplotData.map(item => item.color);
@@ -2832,49 +2866,6 @@
                             },
                             ticks: {
                                 callback: value => `${value.toFixed(0)}%`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-            const canvas = document.getElementById('regionChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (charts.region) charts.region.destroy();
-
-            const regionData = {};
-            allData.forEach(agent => {
-                agent.clienti_provincia.forEach(prov => {
-                    const regionName = getRegionFromProvince(prov.Provincia);
-                    regionData[regionName] = (regionData[regionName] || 0) + (prov.Fatturato || 0);
-                });
-            });
-
-            const labels = Object.keys(regionData);
-            const data = Object.values(regionData);
-            const colors = labels.map(label => getRegionColor(label));
-
-            charts.region = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data,
-                        backgroundColor: colors,
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `${context.label}: ${formatCurrency(context.parsed)}`
                             }
                         }
                     }
@@ -2948,7 +2939,6 @@
                 const target = general?.Obiettivo || 0;
                 const progress = target > 0 ? (current / target * 100) : 0;
 
-                // Calcola regioni e colore principale
                 const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
                 const mainRegion = agentRegions[0] || 'Generale';
                 const regionColor = getRegionColor(mainRegion);
