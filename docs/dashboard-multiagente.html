@@ -1923,27 +1923,30 @@
                                 </div>
                             </div>
 
-                            ${target > 0 ? `
-                                <!-- Obiettivo 2025 -->
-                                <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 1rem;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                                        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Obiettivo 2025</span>
-                                        <span style="font-size: 0.875rem; font-weight: 600; color: ${progress >= 100 ? 'var(--success)' : progress >= 80 ? 'var(--warning)' : 'var(--danger)'};">
-                                            ${Math.round(progress)}%
-                                        </span>
-                                    </div>
-                                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">
-                                        ${formatCurrency(target)}
-                                    </div>
-                                    <div class="progress-bar" style="margin: 0.5rem 0;">
-                                        <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-light);">
-                                        <span>Raggiunto: ${formatCurrency(current)}</span>
-                                        <span>${remaining > 0 ? `Mancano: ${formatCurrency(remaining)}` : 'Obiettivo raggiunto!'}</span>
-                                    </div>
+                            <!-- Obiettivo 2025 - SEMPRE VISIBILE -->
+                            <div style="background: var(--surface-2); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                                    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Obiettivo 2025</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: ${target > 0 ? (progress >= 100 ? 'var(--success)' : progress >= 80 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)'};">
+                                        ${target > 0 ? Math.round(progress) + '%' : 'N/A'}
+                                    </span>
                                 </div>
-                            ` : ''}
+                                <div style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">
+                                    ${target > 0 ? formatCurrency(target) : 'Obiettivo non definito'}
+                                </div>
+                                <div class="progress-bar" style="margin: 0.5rem 0;">
+                                    <div class="progress-fill" style="width: ${target > 0 ? Math.min(progress, 100) : 0}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-light);">
+                                    <span>Raggiunto: ${formatCurrency(current)}</span>
+                                    <span>
+                                        ${target > 0 ? 
+                                            (remaining > 0 ? `Mancano: ${formatCurrency(remaining)}` : 'Obiettivo raggiunto!') : 
+                                            'Da definire'
+                                        }
+                                    </span>
+                                </div>
+                            </div>
 
                             ${topProvince ? `
                                 <!-- Top Performance -->
