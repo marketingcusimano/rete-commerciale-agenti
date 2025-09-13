@@ -331,6 +331,206 @@
             }
         }
 
+        function renderAgentCards() {
+            const agentGridElement = document.getElementById('agentGrid');
+            if (!agentGridElement) return;
+            
+            try {
+                agentGridElement.innerHTML = allData.map(agent => {
+                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                    const current = general?.Anno_Corrente || 0;
+                    const previous = general?.Anno_Precedente || 0;
+                    const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                    const clients = general?.Clienti_Anno_Corrente || 0;
+                    const target = general?.Obiettivo || 0;
+                    const progress = target > 0 ? (current / target * 100) : 0;
+
+                    // Get agent's regions
+                    const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                    const mainRegion = agentRegions[0] || 'Generale';
+                    const regionColor = getRegionColor(mainRegion);
+
+                    return `
+                        <div class="agent-card">
+                            <div class="agent-header" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">
+                                <div class="agent-name">${escapeHtml(agent.nome)}</div>
+                                <div class="agent-code">${escapeHtml(agent.codice)}</div>
+                            </div>
+                            <div class="agent-body">
+                                <div class="agent-metrics">
+                                    <div class="agent-metric">
+                                        <div class="agent-metric-value">${formatCurrency(current)}</div>
+                                        <div class="agent-metric-label">Fatturato 2025</div>
+                                    </div>
+                                    <div class="agent-metric">
+                                        <div class="agent-metric-value">${clients}</div>
+                                        <div class="agent-metric-label">Clienti</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        ${growth >= 0 ? 
+                                            '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                            '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                        }
+                                    </svg>
+                                    ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
+                                </div>
+
+                                <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
+                                    <strong>Regioni:</strong> ${agentRegions.join(', ')}
+                                </div>
+
+                                ${target > 0 ? `
+                                    <div style="margin-top: 1rem;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                            <span>Obiettivo</span>
+                                            <span>${Math.round(progress)}%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
+                                        </div>
+                                        <div class="progress-text">
+                                            <span>${formatCurrency(current)}</span>
+                                            <span>${formatCurrency(target)}</span>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Agent cards render error:', error);
+                if (agentGridElement) {
+                    agentGridElement.innerHTML = '<div class="error-boundary">Errore nel caricamento degli agenti</div>';
+                }
+            }
+        }
+
+        function renderRegionCards() {
+            const regionGridElement = document.getElementById('regionGrid');
+            if (!regionGridElement) return;
+            
+            try {
+                // Calculate region data
+                const regionData = {};
+                allData.forEach(agent => {
+                    agent.clienti_provincia.forEach(prov => {
+                        const regionName = getRegionFromProvince(prov.Provincia);
+                        if (!regionData[regionName]) {
+                            regionData[regionName] = {
+                                name: regionName,
+                                revenue: 0,
+                                clients: 0,
+                                agents: new Set(),
+                                provinces: new Set()
+                            };
+                        }
+                        
+                        regionData[regionName].revenue += prov.Fatturato || 0;
+                        regionData[regionName].clients += prov.Clienti_Serviti || 0;
+                        regionData[regionName].agents.add(agent.codice);
+                        regionData[regionName].provinces.add(prov.Provincia);
+                    });
+                });
+
+                const regions = Object.values(regionData).sort((a, b) => b.revenue - a.revenue);
+
+                regionGridElement.innerHTML = regions.map(region => {
+                    const regionColor = getRegionColor(region.name);
+                    
+                    return `
+                        <div class="region-card">
+                            <div class="region-header">
+                                <div class="region-icon" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">
+                                    ${region.name.charAt(0)}
+                                </div>
+                                <div class="region-info">
+                                    <h3>${escapeHtml(region.name)}</h3>
+                                    <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
+                                </div>
+                            </div>
+                            <div class="region-stats">
+                                <div class="region-stat">
+                                    <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
+                                    <div class="region-stat-label">Fatturato</div>
+                                </div>
+                                <div class="region-stat">
+                                    <div class="region-stat-value">${region.clients}</div>
+                                    <div class="region-stat-label">Clienti</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                                <strong>Province:</strong> ${Array.from(region.provinces).join(', ')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Region cards render error:', error);
+                if (regionGridElement) {
+                    regionGridElement.innerHTML = '<div class="error-boundary">Errore nel caricamento delle regioni</div>';
+                }
+            }
+        }
+
+        function getRegionFromProvince(prov) {
+            const map = {
+                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
+                'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
+                'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
+                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'PC': 'Emilia-Romagna', 'BO': 'Emilia-Romagna', 'MO': 'Emilia-Romagna', 'RE': 'Emilia-Romagna', 'PR': 'Emilia-Romagna', 'FE': 'Emilia-Romagna', 'FC': 'Emilia-Romagna',
+                'CR': 'Lombardia', 'LO': 'Lombardia', 'MI': 'Lombardia', 'BG': 'Lombardia', 'BS': 'Lombardia', 'CO': 'Lombardia', 'MN': 'Lombardia', 'PV': 'Lombardia', 'SO': 'Lombardia', 'VA': 'Lombardia', 'LC': 'Lombardia', 'MB': 'Lombardia',
+                'TO': 'Piemonte', 'AL': 'Piemonte', 'AT': 'Piemonte', 'BI': 'Piemonte', 'CN': 'Piemonte', 'NO': 'Piemonte', 'VB': 'Piemonte', 'VC': 'Piemonte',
+                'VE': 'Veneto', 'VR': 'Veneto', 'VI': 'Veneto', 'PD': 'Veneto', 'TV': 'Veneto', 'BL': 'Veneto', 'RO': 'Veneto',
+                'FI': 'Toscana', 'PI': 'Toscana', 'SI': 'Toscana', 'AR': 'Toscana', 'GR': 'Toscana', 'LI': 'Toscana', 'LU': 'Toscana', 'MS': 'Toscana', 'PT': 'Toscana', 'PO': 'Toscana',
+                'NA': 'Campania', 'AV': 'Campania', 'BN': 'Campania', 'CE': 'Campania', 'SA': 'Campania',
+                'PA': 'Sicilia', 'CT': 'Sicilia', 'ME': 'Sicilia', 'AG': 'Sicilia', 'CL': 'Sicilia', 'EN': 'Sicilia', 'RG': 'Sicilia', 'SR': 'Sicilia', 'TP': 'Sicilia',
+                'BA': 'Puglia', 'BR': 'Puglia', 'FG': 'Puglia', 'LE': 'Puglia', 'TA': 'Puglia', 'BT': 'Puglia',
+                'CZ': 'Calabria', 'CS': 'Calabria', 'KR': 'Calabria', 'RC': 'Calabria', 'VV': 'Calabria',
+                'GE': 'Liguria', 'IM': 'Liguria', 'LA': 'Liguria', 'SV': 'Liguria',
+                'AQ': 'Abruzzo', 'CH': 'Abruzzo', 'PE': 'Abruzzo', 'TE': 'Abruzzo',
+                'CB': 'Molise', 'IS': 'Molise',
+                'MT': 'Basilicata', 'PZ': 'Basilicata',
+                'PG': 'Umbria', 'TR': 'Umbria',
+                'AO': 'Valle d\'Aosta',
+                'TN': 'Trentino-Alto Adige', 'BZ': 'Trentino-Alto Adige',
+                'UD': 'Friuli-Venezia Giulia', 'PN': 'Friuli-Venezia Giulia', 'GO': 'Friuli-Venezia Giulia', 'TS': 'Friuli-Venezia Giulia',
+                'ALB': 'Estero'
+            };
+            return map[prov] || prov;
+        }
+
+        function getRegionColor(regionName) {
+            const regionColors = {
+                'Lazio': '#A8DADC',        // Azzurro pastello
+                'Sardegna': '#B8E6B8',     // Verde pastello
+                'Marche': '#FFD3A5',       // Arancione pastello
+                'Estero': '#FFB3BA',       // Rosa pastello
+                'Lombardia': '#C7B6FF',    // Viola pastello
+                'Emilia-Romagna': '#A5F3FC', // Ciano pastello
+                'Piemonte': '#F8BBD9',     // Rosa chiaro pastello
+                'Veneto': '#D4E6B5',       // Verde lime pastello
+                'Toscana': '#FFD4A3',      // Pesca pastello
+                'Campania': '#B5E7FF',     // Blu cielo pastello
+                'Sicilia': '#FFF2A5',      // Giallo pastello
+                'Puglia': '#A8F5E6',       // Turchese pastello
+                'Calabria': '#E0C3FC',     // Lavanda pastello
+                'Liguria': '#FFDFBA',      // Albicocca pastello
+                'Abruzzo': '#B3D7FF',      // Blu pastello
+                'Molise': '#DFC5FE',       // Viola chiaro pastello
+                'Basilicata': '#D6A2E8',   // Magenta pastello
+                'Umbria': '#A5D6A7',       // Verde menta pastello
+                'Valle d\'Aosta': '#FFABAB', // Rosso pastello
+                'Trentino-Alto Adige': '#D1C4E9', // Indigo pastello
+                'Friuli-Venezia Giulia': '#F8BBE6' // Rosa ciliegia pastello
+            };
+            return regionColors[regionName] || '#64748b';
+        }
+        }
+
         @media (max-width: 1024px) {
             .charts-grid { grid-template-columns: 1fr; }
             .main-content, .header { padding: 1rem; }
@@ -523,9 +723,18 @@
                 });
                 
                 const targetContent = document.getElementById(`${tabId}-content`);
-                if (targetContent) targetContent.style.display = 'block';
+                if (targetContent) {
+                    targetContent.style.display = 'block';
+                }
                 
                 currentTab = tabId;
+                
+                // Render content for the active tab
+                if (tabId === 'agents') {
+                    renderAgentCards();
+                } else if (tabId === 'regions') {
+                    renderRegionCards();
+                }
                 
                 // Resize charts after tab switch
                 setTimeout(() => {
