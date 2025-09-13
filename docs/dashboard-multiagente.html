@@ -809,19 +809,35 @@
                 }
             }
 
-            // Caricamento dati migliorato con retry
+            // Caricamento dati con fallback multipli per CORS
             async loadData() {
+                // Se abbiamo già provato tutti gli URL, mostra errore
+                if (this.currentUrlIndex >= this.CSV_URLS.length) {
+                    this.handleError('Impossibile caricare i dati da tutte le fonti disponibili. Verificare la connessione o contattare l\'amministratore.');
+                    return;
+                }
+
+                const currentUrl = this.CSV_URLS[this.currentUrlIndex];
+                
                 try {
-                    this.updateStatus('Caricamento in corso...');
+                    this.updateStatus(`Caricamento in corso... (fonte ${this.currentUrlIndex + 1}/${this.CSV_URLS.length})`);
                     
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 30000);
+                    const timeoutId = setTimeout(() => controller.abort(), 15000); // Ridotto timeout per fallback più veloce
                     
-                    const response = await fetch(`${this.CSV_URL}?t=${Date.now()}`, {
+                    const headers = {
+                        'Cache-Control': 'no-cache'
+                    };
+                    
+                    // Per CORS proxy, non aggiungere headers che causano preflight
+                    if (!currentUrl.includes('cors-anywhere') && !currentUrl.includes('allorigins')) {
+                        headers['Accept'] = 'text/csv,text/plain,*/*';
+                    }
+                    
+                    const response = await fetch(`${currentUrl}?t=${Date.now()}`, {
                         signal: controller.signal,
-                        headers: {
-                            'Cache-Control': 'no-cache'
-                        }
+                        headers,
+                        mode: currentUrl.startsWith('./') ? 'same-origin' : 'cors'
                     });
                     
                     clearTimeout(timeoutId);
@@ -836,6 +852,11 @@
                         throw new Error('File CSV vuoto o non valido');
                     }
                     
+                    // Test se i dati sembrano essere CSV validi
+                    if (!csvText.includes('DATI STATISTICHE AGENTE') && !csvText.includes('Tipo_Dato')) {
+                        throw new Error('Formato dati non riconosciuto');
+                    }
+                    
                     this.allData = this.parseCSVSafely(csvText);
                     
                     if (this.allData.length === 0) {
@@ -844,16 +865,35 @@
                     
                     this.lastUpdateTime = new Date();
                     this.retryCount = 0;
-                    this.updateStatus(`Aggiornato alle ${this.lastUpdateTime.toLocaleTimeString('it-IT')}`);
+                    this.currentUrlIndex = 0; // Reset per prossimi caricamenti
+                    this.updateStatus(`Aggiornato alle ${this.lastUpdateTime.toLocaleTimeString('it-IT')} (fonte: ${this.getSourceName(currentUrl)})`);
                     this.renderDashboard();
                     this.hideError();
                     
                 } catch (error) {
-                    this.handleLoadError(error);
+                    console.warn(`Errore con fonte ${this.currentUrlIndex + 1}: ${error.message}`);
+                    
+                    // Prova la prossima fonte
+                    this.currentUrlIndex++;
+                    
+                    if (this.currentUrlIndex < this.CSV_URLS.length) {
+                        console.log(`Tentando fonte ${this.currentUrlIndex + 1}...`);
+                        setTimeout(() => this.loadData(), 1000); // Breve pausa prima di provare la prossima fonte
+                    } else {
+                        // Tutte le fonti fallite, usa i dati demo
+                        this.handleLoadError(error);
+                    }
                 }
             }
 
-            // Gestione errori di caricamento con retry
+            getSourceName(url) {
+                if (url.startsWith('./')) return 'File Locale';
+                if (url.includes('cors-anywhere')) return 'Proxy CORS 1';
+                if (url.includes('allorigins')) return 'Proxy CORS 2';
+                return 'GitHub';
+            }
+
+            // Gestione errori con dati demo
             handleLoadError(error) {
                 this.retryCount++;
                 
@@ -863,10 +903,94 @@
                     const retryDelay = Math.min(1000 * Math.pow(2, this.retryCount), 10000);
                     this.updateStatus(`Errore caricamento, riprovo tra ${retryDelay/1000}s...`);
                     
-                    setTimeout(() => this.loadData(), retryDelay);
+                    setTimeout(() => {
+                        this.currentUrlIndex = 0; // Ricomincia dal primo URL
+                        this.loadData();
+                    }, retryDelay);
                 } else {
-                    this.handleError('Impossibile caricare i dati dopo diversi tentativi', error);
+                    // Carica dati demo per permettere il test della dashboard
+                    this.loadDemoData();
                 }
+            }
+
+            // Carica dati demo per test
+            loadDemoData() {
+                console.log('Caricamento dati demo per test della dashboard...');
+                
+                this.allData = this.generateDemoData();
+                this.lastUpdateTime = new Date();
+                this.updateStatus(`Dati demo caricati alle ${this.lastUpdateTime.toLocaleTimeString('it-IT')} - Verificare configurazione CSV`);
+                this.renderDashboard();
+                
+                // Mostra avviso dati demo
+                const errorContainer = document.getElementById('errorContainer');
+                if (errorContainer) {
+                    errorContainer.style.background = 'var(--warning)';
+                    errorContainer.style.color = '#8B5A2B';
+                    errorContainer.innerHTML = `
+                        <strong>⚠️ Modalità Demo Attiva</strong><br>
+                        Non è stato possibile caricare i dati reali. La dashboard sta usando dati di esempio per la dimostrazione.<br>
+                        <small>Verifica: 1) File CSV presente nel repository 2) Connessione internet 3) Configurazione CORS</small>
+                    `;
+                    errorContainer.style.display = 'block';
+                }
+            }
+
+            // Genera dati demo realistici
+            generateDemoData() {
+                const demoAgents = [
+                    { codice: 'AG001', nome: 'Mario Rossi', regioni: ['Lazio'] },
+                    { codice: 'AG002', nome: 'Giulia Verdi', regioni: ['Lombardia'] },
+                    { codice: 'AG003', nome: 'Francesco Bianchi', regioni: ['Campania'] },
+                    { codice: 'AG004', nome: 'Sara Neri', regioni: ['Veneto'] },
+                    { codice: 'AG005', nome: 'Antonio Gialli', regioni: ['Sicilia'] },
+                    { codice: 'AG006', nome: 'Elena Blu', regioni: ['Emilia-Romagna'] },
+                    { codice: 'AG007', nome: 'Marco Viola', regioni: ['Toscana'] },
+                    { codice: 'AG008', nome: 'Chiara Rosa', regioni: ['Piemonte'] }
+                ];
+
+                return demoAgents.map(agent => ({
+                    codice: agent.codice,
+                    nome: agent.nome,
+                    periodo: '2025',
+                    obiettivi: [{
+                        Tipo_Dato: 'OBIETTIVI',
+                        Provincia: 'Generale',
+                        Anno_Precedente: Math.floor(Math.random() * 500000) + 300000,
+                        Anno_Corrente: Math.floor(Math.random() * 600000) + 400000,
+                        Obiettivo: Math.floor(Math.random() * 700000) + 500000,
+                        Clienti_Anno_Precedente: Math.floor(Math.random() * 50) + 20,
+                        Clienti_Anno_Corrente: Math.floor(Math.random() * 60) + 25
+                    }],
+                    clienti_provincia: agent.regioni.map(regione => {
+                        const province = this.getProvincesForRegion(regione);
+                        return province.map(prov => ({
+                            Tipo_Dato: 'CLIENTI_PROVINCIA',
+                            Provincia: prov,
+                            Fatturato: Math.floor(Math.random() * 200000) + 50000,
+                            Clienti_Serviti: Math.floor(Math.random() * 30) + 10
+                        }));
+                    }).flat(),
+                    vendite_cliente: [],
+                    categoria_riepilogo: [],
+                    ripartizione: [],
+                    totali: []
+                }));
+            }
+
+            // Ottieni province per regione (versione semplificata per demo)
+            getProvincesForRegion(regione) {
+                const regionMap = {
+                    'Lazio': ['RM', 'LT'],
+                    'Lombardia': ['MI', 'BG'],
+                    'Campania': ['NA', 'SA'],
+                    'Veneto': ['VE', 'VR'],
+                    'Sicilia': ['PA', 'CT'],
+                    'Emilia-Romagna': ['BO', 'MO'],
+                    'Toscana': ['FI', 'PI'],
+                    'Piemonte': ['TO', 'AL']
+                };
+                return regionMap[regione] || ['XX'];
             }
 
             // Parsing CSV più robusto
@@ -1287,14 +1411,42 @@
                     this.charts.get('revenue').destroy();
                 }
 
-                const agentData = this.allData.map(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    return {
-                        name: agent.nome.split(' ')[0],
-                        current: general?.Anno_Corrente || 0,
-                        previous: general?.Anno_Precedente || 0
-                    };
-                }).sort((a, b) => b.current - a.current).slice(0, 8);
+                if (!this.allData || !Array.isArray(this.allData) || this.allData.length === 0) {
+                    // Render empty chart
+                    const chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: [],
+                            datasets: []
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                    this.charts.set('revenue', chart);
+                    return;
+                }
+
+                const agentData = this.allData
+                    .map(agent => {
+                        if (!agent || !agent.obiettivi || !Array.isArray(agent.obiettivi)) {
+                            return null;
+                        }
+                        
+                        const general = agent.obiettivi.find(o => o && o.Provincia === 'Generale');
+                        return {
+                            name: agent.nome ? agent.nome.split(' ')[0] : 'Agente',
+                            current: general?.Anno_Corrente || 0,
+                            previous: general?.Anno_Precedente || 0
+                        };
+                    })
+                    .filter(item => item !== null)
+                    .sort((a, b) => b.current - a.current)
+                    .slice(0, 8);
 
                 const chart = new Chart(ctx, {
                     type: 'bar',
