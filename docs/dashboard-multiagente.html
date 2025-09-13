@@ -8,19 +8,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         :root {
-            --primary: #2563EB;        /* Blu intenso */
-            --primary-dark: #1D4ED8;   /* Blu scuro intenso */
-            --secondary: #6B7280;      /* Grigio intenso */
-            --success: #059669;        /* Verde intenso */
-            --warning: #D97706;        /* Arancione intenso */
-            --danger: #DC2626;         /* Rosso intenso */
+            --primary: #2563EB;
+            --primary-dark: #1D4ED8;
+            --secondary: #6B7280;
+            --success: #059669;
+            --warning: #D97706;
+            --danger: #DC2626;
             --surface: #ffffff;
-            --surface-2: #F8FAFC;      /* Sfondo molto leggero */
-            --surface-3: #F1F5F9;      /* Sfondo leggero */
-            --border: #D1D5DB;         /* Bordo più definito */
-            --text: #374151;           /* Testo grigio scuro intenso */
-            --text-muted: #6B7280;     /* Testo grigio medio intenso */
-            --text-light: #9CA3AF;     /* Testo grigio chiaro intenso */
+            --surface-2: #F8FAFC;
+            --surface-3: #F1F5F9;
+            --border: #D1D5DB;
+            --text: #374151;
+            --text-muted: #6B7280;
+            --text-light: #9CA3AF;
             --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08);
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.15);
@@ -37,11 +37,7 @@
             line-height: 1.6;
         }
 
-        .dashboard {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+        .dashboard { min-height: 100vh; display: flex; flex-direction: column; }
 
         .header {
             background: var(--surface);
@@ -80,12 +76,7 @@
             color: white;
         }
 
-        .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-size: 0.875rem;
-        }
+        .status-bar { display: flex; align-items: center; gap: 1rem; font-size: 0.875rem; }
 
         .status-item {
             display: flex;
@@ -105,10 +96,7 @@
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         .main-content {
             flex: 1;
@@ -143,34 +131,12 @@
             transition: all 0.2s ease;
         }
 
-        .tab:hover {
-            background: var(--surface);
-            color: var(--text);
-        }
-
-        .tab.active {
-            background: var(--surface);
-            color: var(--primary);
-            box-shadow: var(--shadow);
-        }
+        .tab:hover { background: var(--surface); color: var(--text); }
+        .tab.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow); }
 
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .advanced-charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -184,29 +150,9 @@
             transition: all 0.2s ease;
         }
 
-        .card:hover {
-            box-shadow: var(--shadow);
-            border-color: var(--primary);
-        }
+        .card:hover { box-shadow: var(--shadow); border-color: var(--primary); }
 
-        .card-header {
-            padding: 1.5rem 1.5rem 0;
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
+        .card-body { padding: 1.5rem; }
 
         .metric-value {
             font-size: 2.5rem;
@@ -225,79 +171,6 @@
 
         .metric-change.positive { color: #065F46; }
         .metric-change.negative { color: #991B1B; }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            padding: 1rem 0;
-        }
-
-        .chart-container.large { height: 400px; }
-
-        .chart-details-button {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            padding: 0.5rem 0.75rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .chart-details-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .table-container { overflow-x: auto; }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th,
-        .table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .table th {
-            background: var(--surface-2);
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .table td { font-size: 0.875rem; }
-
-        .table-row { transition: background-color 0.2s ease; }
-        .table-row:hover { background: var(--surface-2); }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .badge.success { background: rgba(5, 150, 105, 0.2); color: #065F46; }
-        .badge.warning { background: rgba(217, 119, 6, 0.2); color: #92400E; }
-        .badge.danger { background: rgba(220, 38, 38, 0.2); color: #991B1B; }
 
         .loading {
             display: flex;
@@ -318,873 +191,7 @@
             margin-bottom: 1rem;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .region-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .region-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .region-card:hover {
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
-            border-color: var(--primary);
-        }
-
-        .region-detail-button {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            padding: 0.75rem 1rem;
-            margin-top: 1rem;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .region-detail-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .region-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .region-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .region-info h3 {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .region-info p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-
-        .region-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .region-stat { text-align: center; }
-
-        .region-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .region-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .agent-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .agent-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .agent-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-4px);
-        }
-
-        .agent-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 1.5rem;
-        }
-
-        .agent-name {
-            font-weight: 600;
-            font-size: 1.125rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .agent-code {
-            opacity: 0.8;
-            font-size: 0.875rem;
-        }
-
-        .agent-body { padding: 1.5rem; }
-
-        .agent-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-metric { text-align: center; }
-
-        .agent-metric-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .agent-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: var(--surface-3);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 0.5rem 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            border-radius: 3px;
-            transition: width 0.6s ease;
-        }
-
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-light);
-        }
-
-        .filter-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .filter-button {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .filter-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .filter-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.5rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow: hidden;
-            transform: scale(0.9);
-            transition: transform 0.2s ease;
-        }
-
-        .modal-overlay.show .modal {
-            transform: scale(1);
-        }
-
-        .region-detail-modal {
-            width: 95%;
-            max-width: 1200px;
-            max-height: 90vh;
-        }
-
-        .details-modal {
-            width: 95%;
-            max-width: 1400px;
-            max-height: 90vh;
-        }
-
-        .details-modal-content {
-            max-height: calc(90vh - 120px);
-            overflow-y: auto;
-        }
-
-        .details-section {
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .details-section:last-child {
-            border-bottom: none;
-        }
-
-        .details-section h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .details-card {
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            padding: 1rem;
-            border: 1px solid var(--border);
-        }
-
-        .details-card h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }
-
-        .details-card p {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-        }
-
-        .details-metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .details-metric:last-child {
-            border-bottom: none;
-        }
-
-        .details-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .details-metric-value {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .details-metric-value.positive { color: #065F46; }
-        .details-metric-value.negative { color: #991B1B; }
-
-        .region-color-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.5rem;
-        }
-
-        .performance-category {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            padding: 0.75rem;
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            border-left: 4px solid;
-        }
-
-        .performance-category.excellent {
-            border-left-color: #059669;
-            background: rgba(5, 150, 105, 0.15);
-        }
-
-        .performance-category.good {
-            border-left-color: #D97706;
-            background: rgba(217, 119, 6, 0.15);
-        }
-
-        .performance-category.warning {
-            border-left-color: #D97706;
-            background: rgba(217, 119, 6, 0.20);
-        }
-
-        .performance-category.critical {
-            border-left-color: #DC2626;
-            background: rgba(220, 38, 38, 0.15);
-        }
-
-        .performance-category h4 {
-            margin: 0;
-            font-size: 1rem;
-        }
-
-        .performance-category span {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-title {
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            padding: 0.5rem;
-            cursor: pointer;
-            border-radius: var(--radius);
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-            background: var(--surface-3);
-            color: var(--text);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .filter-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        .filter-action-btn {
-            padding: 0.5rem 0.75rem;
-            background: var(--surface-3);
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-        }
-
-        .filter-action-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .region-filter-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .region-filter-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: var(--surface-2);
-            border-radius: var(--radius);
-            transition: all 0.2s ease;
-        }
-
-        .region-filter-item:hover {
-            background: var(--surface-3);
-        }
-
-        .region-checkbox {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-
-        .region-filter-info {
-            flex: 1;
-        }
-
-        .region-filter-name {
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-
-        .region-filter-stats {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 0.75rem;
-            justify-content: flex-end;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-secondary {
-            background: var(--surface-3);
-            color: var(--text-muted);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .region-detail-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 2rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .region-detail-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .region-detail-info h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .region-detail-info p {
-            opacity: 0.9;
-            font-size: 0.875rem;
-        }
-
-        .region-detail-tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface);
-        }
-
-        .region-detail-tab {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .region-detail-tab:hover {
-            background: var(--surface-2);
-            color: var(--text);
-        }
-
-        .region-detail-tab.active {
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
-            background: var(--surface-2);
-        }
-
-        .region-detail-content {
-            flex: 1;
-            overflow-y: auto;
-            max-height: calc(90vh - 200px);
-        }
-
-        .region-detail-tab-content {
-            display: none;
-            padding: 2rem;
-        }
-
-        .region-detail-tab-content.active {
-            display: block;
-        }
-
-        .region-overview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .region-overview-card {
-            background: var(--surface-2);
-            padding: 1.5rem;
-            border-radius: var(--radius-lg);
-            text-align: center;
-        }
-
-        .region-overview-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .region-overview-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .region-overview-change {
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-top: 0.25rem;
-        }
-
-        .region-overview-change.positive { color: #065F46; }
-        .region-overview-change.negative { color: #991B1B; }
-
-        .performance-section {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .top-performers {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-        }
-
-        .top-performers h4 {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            color: var(--text);
-        }
-
-        .performer-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .performer-item:last-child {
-            border-bottom: none;
-        }
-
-        .performer-rank {
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .performer-info {
-            flex: 1;
-        }
-
-        .performer-name {
-            font-weight: 500;
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .performer-value {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .performer-change {
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .province-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .province-card {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .province-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .province-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .province-badge {
-            font-size: 0.75rem;
-        }
-
-        .province-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .province-metric {
-            text-align: center;
-        }
-
-        .province-metric-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .province-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .agent-detail-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .agent-detail-card {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .agent-detail-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-avatar {
-            width: 48px;
-            height: 48px;
-            background: var(--primary);
-            color: white;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .agent-detail-info h4 {
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .agent-detail-info p {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .agent-detail-metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .agent-detail-metric {
-            text-align: center;
-        }
-
-        .agent-detail-metric-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .agent-detail-metric-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        @media (max-width: 1024px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            .main-content, .header { padding: 1rem; }
-            .performance-section { grid-template-columns: 1fr; }
-            .region-detail-modal { max-width: 95%; }
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-            .tabs {
-                width: 100%;
-                justify-content: space-around;
-            }
-            .tab {
-                flex: 1;
-                justify-content: center;
-                padding: 0.75rem 1rem;
-            }
-            .metrics-grid,
-            .region-grid,
-            .agent-grid {
-                grid-template-columns: 1fr;
-            }
-            .region-detail-tabs {
-                flex-wrap: wrap;
-            }
-            .region-detail-tab {
-                flex: 1;
-                min-width: 120px;
-                font-size: 0.75rem;
-            }
-            .region-overview-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .details-modal {
-                max-width: 98%;
-                margin: 1rem;
-            }
-            .details-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -1192,12 +199,7 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <div class="logo-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                        </svg>
-                    </div>
+                    <div class="logo-icon">📊</div>
                     <span>Dashboard Commerciale</span>
                 </div>
                 
@@ -1207,10 +209,7 @@
                         <span id="lastUpdate">Caricamento...</span>
                     </div>
                     <div class="status-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12,6 12,12 16,14"/>
-                        </svg>
+                        <span>🕐</span>
                         <span id="currentTime"></span>
                     </div>
                 </div>
@@ -1219,443 +218,37 @@
 
         <main class="main-content">
             <div class="tabs">
-                <button class="tab active" data-tab="overview">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <path d="M9 9h6v6H9z"/>
-                    </svg>
-                    Panoramica
-                </button>
-                <button class="tab" data-tab="agents">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                    Agenti
-                </button>
-                <button class="tab" data-tab="regions">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    Regioni
-                </button>
+                <button class="tab active" data-tab="overview">📊 Panoramica</button>
+                <button class="tab" data-tab="test">🧪 Test Dati</button>
             </div>
 
             <div id="loading" class="loading">
                 <div class="spinner"></div>
-                <p>Caricamento dati...</p>
+                <p>Caricamento dati in corso...</p>
             </div>
 
             <div id="overview-content" class="tab-content" style="display: none;">
                 <div class="metrics-grid" id="kpiMetrics"></div>
+            </div>
 
-                <div class="charts-grid">
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('performance')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18h18"/>
-                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                                </svg>
-                                Performance Agenti
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container large">
-                                <canvas id="revenueChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('regions')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                </svg>
-                                Distribuzione Regionale
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="regionChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="advanced-charts-grid">
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('scatter')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="3"/>
-                                    <circle cx="19" cy="5" r="2"/>
-                                    <circle cx="5" cy="19" r="2"/>
-                                    <path d="M10.4 21.9a10 10 0 0 0 9.941-15.416"/>
-                                    <path d="M13.5 2.1a10 10 0 0 0-9.841 15.416"/>
-                                </svg>
-                                Efficienza Commerciale
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="scatterChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('funnel')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18l5-3 4 3 5-3 4 3V3l-4 3-5-3-4 3-5-3z"/>
-                                </svg>
-                                Funnel Obiettivi
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="funnelChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card" style="position: relative;">
-                        <button class="chart-details-button" onclick="openChartDetailsModal('boxplot')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
-                            </svg>
-                            Dettagli
-                        </button>
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                    <path d="M9 9h6v6H9z"/>
-                                </svg>
-                                Distribuzione Performance
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="boxplotChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+            <div id="test-content" class="tab-content" style="display: none;">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                            </svg>
-                            Classifica Performance
-                        </h3>
-                    </div>
                     <div class="card-body">
-                        <div class="table-container">
-                            <table class="table" id="performanceTable"></table>
+                        <h3>Debug Informazioni</h3>
+                        <div id="debugInfo">
+                            <p>Informazioni di debug verranno mostrate qui...</p>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div id="agents-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="agentFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Agenti
-                        <span class="filter-count" id="agentFilterCount">Tutti</span>
-                    </button>
-                </div>
-                <div class="agent-grid" id="agentGrid"></div>
-            </div>
-
-            <div id="regions-content" class="tab-content" style="display: none;">
-                <div class="filter-container">
-                    <button class="filter-button" id="regionFilterBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                        </svg>
-                        Filtra Regioni
-                        <span class="filter-count" id="filterCount">Tutte</span>
-                    </button>
-                </div>
-                <div class="region-grid" id="regionGrid"></div>
             </div>
         </main>
     </div>
-
-    <!-- Modal Filtro Regioni -->
-    <div class="modal-overlay" id="regionFilterModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Filtro Regioni</h3>
-                <button class="modal-close" id="closeRegionFilter">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="filter-actions">
-                    <button class="filter-action-btn" id="selectAllRegions">Seleziona Tutte</button>
-                    <button class="filter-action-btn" id="deselectAllRegions">Deseleziona Tutte</button>
-                </div>
-                <div class="region-filter-list" id="regionFilterList">
-                    <!-- Lista regioni sarà popolata dinamicamente -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelRegionFilter">Annulla</button>
-                <button class="btn btn-primary" id="applyRegionFilter">Applica Filtro</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Filtro Agenti -->
-    <div class="modal-overlay" id="agentFilterModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Filtro Agenti</h3>
-                <button class="modal-close" id="closeAgentFilter">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="filter-actions">
-                    <button class="filter-action-btn" id="selectAllAgents">Seleziona Tutti</button>
-                    <button class="filter-action-btn" id="deselectAllAgents">Deseleziona Tutti</button>
-                    <button class="filter-action-btn" id="selectTopPerformers">Top Performer</button>
-                    <button class="filter-action-btn" id="selectLowPerformers">Performance Basse</button>
-                </div>
-                <div class="region-filter-list" id="agentFilterList">
-                    <!-- Lista agenti sarà popolata dinamicamente -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelAgentFilter">Annulla</button>
-                <button class="btn btn-primary" id="applyAgentFilter">Applica Filtro</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Dettaglio Regione -->
-    <div class="modal-overlay" id="regionDetailModal">
-        <div class="modal region-detail-modal">
-            <div class="region-detail-header">
-                <div class="region-detail-icon" id="regionDetailIcon">L</div>
-                <div class="region-detail-info">
-                    <h2 id="regionDetailName">Lazio</h2>
-                    <p id="regionDetailSummary">5 agenti attivi in 4 province</p>
-                </div>
-                <button class="modal-close" id="closeRegionDetail" style="color: white;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="region-detail-tabs">
-                <button class="region-detail-tab active" data-region-tab="overview">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <path d="M9 9h6v6H9z"/>
-                    </svg>
-                    Panoramica
-                </button>
-                <button class="region-detail-tab" data-region-tab="provinces">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                    Province
-                </button>
-                <button class="region-detail-tab" data-region-tab="agents">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                    </svg>
-                    Agenti
-                </button>
-            </div>
-
-            <div class="region-detail-content">
-                <!-- Tab Overview -->
-                <div id="regionOverviewTab" class="region-detail-tab-content active">
-                    <div class="region-overview-grid" id="regionOverviewMetrics">
-                        <!-- Metriche popolate dinamicamente -->
-                    </div>
-                    
-                    <div class="performance-section">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Performance nel Tempo</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="regionPerformanceChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="top-performers">
-                            <h4>Top Performer</h4>
-                            <div id="regionTopPerformers">
-                                <!-- Top performers popolati dinamicamente -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab Province -->
-                <div id="regionProvincesTab" class="region-detail-tab-content">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Confronto Province</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="provincesComparisonChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="province-grid" id="provinceDetailGrid">
-                        <!-- Province cards popolate dinamicamente -->
-                    </div>
-                </div>
-
-                <!-- Tab Agenti -->
-                <div id="regionAgentsTab" class="region-detail-tab-content">
-                    <div class="agent-detail-grid" id="regionAgentGrid">
-                        <!-- Agenti cards popolate dinamicamente -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Dettagli Grafici -->
-    <div class="modal-overlay" id="chartDetailsModal">
-        <div class="modal details-modal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="chartDetailsTitle">Dettagli Grafico</h3>
-                <button class="modal-close" id="closeChartDetails">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body details-modal-content" id="chartDetailsContent">
-                <!-- Contenuto popolato dinamicamente -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="closeChartDetailsBtn">Chiudi</button>
-            </div>
-        </div>
-    </div>
-
-    <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script> 
-    <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmf7cw2ev002p1032fkvqlkup'></zapier-interfaces-chatbot-embed>
 
     <script>
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
         
         let allData = [];
         let currentTab = 'overview';
-        let charts = {};
-        let selectedRegions = new Set();
-        let availableRegions = new Map();
-        let tempSelectedRegions = new Set();
-        
-        // Variabili per filtro agenti
-        let selectedAgents = new Set();
-        let availableAgents = [];
-        let tempSelectedAgents = new Set();
-
-        // Variabili per modal dettaglio regione
-        let currentRegionData = null;
-        let currentRegionTab = 'overview';
-        let regionDetailCharts = {};
-
-        // Mappa colori regioni - Colori intensi
-        const regionColors = {
-            'Lazio': '#4A90E2',        // Azzurro intenso
-            'Sardegna': '#6BBF59',     // Verde intenso
-            'Marche': '#F5A623',       // Arancione intenso
-            'Estero': '#E85D75',       // Rosa intenso
-            'Lombardia': '#9013FE',    // Viola intenso
-            'Emilia-Romagna': '#00BCD4', // Ciano intenso
-            'Piemonte': '#E91E63',     // Rosa magenta intenso
-            'Veneto': '#8BC34A',       // Verde lime intenso
-            'Toscana': '#FF6F00',      // Arancione scuro intenso
-            'Campania': '#2196F3',     // Blu intenso
-            'Sicilia': '#FFC107',      // Giallo intenso
-            'Puglia': '#00ACC1',       // Turchese intenso
-            'Calabria': '#9C27B0',     // Viola lavanda intenso
-            'Liguria': '#FF9800',      // Arancione intenso
-            'Abruzzo': '#3F51B5',      // Blu indaco intenso
-            'Molise': '#673AB7',       // Viola scuro intenso
-            'Basilicata': '#E91E63',   // Magenta intenso
-            'Umbria': '#4CAF50',       // Verde intenso
-            'Valle d\'Aosta': '#F44336', // Rosso intenso
-            'Trentino-Alto Adige': '#7B1FA2', // Indigo intenso
-            'Friuli-Venezia Giulia': '#AD1457' // Rosa scuro intenso
-        };
-
-        function parseNumber(value) {
-            if (typeof value === 'number') return value;
-            if (typeof value !== 'string') return 0;
-            
-            let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
-            if (!clean || clean === '') return 0;
-            
-            return parseFloat(clean) || 0;
-        }
 
         function updateClock() {
             const clockElement = document.getElementById('currentTime');
@@ -1668,46 +261,70 @@
             const tabs = document.querySelectorAll('.tab');
             
             tabs.forEach(tab => {
-                if (tab && typeof tab.addEventListener === 'function') {
-                    tab.addEventListener('click', () => {
-                        const tabId = tab.dataset.tab;
-                        
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        
-                        document.querySelectorAll('.tab-content').forEach(content => {
-                            content.style.display = 'none';
-                        });
-                        
-                        const targetContent = document.getElementById(`${tabId}-content`);
-                        if (targetContent) targetContent.style.display = 'block';
-                        
-                        currentTab = tabId;
-                        
-                        setTimeout(() => {
-                            Object.values(charts).forEach(chart => {
-                                if (chart && typeof chart.resize === 'function') {
-                                    chart.resize();
-                                }
-                            });
-                        }, 100);
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.style.display = 'none';
                     });
-                }
+                    
+                    const targetContent = document.getElementById(`${tabId}-content`);
+                    if (targetContent) targetContent.style.display = 'block';
+                    
+                    currentTab = tabId;
+                });
             });
+        }
+
+        function parseNumber(value) {
+            if (typeof value === 'number') return value;
+            if (typeof value !== 'string') return 0;
+            
+            let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
+            if (!clean || clean === '') return 0;
+            
+            return parseFloat(clean) || 0;
         }
 
         async function loadData() {
             try {
                 const lastUpdateElement = document.getElementById('lastUpdate');
+                const debugElement = document.getElementById('debugInfo');
+                
                 if (lastUpdateElement) {
                     lastUpdateElement.textContent = 'Caricamento...';
                 }
+
+                console.log('Iniziando caricamento da:', CSV_URL);
                 
                 const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
                 
                 const csvText = await response.text();
+                console.log('CSV length:', csvText.length);
+                console.log('CSV preview:', csvText.substring(0, 500));
+                
+                if (debugElement) {
+                    debugElement.innerHTML = `
+                        <p><strong>URL:</strong> ${CSV_URL}</p>
+                        <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                        <p><strong>Lunghezza CSV:</strong> ${csvText.length} caratteri</p>
+                        <p><strong>Primi 500 caratteri:</strong></p>
+                        <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.75rem;">${csvText.substring(0, 500)}</pre>
+                    `;
+                }
+                
                 allData = parseCSV(csvText);
+                console.log('Parsed agents:', allData.length);
                 
                 if (lastUpdateElement) {
                     lastUpdateElement.textContent = `Aggiornato alle ${new Date().toLocaleTimeString('it-IT')}`;
@@ -1717,13 +334,233 @@
                 
             } catch (error) {
                 console.error('Errore caricamento:', error);
+                
                 const lastUpdateElement = document.getElementById('lastUpdate');
+                const debugElement = document.getElementById('debugInfo');
+                
                 if (lastUpdateElement) {
                     lastUpdateElement.textContent = 'Errore caricamento';
                     lastUpdateElement.style.color = 'var(--danger)';
+                }
+                
+                if (debugElement) {
+                    debugElement.innerHTML = `
+                        <p style="color: red;"><strong>ERRORE:</strong> ${error.message}</p>
+                        <p><strong>URL tentato:</strong> ${CSV_URL}</p>
+                        <p><strong>Stack trace:</strong></p>
+                        <pre style="background: #ffe6e6; padding: 1rem; border-radius: 4px; font-size: 0.75rem;">${error.stack || 'Non disponibile'}</pre>
+                    `;
                 }
             }
         }
 
         function parseCSV(csvText) {
+            console.log('Iniziando parsing CSV...');
+            
+            if (!csvText || csvText.trim().length === 0) {
+                console.error('CSV vuoto o non valido');
+                return [];
+            }
+
             const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
+            console.log('Sezioni trovate:', sections.length);
+            
+            const agents = [];
+
+            sections.forEach((section, index) => {
+                if (!section.trim()) return;
+
+                console.log(`Processing section ${index}...`);
+
+                const agent = {
+                    codice: '', 
+                    nome: '', 
+                    periodo: '',
+                    obiettivi: [], 
+                    clienti_provincia: [], 
+                    vendite_cliente: [],
+                    categoria_riepilogo: [], 
+                    ripartizione: [], 
+                    totali: []
+                };
+
+                const lines = section.split('\n');
+                let headers = [];
+
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (!line || line.startsWith('##')) return;
+
+                    // Estrai metadata agente
+                    if (line.includes('Codice Agente:')) {
+                        agent.codice = line.split(':')[1]?.trim() || '';
+                    } else if (line.includes('Ragione Sociale:')) {
+                        agent.nome = line.split(':')[1]?.trim() || '';
+                    } else if (line.includes('Periodo:')) {
+                        agent.periodo = line.split(':')[1]?.trim() || '';
+                    }
+                    
+                    // Identifica headers
+                    if (line.includes('Tipo_Dato,')) {
+                        headers = line.split(',').map(h => h.trim());
+                        return;
+                    }
+
+                    // Processa dati
+                    if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
+                        try {
+                            const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+                            if (values.length >= headers.length) {
+                                const row = {};
+                                headers.forEach((header, index) => {
+                                    let value = values[index] || '';
+                                    
+                                    // Converti numeri
+                                    if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
+                                         'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
+                                         'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
+                                        value = parseNumber(value);
+                                    }
+                                    row[header] = value;
+                                });
+
+                                // Categorizza dati
+                                switch (row.Tipo_Dato) {
+                                    case 'OBIETTIVI': 
+                                        agent.obiettivi.push(row); 
+                                        break;
+                                    case 'CLIENTI_PROVINCIA': 
+                                        agent.clienti_provincia.push(row); 
+                                        break;
+                                    case 'VENDITE_CLIENTE': 
+                                        agent.vendite_cliente.push(row); 
+                                        break;
+                                    case 'CATEGORIA_RIEPILOGO': 
+                                        agent.categoria_riepilogo.push(row); 
+                                        break;
+                                    case 'RIPARTIZIONE': 
+                                        agent.ripartizione.push(row); 
+                                        break;
+                                    case 'TOTALE': 
+                                        agent.totali.push(row); 
+                                        break;
+                                }
+                            }
+                        } catch (parseError) {
+                            console.warn('Errore parsing riga:', line, parseError);
+                        }
+                    }
+                });
+
+                // Aggiungi agente se ha dati validi
+                if (agent.codice && agent.nome) {
+                    agents.push(agent);
+                    console.log(`Agente aggiunto: ${agent.nome} (${agent.codice})`);
+                }
+            });
+
+            console.log(`Parsing completato. Agenti processati: ${agents.length}`);
+            return agents;
+        }
+
+        function renderDashboard() {
+            console.log('Rendering dashboard...');
+            
+            const loadingElement = document.getElementById('loading');
+            const overviewElement = document.getElementById('overview-content');
+            
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (overviewElement) overviewElement.style.display = 'block';
+            
+            renderKPIMetrics();
+        }
+
+        function renderKPIMetrics() {
+            let totalRevenue = 0, totalPrevRevenue = 0, totalClients = 0;
+            
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                if (general) {
+                    totalRevenue += general.Anno_Corrente || 0;
+                    totalPrevRevenue += general.Anno_Precedente || 0;
+                    totalClients += general.Clienti_Anno_Corrente || 0;
+                }
+            });
+
+            const growth = totalPrevRevenue > 0 ? 
+                ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
+
+            const metrics = [
+                { 
+                    title: 'Fatturato Totale', 
+                    value: formatCurrency(totalRevenue), 
+                    change: growth,
+                    previous: formatCurrency(totalPrevRevenue),
+                    showComparison: true
+                },
+                { 
+                    title: 'Clienti Attivi', 
+                    value: totalClients.toLocaleString('it-IT'), 
+                    change: null 
+                },
+                { 
+                    title: 'Agenti Attivi', 
+                    value: allData.length.toString(), 
+                    change: null 
+                },
+                { 
+                    title: 'Crescita Media', 
+                    value: `${growth.toFixed(1)}%`, 
+                    change: growth 
+                }
+            ];
+
+            const kpiElement = document.getElementById('kpiMetrics');
+            if (kpiElement) {
+                kpiElement.innerHTML = metrics.map(metric => `
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">${metric.title}</h4>
+                            <div class="metric-value">${metric.value}</div>
+                            ${metric.showComparison ? `
+                                <div style="font-size: 0.875rem; color: var(--text-muted); margin: 0.5rem 0;">
+                                    <strong>2024:</strong> ${metric.previous}
+                                </div>
+                            ` : ''}
+                            ${metric.change !== null ? `
+                                <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
+                                    ${metric.change >= 0 ? '↗️' : '↘️'}
+                                    ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            console.log('KPI metrics rendered:', metrics);
+        }
+
+        function formatCurrency(value) {
+            if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
+            if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
+            return `€${value.toLocaleString('it-IT')}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, inizializzazione dashboard...');
+            
+            try {
+                initializeTabs();
+                updateClock();
+                setInterval(updateClock, 1000);
+                loadData();
+                setInterval(loadData, 120000); // Ricarica ogni 2 minuti
+            } catch (error) {
+                console.error('Errore inizializzazione:', error);
+            }
+        });
+    </script>
+</body>
+</html>
