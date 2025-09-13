@@ -2037,16 +2037,16 @@
                                     </span>
                                 </div>
                                 <div style="font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">
-                                    ${target > 0 ? formatCurrency(target) : 'Obiettivo non definito'}
+                                    ${objectiveText}
                                 </div>
                                 <!-- Progress bar sempre presente -->
                                 <div class="progress-bar" style="margin: 0.5rem 0;">
-                                    <div class="progress-fill ${progressClass}" style="width: ${target > 0 ? Math.min(progress, 100) : 0}%;"></div>
+                                    <div class="progress-fill ${progressClass}" style="width: ${progressWidth}%;"></div>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-light);">
                                     <span>Raggiunto: ${formatCurrency(current)}</span>
                                     <span>
-                                        ${target > 0 ? 
+                                        ${hasObjective && target > 0 ? 
                                             (remaining > 0 ? `Mancano: ${formatCurrency(remaining)}` : 'Obiettivo raggiunto!') : 
                                             'Da definire'
                                         }
