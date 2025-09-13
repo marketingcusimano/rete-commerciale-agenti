@@ -2067,6 +2067,122 @@
             }
         });
 
+        // Funzioni per gestire i modali delle regioni
+        function openRegionDetailModal(regionName) {
+            const region = availableRegions.get(regionName);
+            if (!region) {
+                console.error('Regione non trovata:', regionName);
+                return;
+            }
+            
+            // Crea un modal semplice con le informazioni della regione
+            const modalHtml = `
+                <div class="modal-overlay" id="regionModal" style="opacity: 1; visibility: visible;">
+                    <div class="modal" style="transform: scale(1); max-width: 600px;">
+                        <div class="modal-header" style="background: linear-gradient(135deg, ${getRegionColor(regionName)}, ${getRegionColor(regionName)}dd); color: white;">
+                            <h3 class="modal-title">Dettagli ${regionName}</h3>
+                            <button class="modal-close" onclick="closeRegionModal()" style="color: white;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="padding: 2rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                                <div style="text-align: center; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius);">
+                                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">
+                                        ${formatCurrency(region.revenue)}
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
+                                        Fatturato Totale
+                                    </div>
+                                </div>
+                                <div style="text-align: center; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius);">
+                                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">
+                                        ${region.clients}
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
+                                        Clienti Serviti
+                                    </div>
+                                </div>
+                                <div style="text-align: center; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius);">
+                                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">
+                                        ${region.agents.size}
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
+                                        Agenti Attivi
+                                    </div>
+                                </div>
+                                <div style="text-align: center; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius);">
+                                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">
+                                        ${region.provinces.size}
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
+                                        Province Coperte
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="background: var(--surface-2); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
+                                <h4 style="margin-bottom: 1rem; color: var(--text);">Province Operative</h4>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                    ${Array.from(region.provinces).map(prov => `
+                                        <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500;">
+                                            ${prov}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <div style="background: var(--surface-2); padding: 1.5rem; border-radius: var(--radius);">
+                                <h4 style="margin-bottom: 1rem; color: var(--text);">Agenti della Regione</h4>
+                                <div style="display: grid; gap: 0.75rem;">
+                                    ${Array.from(region.agents).map(agentCode => {
+                                        const agent = allData.find(a => a.codice === agentCode);
+                                        const general = agent?.obiettivi.find(o => o.Provincia === 'Generale');
+                                        const current = general?.Anno_Corrente || 0;
+                                        return `
+                                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
+                                                <div>
+                                                    <div style="font-weight: 600; font-size: 0.875rem;">${agent?.nome || agentCode}</div>
+                                                    <div style="font-size: 0.75rem; color: var(--text-muted);">${agentCode}</div>
+                                                </div>
+                                                <div style="text-align: right;">
+                                                    <div style="font-weight: 600; color: var(--primary);">${formatCurrency(current)}</div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" onclick="closeRegionModal()">Chiudi</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Rimuovi modal esistente se presente
+            const existingModal = document.getElementById('regionModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Aggiungi nuovo modal
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRegionModal() {
+            const modal = document.getElementById('regionModal');
+            if (modal) {
+                modal.remove();
+                document.body.style.overflow = '';
+            }
+        }
+
         // Placeholder functions for chart details
         function openChartDetailsModal(chartType) {
             console.log('Opening chart details for:', chartType);
