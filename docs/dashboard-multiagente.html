@@ -3924,6 +3924,7 @@
                                 <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
                             </div>
                         </div>
+                        
                         <div class="region-stats">
                             <div class="region-stat">
                                 <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
@@ -3934,9 +3935,16 @@
                                 <div class="region-stat-label">Clienti</div>
                             </div>
                         </div>
-                        <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
-                            Province: ${Array.from(region.provinces).join(', ')}
+                        
+                        <div style="background: var(--surface-2); padding: 1rem; border-radius: var(--radius); margin: 1.5rem 0; border: 1px solid var(--border);">
+                            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">
+                                Province Operative
+                            </div>
+                            <div style="font-size: 0.875rem; color: var(--text); line-height: 1.5;">
+                                ${Array.from(region.provinces).slice(0, 8).join(', ')}${region.provinces.size > 8 ? ` e altre ${region.provinces.size - 8}` : ''}
+                            </div>
                         </div>
+                        
                         <button class="region-detail-button" onclick="openRegionDetailModal('${region.name}')">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14"/>
