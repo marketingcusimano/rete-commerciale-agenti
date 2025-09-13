@@ -8,22 +8,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         :root {
-            --primary: #2563EB;
-            --primary-dark: #1D4ED8;
-            --secondary: #6B7280;
-            --success: #059669;
-            --warning: #D97706;
-            --danger: #DC2626;
+            --primary: #7C93C3;        /* Blu pastello principale */
+            --primary-dark: #6B8CAE;   /* Blu pastello scuro */
+            --secondary: #94A3B8;      /* Grigio pastello */
+            --success: #A8E6A1;        /* Verde pastello */
+            --warning: #FFD3A5;        /* Arancione pastello */
+            --danger: #FFB3BA;         /* Rosa pastello */
             --surface: #ffffff;
-            --surface-2: #F8FAFC;
-            --surface-3: #F1F5F9;
-            --border: #D1D5DB;
-            --text: #374151;
-            --text-muted: #6B7280;
-            --text-light: #9CA3AF;
-            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08);
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.15);
+            --surface-2: #F8FAFF;      /* Sfondo molto leggero */
+            --surface-3: #F1F5FF;      /* Sfondo leggero */
+            --border: #E8E8E8;         /* Bordo pastello */
+            --text: #4A4A4A;           /* Testo grigio scuro */
+            --text-muted: #8A8A8A;     /* Testo grigio medio */
+            --text-light: #B8B8B8;     /* Testo grigio chiaro */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
             --radius: 8px;
             --radius-lg: 12px;
         }
@@ -37,7 +37,11 @@
             line-height: 1.6;
         }
 
-        .dashboard { min-height: 100vh; display: flex; flex-direction: column; }
+        .dashboard {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
         .header {
             background: var(--surface);
@@ -76,7 +80,12 @@
             color: white;
         }
 
-        .status-bar { display: flex; align-items: center; gap: 1rem; font-size: 0.875rem; }
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
 
         .status-item {
             display: flex;
@@ -96,7 +105,10 @@
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
 
         .main-content {
             flex: 1;
@@ -131,12 +143,34 @@
             transition: all 0.2s ease;
         }
 
-        .tab:hover { background: var(--surface); color: var(--text); }
-        .tab.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow); }
+        .tab:hover {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .tab.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
 
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .advanced-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -150,9 +184,29 @@
             transition: all 0.2s ease;
         }
 
-        .card:hover { box-shadow: var(--shadow); border-color: var(--primary); }
+        .card:hover {
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
 
-        .card-body { padding: 1.5rem; }
+        .card-header {
+            padding: 1.5rem 1.5rem 0;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
 
         .metric-value {
             font-size: 2.5rem;
@@ -169,8 +223,81 @@
             font-weight: 500;
         }
 
-        .metric-change.positive { color: #065F46; }
-        .metric-change.negative { color: #991B1B; }
+        .metric-change.positive { color: #4A7C59; }
+        .metric-change.negative { color: #8B4A4A; }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            padding: 1rem 0;
+        }
+
+        .chart-container.large { height: 400px; }
+
+        .chart-details-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .chart-details-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .table-container { overflow-x: auto; }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            background: var(--surface-2);
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .table td { font-size: 0.875rem; }
+
+        .table-row { transition: background-color 0.2s ease; }
+        .table-row:hover { background: var(--surface-2); }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge.success { background: rgba(168, 230, 161, 0.2); color: #4A7C59; }
+        .badge.warning { background: rgba(255, 211, 165, 0.2); color: #8B5A2B; }
+        .badge.danger { background: rgba(255, 179, 186, 0.2); color: #8B4A4A; }
 
         .loading {
             display: flex;
@@ -191,7 +318,873 @@
             margin-bottom: 1rem;
         }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .region-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .region-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .region-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .region-detail-button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .region-detail-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .region-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .region-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .region-info h3 {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .region-info p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .region-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .region-stat { text-align: center; }
+
+        .region-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .region-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .agent-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .agent-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .agent-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .agent-code {
+            opacity: 0.8;
+            font-size: 0.875rem;
+        }
+
+        .agent-body { padding: 1.5rem; }
+
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agent-metric { text-align: center; }
+
+        .agent-metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .agent-metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--surface-3);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .filter-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .filter-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .region-detail-modal {
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+        }
+
+        .details-modal {
+            width: 95%;
+            max-width: 1400px;
+            max-height: 90vh;
+        }
+
+        .details-modal-content {
+            max-height: calc(90vh - 120px);
+            overflow-y: auto;
+        }
+
+        .details-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .details-section:last-child {
+            border-bottom: none;
+        }
+
+        .details-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .details-card {
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            padding: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .details-card h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .details-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .details-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .details-metric:last-child {
+            border-bottom: none;
+        }
+
+        .details-metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .details-metric-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .details-metric-value.positive { color: #4A7C59; }
+        .details-metric-value.negative { color: #8B4A4A; }
+
+        .region-color-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .performance-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            border-left: 4px solid;
+        }
+
+        .performance-category.excellent {
+            border-left-color: #7ED957;
+            background: rgba(126, 217, 87, 0.15);
+        }
+
+        .performance-category.good {
+            border-left-color: #FFB366;
+            background: rgba(255, 179, 102, 0.15);
+        }
+
+        .performance-category.warning {
+            border-left-color: #FFB366;
+            background: rgba(255, 179, 102, 0.20);
+        }
+
+        .performance-category.critical {
+            border-left-color: #FF7A85;
+            background: rgba(255, 122, 133, 0.15);
+        }
+
+        .performance-category h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .performance-category span {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--surface-3);
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .filter-action-btn {
+            padding: 0.5rem 0.75rem;
+            background: var(--surface-3);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .filter-action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .region-filter-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .region-filter-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .region-filter-item:hover {
+            background: var(--surface-3);
+        }
+
+        .region-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .region-filter-info {
+            flex: 1;
+        }
+
+        .region-filter-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .region-filter-stats {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: var(--surface-3);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .region-detail-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .region-detail-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .region-detail-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .region-detail-info p {
+            opacity: 0.9;
+            font-size: 0.875rem;
+        }
+
+        .region-detail-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .region-detail-tab {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .region-detail-tab:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        .region-detail-tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            background: var(--surface-2);
+        }
+
+        .region-detail-content {
+            flex: 1;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+
+        .region-detail-tab-content {
+            display: none;
+            padding: 2rem;
+        }
+
+        .region-detail-tab-content.active {
+            display: block;
+        }
+
+        .region-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .region-overview-card {
+            background: var(--surface-2);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+        }
+
+        .region-overview-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .region-overview-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .region-overview-change {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .region-overview-change.positive { color: #4A7C59; }
+        .region-overview-change.negative { color: #8B4A4A; }
+
+        .performance-section {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .top-performers {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .top-performers h4 {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .performer-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .performer-item:last-child {
+            border-bottom: none;
+        }
+
+        .performer-rank {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .performer-info {
+            flex: 1;
+        }
+
+        .performer-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .performer-value {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .performer-change {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .province-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .province-card {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .province-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .province-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .province-badge {
+            font-size: 0.75rem;
+        }
+
+        .province-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .province-metric {
+            text-align: center;
+        }
+
+        .province-metric-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .province-metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .agent-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .agent-detail-card {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .agent-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agent-avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .agent-detail-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .agent-detail-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .agent-detail-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agent-detail-metric {
+            text-align: center;
+        }
+
+        .agent-detail-metric-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .agent-detail-metric-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .main-content, .header { padding: 1rem; }
+            .performance-section { grid-template-columns: 1fr; }
+            .region-detail-modal { max-width: 95%; }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            .tabs {
+                width: 100%;
+                justify-content: space-around;
+            }
+            .tab {
+                flex: 1;
+                justify-content: center;
+                padding: 0.75rem 1rem;
+            }
+            .metrics-grid,
+            .region-grid,
+            .agent-grid {
+                grid-template-columns: 1fr;
+            }
+            .region-detail-tabs {
+                flex-wrap: wrap;
+            }
+            .region-detail-tab {
+                flex: 1;
+                min-width: 120px;
+                font-size: 0.75rem;
+            }
+            .region-overview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .details-modal {
+                max-width: 98%;
+                margin: 1rem;
+            }
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -199,7 +1192,12 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <div class="logo-icon">📊</div>
+                    <div class="logo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                        </svg>
+                    </div>
                     <span>Dashboard Commerciale</span>
                 </div>
                 
@@ -209,7 +1207,10 @@
                         <span id="lastUpdate">Caricamento...</span>
                     </div>
                     <div class="status-item">
-                        <span>🕐</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12,6 12,12 16,14"/>
+                        </svg>
                         <span id="currentTime"></span>
                     </div>
                 </div>
@@ -218,37 +1219,443 @@
 
         <main class="main-content">
             <div class="tabs">
-                <button class="tab active" data-tab="overview">📊 Panoramica</button>
-                <button class="tab" data-tab="test">🧪 Test Dati</button>
+                <button class="tab active" data-tab="overview">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M9 9h6v6H9z"/>
+                    </svg>
+                    Panoramica
+                </button>
+                <button class="tab" data-tab="agents">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Agenti
+                </button>
+                <button class="tab" data-tab="regions">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Regioni
+                </button>
             </div>
 
             <div id="loading" class="loading">
                 <div class="spinner"></div>
-                <p>Caricamento dati in corso...</p>
+                <p>Caricamento dati...</p>
             </div>
 
             <div id="overview-content" class="tab-content" style="display: none;">
                 <div class="metrics-grid" id="kpiMetrics"></div>
-            </div>
 
-            <div id="test-content" class="tab-content" style="display: none;">
+                <div class="charts-grid">
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('performance')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18h18"/>
+                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                                </svg>
+                                Performance Agenti
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container large">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('regions')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                                Distribuzione Regionale
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="regionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="advanced-charts-grid">
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('scatter')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <circle cx="19" cy="5" r="2"/>
+                                    <circle cx="5" cy="19" r="2"/>
+                                    <path d="M10.4 21.9a10 10 0 0 0 9.941-15.416"/>
+                                    <path d="M13.5 2.1a10 10 0 0 0-9.841 15.416"/>
+                                </svg>
+                                Efficienza Commerciale
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="scatterChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('funnel')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18l5-3 4 3 5-3 4 3V3l-4 3-5-3-4 3-5-3z"/>
+                                </svg>
+                                Funnel Obiettivi
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="funnelChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('boxplot')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    <path d="M9 9h6v6H9z"/>
+                                </svg>
+                                Distribuzione Performance
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="boxplotChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                            </svg>
+                            Classifica Performance
+                        </h3>
+                    </div>
                     <div class="card-body">
-                        <h3>Debug Informazioni</h3>
-                        <div id="debugInfo">
-                            <p>Informazioni di debug verranno mostrate qui...</p>
+                        <div class="table-container">
+                            <table class="table" id="performanceTable"></table>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div id="agents-content" class="tab-content" style="display: none;">
+                <div class="filter-container">
+                    <button class="filter-button" id="agentFilterBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                        </svg>
+                        Filtra Agenti
+                        <span class="filter-count" id="agentFilterCount">Tutti</span>
+                    </button>
+                </div>
+                <div class="agent-grid" id="agentGrid"></div>
+            </div>
+
+            <div id="regions-content" class="tab-content" style="display: none;">
+                <div class="filter-container">
+                    <button class="filter-button" id="regionFilterBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                        </svg>
+                        Filtra Regioni
+                        <span class="filter-count" id="filterCount">Tutte</span>
+                    </button>
+                </div>
+                <div class="region-grid" id="regionGrid"></div>
+            </div>
         </main>
     </div>
+
+    <!-- Modal Filtro Regioni -->
+    <div class="modal-overlay" id="regionFilterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Filtro Regioni</h3>
+                <button class="modal-close" id="closeRegionFilter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-actions">
+                    <button class="filter-action-btn" id="selectAllRegions">Seleziona Tutte</button>
+                    <button class="filter-action-btn" id="deselectAllRegions">Deseleziona Tutte</button>
+                </div>
+                <div class="region-filter-list" id="regionFilterList">
+                    <!-- Lista regioni sarà popolata dinamicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelRegionFilter">Annulla</button>
+                <button class="btn btn-primary" id="applyRegionFilter">Applica Filtro</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Filtro Agenti -->
+    <div class="modal-overlay" id="agentFilterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Filtro Agenti</h3>
+                <button class="modal-close" id="closeAgentFilter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-actions">
+                    <button class="filter-action-btn" id="selectAllAgents">Seleziona Tutti</button>
+                    <button class="filter-action-btn" id="deselectAllAgents">Deseleziona Tutti</button>
+                    <button class="filter-action-btn" id="selectTopPerformers">Top Performer</button>
+                    <button class="filter-action-btn" id="selectLowPerformers">Performance Basse</button>
+                </div>
+                <div class="region-filter-list" id="agentFilterList">
+                    <!-- Lista agenti sarà popolata dinamicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAgentFilter">Annulla</button>
+                <button class="btn btn-primary" id="applyAgentFilter">Applica Filtro</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dettaglio Regione -->
+    <div class="modal-overlay" id="regionDetailModal">
+        <div class="modal region-detail-modal">
+            <div class="region-detail-header">
+                <div class="region-detail-icon" id="regionDetailIcon">L</div>
+                <div class="region-detail-info">
+                    <h2 id="regionDetailName">Lazio</h2>
+                    <p id="regionDetailSummary">5 agenti attivi in 4 province</p>
+                </div>
+                <button class="modal-close" id="closeRegionDetail" style="color: white;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="region-detail-tabs">
+                <button class="region-detail-tab active" data-region-tab="overview">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M9 9h6v6H9z"/>
+                    </svg>
+                    Panoramica
+                </button>
+                <button class="region-detail-tab" data-region-tab="provinces">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Province
+                </button>
+                <button class="region-detail-tab" data-region-tab="agents">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                    </svg>
+                    Agenti
+                </button>
+            </div>
+
+            <div class="region-detail-content">
+                <!-- Tab Overview -->
+                <div id="regionOverviewTab" class="region-detail-tab-content active">
+                    <div class="region-overview-grid" id="regionOverviewMetrics">
+                        <!-- Metriche popolate dinamicamente -->
+                    </div>
+                    
+                    <div class="performance-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Performance nel Tempo</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="regionPerformanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="top-performers">
+                            <h4>Top Performer</h4>
+                            <div id="regionTopPerformers">
+                                <!-- Top performers popolati dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Province -->
+                <div id="regionProvincesTab" class="region-detail-tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Confronto Province</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="provincesComparisonChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="province-grid" id="provinceDetailGrid">
+                        <!-- Province cards popolate dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Tab Agenti -->
+                <div id="regionAgentsTab" class="region-detail-tab-content">
+                    <div class="agent-detail-grid" id="regionAgentGrid">
+                        <!-- Agenti cards popolate dinamicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dettagli Grafici -->
+    <div class="modal-overlay" id="chartDetailsModal">
+        <div class="modal details-modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="chartDetailsTitle">Dettagli Grafico</h3>
+                <button class="modal-close" id="closeChartDetails">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body details-modal-content" id="chartDetailsContent">
+                <!-- Contenuto popolato dinamicamente -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeChartDetailsBtn">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script> 
+    <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmf7cw2ev002p1032fkvqlkup'></zapier-interfaces-chatbot-embed>
 
     <script>
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
         
         let allData = [];
         let currentTab = 'overview';
+        let charts = {};
+        let selectedRegions = new Set();
+        let availableRegions = new Map();
+        let tempSelectedRegions = new Set();
+        
+        // Variabili per filtro agenti
+        let selectedAgents = new Set();
+        let availableAgents = [];
+        let tempSelectedAgents = new Set();
+
+        // Variabili per modal dettaglio regione
+        let currentRegionData = null;
+        let currentRegionTab = 'overview';
+        let regionDetailCharts = {};
+
+        // Mappa colori regioni - Palette pastello moderna
+        const regionColors = {
+            'Lazio': '#A8DADC',        // Azzurro pastello
+            'Sardegna': '#B8E6B8',     // Verde pastello
+            'Marche': '#FFD3A5',       // Arancione pastello
+            'Estero': '#FFB3BA',       // Rosa pastello
+            'Lombardia': '#C7B6FF',    // Viola pastello
+            'Emilia-Romagna': '#A5F3FC', // Ciano pastello
+            'Piemonte': '#F8BBD9',     // Rosa chiaro pastello
+            'Veneto': '#D4E6B5',       // Verde lime pastello
+            'Toscana': '#FFD4A3',      // Pesca pastello
+            'Campania': '#B5E7FF',     // Blu cielo pastello
+            'Sicilia': '#FFF2A5',      // Giallo pastello
+            'Puglia': '#A8F5E6',       // Turchese pastello
+            'Calabria': '#E0C3FC',     // Lavanda pastello
+            'Liguria': '#FFDFBA',      // Albicocca pastello
+            'Abruzzo': '#B3D7FF',      // Blu pastello
+            'Molise': '#DFC5FE',       // Viola chiaro pastello
+            'Basilicata': '#D6A2E8',   // Magenta pastello
+            'Umbria': '#A5D6A7',       // Verde menta pastello
+            'Valle d\'Aosta': '#FFABAB', // Rosso pastello
+            'Trentino-Alto Adige': '#D1C4E9', // Indigo pastello
+            'Friuli-Venezia Giulia': '#F8BBE6' // Rosa ciliegia pastello
+        };
+
+        function parseNumber(value) {
+            if (typeof value === 'number') return value;
+            if (typeof value !== 'string') return 0;
+            
+            let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
+            if (!clean || clean === '') return 0;
+            
+            return parseFloat(clean) || 0;
+        }
 
         function updateClock() {
             const clockElement = document.getElementById('currentTime');
@@ -261,70 +1668,46 @@
             const tabs = document.querySelectorAll('.tab');
             
             tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.dataset.tab;
-                    
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.style.display = 'none';
+                if (tab && typeof tab.addEventListener === 'function') {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.dataset.tab;
+                        
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        
+                        document.querySelectorAll('.tab-content').forEach(content => {
+                            content.style.display = 'none';
+                        });
+                        
+                        const targetContent = document.getElementById(`${tabId}-content`);
+                        if (targetContent) targetContent.style.display = 'block';
+                        
+                        currentTab = tabId;
+                        
+                        setTimeout(() => {
+                            Object.values(charts).forEach(chart => {
+                                if (chart && typeof chart.resize === 'function') {
+                                    chart.resize();
+                                }
+                            });
+                        }, 100);
                     });
-                    
-                    const targetContent = document.getElementById(`${tabId}-content`);
-                    if (targetContent) targetContent.style.display = 'block';
-                    
-                    currentTab = tabId;
-                });
+                }
             });
-        }
-
-        function parseNumber(value) {
-            if (typeof value === 'number') return value;
-            if (typeof value !== 'string') return 0;
-            
-            let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
-            if (!clean || clean === '') return 0;
-            
-            return parseFloat(clean) || 0;
         }
 
         async function loadData() {
             try {
                 const lastUpdateElement = document.getElementById('lastUpdate');
-                const debugElement = document.getElementById('debugInfo');
-                
                 if (lastUpdateElement) {
                     lastUpdateElement.textContent = 'Caricamento...';
                 }
-
-                console.log('Iniziando caricamento da:', CSV_URL);
                 
                 const response = await fetch(`${CSV_URL}?t=${Date.now()}`);
-                
-                console.log('Response status:', response.status);
-                console.log('Response ok:', response.ok);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const csvText = await response.text();
-                console.log('CSV length:', csvText.length);
-                console.log('CSV preview:', csvText.substring(0, 500));
-                
-                if (debugElement) {
-                    debugElement.innerHTML = `
-                        <p><strong>URL:</strong> ${CSV_URL}</p>
-                        <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
-                        <p><strong>Lunghezza CSV:</strong> ${csvText.length} caratteri</p>
-                        <p><strong>Primi 500 caratteri:</strong></p>
-                        <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.75rem;">${csvText.substring(0, 500)}</pre>
-                    `;
-                }
-                
                 allData = parseCSV(csvText);
-                console.log('Parsed agents:', allData.length);
                 
                 if (lastUpdateElement) {
                     lastUpdateElement.textContent = `Aggiornato alle ${new Date().toLocaleTimeString('it-IT')}`;
@@ -334,54 +1717,25 @@
                 
             } catch (error) {
                 console.error('Errore caricamento:', error);
-                
                 const lastUpdateElement = document.getElementById('lastUpdate');
-                const debugElement = document.getElementById('debugInfo');
-                
                 if (lastUpdateElement) {
                     lastUpdateElement.textContent = 'Errore caricamento';
                     lastUpdateElement.style.color = 'var(--danger)';
-                }
-                
-                if (debugElement) {
-                    debugElement.innerHTML = `
-                        <p style="color: red;"><strong>ERRORE:</strong> ${error.message}</p>
-                        <p><strong>URL tentato:</strong> ${CSV_URL}</p>
-                        <p><strong>Stack trace:</strong></p>
-                        <pre style="background: #ffe6e6; padding: 1rem; border-radius: 4px; font-size: 0.75rem;">${error.stack || 'Non disponibile'}</pre>
-                    `;
                 }
             }
         }
 
         function parseCSV(csvText) {
-            console.log('Iniziando parsing CSV...');
-            
-            if (!csvText || csvText.trim().length === 0) {
-                console.error('CSV vuoto o non valido');
-                return [];
-            }
-
             const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
-            console.log('Sezioni trovate:', sections.length);
-            
             const agents = [];
 
-            sections.forEach((section, index) => {
+            sections.forEach(section => {
                 if (!section.trim()) return;
 
-                console.log(`Processing section ${index}...`);
-
                 const agent = {
-                    codice: '', 
-                    nome: '', 
-                    periodo: '',
-                    obiettivi: [], 
-                    clienti_provincia: [], 
-                    vendite_cliente: [],
-                    categoria_riepilogo: [], 
-                    ripartizione: [], 
-                    totali: []
+                    codice: '', nome: '', periodo: '',
+                    obiettivi: [], clienti_provincia: [], vendite_cliente: [],
+                    categoria_riepilogo: [], ripartizione: [], totali: []
                 };
 
                 const lines = section.split('\n');
@@ -391,7 +1745,6 @@
                     line = line.trim();
                     if (!line || line.startsWith('##')) return;
 
-                    // Estrai metadata agente
                     if (line.includes('Codice Agente:')) {
                         agent.codice = line.split(':')[1]?.trim() || '';
                     } else if (line.includes('Ragione Sociale:')) {
@@ -400,79 +1753,1434 @@
                         agent.periodo = line.split(':')[1]?.trim() || '';
                     }
                     
-                    // Identifica headers
                     if (line.includes('Tipo_Dato,')) {
                         headers = line.split(',').map(h => h.trim());
                         return;
                     }
 
-                    // Processa dati
                     if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
-                        try {
-                            const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-                            if (values.length >= headers.length) {
-                                const row = {};
-                                headers.forEach((header, index) => {
-                                    let value = values[index] || '';
-                                    
-                                    // Converti numeri
-                                    if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
-                                         'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
-                                         'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
-                                        value = parseNumber(value);
-                                    }
-                                    row[header] = value;
-                                });
-
-                                // Categorizza dati
-                                switch (row.Tipo_Dato) {
-                                    case 'OBIETTIVI': 
-                                        agent.obiettivi.push(row); 
-                                        break;
-                                    case 'CLIENTI_PROVINCIA': 
-                                        agent.clienti_provincia.push(row); 
-                                        break;
-                                    case 'VENDITE_CLIENTE': 
-                                        agent.vendite_cliente.push(row); 
-                                        break;
-                                    case 'CATEGORIA_RIEPILOGO': 
-                                        agent.categoria_riepilogo.push(row); 
-                                        break;
-                                    case 'RIPARTIZIONE': 
-                                        agent.ripartizione.push(row); 
-                                        break;
-                                    case 'TOTALE': 
-                                        agent.totali.push(row); 
-                                        break;
+                        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+                        if (values.length >= headers.length) {
+                            const row = {};
+                            headers.forEach((header, index) => {
+                                let value = values[index] || '';
+                                
+                                if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
+                                     'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
+                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
+                                    value = parseNumber(value);
                                 }
+                                row[header] = value;
+                            });
+
+                            switch (row.Tipo_Dato) {
+                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
+                                case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
+                                case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
+                                case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
+                                case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
+                                case 'TOTALE': agent.totali.push(row); break;
                             }
-                        } catch (parseError) {
-                            console.warn('Errore parsing riga:', line, parseError);
                         }
                     }
                 });
 
-                // Aggiungi agente se ha dati validi
                 if (agent.codice && agent.nome) {
                     agents.push(agent);
-                    console.log(`Agente aggiunto: ${agent.nome} (${agent.codice})`);
                 }
             });
 
-            console.log(`Parsing completato. Agenti processati: ${agents.length}`);
             return agents;
         }
 
-        function renderDashboard() {
-            console.log('Rendering dashboard...');
+        function getRegionFromProvince(prov) {
+            const map = {
+                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
+                'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
+                'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
+                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'PC': 'Emilia-Romagna', 'BO': 'Emilia-Romagna', 'MO': 'Emilia-Romagna', 'RE': 'Emilia-Romagna', 'PR': 'Emilia-Romagna', 'FE': 'Emilia-Romagna', 'FC': 'Emilia-Romagna',
+                'CR': 'Lombardia', 'LO': 'Lombardia', 'MI': 'Lombardia', 'BG': 'Lombardia', 'BS': 'Lombardia', 'CO': 'Lombardia', 'MN': 'Lombardia', 'PV': 'Lombardia', 'SO': 'Lombardia', 'VA': 'Lombardia', 'LC': 'Lombardia', 'MB': 'Lombardia',
+                'TO': 'Piemonte', 'AL': 'Piemonte', 'AT': 'Piemonte', 'BI': 'Piemonte', 'CN': 'Piemonte', 'NO': 'Piemonte', 'VB': 'Piemonte', 'VC': 'Piemonte',
+                'VE': 'Veneto', 'VR': 'Veneto', 'VI': 'Veneto', 'PD': 'Veneto', 'TV': 'Veneto', 'BL': 'Veneto', 'RO': 'Veneto',
+                'FI': 'Toscana', 'PI': 'Toscana', 'SI': 'Toscana', 'AR': 'Toscana', 'GR': 'Toscana', 'LI': 'Toscana', 'LU': 'Toscana', 'MS': 'Toscana', 'PT': 'Toscana', 'PO': 'Toscana',
+                'NA': 'Campania', 'AV': 'Campania', 'BN': 'Campania', 'CE': 'Campania', 'SA': 'Campania',
+                'PA': 'Sicilia', 'CT': 'Sicilia', 'ME': 'Sicilia', 'AG': 'Sicilia', 'CL': 'Sicilia', 'EN': 'Sicilia', 'RG': 'Sicilia', 'SR': 'Sicilia', 'TP': 'Sicilia',
+                'BA': 'Puglia', 'BR': 'Puglia', 'FG': 'Puglia', 'LE': 'Puglia', 'TA': 'Puglia', 'BT': 'Puglia',
+                'CZ': 'Calabria', 'CS': 'Calabria', 'KR': 'Calabria', 'RC': 'Calabria', 'VV': 'Calabria',
+                'GE': 'Liguria', 'IM': 'Liguria', 'LA': 'Liguria', 'SV': 'Liguria',
+                'AQ': 'Abruzzo', 'CH': 'Abruzzo', 'PE': 'Abruzzo', 'TE': 'Abruzzo',
+                'CB': 'Molise', 'IS': 'Molise',
+                'MT': 'Basilicata', 'PZ': 'Basilicata',
+                'PG': 'Umbria', 'TR': 'Umbria',
+                'AO': 'Valle d\'Aosta',
+                'TN': 'Trentino-Alto Adige', 'BZ': 'Trentino-Alto Adige',
+                'UD': 'Friuli-Venezia Giulia', 'PN': 'Friuli-Venezia Giulia', 'GO': 'Friuli-Venezia Giulia', 'TS': 'Friuli-Venezia Giulia',
+                'ALB': 'Estero'
+            };
+            return map[prov] || prov;
+        }
+
+        function getRegionColor(regionName) {
+            return regionColors[regionName] || '#64748b';
+        }
+
+        function populateAvailableRegions() {
+            availableRegions.clear();
             
+            allData.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    const regionName = getRegionFromProvince(prov.Provincia);
+                    
+                    if (!availableRegions.has(regionName)) {
+                        availableRegions.set(regionName, {
+                            name: regionName,
+                            revenue: 0,
+                            clients: 0,
+                            agents: new Set(),
+                            provinces: new Set()
+                        });
+                    }
+                    
+                    const region = availableRegions.get(regionName);
+                    region.revenue += prov.Fatturato || 0;
+                    region.clients += prov.Clienti_Serviti || 0;
+                    region.agents.add(agent.codice);
+                    region.provinces.add(prov.Provincia);
+                });
+            });
+        }
+
+        function populateAvailableAgents() {
+            availableAgents = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                
+                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                
+                let status = 'Critico';
+                if (growth >= 10) status = 'Ottimo';
+                else if (growth >= 0) status = 'Buono';
+                
+                return {
+                    codice: agent.codice,
+                    nome: agent.nome,
+                    current,
+                    previous,
+                    growth,
+                    clients,
+                    status,
+                    regions
+                };
+            }).sort((a, b) => b.current - a.current);
+        }
+
+        // Funzioni per modal dettagli grafici
+        function openChartDetailsModal(chartType) {
+            const modal = document.getElementById('chartDetailsModal');
+            const title = document.getElementById('chartDetailsTitle');
+            const content = document.getElementById('chartDetailsContent');
+            
+            if (!modal || !title || !content) return;
+
+            // Imposta il titolo
+            const titles = {
+                'performance': 'Performance Agenti - Dettagli Completi',
+                'regions': 'Distribuzione Regionale - Dettagli Completi', 
+                'scatter': 'Efficienza Commerciale - Analisi Dettagliata',
+                'funnel': 'Funnel Obiettivi - Classificazione Agenti',
+                'boxplot': 'Distribuzione Performance - Statistiche per Regione'
+            };
+            title.textContent = titles[chartType] || 'Dettagli Grafico';
+
+            // Genera il contenuto
+            switch(chartType) {
+                case 'performance':
+                    content.innerHTML = generatePerformanceDetails();
+                    break;
+                case 'regions':
+                    content.innerHTML = generateRegionDetails();
+                    break;
+                case 'scatter':
+                    content.innerHTML = generateScatterDetails();
+                    break;
+                case 'funnel':
+                    content.innerHTML = generateFunnelDetails();
+                    break;
+                case 'boxplot':
+                    content.innerHTML = generateBoxplotDetails();
+                    break;
+                default:
+                    content.innerHTML = '<p>Dettagli non disponibili</p>';
+            }
+
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeChartDetailsModal() {
+            const modal = document.getElementById('chartDetailsModal');
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function initializeChartDetailsModal() {
+            const closeBtn = document.getElementById('closeChartDetails');
+            const closeBtnFooter = document.getElementById('closeChartDetailsBtn');
+            const modal = document.getElementById('chartDetailsModal');
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeChartDetailsModal);
+            }
+            
+            if (closeBtnFooter) {
+                closeBtnFooter.addEventListener('click', closeChartDetailsModal);
+            }
+
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target.id === 'chartDetailsModal') {
+                        closeChartDetailsModal();
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal && modal.classList.contains('show')) {
+                    closeChartDetailsModal();
+                }
+            });
+        }
+
+        function generatePerformanceDetails() {
+            const agentData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                
+                return { 
+                    agent, current, previous, growth, clients, regions,
+                    efficiency: clients > 0 ? current / clients : 0
+                };
+            }).sort((a, b) => b.current - a.current);
+
+            return `
+                <div class="details-section">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                        </svg>
+                        Performance Completa Agenti
+                    </h3>
+                    <div class="details-grid">
+                        ${agentData.map((item, index) => `
+                            <div class="details-card">
+                                <h4>${item.agent.nome}</h4>
+                                <p>Codice: ${item.agent.codice} | Posizione: #${index + 1}</p>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Fatturato 2025</span>
+                                    <span class="details-metric-value">${formatCurrency(item.current)}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Fatturato 2024</span>
+                                    <span class="details-metric-value">${formatCurrency(item.previous)}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Crescita</span>
+                                    <span class="details-metric-value ${item.growth >= 0 ? 'positive' : 'negative'}">${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Clienti Attivi</span>
+                                    <span class="details-metric-value">${item.clients}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Efficienza</span>
+                                    <span class="details-metric-value">${formatCurrency(item.efficiency)}/cliente</span>
+                                </div>
+                                <div style="margin-top: 0.75rem;">
+                                    <span class="details-metric-label">Regioni:</span><br>
+                                    ${item.regions.map(region => `
+                                        <span style="display: inline-flex; align-items: center; margin: 0.25rem 0.5rem 0.25rem 0;">
+                                            <span class="region-color-indicator" style="background-color: ${getRegionColor(region)};"></span>
+                                            <span style="font-size: 0.75rem;">${region}</span>
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateRegionDetails() {
+            const regionData = {};
+            
+            allData.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    const regionName = getRegionFromProvince(prov.Provincia);
+                    if (!regionData[regionName]) {
+                        regionData[regionName] = {
+                            name: regionName,
+                            revenue: 0,
+                            clients: 0,
+                            agents: new Set(),
+                            provinces: new Set(),
+                            agentList: []
+                        };
+                    }
+                    regionData[regionName].revenue += prov.Fatturato || 0;
+                    regionData[regionName].clients += prov.Clienti_Serviti || 0;
+                    regionData[regionName].agents.add(agent.codice);
+                    regionData[regionName].provinces.add(prov.Provincia);
+                    
+                    if (!regionData[regionName].agentList.find(a => a.codice === agent.codice)) {
+                        regionData[regionName].agentList.push({
+                            codice: agent.codice,
+                            nome: agent.nome
+                        });
+                    }
+                });
+            });
+
+            const sortedRegions = Object.values(regionData).sort((a, b) => b.revenue - a.revenue);
+
+            return `
+                <div class="details-section">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                        Distribuzione Regionale Completa
+                    </h3>
+                    <div class="details-grid">
+                        ${sortedRegions.map((region, index) => `
+                            <div class="details-card">
+                                <h4>
+                                    <span class="region-color-indicator" style="background-color: ${getRegionColor(region.name)};"></span>
+                                    ${region.name}
+                                </h4>
+                                <p>Posizione: #${index + 1} per fatturato</p>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Fatturato Totale</span>
+                                    <span class="details-metric-value">${formatCurrency(region.revenue)}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Clienti Serviti</span>
+                                    <span class="details-metric-value">${region.clients}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Numero Agenti</span>
+                                    <span class="details-metric-value">${region.agents.size}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Province Coperte</span>
+                                    <span class="details-metric-value">${region.provinces.size}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Media per Agente</span>
+                                    <span class="details-metric-value">${formatCurrency(region.revenue / region.agents.size)}</span>
+                                </div>
+                                <div style="margin-top: 0.75rem;">
+                                    <span class="details-metric-label">Agenti:</span><br>
+                                    ${region.agentList.map(agent => `
+                                        <span style="font-size: 0.75rem; display: block; margin: 0.25rem 0;">${agent.nome} (${agent.codice})</span>
+                                    `).join('')}
+                                </div>
+                                <div style="margin-top: 0.5rem;">
+                                    <span class="details-metric-label">Province:</span><br>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">${Array.from(region.provinces).join(', ')}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateScatterDetails() {
+            const scatterData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const efficiency = clients > 0 ? current / clients : 0;
+                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                
+                return { agent, current, clients, growth, efficiency, regions, previous };
+            }).filter(item => item.clients > 0 && item.current > 0)
+              .sort((a, b) => b.efficiency - a.efficiency);
+
+            return `
+                <div class="details-section">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <circle cx="19" cy="5" r="2"/>
+                            <circle cx="5" cy="19" r="2"/>
+                        </svg>
+                        Analisi Efficienza Commerciale
+                    </h3>
+                    <div class="details-grid">
+                        ${scatterData.map((item, index) => `
+                            <div class="details-card">
+                                <h4>${item.agent.nome}</h4>
+                                <p>Codice: ${item.agent.codice} | Ranking Efficienza: #${index + 1}</p>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Efficienza (€/cliente)</span>
+                                    <span class="details-metric-value">${formatCurrency(item.efficiency)}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Fatturato Totale</span>
+                                    <span class="details-metric-value">${formatCurrency(item.current)}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Clienti Gestiti</span>
+                                    <span class="details-metric-value">${item.clients}</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Crescita vs 2024</span>
+                                    <span class="details-metric-value ${item.growth >= 0 ? 'positive' : 'negative'}">${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%</span>
+                                </div>
+                                <div class="details-metric">
+                                    <span class="details-metric-label">Fatturato 2024</span>
+                                    <span class="details-metric-value">${formatCurrency(item.previous)}</span>
+                                </div>
+                                <div style="margin-top: 0.75rem;">
+                                    <span class="details-metric-label">Regioni Operative:</span><br>
+                                    ${item.regions.map(region => `
+                                        <span style="display: inline-flex; align-items: center; margin: 0.25rem 0.5rem 0.25rem 0;">
+                                            <span class="region-color-indicator" style="background-color: ${getRegionColor(region)};"></span>
+                                            <span style="font-size: 0.75rem;">${region}</span>
+                                        </span>
+                                    `).join('')}
+                                </div>
+                                <div style="margin-top: 0.5rem;">
+                                    <span class="badge ${item.efficiency > 50000 ? 'success' : item.efficiency > 30000 ? 'warning' : 'danger'}" style="font-size: 0.75rem;">
+                                        ${item.efficiency > 50000 ? 'Alta Efficienza' : item.efficiency > 30000 ? 'Efficienza Media' : 'Efficienza Bassa'}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateFunnelDetails() {
+            const categories = {
+                excellent: { agents: [], label: 'Eccellenti (100%+)', color: '#A8E6A1', min: 100 },
+                good: { agents: [], label: 'Buoni (80-99%)', color: '#FFD3A5', min: 80, max: 99.9 },
+                warning: { agents: [], label: 'Attenzione (60-79%)', color: '#FFD3A5', min: 60, max: 79.9 },
+                critical: { agents: [], label: 'Critici (Sotto 60%)', color: '#FFB3BA', max: 59.9 }
+            };
+
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const target = general?.Obiettivo || 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                
+                if (target > 0) {
+                    const achievement = (current / target) * 100;
+                    const agentData = { agent, current, target, achievement, clients, growth, previous };
+                    
+                    if (achievement >= 100) categories.excellent.agents.push(agentData);
+                    else if (achievement >= 80) categories.good.agents.push(agentData);
+                    else if (achievement >= 60) categories.warning.agents.push(agentData);
+                    else categories.critical.agents.push(agentData);
+                }
+            });
+
+            // Ordina ogni categoria per achievement
+            Object.values(categories).forEach(category => {
+                category.agents.sort((a, b) => b.achievement - a.achievement);
+            });
+
+            return `
+                <div class="details-section">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18l5-3 4 3 5-3 4 3V3l-4 3-5-3-4 3-5-3z"/>
+                        </svg>
+                        Classificazione Agenti per Performance
+                    </h3>
+                    
+                    ${Object.entries(categories).map(([key, category]) => `
+                        <div class="performance-category ${key}">
+                            <div>
+                                <h4>${category.label}</h4>
+                                <span>${category.agents.length} agenti (${((category.agents.length / allData.length) * 100).toFixed(1)}%)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="details-grid" style="margin-bottom: 2rem;">
+                            ${category.agents.map((item, index) => `
+                                <div class="details-card">
+                                    <h4>${item.agent.nome}</h4>
+                                    <p>Codice: ${item.agent.codice} | Posizione in categoria: #${index + 1}</p>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Raggiungimento Obiettivo</span>
+                                        <span class="details-metric-value" style="color: ${category.color};">${item.achievement.toFixed(1)}%</span>
+                                    </div>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Fatturato Attuale</span>
+                                        <span class="details-metric-value">${formatCurrency(item.current)}</span>
+                                    </div>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Obiettivo Target</span>
+                                        <span class="details-metric-value">${formatCurrency(item.target)}</span>
+                                    </div>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Gap da Obiettivo</span>
+                                        <span class="details-metric-value ${item.current >= item.target ? 'positive' : 'negative'}">
+                                            ${item.current >= item.target ? '+' : ''}${formatCurrency(item.current - item.target)}
+                                        </span>
+                                    </div>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Clienti Attivi</span>
+                                        <span class="details-metric-value">${item.clients}</span>
+                                    </div>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Crescita vs 2024</span>
+                                        <span class="details-metric-value ${item.growth >= 0 ? 'positive' : 'negative'}">${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%</span>
+                                    </div>
+                                    <div style="margin-top: 0.75rem;">
+                                        <div style="background: ${category.color}20; padding: 0.5rem; border-radius: 4px; border-left: 3px solid ${category.color};">
+                                            <span style="font-size: 0.75rem; font-weight: 600;">
+                                                ${key === 'excellent' ? 'Superato l\'obiettivo!' : 
+                                                  key === 'good' ? 'Vicino all\'obiettivo' : 
+                                                  key === 'warning' ? 'Necessita spinta finale' : 
+                                                  'Richiede attenzione urgente'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function generateBoxplotDetails() {
+            const regionPerformance = {};
+            
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                
+                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                const mainRegion = agentRegions[0] || 'Generale';
+                
+                if (!regionPerformance[mainRegion]) {
+                    regionPerformance[mainRegion] = {
+                        name: mainRegion,
+                        agents: [],
+                        growths: []
+                    };
+                }
+                
+                regionPerformance[mainRegion].agents.push({
+                    agent, current, previous, growth, clients
+                });
+                regionPerformance[mainRegion].growths.push(growth);
+            });
+
+            // Calcola statistiche per ogni regione
+            Object.values(regionPerformance).forEach(region => {
+                const sorted = region.growths.sort((a, b) => a - b);
+                const len = sorted.length;
+                region.stats = {
+                    min: sorted[0],
+                    q1: sorted[Math.floor(len * 0.25)],
+                    median: sorted[Math.floor(len * 0.5)],
+                    q3: sorted[Math.floor(len * 0.75)],
+                    max: sorted[len - 1],
+                    average: sorted.reduce((sum, val) => sum + val, 0) / len
+                };
+                
+                // Ordina agenti per crescita
+                region.agents.sort((a, b) => b.growth - a.growth);
+            });
+
+            const sortedRegions = Object.values(regionPerformance).sort((a, b) => b.stats.median - a.stats.median);
+
+            return `
+                <div class="details-section">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M9 9h6v6H9z"/>
+                        </svg>
+                        Distribuzione Performance per Regione
+                    </h3>
+                    
+                    <div class="details-grid">
+                        ${sortedRegions.map((region, index) => `
+                            <div class="details-card">
+                                <h4>
+                                    <span class="region-color-indicator" style="background-color: ${getRegionColor(region.name)};"></span>
+                                    ${region.name}
+                                </h4>
+                                <p>Ranking per crescita mediana: #${index + 1}</p>
+                                
+                                <div style="background: var(--surface-3); padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                                    <h5 style="margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--text);">Statistiche Crescita</h5>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Crescita Mediana</span>
+                                        <span class="details-metric-value ${region.stats.median >= 0 ? 'positive' : 'negative'}">${region.stats.median.toFixed(1)}%</span>
+                                    </div>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Crescita Media</span>
+                                        <span class="details-metric-value ${region.stats.average >= 0 ? 'positive' : 'negative'}">${region.stats.average.toFixed(1)}%</span>
+                                    </div>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Migliore Performance</span>
+                                        <span class="details-metric-value positive">${region.stats.max.toFixed(1)}%</span>
+                                    </div>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Performance Minima</span>
+                                        <span class="details-metric-value ${region.stats.min >= 0 ? 'positive' : 'negative'}">${region.stats.min.toFixed(1)}%</span>
+                                    </div>
+                                    <div class="details-metric">
+                                        <span class="details-metric-label">Range (Q3-Q1)</span>
+                                        <span class="details-metric-value">${(region.stats.q3 - region.stats.q1).toFixed(1)}%</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h5 style="margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--text);">Agenti della Regione</h5>
+                                    ${region.agents.map((item, agentIndex) => `
+                                        <div style="padding: 0.5rem; margin: 0.25rem 0; background: ${agentIndex === 0 ? 'rgba(168, 230, 161, 0.1)' : agentIndex === region.agents.length - 1 && region.agents.length > 1 ? 'rgba(255, 179, 186, 0.1)' : 'var(--surface-2)'}; border-radius: 4px; font-size: 0.75rem;">
+                                            <div style="font-weight: 600; margin-bottom: 0.25rem;">${item.agent.nome} (${item.agent.codice})</div>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <span>Fatturato: ${formatCurrency(item.current)}</span>
+                                                <span class="${item.growth >= 0 ? 'positive' : 'negative'}">${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%</span>
+                                            </div>
+                                            <div style="color: var(--text-muted);">Clienti: ${item.clients}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Funzioni esistenti continuano...
+        function updateFilterButtonText() {
+            const filterCount = document.getElementById('filterCount');
+            if (!filterCount) return;
+            
+            const totalRegions = availableRegions.size;
+            
+            if (selectedRegions.size === 0) {
+                filterCount.textContent = 'Tutte';
+            } else if (selectedRegions.size === totalRegions) {
+                filterCount.textContent = 'Tutte';
+            } else {
+                filterCount.textContent = `${selectedRegions.size}/${totalRegions}`;
+            }
+        }
+
+        function updateAgentFilterButtonText() {
+            const filterCount = document.getElementById('agentFilterCount');
+            if (!filterCount) return;
+            
+            const totalAgents = availableAgents.length;
+            
+            if (selectedAgents.size === 0) {
+                filterCount.textContent = 'Tutti';
+            } else if (selectedAgents.size === totalAgents) {
+                filterCount.textContent = 'Tutti';
+            } else {
+                filterCount.textContent = `${selectedAgents.size}/${totalAgents}`;
+            }
+        }
+
+        function openRegionFilterModal() {
+            tempSelectedRegions = new Set(selectedRegions);
+            
+            const filterList = document.getElementById('regionFilterList');
+            if (!filterList) return;
+            
+            filterList.innerHTML = '';
+            
+            Array.from(availableRegions.values())
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .forEach(region => {
+                    const isSelected = tempSelectedRegions.has(region.name);
+                    
+                    const item = document.createElement('div');
+                    item.className = 'region-filter-item';
+                    item.innerHTML = `
+                        <input type="checkbox" 
+                               class="region-checkbox" 
+                               id="region-${region.name}" 
+                               ${isSelected ? 'checked' : ''}
+                               data-region="${region.name}">
+                        <div class="region-filter-info">
+                            <div class="region-filter-name">${region.name}</div>
+                            <div class="region-filter-stats">
+                                ${formatCurrency(region.revenue)} • ${region.clients} clienti • ${region.agents.size} agenti
+                            </div>
+                        </div>
+                    `;
+                    
+                    const checkbox = item.querySelector('.region-checkbox');
+                    if (checkbox) {
+                        checkbox.addEventListener('change', (e) => {
+                            if (e.target.checked) {
+                                tempSelectedRegions.add(region.name);
+                            } else {
+                                tempSelectedRegions.delete(region.name);
+                            }
+                        });
+                    }
+                    
+                    filterList.appendChild(item);
+                });
+            
+            const modal = document.getElementById('regionFilterModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeRegionFilterModal() {
+            const modal = document.getElementById('regionFilterModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function applyRegionFilter() {
+            selectedRegions = new Set(tempSelectedRegions);
+            renderRegionCards();
+            updateFilterButtonText();
+            closeRegionFilterModal();
+        }
+
+        function selectAllRegions() {
+            tempSelectedRegions.clear();
+            availableRegions.forEach((region, name) => {
+                tempSelectedRegions.add(name);
+            });
+            
+            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllRegions() {
+            tempSelectedRegions.clear();
+            
+            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function openAgentFilterModal() {
+            tempSelectedAgents = new Set(selectedAgents);
+            
+            const filterList = document.getElementById('agentFilterList');
+            if (!filterList) return;
+            
+            filterList.innerHTML = '';
+            
+            availableAgents.forEach((agent, index) => {
+                const isSelected = tempSelectedAgents.has(agent.codice);
+                
+                const item = document.createElement('div');
+                item.className = 'region-filter-item';
+                item.innerHTML = `
+                    <input type="checkbox" 
+                           class="region-checkbox" 
+                           id="agent-${agent.codice}" 
+                           ${isSelected ? 'checked' : ''}
+                           data-agent="${agent.codice}">
+                    <div class="region-filter-info">
+                        <div class="region-filter-name">${agent.nome}</div>
+                        <div class="region-filter-stats">
+                            ${formatCurrency(agent.current)} • ${agent.clients} clienti • ${agent.growth.toFixed(1)}% crescita
+                        </div>
+                        <div class="region-filter-stats">
+                            <span class="badge ${agent.growth >= 10 ? 'success' : agent.growth >= 0 ? 'warning' : 'danger'}" style="margin-top: 0.25rem;">
+                                ${agent.status}
+                            </span>
+                            <span style="font-size: 0.65rem; margin-left: 0.5rem; color: var(--text-muted);">
+                                ${agent.regions.join(', ')}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                
+                const checkbox = item.querySelector('.region-checkbox');
+                if (checkbox) {
+                    checkbox.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            tempSelectedAgents.add(agent.codice);
+                        } else {
+                            tempSelectedAgents.delete(agent.codice);
+                        }
+                    });
+                }
+                
+                filterList.appendChild(item);
+            });
+            
+            const modal = document.getElementById('agentFilterModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeAgentFilterModal() {
+            const modal = document.getElementById('agentFilterModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function applyAgentFilter() {
+            selectedAgents = new Set(tempSelectedAgents);
+            renderAgentCards();
+            updateAgentFilterButtonText();
+            closeAgentFilterModal();
+        }
+
+        function selectAllAgents() {
+            tempSelectedAgents.clear();
+            availableAgents.forEach(agent => {
+                tempSelectedAgents.add(agent.codice);
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllAgents() {
+            tempSelectedAgents.clear();
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function selectTopPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth >= 10) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                const agentCode = checkbox.dataset.agent;
+                const agent = availableAgents.find(a => a.codice === agentCode);
+                checkbox.checked = agent && agent.growth >= 10;
+            });
+        }
+
+        function selectLowPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth < 0) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                const agentCode = checkbox.dataset.agent;
+                const agent = availableAgents.find(a => a.codice === agentCode);
+                checkbox.checked = agent && agent.growth < 0;
+            });
+        }
+
+        function initializeRegionFilter() {
+            const regionFilterBtn = document.getElementById('regionFilterBtn');
+            const closeRegionFilter = document.getElementById('closeRegionFilter');
+            const cancelRegionFilter = document.getElementById('cancelRegionFilter');
+            const applyRegionFilterBtn = document.getElementById('applyRegionFilter');
+            const selectAllRegionsBtn = document.getElementById('selectAllRegions');
+            const deselectAllRegionsBtn = document.getElementById('deselectAllRegions');
+            const regionFilterModal = document.getElementById('regionFilterModal');
+
+            if (regionFilterBtn) {
+                regionFilterBtn.addEventListener('click', openRegionFilterModal);
+            }
+            
+            if (closeRegionFilter) {
+                closeRegionFilter.addEventListener('click', closeRegionFilterModal);
+            }
+            
+            if (cancelRegionFilter) {
+                cancelRegionFilter.addEventListener('click', closeRegionFilterModal);
+            }
+            
+            if (applyRegionFilterBtn) {
+                applyRegionFilterBtn.addEventListener('click', applyRegionFilter);
+            }
+            
+            if (selectAllRegionsBtn) {
+                selectAllRegionsBtn.addEventListener('click', selectAllRegions);
+            }
+            
+            if (deselectAllRegionsBtn) {
+                deselectAllRegionsBtn.addEventListener('click', deselectAllRegions);
+            }
+            
+            if (regionFilterModal) {
+                regionFilterModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'regionFilterModal') {
+                        closeRegionFilterModal();
+                    }
+                });
+            }
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && regionFilterModal && regionFilterModal.classList.contains('show')) {
+                    closeRegionFilterModal();
+                }
+            });
+        }
+
+        function initializeAgentFilter() {
+            const agentFilterBtn = document.getElementById('agentFilterBtn');
+            const closeAgentFilter = document.getElementById('closeAgentFilter');
+            const cancelAgentFilter = document.getElementById('cancelAgentFilter');
+            const applyAgentFilterBtn = document.getElementById('applyAgentFilter');
+            const selectAllAgentsBtn = document.getElementById('selectAllAgents');
+            const deselectAllAgentsBtn = document.getElementById('deselectAllAgents');
+            const selectTopPerformersBtn = document.getElementById('selectTopPerformers');
+            const selectLowPerformersBtn = document.getElementById('selectLowPerformers');
+            const agentFilterModal = document.getElementById('agentFilterModal');
+
+            if (agentFilterBtn) {
+                agentFilterBtn.addEventListener('click', openAgentFilterModal);
+            }
+            
+            if (closeAgentFilter) {
+                closeAgentFilter.addEventListener('click', closeAgentFilterModal);
+            }
+            
+            if (cancelAgentFilter) {
+                cancelAgentFilter.addEventListener('click', closeAgentFilterModal);
+            }
+            
+            if (applyAgentFilterBtn) {
+                applyAgentFilterBtn.addEventListener('click', applyAgentFilter);
+            }
+            
+            if (selectAllAgentsBtn) {
+                selectAllAgentsBtn.addEventListener('click', selectAllAgents);
+            }
+            
+            if (deselectAllAgentsBtn) {
+                deselectAllAgentsBtn.addEventListener('click', deselectAllAgents);
+            }
+            
+            if (selectTopPerformersBtn) {
+                selectTopPerformersBtn.addEventListener('click', selectTopPerformers);
+            }
+            
+            if (selectLowPerformersBtn) {
+                selectLowPerformersBtn.addEventListener('click', selectLowPerformers);
+            }
+            
+            if (agentFilterModal) {
+                agentFilterModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'agentFilterModal') {
+                        closeAgentFilterModal();
+                    }
+                });
+            }
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && agentFilterModal && agentFilterModal.classList.contains('show')) {
+                    closeAgentFilterModal();
+                }
+            });
+        }
+
+        function initializeRegionDetailModal() {
+            console.log('Inizializzazione modal dettaglio regione...');
+            
+            const regionTabs = document.querySelectorAll('.region-detail-tab');
+            regionTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.regionTab;
+                    switchRegionTab(tabId);
+                });
+            });
+
+            const closeBtn = document.getElementById('closeRegionDetail');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeRegionDetailModal);
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('regionDetailModal');
+                    if (modal && modal.classList.contains('show')) {
+                        closeRegionDetailModal();
+                    }
+                }
+            });
+
+            const modal = document.getElementById('regionDetailModal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target.id === 'regionDetailModal') {
+                        closeRegionDetailModal();
+                    }
+                });
+            }
+        }
+
+        function openRegionDetailModal(regionName) {
+            const region = availableRegions.get(regionName);
+            if (!region) return;
+
+            currentRegionData = region;
+            const regionColor = getRegionColor(regionName);
+            
+            const icon = document.getElementById('regionDetailIcon');
+            const name = document.getElementById('regionDetailName');
+            const summary = document.getElementById('regionDetailSummary');
+            const header = document.querySelector('.region-detail-header');
+            
+            if (icon) icon.textContent = region.name.charAt(0);
+            if (name) name.textContent = region.name;
+            if (summary) {
+                summary.textContent = `${region.agents.size} agenti attivi in ${region.provinces.size} province`;
+            }
+            if (header) {
+                header.style.background = `linear-gradient(135deg, ${regionColor}, ${regionColor}dd)`;
+            }
+
+            const modal = document.getElementById('regionDetailModal');
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+
+            switchRegionTab('overview');
+        }
+
+        function closeRegionDetailModal() {
+            const modal = document.getElementById('regionDetailModal');
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+
+            Object.values(regionDetailCharts).forEach(chart => {
+                if (chart && typeof chart.destroy === 'function') {
+                    chart.destroy();
+                }
+            });
+            regionDetailCharts = {};
+            currentRegionData = null;
+        }
+
+        function switchRegionTab(tabId) {
+            document.querySelectorAll('.region-detail-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.region-detail-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            const activeTab = document.querySelector(`[data-region-tab="${tabId}"]`);
+            const activeContent = document.getElementById(`region${tabId.charAt(0).toUpperCase() + tabId.slice(1)}Tab`);
+            
+            if (activeTab) activeTab.classList.add('active');
+            if (activeContent) activeContent.classList.add('active');
+
+            currentRegionTab = tabId;
+
+            setTimeout(() => {
+                switch(tabId) {
+                    case 'overview':
+                        renderRegionOverview();
+                        break;
+                    case 'provinces':
+                        renderRegionProvinces();
+                        break;
+                    case 'agents':
+                        renderRegionAgents();
+                        break;
+                }
+            }, 100);
+        }
+
+        function renderRegionOverview() {
+            if (!currentRegionData) return;
+
+            const regionAgents = allData.filter(agent => 
+                agent.clienti_provincia.some(prov => 
+                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
+                )
+            );
+
+            let totalPrevious = 0;
+            regionAgents.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
+                        totalPrevious += (prov.Fatturato || 0) * 0.85;
+                    }
+                });
+            });
+
+            const growth = totalPrevious > 0 ? 
+                ((currentRegionData.revenue - totalPrevious) / totalPrevious * 100) : 0;
+
+            const metricsContainer = document.getElementById('regionOverviewMetrics');
+            if (metricsContainer) {
+                metricsContainer.innerHTML = `
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${formatCurrency(currentRegionData.revenue)}</div>
+                        <div class="region-overview-label">Fatturato Totale</div>
+                        <div class="region-overview-change ${growth >= 0 ? 'positive' : 'negative'}">
+                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${currentRegionData.clients}</div>
+                        <div class="region-overview-label">Clienti Attivi</div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${currentRegionData.agents.size}</div>
+                        <div class="region-overview-label">Agenti</div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${currentRegionData.provinces.size}</div>
+                        <div class="region-overview-label">Province</div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${formatCurrency(currentRegionData.revenue / currentRegionData.agents.size)}</div>
+                        <div class="region-overview-label">Media per Agente</div>
+                    </div>
+                    <div class="region-overview-card">
+                        <div class="region-overview-value">${Math.round(currentRegionData.clients / currentRegionData.agents.size)}</div>
+                        <div class="region-overview-label">Clienti per Agente</div>
+                    </div>
+                `;
+            }
+
+            renderRegionPerformanceChart();
+            renderRegionTopPerformers();
+        }
+
+        function renderRegionPerformanceChart() {
+            const canvas = document.getElementById('regionPerformanceChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            
+            if (regionDetailCharts.performance) {
+                regionDetailCharts.performance.destroy();
+            }
+
+            const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+            const monthlyData = months.map((month, index) => {
+                const baseValue = currentRegionData.revenue / 12;
+                const variation = (Math.sin(index * 0.5) + Math.random() * 0.3) * baseValue * 0.2;
+                return Math.max(0, baseValue + variation);
+            });
+
+            regionDetailCharts.performance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Fatturato Mensile',
+                        data: monthlyData,
+                        borderColor: '#7C93C3',
+                        backgroundColor: 'rgba(124, 147, 195, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: context => formatCurrency(context.parsed.y)
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: value => formatCurrency(value) }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRegionTopPerformers() {
+            const container = document.getElementById('regionTopPerformers');
+            if (!container) return;
+
+            const regionAgents = allData.filter(agent => 
+                agent.clienti_provincia.some(prov => 
+                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
+                )
+            );
+
+            const performers = regionAgents.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                
+                return { agent, current, growth };
+            }).sort((a, b) => b.current - a.current).slice(0, 5);
+
+            container.innerHTML = performers.map((performer, index) => `
+                <div class="performer-item">
+                    <div class="performer-rank">${index + 1}</div>
+                    <div class="performer-info">
+                        <div class="performer-name">${performer.agent.nome}</div>
+                        <div class="performer-value">${formatCurrency(performer.current)}</div>
+                    </div>
+                    <div class="performer-change ${performer.growth >= 0 ? 'positive' : 'negative'}">
+                        ${performer.growth >= 0 ? '+' : ''}${performer.growth.toFixed(1)}%
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRegionProvinces() {
+            if (!currentRegionData) return;
+
+            const canvas = document.getElementById('provincesComparisonChart');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                
+                if (regionDetailCharts.provinces) {
+                    regionDetailCharts.provinces.destroy();
+                }
+
+                const provinceData = {};
+                allData.forEach(agent => {
+                    agent.clienti_provincia.forEach(prov => {
+                        if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
+                            if (!provinceData[prov.Provincia]) {
+                                provinceData[prov.Provincia] = { revenue: 0, clients: 0 };
+                            }
+                            provinceData[prov.Provincia].revenue += prov.Fatturato || 0;
+                            provinceData[prov.Provincia].clients += prov.Clienti_Serviti || 0;
+                        }
+                    });
+                });
+
+                const labels = Object.keys(provinceData);
+                const data = Object.values(provinceData).map(p => p.revenue);
+                
+                regionDetailCharts.provinces = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Fatturato per Provincia',
+                            data,
+                            backgroundColor: '#7C93C3',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => formatCurrency(context.parsed.y)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: value => formatCurrency(value) }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const container = document.getElementById('provinceDetailGrid');
+            if (container) {
+                const provinceData = {};
+                allData.forEach(agent => {
+                    agent.clienti_provincia.forEach(prov => {
+                        if (getRegionFromProvince(prov.Provincia) === currentRegionData.name) {
+                            if (!provinceData[prov.Provincia]) {
+                                provinceData[prov.Provincia] = { 
+                                    revenue: 0, 
+                                    clients: 0, 
+                                    agents: new Set() 
+                                };
+                            }
+                            provinceData[prov.Provincia].revenue += prov.Fatturato || 0;
+                            provinceData[prov.Provincia].clients += prov.Clienti_Serviti || 0;
+                            provinceData[prov.Provincia].agents.add(agent.codice);
+                        }
+                    });
+                });
+
+                container.innerHTML = Object.entries(provinceData).map(([provincia, data]) => {
+                    const avgRevenue = currentRegionData.revenue / currentRegionData.provinces.size;
+                    const performance = data.revenue >= avgRevenue ? 'success' : 
+                                      data.revenue >= avgRevenue * 0.8 ? 'warning' : 'danger';
+                    
+                    return `
+                        <div class="province-card">
+                            <div class="province-header">
+                                <div class="province-name">${provincia}</div>
+                                <div class="province-badge badge ${performance}">
+                                    ${performance === 'success' ? 'Top' : performance === 'warning' ? 'Medio' : 'Basso'}
+                                </div>
+                            </div>
+                            <div class="province-metrics">
+                                <div class="province-metric">
+                                    <div class="province-metric-value">${formatCurrency(data.revenue)}</div>
+                                    <div class="province-metric-label">Fatturato</div>
+                                </div>
+                                <div class="province-metric">
+                                    <div class="province-metric-value">${data.clients}</div>
+                                    <div class="province-metric-label">Clienti</div>
+                                </div>
+                                <div class="province-metric">
+                                    <div class="province-metric-value">${data.agents.size}</div>
+                                    <div class="province-metric-label">Agenti</div>
+                                </div>
+                                <div class="province-metric">
+                                    <div class="province-metric-value">${formatCurrency(data.revenue / data.agents.size)}</div>
+                                    <div class="province-metric-label">Media/Agente</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderRegionAgents() {
+            if (!currentRegionData) return;
+
+            const container = document.getElementById('regionAgentGrid');
+            if (!container) return;
+
+            const regionAgents = allData.filter(agent => 
+                agent.clienti_provincia.some(prov => 
+                    getRegionFromProvince(prov.Provincia) === currentRegionData.name
+                )
+            );
+
+            container.innerHTML = regionAgents.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                
+                const regionRevenue = agent.clienti_provincia
+                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
+                    .reduce((sum, prov) => sum + (prov.Fatturato || 0), 0);
+                    
+                const regionClients = agent.clienti_provincia
+                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
+                    .reduce((sum, prov) => sum + (prov.Clienti_Serviti || 0), 0);
+
+                const agentProvinces = agent.clienti_provincia
+                    .filter(prov => getRegionFromProvince(prov.Provincia) === currentRegionData.name)
+                    .map(prov => prov.Provincia);
+
+                return `
+                    <div class="agent-detail-card">
+                        <div class="agent-detail-header">
+                            <div class="agent-avatar">${agent.nome.split(' ').map(n => n.charAt(0)).join('')}</div>
+                            <div class="agent-detail-info">
+                                <h4>${agent.nome}</h4>
+                                <p>${agent.codice} • ${agentProvinces.join(', ')}</p>
+                            </div>
+                        </div>
+                        <div class="agent-detail-metrics">
+                            <div class="agent-detail-metric">
+                                <div class="agent-detail-metric-value">${formatCurrency(regionRevenue)}</div>
+                                <div class="agent-detail-metric-label">Fatturato Regione</div>
+                            </div>
+                            <div class="agent-detail-metric">
+                                <div class="agent-detail-metric-value">${regionClients}</div>
+                                <div class="agent-detail-metric-label">Clienti Regione</div>
+                            </div>
+                            <div class="agent-detail-metric">
+                                <div class="agent-detail-metric-value">${formatCurrency(current)}</div>
+                                <div class="agent-detail-metric-label">Totale Agente</div>
+                            </div>
+                        </div>
+                        <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                ${growth >= 0 ? 
+                                    '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                    '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                }
+                            </svg>
+                            ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% crescita totale
+                        </div>
+                        <div style="margin-top: 0.75rem;">
+                            <span class="badge ${growth >= 10 ? 'success' : growth >= 0 ? 'warning' : 'danger'}">
+                                ${growth >= 10 ? 'Top Performer' : growth >= 0 ? 'Performance Buona' : 'Necessita Attenzione'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDashboard() {
             const loadingElement = document.getElementById('loading');
             const overviewElement = document.getElementById('overview-content');
             
             if (loadingElement) loadingElement.style.display = 'none';
             if (overviewElement) overviewElement.style.display = 'block';
             
+            populateAvailableRegions();
+            populateAvailableAgents();
             renderKPIMetrics();
+            renderCharts();
+            renderPerformanceTable();
+            renderAgentCards();
+            renderRegionCards();
+            updateFilterButtonText();
+            updateAgentFilterButtonText();
         }
 
         function renderKPIMetrics() {
@@ -491,28 +3199,10 @@
                 ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
 
             const metrics = [
-                { 
-                    title: 'Fatturato Totale', 
-                    value: formatCurrency(totalRevenue), 
-                    change: growth,
-                    previous: formatCurrency(totalPrevRevenue),
-                    showComparison: true
-                },
-                { 
-                    title: 'Clienti Attivi', 
-                    value: totalClients.toLocaleString('it-IT'), 
-                    change: null 
-                },
-                { 
-                    title: 'Agenti Attivi', 
-                    value: allData.length.toString(), 
-                    change: null 
-                },
-                { 
-                    title: 'Crescita Media', 
-                    value: `${growth.toFixed(1)}%`, 
-                    change: growth 
-                }
+                { title: 'Fatturato Totale', value: formatCurrency(totalRevenue), change: growth },
+                { title: 'Clienti Attivi', value: totalClients.toLocaleString('it-IT'), change: null },
+                { title: 'Agenti Attivi', value: allData.length.toString(), change: null },
+                { title: 'Crescita Media', value: `${growth.toFixed(1)}%`, change: growth }
             ];
 
             const kpiElement = document.getElementById('kpiMetrics');
@@ -520,16 +3210,16 @@
                 kpiElement.innerHTML = metrics.map(metric => `
                     <div class="card">
                         <div class="card-body">
-                            <h4 style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">${metric.title}</h4>
+                            <div class="card-title">${metric.title}</div>
                             <div class="metric-value">${metric.value}</div>
-                            ${metric.showComparison ? `
-                                <div style="font-size: 0.875rem; color: var(--text-muted); margin: 0.5rem 0;">
-                                    <strong>2024:</strong> ${metric.previous}
-                                </div>
-                            ` : ''}
                             ${metric.change !== null ? `
                                 <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
-                                    ${metric.change >= 0 ? '↗️' : '↘️'}
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        ${metric.change >= 0 ? 
+                                            '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                            '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                        }
+                                    </svg>
                                     ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
                                 </div>
                             ` : ''}
@@ -537,8 +3227,547 @@
                     </div>
                 `).join('');
             }
+        }
 
-            console.log('KPI metrics rendered:', metrics);
+        function renderCharts() {
+            renderRevenueChart();
+            renderRegionChart();
+            renderScatterChart();
+            renderFunnelChart();
+            renderBoxplotChart();
+        }
+
+        function renderRevenueChart() {
+            const canvas = document.getElementById('revenueChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (charts.revenue) charts.revenue.destroy();
+
+            const agentData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                return {
+                    name: agent.nome.split(' ')[0],
+                    current: general?.Anno_Corrente || 0,
+                    previous: general?.Anno_Precedente || 0
+                };
+            }).sort((a, b) => b.current - a.current).slice(0, 8);
+
+            charts.revenue = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: agentData.map(a => a.name),
+                    datasets: [
+                        {
+                            label: '2024',
+                            data: agentData.map(a => a.previous),
+                            backgroundColor: '#E1E7F0',
+                            borderRadius: 4
+                        },
+                        {
+                            label: '2025',
+                            data: agentData.map(a => a.current),
+                            backgroundColor: '#7C93C3',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: value => formatCurrency(value) }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRegionChart() {
+            const canvas = document.getElementById('regionChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (charts.region) charts.region.destroy();
+
+            const regionData = {};
+            allData.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    const regionName = getRegionFromProvince(prov.Provincia);
+                    regionData[regionName] = (regionData[regionName] || 0) + (prov.Fatturato || 0);
+                });
+            });
+
+            const labels = Object.keys(regionData);
+            const data = Object.values(regionData);
+            const colors = labels.map(label => getRegionColor(label));
+
+            charts.region = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: context => `${context.label}: ${formatCurrency(context.parsed)}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderScatterChart() {
+            const canvas = document.getElementById('scatterChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (charts.scatter) charts.scatter.destroy();
+
+            const scatterData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                
+                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                const mainRegion = agentRegions[0] || 'Generale';
+                const color = getRegionColor(mainRegion);
+                
+                return {
+                    x: clients,
+                    y: current,
+                    label: agent.nome.split(' ')[0],
+                    backgroundColor: color + '80',
+                    borderColor: color,
+                    growth: growth,
+                    efficiency: clients > 0 ? current / clients : 0
+                };
+            }).filter(item => item.x > 0 && item.y > 0);
+
+            charts.scatter = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Agenti',
+                        data: scatterData,
+                        backgroundColor: scatterData.map(item => item.backgroundColor),
+                        borderColor: scatterData.map(item => item.borderColor),
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const point = scatterData[context[0].dataIndex];
+                                    return point.label;
+                                },
+                                label: function(context) {
+                                    const point = scatterData[context.dataIndex];
+                                    return [
+                                        `Fatturato: ${formatCurrency(point.y)}`,
+                                        `Clienti: ${point.x}`,
+                                        `Efficienza: ${formatCurrency(point.efficiency)}/cliente`,
+                                        `Crescita: ${point.growth.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Numero Clienti'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Fatturato (€)'
+                            },
+                            ticks: {
+                                callback: value => formatCurrency(value)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderFunnelChart() {
+            const canvas = document.getElementById('funnelChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (charts.funnel) charts.funnel.destroy();
+
+            let critici = 0, rischio = 0, buoni = 0, ottimi = 0, totalAgents = 0;
+            
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const target = general?.Obiettivo || 0;
+                
+                if (target > 0) {
+                    totalAgents++;
+                    const achievement = (current / target) * 100;
+                    
+                    if (achievement >= 100) ottimi++;
+                    else if (achievement >= 80) buoni++;
+                    else if (achievement >= 60) rischio++;
+                    else critici++;
+                }
+            });
+
+            const funnelData = [
+                { label: 'Sotto 60%', value: critici, color: '#FFB3BA', percentage: (critici/totalAgents*100).toFixed(1) },
+                { label: '60-79%', value: rischio, color: '#FFD3A5', percentage: (rischio/totalAgents*100).toFixed(1) },
+                { label: '80-99%', value: buoni, color: '#A5F3FC', percentage: (buoni/totalAgents*100).toFixed(1) },
+                { label: '100%+', value: ottimi, color: '#A8E6A1', percentage: (ottimi/totalAgents*100).toFixed(1) }
+            ];
+
+            charts.funnel = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: funnelData.map(item => `${item.label} (${item.percentage}%)`),
+                    datasets: [{
+                        data: funnelData.map(item => item.value),
+                        backgroundColor: funnelData.map(item => item.color),
+                        borderWidth: 0,
+                        cutout: '50%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const item = funnelData[context.dataIndex];
+                                    return `${item.label}: ${item.value} agenti (${item.percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderBoxplotChart() {
+            const canvas = document.getElementById('boxplotChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (charts.boxplot) charts.boxplot.destroy();
+
+            const regionPerformance = {};
+            
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                
+                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                const mainRegion = agentRegions[0] || 'Generale';
+                
+                if (!regionPerformance[mainRegion]) {
+                    regionPerformance[mainRegion] = [];
+                }
+                regionPerformance[mainRegion].push(growth);
+            });
+
+            const boxplotData = Object.entries(regionPerformance).map(([region, growths]) => {
+                const sorted = growths.sort((a, b) => a - b);
+                const len = sorted.length;
+                const q1 = sorted[Math.floor(len * 0.25)];
+                const median = sorted[Math.floor(len * 0.5)];
+                const q3 = sorted[Math.floor(len * 0.75)];
+                const min = sorted[0];
+                const max = sorted[len - 1];
+                
+                return {
+                    label: region,
+                    min: min,
+                    q1: q1,
+                    median: median,
+                    q3: q3,
+                    max: max,
+                    color: getRegionColor(region)
+                };
+            });
+
+            const labels = boxplotData.map(item => item.label);
+            const medians = boxplotData.map(item => item.median);
+            const colors = boxplotData.map(item => item.color);
+
+            charts.boxplot = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Crescita Mediana (%)',
+                        data: medians,
+                        backgroundColor: colors.map(color => color + '60'),
+                        borderColor: colors,
+                        borderWidth: 2,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return `Regione: ${context[0].label}`;
+                                },
+                                label: function(context) {
+                                    const region = boxplotData[context.dataIndex];
+                                    return [
+                                        `Mediana: ${region.median.toFixed(1)}%`,
+                                        `Min: ${region.min.toFixed(1)}%`,
+                                        `Max: ${region.max.toFixed(1)}%`,
+                                        `Q1: ${region.q1.toFixed(1)}%`,
+                                        `Q3: ${region.q3.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Regioni'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Crescita (%)'
+                            },
+                            ticks: {
+                                callback: value => `${value.toFixed(0)}%`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderPerformanceTable() {
+            const tableElement = document.getElementById('performanceTable');
+            if (!tableElement) return;
+            
+            const agentPerformance = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                
+                return { agent, current, previous, growth, clients };
+            }).sort((a, b) => b.current - a.current);
+
+            tableElement.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Agente</th>
+                        <th>Fatturato 2025</th>
+                        <th>Crescita</th>
+                        <th>Clienti</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${agentPerformance.map(item => `
+                        <tr class="table-row">
+                            <td>
+                                <strong>${item.agent.nome}</strong><br>
+                                <small style="color: var(--text-muted);">${item.agent.codice}</small>
+                            </td>
+                            <td><strong>${formatCurrency(item.current)}</strong></td>
+                            <td>
+                                <span class="badge ${item.growth >= 0 ? 'success' : 'danger'}">
+                                    ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%
+                                </span>
+                            </td>
+                            <td>${item.clients}</td>
+                            <td>
+                                <span class="badge ${item.growth >= 10 ? 'success' : item.growth >= 0 ? 'warning' : 'danger'}">
+                                    ${item.growth >= 10 ? 'Ottimo' : item.growth >= 0 ? 'Buono' : 'Critico'}
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+        }
+
+        function renderAgentCards() {
+            const agentGridElement = document.getElementById('agentGrid');
+            if (!agentGridElement) return;
+            
+            const filteredAgents = allData.filter(agent => {
+                return selectedAgents.size === 0 || selectedAgents.has(agent.codice);
+            });
+            
+            agentGridElement.innerHTML = filteredAgents.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const target = general?.Obiettivo || 0;
+                const progress = target > 0 ? (current / target * 100) : 0;
+
+                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                const mainRegion = agentRegions[0] || 'Generale';
+                const regionColor = getRegionColor(mainRegion);
+
+                return `
+                    <div class="agent-card">
+                        <div class="agent-header" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">
+                            <div class="agent-name">${agent.nome}</div>
+                            <div class="agent-code">${agent.codice}</div>
+                        </div>
+                        <div class="agent-body">
+                            <div class="agent-metrics">
+                                <div class="agent-metric">
+                                    <div class="agent-metric-value">${formatCurrency(current)}</div>
+                                    <div class="agent-metric-label">Fatturato 2025</div>
+                                </div>
+                                <div class="agent-metric">
+                                    <div class="agent-metric-value">${clients}</div>
+                                    <div class="agent-metric-label">Clienti</div>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    ${growth >= 0 ? 
+                                        '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
+                                        '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
+                                    }
+                                </svg>
+                                ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
+                            </div>
+
+                            <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
+                                <strong>Regioni:</strong> ${agentRegions.join(', ')}
+                            </div>
+
+                            ${target > 0 ? `
+                                <div style="margin-top: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                        <span>Obiettivo</span>
+                                        <span>${Math.round(progress)}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
+                                    </div>
+                                    <div class="progress-text">
+                                        <span>${formatCurrency(current)}</span>
+                                        <span>${formatCurrency(target)}</span>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderRegionCards() {
+            const regionGridElement = document.getElementById('regionGrid');
+            if (!regionGridElement) return;
+            
+            const filteredRegions = Array.from(availableRegions.values()).filter(region => {
+                return selectedRegions.size === 0 || selectedRegions.has(region.name);
+            });
+
+            regionGridElement.innerHTML = filteredRegions.map(region => {
+                const regionColor = getRegionColor(region.name);
+                
+                return `
+                    <div class="region-card">
+                        <div class="region-header">
+                            <div class="region-icon" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">${region.name.charAt(0)}</div>
+                            <div class="region-info">
+                                <h3>${region.name}</h3>
+                                <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
+                            </div>
+                        </div>
+                        <div class="region-stats">
+                            <div class="region-stat">
+                                <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
+                                <div class="region-stat-label">Fatturato</div>
+                            </div>
+                            <div class="region-stat">
+                                <div class="region-stat-value">${region.clients}</div>
+                                <div class="region-stat-label">Clienti</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                            Province: ${Array.from(region.provinces).join(', ')}
+                        </div>
+                        <button class="region-detail-button" onclick="openRegionDetailModal('${region.name}')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                                <path d="m12 5 7 7-7 7"/>
+                            </svg>
+                            Visualizza Dettagli
+                        </button>
+                    </div>
+                `;
+            }).join('');
         }
 
         function formatCurrency(value) {
@@ -549,17 +3778,60 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, inizializzazione dashboard...');
+            console.log('Inizializzazione dashboard...');
             
             try {
                 initializeTabs();
+                console.log('Tabs inizializzati');
+            } catch (error) {
+                console.error('Errore tabs:', error);
+            }
+            
+            try {
                 updateClock();
                 setInterval(updateClock, 1000);
-                loadData();
-                setInterval(loadData, 120000); // Ricarica ogni 2 minuti
+                console.log('Clock inizializzato');
             } catch (error) {
-                console.error('Errore inizializzazione:', error);
+                console.error('Errore clock:', error);
             }
+            
+            try {
+                loadData();
+                setInterval(loadData, 120000);
+                console.log('Caricamento dati avviato');
+            } catch (error) {
+                console.error('Errore caricamento dati:', error);
+            }
+            
+            setTimeout(() => {
+                try {
+                    initializeRegionFilter();
+                    console.log('Filtro regioni inizializzato');
+                } catch (error) {
+                    console.error('Errore inizializzazione filtro regioni:', error);
+                }
+                
+                try {
+                    initializeAgentFilter();
+                    console.log('Filtro agenti inizializzato');
+                } catch (error) {
+                    console.error('Errore inizializzazione filtro agenti:', error);
+                }
+                
+                try {
+                    initializeChartDetailsModal();
+                    console.log('Modal dettagli grafici inizializzato');
+                } catch (error) {
+                    console.error('Errore inizializzazione modal grafici:', error);
+                }
+                
+                try {
+                    initializeRegionDetailModal();
+                    console.log('Modal dettaglio regione inizializzato');
+                } catch (error) {
+                    console.error('Errore inizializzazione modal regione:', error);
+                }
+            }, 500);
         });
     </script>
 </body>
