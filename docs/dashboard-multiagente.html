@@ -1939,10 +1939,13 @@
                 const mainRegion = agentRegions[0] || 'Generale';
                 const regionColor = getRegionColor(mainRegion);
 
-                // Determina il colore e la classe della progress bar basata sulla performance
+                // Fixed variables
+                const hasObjective = target > 0;
                 let progressClass = 'undefined';
                 let statusColor = 'var(--text-muted)';
                 let statusText = 'Da definire';
+                let objectiveText = hasObjective ? formatCurrency(target) : 'Da definire';
+                let progressWidth = hasObjective ? Math.min(progress, 100) : 0;
                 
                 if (target > 0) {
                     if (progress >= 100) {
