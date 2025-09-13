@@ -8,19 +8,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         :root {
-            --primary: #7C93C3;
-            --primary-dark: #6B8CAE;
-            --secondary: #94A3B8;
-            --success: #A8E6A1;
-            --warning: #FFD3A5;
-            --danger: #FFB3BA;
+            --primary: #7C93C3;        /* Blu pastello principale */
+            --primary-dark: #6B8CAE;   /* Blu pastello scuro */
+            --secondary: #94A3B8;      /* Grigio pastello */
+            --success: #A8E6A1;        /* Verde pastello */
+            --warning: #FFD3A5;        /* Arancione pastello */
+            --danger: #FFB3BA;         /* Rosa pastello */
             --surface: #ffffff;
-            --surface-2: #F8FAFF;
-            --surface-3: #F1F5FF;
-            --border: #E8E8E8;
-            --text: #4A4A4A;
-            --text-muted: #8A8A8A;
-            --text-light: #B8B8B8;
+            --surface-2: #F8FAFF;      /* Sfondo molto leggero */
+            --surface-3: #F1F5FF;      /* Sfondo leggero */
+            --border: #E8E8E8;         /* Bordo pastello */
+            --text: #4A4A4A;           /* Testo grigio scuro */
+            --text-muted: #8A8A8A;     /* Testo grigio medio */
+            --text-light: #B8B8B8;     /* Testo grigio chiaro */
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
@@ -154,11 +154,6 @@
             box-shadow: var(--shadow);
         }
 
-        .tab:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -169,6 +164,13 @@
         .charts-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .advanced-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -232,33 +234,31 @@
 
         .chart-container.large { height: 400px; }
 
-        .loading {
+        .chart-details-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 3rem;
-            color: var(--text-muted);
+            gap: 0.25rem;
+            transition: all 0.2s ease;
+            z-index: 10;
         }
 
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid var(--surface-3);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
+        .chart-details-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .table-container { 
-            overflow-x: auto; 
-        }
+        .table-container { overflow-x: auto; }
 
         .table {
             width: 100%;
@@ -299,241 +299,910 @@
         .badge.warning { background: rgba(255, 211, 165, 0.2); color: #8B5A2B; }
         .badge.danger { background: rgba(255, 179, 186, 0.2); color: #8B4A4A; }
 
-        .error-boundary {
-            padding: 2rem;
-            background: rgba(255, 179, 186, 0.1);
-            border: 1px solid var(--danger);
-            border-radius: var(--radius);
-            text-align: center;
-            color: var(--danger);
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-muted);
         }
 
-        .retry-btn {
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--surface-3);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .region-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .region-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .region-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .region-detail-button {
+            width: 100%;
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
             border-radius: var(--radius);
-            cursor: pointer;
+            padding: 0.75rem 1rem;
             margin-top: 1rem;
+            cursor: pointer;
             font-weight: 500;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
         }
 
-        .retry-btn:hover {
+        .region-detail-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .region-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .region-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .region-info h3 {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .region-info p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .region-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .region-stat { text-align: center; }
+
+        .region-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .region-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .agent-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .agent-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .agent-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .agent-code {
+            opacity: 0.8;
+            font-size: 0.875rem;
+        }
+
+        .agent-body { padding: 1.5rem; }
+
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agent-metric { text-align: center; }
+
+        .agent-metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .agent-metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--surface-3);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .filter-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .filter-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .region-detail-modal {
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+        }
+
+        .details-modal {
+            width: 95%;
+            max-width: 1400px;
+            max-height: 90vh;
+        }
+
+        .details-modal-content {
+            max-height: calc(90vh - 120px);
+            overflow-y: auto;
+        }
+
+        .details-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .details-section:last-child {
+            border-bottom: none;
+        }
+
+        .details-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .details-card {
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            padding: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .details-card h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .details-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .details-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .details-metric:last-child {
+            border-bottom: none;
+        }
+
+        .details-metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .details-metric-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .details-metric-value.positive { color: #4A7C59; }
+        .details-metric-value.negative { color: #8B4A4A; }
+
+        .region-color-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .performance-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            border-left: 4px solid;
+        }
+
+        .performance-category.excellent {
+            border-left-color: #7ED957;
+            background: rgba(126, 217, 87, 0.15);
+        }
+
+        .performance-category.good {
+            border-left-color: #FFB366;
+            background: rgba(255, 179, 102, 0.15);
+        }
+
+        .performance-category.warning {
+            border-left-color: #FFB366;
+            background: rgba(255, 179, 102, 0.20);
+        }
+
+        .performance-category.critical {
+            border-left-color: #FF7A85;
+            background: rgba(255, 122, 133, 0.15);
+        }
+
+        .performance-category h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .performance-category span {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--surface-3);
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .filter-action-btn {
+            padding: 0.5rem 0.75rem;
+            background: var(--surface-3);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .filter-action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .region-filter-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .region-filter-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .region-filter-item:hover {
+            background: var(--surface-3);
+        }
+
+        .region-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .region-filter-info {
+            flex: 1;
+        }
+
+        .region-filter-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .region-filter-stats {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: var(--surface-3);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
             background: var(--primary-dark);
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
+        .region-detail-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
         }
 
-        function renderAgentCards() {
-            const agentGridElement = document.getElementById('agentGrid');
-            if (!agentGridElement) return;
-            
-            try {
-                agentGridElement.innerHTML = allData.map(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    const current = general?.Anno_Corrente || 0;
-                    const previous = general?.Anno_Precedente || 0;
-                    const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                    const clients = general?.Clienti_Anno_Corrente || 0;
-                    const target = general?.Obiettivo || 0;
-                    const progress = target > 0 ? (current / target * 100) : 0;
-
-                    // Get agent's regions
-                    const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
-                    const mainRegion = agentRegions[0] || 'Generale';
-                    const regionColor = getRegionColor(mainRegion);
-
-                    return `
-                        <div class="agent-card">
-                            <div class="agent-header" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">
-                                <div class="agent-name">${escapeHtml(agent.nome)}</div>
-                                <div class="agent-code">${escapeHtml(agent.codice)}</div>
-                            </div>
-                            <div class="agent-body">
-                                <div class="agent-metrics">
-                                    <div class="agent-metric">
-                                        <div class="agent-metric-value">${formatCurrency(current)}</div>
-                                        <div class="agent-metric-label">Fatturato 2025</div>
-                                    </div>
-                                    <div class="agent-metric">
-                                        <div class="agent-metric-value">${clients}</div>
-                                        <div class="agent-metric-label">Clienti</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="metric-change ${growth >= 0 ? 'positive' : 'negative'}">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        ${growth >= 0 ? 
-                                            '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                            '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                        }
-                                    </svg>
-                                    ${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% vs 2024
-                                </div>
-
-                                <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
-                                    <strong>Regioni:</strong> ${agentRegions.join(', ')}
-                                </div>
-
-                                ${target > 0 ? `
-                                    <div style="margin-top: 1rem;">
-                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
-                                            <span>Obiettivo</span>
-                                            <span>${Math.round(progress)}%</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: ${Math.min(progress, 100)}%; background: linear-gradient(90deg, ${regionColor}, ${regionColor}dd);"></div>
-                                        </div>
-                                        <div class="progress-text">
-                                            <span>${formatCurrency(current)}</span>
-                                            <span>${formatCurrency(target)}</span>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error('Agent cards render error:', error);
-                if (agentGridElement) {
-                    agentGridElement.innerHTML = '<div class="error-boundary">Errore nel caricamento degli agenti</div>';
-                }
-            }
+        .region-detail-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
         }
 
-        function renderRegionCards() {
-            const regionGridElement = document.getElementById('regionGrid');
-            if (!regionGridElement) return;
-            
-            try {
-                // Calculate region data
-                const regionData = {};
-                allData.forEach(agent => {
-                    agent.clienti_provincia.forEach(prov => {
-                        const regionName = getRegionFromProvince(prov.Provincia);
-                        if (!regionData[regionName]) {
-                            regionData[regionName] = {
-                                name: regionName,
-                                revenue: 0,
-                                clients: 0,
-                                agents: new Set(),
-                                provinces: new Set()
-                            };
-                        }
-                        
-                        regionData[regionName].revenue += prov.Fatturato || 0;
-                        regionData[regionName].clients += prov.Clienti_Serviti || 0;
-                        regionData[regionName].agents.add(agent.codice);
-                        regionData[regionName].provinces.add(prov.Provincia);
-                    });
-                });
-
-                const regions = Object.values(regionData).sort((a, b) => b.revenue - a.revenue);
-
-                regionGridElement.innerHTML = regions.map(region => {
-                    const regionColor = getRegionColor(region.name);
-                    
-                    return `
-                        <div class="region-card">
-                            <div class="region-header">
-                                <div class="region-icon" style="background: linear-gradient(135deg, ${regionColor}, ${regionColor}dd);">
-                                    ${region.name.charAt(0)}
-                                </div>
-                                <div class="region-info">
-                                    <h3>${escapeHtml(region.name)}</h3>
-                                    <p>${region.agents.size} agenti • ${region.provinces.size} province</p>
-                                </div>
-                            </div>
-                            <div class="region-stats">
-                                <div class="region-stat">
-                                    <div class="region-stat-value">${formatCurrency(region.revenue)}</div>
-                                    <div class="region-stat-label">Fatturato</div>
-                                </div>
-                                <div class="region-stat">
-                                    <div class="region-stat-value">${region.clients}</div>
-                                    <div class="region-stat-label">Clienti</div>
-                                </div>
-                            </div>
-                            <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
-                                <strong>Province:</strong> ${Array.from(region.provinces).join(', ')}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error('Region cards render error:', error);
-                if (regionGridElement) {
-                    regionGridElement.innerHTML = '<div class="error-boundary">Errore nel caricamento delle regioni</div>';
-                }
-            }
+        .region-detail-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
         }
 
-        function getRegionFromProvince(prov) {
-            const map = {
-                'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
-                'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
-                'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna', 'SU': 'Sardegna', 'OT': 'Sardegna',
-                'RN': 'Emilia-Romagna', 'RA': 'Emilia-Romagna', 'PC': 'Emilia-Romagna', 'BO': 'Emilia-Romagna', 'MO': 'Emilia-Romagna', 'RE': 'Emilia-Romagna', 'PR': 'Emilia-Romagna', 'FE': 'Emilia-Romagna', 'FC': 'Emilia-Romagna',
-                'CR': 'Lombardia', 'LO': 'Lombardia', 'MI': 'Lombardia', 'BG': 'Lombardia', 'BS': 'Lombardia', 'CO': 'Lombardia', 'MN': 'Lombardia', 'PV': 'Lombardia', 'SO': 'Lombardia', 'VA': 'Lombardia', 'LC': 'Lombardia', 'MB': 'Lombardia',
-                'TO': 'Piemonte', 'AL': 'Piemonte', 'AT': 'Piemonte', 'BI': 'Piemonte', 'CN': 'Piemonte', 'NO': 'Piemonte', 'VB': 'Piemonte', 'VC': 'Piemonte',
-                'VE': 'Veneto', 'VR': 'Veneto', 'VI': 'Veneto', 'PD': 'Veneto', 'TV': 'Veneto', 'BL': 'Veneto', 'RO': 'Veneto',
-                'FI': 'Toscana', 'PI': 'Toscana', 'SI': 'Toscana', 'AR': 'Toscana', 'GR': 'Toscana', 'LI': 'Toscana', 'LU': 'Toscana', 'MS': 'Toscana', 'PT': 'Toscana', 'PO': 'Toscana',
-                'NA': 'Campania', 'AV': 'Campania', 'BN': 'Campania', 'CE': 'Campania', 'SA': 'Campania',
-                'PA': 'Sicilia', 'CT': 'Sicilia', 'ME': 'Sicilia', 'AG': 'Sicilia', 'CL': 'Sicilia', 'EN': 'Sicilia', 'RG': 'Sicilia', 'SR': 'Sicilia', 'TP': 'Sicilia',
-                'BA': 'Puglia', 'BR': 'Puglia', 'FG': 'Puglia', 'LE': 'Puglia', 'TA': 'Puglia', 'BT': 'Puglia',
-                'CZ': 'Calabria', 'CS': 'Calabria', 'KR': 'Calabria', 'RC': 'Calabria', 'VV': 'Calabria',
-                'GE': 'Liguria', 'IM': 'Liguria', 'LA': 'Liguria', 'SV': 'Liguria',
-                'AQ': 'Abruzzo', 'CH': 'Abruzzo', 'PE': 'Abruzzo', 'TE': 'Abruzzo',
-                'CB': 'Molise', 'IS': 'Molise',
-                'MT': 'Basilicata', 'PZ': 'Basilicata',
-                'PG': 'Umbria', 'TR': 'Umbria',
-                'AO': 'Valle d\'Aosta',
-                'TN': 'Trentino-Alto Adige', 'BZ': 'Trentino-Alto Adige',
-                'UD': 'Friuli-Venezia Giulia', 'PN': 'Friuli-Venezia Giulia', 'GO': 'Friuli-Venezia Giulia', 'TS': 'Friuli-Venezia Giulia',
-                'ALB': 'Estero'
-            };
-            return map[prov] || prov;
+        .region-detail-info p {
+            opacity: 0.9;
+            font-size: 0.875rem;
         }
 
-        function getRegionColor(regionName) {
-            const regionColors = {
-                'Lazio': '#A8DADC',        // Azzurro pastello
-                'Sardegna': '#B8E6B8',     // Verde pastello
-                'Marche': '#FFD3A5',       // Arancione pastello
-                'Estero': '#FFB3BA',       // Rosa pastello
-                'Lombardia': '#C7B6FF',    // Viola pastello
-                'Emilia-Romagna': '#A5F3FC', // Ciano pastello
-                'Piemonte': '#F8BBD9',     // Rosa chiaro pastello
-                'Veneto': '#D4E6B5',       // Verde lime pastello
-                'Toscana': '#FFD4A3',      // Pesca pastello
-                'Campania': '#B5E7FF',     // Blu cielo pastello
-                'Sicilia': '#FFF2A5',      // Giallo pastello
-                'Puglia': '#A8F5E6',       // Turchese pastello
-                'Calabria': '#E0C3FC',     // Lavanda pastello
-                'Liguria': '#FFDFBA',      // Albicocca pastello
-                'Abruzzo': '#B3D7FF',      // Blu pastello
-                'Molise': '#DFC5FE',       // Viola chiaro pastello
-                'Basilicata': '#D6A2E8',   // Magenta pastello
-                'Umbria': '#A5D6A7',       // Verde menta pastello
-                'Valle d\'Aosta': '#FFABAB', // Rosso pastello
-                'Trentino-Alto Adige': '#D1C4E9', // Indigo pastello
-                'Friuli-Venezia Giulia': '#F8BBE6' // Rosa ciliegia pastello
-            };
-            return regionColors[regionName] || '#64748b';
-        }
+        /* Miglioramento delle tabs nel modal */
+        .region-detail-tabs {
+            display: flex;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
         }
 
+        .region-detail-tab {
+            flex-shrink: 0;
+            min-width: 140px;
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            border-bottom: 3px solid transparent;
+        }
+
+        .region-detail-tab:hover {
+            background: var(--surface-3);
+            color: var(--text);
+        }
+
+        .region-detail-tab.active {
+            color: var(--primary);
+            background: var(--surface-3);
+            border-bottom-color: var(--primary);
+        }
+
+        .region-detail-tab svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .region-detail-content {
+            flex: 1;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+
+        .region-detail-tab-content {
+            display: none;
+            padding: 2rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .region-detail-tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .region-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .region-overview-card {
+            background: var(--surface-2);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .region-overview-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .region-overview-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .region-overview-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .region-overview-change {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .region-overview-change.positive { color: #4A7C59; }
+        .region-overview-change.negative { color: #8B4A4A; }
+
+        .performance-section {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .top-performers {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .top-performers:hover {
+            border-color: var(--primary);
+        }
+
+        .top-performers h4 {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .performer-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .performer-item:hover {
+            background: var(--surface-3);
+        }
+
+        .performer-item:last-child {
+            border-bottom: none;
+        }
+
+        .performer-rank {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .performer-info {
+            flex: 1;
+        }
+
+        .performer-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .performer-value {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .performer-change {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius);
+        }
+
+        .performer-change.positive { background: rgba(74, 124, 89, 0.1); color: #4A7C59; }
+        .performer-change.negative { background: rgba(139, 74, 74, 0.1); color: #8B4A4A; }
+
+        .province-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .province-card {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .province-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .province-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .province-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .province-badge {
+            font-size: 0.75rem;
+        }
+
+        .province-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .province-metric {
+            text-align: center;
+        }
+
+        .province-metric-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .province-metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .agent-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .agent-detail-card {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .agent-detail-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .agent-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agent-avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .agent-detail-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .agent-detail-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .agent-detail-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agent-detail-metric {
+            text-align: center;
+        }
+
+        .agent-detail-metric-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .agent-detail-metric-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Miglioramenti per dispositivi mobili */
         @media (max-width: 1024px) {
             .charts-grid { grid-template-columns: 1fr; }
             .main-content, .header { padding: 1rem; }
+            .performance-section { grid-template-columns: 1fr; }
+            .region-detail-modal { max-width: 95%; }
         }
 
         @media (max-width: 768px) {
@@ -551,7 +1220,27 @@
                 justify-content: center;
                 padding: 0.75rem 1rem;
             }
-            .metrics-grid {
+            .metrics-grid,
+            .region-grid,
+            .agent-grid {
+                grid-template-columns: 1fr;
+            }
+            .region-detail-tabs {
+                flex-wrap: wrap;
+            }
+            .region-detail-tab {
+                flex: 1;
+                min-width: 120px;
+                font-size: 0.75rem;
+            }
+            .region-overview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .details-modal {
+                max-width: 98%;
+                margin: 1rem;
+            }
+            .details-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -600,6 +1289,8 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                         <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
                     Agenti
                 </button>
@@ -621,9 +1312,22 @@
                 <div class="metrics-grid" id="kpiMetrics"></div>
 
                 <div class="charts-grid">
-                    <div class="card">
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('performance')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
                         <div class="card-header">
-                            <h3 class="card-title">Performance Agenti</h3>
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18h18"/>
+                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                                </svg>
+                                Performance Agenti
+                            </h3>
                         </div>
                         <div class="card-body">
                             <div class="chart-container large">
@@ -632,9 +1336,21 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('regions')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
                         <div class="card-header">
-                            <h3 class="card-title">Distribuzione Regionale</h3>
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                                Distribuzione Regionale
+                            </h3>
                         </div>
                         <div class="card-body">
                             <div class="chart-container">
@@ -644,9 +1360,92 @@
                     </div>
                 </div>
 
+                <div class="advanced-charts-grid">
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('scatter')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <circle cx="19" cy="5" r="2"/>
+                                    <circle cx="5" cy="19" r="2"/>
+                                    <path d="M10.4 21.9a10 10 0 0 0 9.941-15.416"/>
+                                    <path d="M13.5 2.1a10 10 0 0 0-9.841 15.416"/>
+                                </svg>
+                                Efficienza Commerciale
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="scatterChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('trend')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18h18"/>
+                                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                                </svg>
+                                Trend Mensile
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="position: relative;">
+                        <button class="chart-details-button" onclick="openChartDetailsModal('boxplot')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            Dettagli
+                        </button>
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    <path d="M9 9h6v6H9z"/>
+                                </svg>
+                                Distribuzione Performance
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="boxplotChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Classifica Performance</h3>
+                        <h3 class="card-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                            </svg>
+                            Classifica Performance
+                        </h3>
                     </div>
                     <div class="card-body">
                         <div class="table-container">
@@ -657,534 +1456,255 @@
             </div>
 
             <div id="agents-content" class="tab-content" style="display: none;">
-                <p>Sezione Agenti - Da implementare</p>
+                <div class="filter-container">
+                    <button class="filter-button" id="agentFilterBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                        </svg>
+                        Filtra Agenti
+                        <span class="filter-count" id="agentFilterCount">Tutti</span>
+                    </button>
+                </div>
+                <div class="agent-grid" id="agentGrid"></div>
             </div>
 
             <div id="regions-content" class="tab-content" style="display: none;">
-                <p>Sezione Regioni - Da implementare</p>
+                <div class="filter-container">
+                    <button class="filter-button" id="regionFilterBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                        </svg>
+                        Filtra Regioni
+                        <span class="filter-count" id="filterCount">Tutte</span>
+                    </button>
+                </div>
+                <div class="region-grid" id="regionGrid"></div>
             </div>
         </main>
     </div>
 
-    <script>
-        'use strict';
+    <!-- Modal Filtro Regioni -->
+    <div class="modal-overlay" id="regionFilterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Filtro Regioni</h3>
+                <button class="modal-close" id="closeRegionFilter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-actions">
+                    <button class="filter-action-btn" id="selectAllRegions">Seleziona Tutte</button>
+                    <button class="filter-action-btn" id="deselectAllRegions">Deseleziona Tutte</button>
+                </div>
+                <div class="region-filter-list" id="regionFilterList">
+                    <!-- Lista regioni sarà popolata dinamicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelRegionFilter">Annulla</button>
+                <button class="btn btn-primary" id="applyRegionFilter">Applica Filtro</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modal Filtro Agenti -->
+    <div class="modal-overlay" id="agentFilterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Filtro Agenti</h3>
+                <button class="modal-close" id="closeAgentFilter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-actions">
+                    <button class="filter-action-btn" id="selectAllAgents">Seleziona Tutti</button>
+                    <button class="filter-action-btn" id="deselectAllAgents">Deseleziona Tutti</button>
+                    <button class="filter-action-btn" id="selectTopPerformers">Top Performer</button>
+                    <button class="filter-action-btn" id="selectLowPerformers">Performance Basse</button>
+                </div>
+                <div class="region-filter-list" id="agentFilterList">
+                    <!-- Lista agenti sarà popolata dinamicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAgentFilter">Annulla</button>
+                <button class="btn btn-primary" id="applyAgentFilter">Applica Filtro</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dettaglio Regione -->
+    <div class="modal-overlay" id="regionDetailModal">
+        <div class="modal region-detail-modal">
+            <div class="region-detail-header">
+                <div class="region-detail-icon" id="regionDetailIcon">L</div>
+                <div class="region-detail-info">
+                    <h2 id="regionDetailName">Lazio</h2>
+                    <p id="regionDetailSummary">5 agenti attivi in 4 province</p>
+                </div>
+                <button class="modal-close" id="closeRegionDetail" style="color: white; position: absolute; top: 1rem; right: 1rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="region-detail-tabs">
+                <button class="region-detail-tab active" data-region-tab="overview">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M9 9h6v6H9z"/>
+                    </svg>
+                    Panoramica
+                </button>
+                <button class="region-detail-tab" data-region-tab="provinces">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Province
+                </button>
+                <button class="region-detail-tab" data-region-tab="agents">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                    </svg>
+                    Agenti
+                </button>
+            </div>
+
+            <div class="region-detail-content">
+                <!-- Tab Overview -->
+                <div id="regionOverviewTab" class="region-detail-tab-content active">
+                    <div class="region-overview-grid" id="regionOverviewMetrics">
+                        <!-- Metriche popolate dinamicamente -->
+                    </div>
+                    
+                    <div class="performance-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Performance nel Tempo</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="regionPerformanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="top-performers">
+                            <h4>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                                </svg>
+                                Top Performer
+                            </h4>
+                            <div id="regionTopPerformers">
+                                <!-- Top performers popolati dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Province -->
+                <div id="regionProvincesTab" class="region-detail-tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Confronto Province</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="provincesComparisonChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="province-grid" id="provinceDetailGrid">
+                        <!-- Province cards popolate dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Tab Agenti -->
+                <div id="regionAgentsTab" class="region-detail-tab-content">
+                    <div class="agent-detail-grid" id="regionAgentGrid">
+                        <!-- Agenti cards popolate dinamicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dettagli Grafici -->
+    <div class="modal-overlay" id="chartDetailsModal">
+        <div class="modal details-modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="chartDetailsTitle">Dettagli Grafico</h3>
+                <button class="modal-close" id="closeChartDetails">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body details-modal-content" id="chartDetailsContent">
+                <!-- Contenuto popolato dinamicamente -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeChartDetailsBtn">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script> 
+    <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmf7cw2ev002p1032fkvqlkup'></zapier-interfaces-chatbot-embed>
+
+    <script>
         const CSV_URL = 'https://raw.githubusercontent.com/marketingcusimano/rete-commerciale-agenti/refs/heads/main/docs/csv-concatenato-agenti.csv';
         
         let allData = [];
         let currentTab = 'overview';
         let charts = {};
-        let cache = new Map();
-        let retryCount = 0;
-        const MAX_RETRIES = 3;
+        let selectedRegions = new Set();
+        let availableRegions = new Map();
+        let tempSelectedRegions = new Set();
+        
+        // Variabili per filtro agenti
+        let selectedAgents = new Set();
+        let availableAgents = [];
+        let tempSelectedAgents = new Set();
 
-        function parseNumber(value) {
-            if (typeof value === 'number') return value;
-            if (typeof value !== 'string') return 0;
-            
-            let clean = value.trim().replace(/"/g, '').replace(/'/g, '');
-            if (!clean || clean === '') return 0;
-            
-            return parseFloat(clean.replace(/[^\d.-]/g, '')) || 0;
-        }
+        // Variabili per modal dettaglio regione
+        let currentRegionData = null;
+        let currentRegionTab = 'overview';
+        let regionDetailCharts = {};
 
-        function updateClock() {
-            const clockElement = document.getElementById('currentTime');
-            if (clockElement) {
-                clockElement.textContent = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-            }
-        }
-
-        function initializeTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            
-            tabs.forEach(tab => {
-                if (tab && typeof tab.addEventListener === 'function') {
-                    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-                    
-                    // Keyboard navigation
-                    tab.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            switchTab(tab.dataset.tab);
-                        }
-                    });
-                }
-            });
-        }
-
-        function switchTab(tabId) {
-            try {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-                
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.style.display = 'none';
-                });
-                
-                const targetContent = document.getElementById(`${tabId}-content`);
-                if (targetContent) {
-                    targetContent.style.display = 'block';
-                }
-                
-                currentTab = tabId;
-                
-                // Render content for the active tab
-                if (tabId === 'agents') {
-                    renderAgentCards();
-                } else if (tabId === 'regions') {
-                    renderRegionCards();
-                }
-                
-                // Resize charts after tab switch
-                setTimeout(() => {
-                    Object.values(charts).forEach(chart => {
-                        if (chart && typeof chart.resize === 'function') {
-                            try {
-                                chart.resize();
-                            } catch (error) {
-                                console.warn('Chart resize error:', error);
-                            }
-                        }
-                    });
-                }, 100);
-            } catch (error) {
-                console.error('Tab switch error:', error);
-            }
-        }
-
-        async function loadData() {
-            try {
-                updateLoadingStatus('Caricamento...');
-                
-                // Check cache first
-                const cacheKey = 'dashboard-data';
-                const cachedData = cache.get(cacheKey);
-                const now = Date.now();
-                
-                if (cachedData && (now - cachedData.timestamp < 120000)) {
-                    allData = cachedData.data;
-                    renderDashboard();
-                    updateLoadingStatus(`Cache - ${new Date(cachedData.timestamp).toLocaleTimeString('it-IT')}`);
-                    return;
-                }
-                
-                const response = await fetch(`${CSV_URL}?t=${now}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                
-                const csvText = await response.text();
-                allData = parseCSV(csvText);
-                
-                // Cache the data
-                cache.set(cacheKey, { data: allData, timestamp: now });
-                
-                updateLoadingStatus(`Aggiornato alle ${new Date().toLocaleTimeString('it-IT')}`);
-                renderDashboard();
-                retryCount = 0;
-                
-            } catch (error) {
-                console.error('Errore caricamento:', error);
-                handleLoadError(error);
-            }
-        }
-
-        function handleLoadError(error) {
-            if (retryCount < MAX_RETRIES) {
-                retryCount++;
-                updateLoadingStatus(`Errore - Tentativo ${retryCount}/${MAX_RETRIES}...`, true);
-                setTimeout(() => loadData(), 2000 * retryCount);
-            } else {
-                updateLoadingStatus('Errore caricamento', true);
-                showErrorUI(error);
-            }
-        }
-
-        function showErrorUI(error) {
-            const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.innerHTML = `
-                    <div class="error-boundary">
-                        <h3>Errore di Caricamento</h3>
-                        <p>Si è verificato un errore durante il caricamento dei dati:</p>
-                        <p><small>${error.message}</small></p>
-                        <button class="retry-btn" onclick="location.reload()">Ricarica Pagina</button>
-                    </div>
-                `;
-            }
-        }
-
-        function updateLoadingStatus(text, isError = false) {
-            const lastUpdateElement = document.getElementById('lastUpdate');
-            if (lastUpdateElement) {
-                lastUpdateElement.textContent = text;
-                lastUpdateElement.style.color = isError ? 'var(--danger)' : '';
-            }
-        }
-
-        function parseCSV(csvText) {
-            try {
-                const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
-                const agents = [];
-
-                sections.forEach(section => {
-                    if (!section.trim()) return;
-
-                    const agent = {
-                        codice: '', nome: '', periodo: '',
-                        obiettivi: [], clienti_provincia: [], vendite_cliente: [],
-                        categoria_riepilogo: [], ripartizione: [], totali: []
-                    };
-
-                    const lines = section.split('\n');
-                    let headers = [];
-
-                    lines.forEach(line => {
-                        line = line.trim();
-                        if (!line || line.startsWith('##')) return;
-
-                        if (line.includes('Codice Agente:')) {
-                            agent.codice = line.split(':')[1]?.trim() || '';
-                        } else if (line.includes('Ragione Sociale:')) {
-                            agent.nome = line.split(':')[1]?.trim() || '';
-                        } else if (line.includes('Periodo:')) {
-                            agent.periodo = line.split(':')[1]?.trim() || '';
-                        }
-                        
-                        if (line.includes('Tipo_Dato,')) {
-                            headers = line.split(',').map(h => h.trim());
-                            return;
-                        }
-
-                        if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
-                            const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-                            if (values.length >= headers.length) {
-                                const row = {};
-                                headers.forEach((header, index) => {
-                                    let value = values[index] || '';
-                                    
-                                    if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
-                                         'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
-                                         'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
-                                        value = parseNumber(value);
-                                    }
-                                    row[header] = value;
-                                });
-
-                                switch (row.Tipo_Dato) {
-                                    case 'OBIETTIVI': agent.obiettivi.push(row); break;
-                                    case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
-                                    case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
-                                    case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
-                                    case 'RIPARTIZIONE': agent.ripartizione.push(row); break;
-                                    case 'TOTALE': agent.totali.push(row); break;
-                                }
-                            }
-                        }
-                    });
-
-                    if (agent.codice && agent.nome) {
-                        agents.push(agent);
-                    }
-                });
-
-                return agents;
-            } catch (error) {
-                console.error('CSV parsing error:', error);
-                throw new Error('Errore nel parsing dei dati CSV');
-            }
-        }
-
-        function renderDashboard() {
-            try {
-                const loadingElement = document.getElementById('loading');
-                const overviewElement = document.getElementById('overview-content');
-                
-                if (loadingElement) loadingElement.style.display = 'none';
-                if (overviewElement) overviewElement.style.display = 'block';
-                
-                renderKPIMetrics();
-                renderCharts();
-                renderPerformanceTable();
-            } catch (error) {
-                console.error('Dashboard render error:', error);
-                showErrorUI(error);
-            }
-        }
-
-        function renderKPIMetrics() {
-            try {
-                let totalRevenue = 0, totalPrevRevenue = 0, totalClients = 0;
-                
-                allData.forEach(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    if (general) {
-                        totalRevenue += general.Anno_Corrente || 0;
-                        totalPrevRevenue += general.Anno_Precedente || 0;
-                        totalClients += general.Clienti_Anno_Corrente || 0;
-                    }
-                });
-
-                const growth = totalPrevRevenue > 0 ? 
-                    ((totalRevenue - totalPrevRevenue) / totalPrevRevenue * 100) : 0;
-
-                const metrics = [
-                    { title: 'Fatturato Totale', value: formatCurrency(totalRevenue), change: growth },
-                    { title: 'Clienti Attivi', value: totalClients.toLocaleString('it-IT'), change: null },
-                    { title: 'Agenti Attivi', value: allData.length.toString(), change: null },
-                    { title: 'Crescita Media', value: `${growth.toFixed(1)}%`, change: growth }
-                ];
-
-                const kpiElement = document.getElementById('kpiMetrics');
-                if (kpiElement) {
-                    kpiElement.innerHTML = metrics.map(metric => `
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="card-title">${metric.title}</div>
-                                <div class="metric-value">${metric.value}</div>
-                                ${metric.change !== null ? `
-                                    <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            ${metric.change >= 0 ? 
-                                                '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>' :
-                                                '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>'
-                                            }
-                                        </svg>
-                                        ${metric.change >= 0 ? '+' : ''}${metric.change.toFixed(1)}%
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error('KPI render error:', error);
-            }
-        }
-
-        function renderCharts() {
-            renderRevenueChart();
-            renderRegionChart();
-        }
-
-        function renderRevenueChart() {
-            const canvas = document.getElementById('revenueChart');
-            if (!canvas) return;
-            
-            try {
-                const ctx = canvas.getContext('2d');
-                
-                if (charts.revenue) charts.revenue.destroy();
-
-                const agentData = allData.map(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    return {
-                        name: agent.nome.split(' ')[0],
-                        current: general?.Anno_Corrente || 0,
-                        previous: general?.Anno_Precedente || 0
-                    };
-                }).sort((a, b) => b.current - a.current).slice(0, 8);
-
-                charts.revenue = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: agentData.map(a => a.name),
-                        datasets: [
-                            {
-                                label: '2024',
-                                data: agentData.map(a => a.previous),
-                                backgroundColor: '#E1E7F0',
-                                borderRadius: 4
-                            },
-                            {
-                                label: '2025',
-                                data: agentData.map(a => a.current),
-                                backgroundColor: '#7C93C3',
-                                borderRadius: 4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { callback: value => formatCurrency(value) }
-                            }
-                        },
-                        plugins: {
-                            legend: { position: 'top' },
-                            tooltip: {
-                                callbacks: {
-                                    label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Revenue chart error:', error);
-                if (canvas.parentElement) {
-                    canvas.parentElement.innerHTML = '<div class="error-boundary">Errore nel caricamento del grafico</div>';
-                }
-            }
-        }
-
-        function renderRegionChart() {
-            const canvas = document.getElementById('regionChart');
-            if (!canvas) return;
-            
-            try {
-                const ctx = canvas.getContext('2d');
-                
-                if (charts.region) charts.region.destroy();
-
-                const regionMap = {
-                    'LT': 'Lazio', 'RM': 'Lazio', 'FR': 'Lazio', 'VT': 'Lazio', 'RI': 'Lazio',
-                    'AN': 'Marche', 'PU': 'Marche', 'MC': 'Marche', 'FM': 'Marche', 'AP': 'Marche',
-                    'CA': 'Sardegna', 'SS': 'Sardegna', 'NU': 'Sardegna', 'OR': 'Sardegna'
-                };
-
-                const regionColors = {
-                    'Lazio': '#A8DADC',
-                    'Sardegna': '#B8E6B8',
-                    'Marche': '#FFD3A5'
-                };
-
-                const regionData = {};
-                allData.forEach(agent => {
-                    agent.clienti_provincia.forEach(prov => {
-                        const regionName = regionMap[prov.Provincia] || prov.Provincia;
-                        regionData[regionName] = (regionData[regionName] || 0) + (prov.Fatturato || 0);
-                    });
-                });
-
-                const labels = Object.keys(regionData);
-                const data = Object.values(regionData);
-                const colors = labels.map(label => regionColors[label] || '#64748b');
-
-                charts.region = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels,
-                        datasets: [{
-                            data,
-                            backgroundColor: colors,
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom' },
-                            tooltip: {
-                                callbacks: {
-                                    label: context => `${context.label}: ${formatCurrency(context.parsed)}`
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Region chart error:', error);
-                if (canvas.parentElement) {
-                    canvas.parentElement.innerHTML = '<div class="error-boundary">Errore nel caricamento del grafico</div>';
-                }
-            }
-        }
-
-        function renderPerformanceTable() {
-            const tableElement = document.getElementById('performanceTable');
-            if (!tableElement) return;
-            
-            try {
-                const agentPerformance = allData.map(agent => {
-                    const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
-                    const current = general?.Anno_Corrente || 0;
-                    const previous = general?.Anno_Precedente || 0;
-                    const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
-                    const clients = general?.Clienti_Anno_Corrente || 0;
-                    
-                    return { agent, current, previous, growth, clients };
-                }).sort((a, b) => b.current - a.current);
-
-                tableElement.innerHTML = `
-                    <thead>
-                        <tr>
-                            <th>Agente</th>
-                            <th>Fatturato 2025</th>
-                            <th>Crescita</th>
-                            <th>Clienti</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${agentPerformance.map(item => `
-                            <tr class="table-row">
-                                <td>
-                                    <strong>${escapeHtml(item.agent.nome)}</strong><br>
-                                    <small style="color: var(--text-muted);">${escapeHtml(item.agent.codice)}</small>
-                                </td>
-                                <td><strong>${formatCurrency(item.current)}</strong></td>
-                                <td>
-                                    <span class="badge ${item.growth >= 0 ? 'success' : 'danger'}">
-                                        ${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%
-                                    </span>
-                                </td>
-                                <td>${item.clients}</td>
-                                <td>
-                                    <span class="badge ${item.growth >= 10 ? 'success' : item.growth >= 0 ? 'warning' : 'danger'}">
-                                        ${item.growth >= 10 ? 'Ottimo' : item.growth >= 0 ? 'Buono' : 'Critico'}
-                                    </span>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                `;
-            } catch (error) {
-                console.error('Table render error:', error);
-                if (tableElement) {
-                    tableElement.innerHTML = '<tbody><tr><td colspan="5" class="error-boundary">Errore nel caricamento della tabella</td></tr></tbody>';
-                }
-            }
-        }
-
-        function formatCurrency(value) {
-            if (typeof value !== 'number' || isNaN(value)) return '€0';
-            if (value >= 1000000) return `€${(value / 1000000).toFixed(1)}M`;
-            if (value >= 1000) return `€${(value / 1000).toFixed(0)}k`;
-            return `€${value.toLocaleString('it-IT')}`;
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            try {
-                initializeTabs();
-                updateClock();
-                setInterval(updateClock, 1000);
-                loadData();
-                setInterval(loadData, 120000); // Auto-refresh every 2 minutes
-            } catch (error) {
-                console.error('Initialization error:', error);
-                showErrorUI(error);
-            }
-        });
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            Object.values(charts).forEach(chart => {
-                if (chart && typeof chart.destroy === 'function') {
-                    chart.destroy();
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+        // Mappa colori regioni - Palette pastello moderna
+        const regionColors = {
+            'Lazio': '#A8DADC',        // Azzurro pastello
+            'Sardegna': '#B8E6B8',     // Verde pastello
+            'Marche': '#FFD3A5',       // Arancione pastello
+            'Estero': '#FFB3BA',       // Rosa pastello
+            'Lombardia': '#C7B6FF',    // Viola pastello
+            'Emilia-Romagna': '#A5F3FC', // Ciano pastello
+            'Piemonte': '#F8BBD9',     // Rosa chiaro pastello
+            'Veneto': '#D4E6B5',       // Verde lime pastello
+            'Toscana': '#FFD4A3',      // Pesca pastello
+            'Campania': '#B5E7FF',     // Blu cielo pastello
+            'Sicilia': '#FFF2A5',      // Giallo pastello
+            'Puglia': '#A8F5E6',       // Turchese pastello
+            'Calabria': '#E0C3FC',     // Lavanda pastello
+            'Liguria': '#FFDFBA',      // Albicocca pastello
+            'Abruzzo': '#B3D7FF',      // Blu pastello
+            'Molise': '#DFC5FE',       // Viola chiaro pastello
+            'Basilicata': '#D6A2E8',   // Magenta pastello
+            'Umbria': '#A5D6A7',       // Verde menta pastello
+            '
