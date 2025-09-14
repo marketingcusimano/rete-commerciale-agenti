@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -582,46 +581,6 @@
             left: 100%;
         }
 
-        /* Responsive migliorato */
-        @media (max-width: 1024px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            .main-content, .header { padding: 1rem; }
-            .card-body, .metrics-grid .card-body { padding: 1.5rem; }
-            .region-header { padding: 1.5rem 1.5rem 0; }
-            .region-stats { padding: 0 1.5rem; }
-            .agent-header, .agent-body { padding: 1.5rem; }
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-            .tabs {
-                width: 100%;
-                overflow-x: auto;
-                scrollbar-width: none;
-                -ms-overflow-style: none;
-            }
-            .tabs::-webkit-scrollbar {
-                display: none;
-            }
-            .tab {
-                flex-shrink: 0;
-            }
-            .metrics-grid,
-            .region-grid,
-            .agent-grid {
-                grid-template-columns: 1fr;
-            }
-            .card-body, .metrics-grid .card-body { padding: 1.25rem; }
-            .region-header { padding: 1.25rem 1.25rem 0; }
-            .region-stats { padding: 0 1.25rem; }
-            .agent-header, .agent-body { padding: 1.25rem; }
-            .region-detail-button { margin: 1.25rem; width: calc(100% - 2.5rem); }
-        }
-
         /* Grids */
         .metrics-grid {
             display: grid;
@@ -773,7 +732,7 @@
             margin-bottom: 1.5rem;
         }
 
-        /* Modal e altri componenti esistenti mantengono i loro stili */
+        /* Modal e altri componenti */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -882,6 +841,113 @@
 
         .btn-primary:hover {
             background: var(--primary-dark);
+        }
+
+        /* Stili per modali filtri */
+        .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .filter-action-btn {
+            padding: 0.5rem 0.75rem;
+            background: var(--surface-3);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .filter-action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .region-filter-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .region-filter-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .region-filter-item:hover {
+            background: var(--surface-3);
+        }
+
+        .region-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .region-filter-info {
+            flex: 1;
+        }
+
+        .region-filter-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .region-filter-stats {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive migliorato */
+        @media (max-width: 1024px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .main-content, .header { padding: 1rem; }
+            .card-body, .metrics-grid .card-body { padding: 1.5rem; }
+            .region-header { padding: 1.5rem 1.5rem 0; }
+            .region-stats { padding: 0 1.5rem; }
+            .agent-header, .agent-body { padding: 1.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            .tabs {
+                width: 100%;
+                overflow-x: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            .tabs::-webkit-scrollbar {
+                display: none;
+            }
+            .tab {
+                flex-shrink: 0;
+            }
+            .metrics-grid,
+            .region-grid,
+            .agent-grid {
+                grid-template-columns: 1fr;
+            }
+            .card-body, .metrics-grid .card-body { padding: 1.25rem; }
+            .region-header { padding: 1.25rem 1.25rem 0; }
+            .region-stats { padding: 0 1.25rem; }
+            .agent-header, .agent-body { padding: 1.25rem; }
+            .region-detail-button { margin: 1.25rem; width: calc(100% - 2.5rem); }
         }
     </style>
 </head>
@@ -1122,6 +1188,64 @@
                 <div class="region-grid" id="regionGrid"></div>
             </div>
         </main>
+    </div>
+
+    <!-- Modal Filtro Regioni -->
+    <div class="modal-overlay" id="regionFilterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Filtro Regioni</h3>
+                <button class="modal-close" id="closeRegionFilter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-actions">
+                    <button class="filter-action-btn" id="selectAllRegions">Seleziona Tutte</button>
+                    <button class="filter-action-btn" id="deselectAllRegions">Deseleziona Tutte</button>
+                </div>
+                <div class="region-filter-list" id="regionFilterList">
+                    <!-- Lista regioni sarà popolata dinamicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelRegionFilter">Annulla</button>
+                <button class="btn btn-primary" id="applyRegionFilter">Applica Filtro</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Filtro Agenti -->
+    <div class="modal-overlay" id="agentFilterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Filtro Agenti</h3>
+                <button class="modal-close" id="closeAgentFilter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-actions">
+                    <button class="filter-action-btn" id="selectAllAgents">Seleziona Tutti</button>
+                    <button class="filter-action-btn" id="deselectAllAgents">Deseleziona Tutti</button>
+                    <button class="filter-action-btn" id="selectTopPerformers">Top Performer</button>
+                    <button class="filter-action-btn" id="selectLowPerformers">Performance Basse</button>
+                </div>
+                <div class="region-filter-list" id="agentFilterList">
+                    <!-- Lista agenti sarà popolata dinamicamente -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAgentFilter">Annulla</button>
+                <button class="btn btn-primary" id="applyAgentFilter">Applica Filtro</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1408,6 +1532,8 @@
             renderPerformanceTable();
             renderAgentCards();
             renderRegionCards();
+            updateFilterButtonText();
+            updateAgentFilterButtonText();
         }
 
         // Funzione migliorata per KPI con confronto anno precedente
@@ -2149,33 +2275,344 @@
             return `€${value.toLocaleString('it-IT')}`;
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Inizializzazione dashboard...');
+        // Funzioni per filtri e modali
+        function updateFilterButtonText() {
+            const filterCount = document.getElementById('filterCount');
+            if (!filterCount) return;
             
-            try {
-                initializeTabs();
-                console.log('Tabs inizializzati');
-            } catch (error) {
-                console.error('Errore tabs:', error);
+            const totalRegions = availableRegions.size;
+            
+            if (selectedRegions.size === 0) {
+                filterCount.textContent = 'Tutte';
+            } else if (selectedRegions.size === totalRegions) {
+                filterCount.textContent = 'Tutte';
+            } else {
+                filterCount.textContent = `${selectedRegions.size}/${totalRegions}`;
+            }
+        }
+
+        function updateAgentFilterButtonText() {
+            const filterCount = document.getElementById('agentFilterCount');
+            if (!filterCount) return;
+            
+            const totalAgents = availableAgents.length;
+            
+            if (selectedAgents.size === 0) {
+                filterCount.textContent = 'Tutti';
+            } else if (selectedAgents.size === totalAgents) {
+                filterCount.textContent = 'Tutti';
+            } else {
+                filterCount.textContent = `${selectedAgents.size}/${totalAgents}`;
+            }
+        }
+
+        function openRegionFilterModal() {
+            tempSelectedRegions = new Set(selectedRegions);
+            
+            const filterList = document.getElementById('regionFilterList');
+            if (!filterList) return;
+            
+            filterList.innerHTML = '';
+            
+            Array.from(availableRegions.values())
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .forEach(region => {
+                    const isSelected = tempSelectedRegions.has(region.name);
+                    
+                    const item = document.createElement('div');
+                    item.className = 'region-filter-item';
+                    item.innerHTML = `
+                        <input type="checkbox" 
+                               class="region-checkbox" 
+                               id="region-${region.name}" 
+                               ${isSelected ? 'checked' : ''}
+                               data-region="${region.name}">
+                        <div class="region-filter-info">
+                            <div class="region-filter-name">${region.name}</div>
+                            <div class="region-filter-stats">
+                                ${formatCurrency(region.revenue)} • ${region.clients} clienti • ${region.agents.size} agenti
+                            </div>
+                        </div>
+                    `;
+                    
+                    const checkbox = item.querySelector('.region-checkbox');
+                    if (checkbox) {
+                        checkbox.addEventListener('change', (e) => {
+                            if (e.target.checked) {
+                                tempSelectedRegions.add(region.name);
+                            } else {
+                                tempSelectedRegions.delete(region.name);
+                            }
+                        });
+                    }
+                    
+                    filterList.appendChild(item);
+                });
+            
+            const modal = document.getElementById('regionFilterModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeRegionFilterModal() {
+            const modal = document.getElementById('regionFilterModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function applyRegionFilter() {
+            selectedRegions = new Set(tempSelectedRegions);
+            renderRegionCards();
+            updateFilterButtonText();
+            closeRegionFilterModal();
+        }
+
+        function selectAllRegions() {
+            tempSelectedRegions.clear();
+            availableRegions.forEach((region, name) => {
+                tempSelectedRegions.add(name);
+            });
+            
+            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllRegions() {
+            tempSelectedRegions.clear();
+            
+            document.querySelectorAll('.region-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function openAgentFilterModal() {
+            tempSelectedAgents = new Set(selectedAgents);
+            
+            const filterList = document.getElementById('agentFilterList');
+            if (!filterList) return;
+            
+            filterList.innerHTML = '';
+            
+            availableAgents.forEach((agent, index) => {
+                const isSelected = tempSelectedAgents.has(agent.codice);
+                
+                const item = document.createElement('div');
+                item.className = 'region-filter-item';
+                item.innerHTML = `
+                    <input type="checkbox" 
+                           class="region-checkbox" 
+                           id="agent-${agent.codice}" 
+                           ${isSelected ? 'checked' : ''}
+                           data-agent="${agent.codice}">
+                    <div class="region-filter-info">
+                        <div class="region-filter-name">${agent.nome}</div>
+                        <div class="region-filter-stats">
+                            ${formatCurrency(agent.current)} • ${agent.clients} clienti • ${agent.growth.toFixed(1)}% crescita
+                        </div>
+                        <div class="region-filter-stats">
+                            <span class="badge ${agent.growth >= 10 ? 'success' : agent.growth >= 0 ? 'warning' : 'danger'}" style="margin-top: 0.25rem;">
+                                ${agent.status}
+                            </span>
+                            <span style="font-size: 0.65rem; margin-left: 0.5rem; color: var(--text-muted);">
+                                ${agent.regions.join(', ')}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                
+                const checkbox = item.querySelector('.region-checkbox');
+                if (checkbox) {
+                    checkbox.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            tempSelectedAgents.add(agent.codice);
+                        } else {
+                            tempSelectedAgents.delete(agent.codice);
+                        }
+                    });
+                }
+                
+                filterList.appendChild(item);
+            });
+            
+            const modal = document.getElementById('agentFilterModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeAgentFilterModal() {
+            const modal = document.getElementById('agentFilterModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function applyAgentFilter() {
+            selectedAgents = new Set(tempSelectedAgents);
+            renderAgentCards();
+            updateAgentFilterButtonText();
+            closeAgentFilterModal();
+        }
+
+        function selectAllAgents() {
+            tempSelectedAgents.clear();
+            availableAgents.forEach(agent => {
+                tempSelectedAgents.add(agent.codice);
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        }
+
+        function deselectAllAgents() {
+            tempSelectedAgents.clear();
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function selectTopPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth >= 10) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                const agentCode = checkbox.dataset.agent;
+                const agent = availableAgents.find(a => a.codice === agentCode);
+                checkbox.checked = agent && agent.growth >= 10;
+            });
+        }
+
+        function selectLowPerformers() {
+            tempSelectedAgents.clear();
+            
+            availableAgents.forEach(agent => {
+                if (agent.growth < 0) {
+                    tempSelectedAgents.add(agent.codice);
+                }
+            });
+            
+            document.querySelectorAll('#agentFilterList .region-checkbox').forEach(checkbox => {
+                const agentCode = checkbox.dataset.agent;
+                const agent = availableAgents.find(a => a.codice === agentCode);
+                checkbox.checked = agent && agent.growth < 0;
+            });
+        }
+
+        function initializeRegionFilter() {
+            const regionFilterBtn = document.getElementById('regionFilterBtn');
+            const closeRegionFilter = document.getElementById('closeRegionFilter');
+            const cancelRegionFilter = document.getElementById('cancelRegionFilter');
+            const applyRegionFilterBtn = document.getElementById('applyRegionFilter');
+            const selectAllRegionsBtn = document.getElementById('selectAllRegions');
+            const deselectAllRegionsBtn = document.getElementById('deselectAllRegions');
+            const regionFilterModal = document.getElementById('regionFilterModal');
+
+            if (regionFilterBtn) {
+                regionFilterBtn.addEventListener('click', openRegionFilterModal);
             }
             
-            try {
-                updateClock();
-                setInterval(updateClock, 1000);
-                console.log('Clock inizializzato');
-            } catch (error) {
-                console.error('Errore clock:', error);
+            if (closeRegionFilter) {
+                closeRegionFilter.addEventListener('click', closeRegionFilterModal);
             }
             
-            try {
-                loadData();
-                setInterval(loadData, 120000);
-                console.log('Caricamento dati avviato');
-            } catch (error) {
-                console.error('Errore caricamento dati:', error);
+            if (cancelRegionFilter) {
+                cancelRegionFilter.addEventListener('click', closeRegionFilterModal);
             }
-        });
+            
+            if (applyRegionFilterBtn) {
+                applyRegionFilterBtn.addEventListener('click', applyRegionFilter);
+            }
+            
+            if (selectAllRegionsBtn) {
+                selectAllRegionsBtn.addEventListener('click', selectAllRegions);
+            }
+            
+            if (deselectAllRegionsBtn) {
+                deselectAllRegionsBtn.addEventListener('click', deselectAllRegions);
+            }
+            
+            if (regionFilterModal) {
+                regionFilterModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'regionFilterModal') {
+                        closeRegionFilterModal();
+                    }
+                });
+            }
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && regionFilterModal && regionFilterModal.classList.contains('show')) {
+                    closeRegionFilterModal();
+                }
+            });
+        }
+
+        function initializeAgentFilter() {
+            const agentFilterBtn = document.getElementById('agentFilterBtn');
+            const closeAgentFilter = document.getElementById('closeAgentFilter');
+            const cancelAgentFilter = document.getElementById('cancelAgentFilter');
+            const applyAgentFilterBtn = document.getElementById('applyAgentFilter');
+            const selectAllAgentsBtn = document.getElementById('selectAllAgents');
+            const deselectAllAgentsBtn = document.getElementById('deselectAllAgents');
+            const selectTopPerformersBtn = document.getElementById('selectTopPerformers');
+            const selectLowPerformersBtn = document.getElementById('selectLowPerformers');
+            const agentFilterModal = document.getElementById('agentFilterModal');
+
+            if (agentFilterBtn) {
+                agentFilterBtn.addEventListener('click', openAgentFilterModal);
+            }
+            
+            if (closeAgentFilter) {
+                closeAgentFilter.addEventListener('click', closeAgentFilterModal);
+            }
+            
+            if (cancelAgentFilter) {
+                cancelAgentFilter.addEventListener('click', closeAgentFilterModal);
+            }
+            
+            if (applyAgentFilterBtn) {
+                applyAgentFilterBtn.addEventListener('click', applyAgentFilter);
+            }
+            
+            if (selectAllAgentsBtn) {
+                selectAllAgentsBtn.addEventListener('click', selectAllAgents);
+            }
+            
+            if (deselectAllAgentsBtn) {
+                deselectAllAgentsBtn.addEventListener('click', deselectAllAgents);
+            }
+            
+            if (selectTopPerformersBtn) {
+                selectTopPerformersBtn.addEventListener('click', selectTopPerformers);
+            }
+            
+            if (selectLowPerformersBtn) {
+                selectLowPerformersBtn.addEventListener('click', selectLowPerformers);
+            }
+            
+            if (agentFilterModal) {
+                agentFilterModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'agentFilterModal') {
+                        closeAgentFilterModal();
+                    }
+                });
+            }
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && agentFilterModal && agentFilterModal.classList.contains('show')) {
+                    closeAgentFilterModal();
+                }
+            });
+        }
 
         // Funzioni per gestire i modali delle regioni - CORRETTE
         function openRegionDetailModal(regionName) {
@@ -2293,10 +2730,131 @@
             }
         }
 
-        // Placeholder functions for chart details
+        // Funzioni per modal dettagli grafici
         function openChartDetailsModal(chartType) {
-            console.log('Opening chart details for:', chartType);
+            const modal = document.getElementById('chartDetailsModal') || createChartDetailsModal();
+            const title = modal.querySelector('.modal-title');
+            const content = modal.querySelector('.modal-body');
+            
+            if (!title || !content) return;
+
+            // Imposta il titolo
+            const titles = {
+                'performance': 'Performance Agenti - Dettagli Completi',
+                'regions': 'Distribuzione Regionale - Dettagli Completi', 
+                'scatter': 'Efficienza Commerciale - Analisi Dettagliata',
+                'heatmap': 'Matrice Performance - Analisi Completa',
+                'boxplot': 'Distribuzione Performance - Statistiche per Regione'
+            };
+            title.textContent = titles[chartType] || 'Dettagli Grafico';
+
+            // Genera il contenuto
+            switch(chartType) {
+                case 'performance':
+                    content.innerHTML = generatePerformanceDetails();
+                    break;
+                case 'regions':
+                    content.innerHTML = generateRegionDetails();
+                    break;
+                case 'scatter':
+                    content.innerHTML = generateScatterDetails();
+                    break;
+                case 'heatmap':
+                    content.innerHTML = generateHeatmapDetails();
+                    break;
+                case 'boxplot':
+                    content.innerHTML = generateBoxplotDetails();
+                    break;
+                default:
+                    content.innerHTML = '<p>Dettagli non disponibili</p>';
+            }
+
+            modal.style.opacity = '1';
+            modal.style.visibility = 'visible';
+            document.body.style.overflow = 'hidden';
         }
-    </script>
-</body>
-</html>
+
+        function createChartDetailsModal() {
+            const modalHtml = `
+                <div class="modal-overlay" id="chartDetailsModal" style="opacity: 0; visibility: hidden;">
+                    <div class="modal" style="transform: scale(0.9); max-width: 1200px; max-height: 90vh;">
+                        <div class="modal-header">
+                            <h3 class="modal-title">Dettagli Grafico</h3>
+                            <button class="modal-close" onclick="closeChartDetailsModal()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="max-height: calc(90vh - 120px); overflow-y: auto; padding: 2rem;">
+                            <!-- Contenuto popolato dinamicamente -->
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" onclick="closeChartDetailsModal()">Chiudi</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            return document.getElementById('chartDetailsModal');
+        }
+
+        function closeChartDetailsModal() {
+            const modal = document.getElementById('chartDetailsModal');
+            if (modal) {
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
+                document.body.style.overflow = '';
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+
+        function generatePerformanceDetails() {
+            const agentData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                
+                return { 
+                    agent, current, previous, growth, clients, regions,
+                    efficiency: clients > 0 ? current / clients : 0
+                };
+            }).sort((a, b) => b.current - a.current);
+
+            return `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                        </svg>
+                        Performance Completa Agenti
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+                        ${agentData.map((item, index) => `
+                            <div style="background: var(--surface-2); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border);">
+                                <h4 style="margin-bottom: 0.5rem; color: var(--text);">${item.agent.nome}</h4>
+                                <p style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.875rem;">Codice: ${item.agent.codice} | Posizione: #${index + 1}</p>
+                                
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Fatturato 2025</span>
+                                    <span style="font-weight: 600; color: var(--text);">${formatCurrency(item.current)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Fatturato 2024</span>
+                                    <span style="font-weight: 600; color: var(--text);">${formatCurrency(item.previous)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Crescita</span>
+                                    <span style="font-weight: 600; color: ${item.growth >= 0 ? 'var(--success)' : 'var(--danger)'};">${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Clienti Attivi</span>
+                                    <span style="font-weight: 600; color: var(--text);">${item.clients}</span>
+                                </div>
+                                <div style="display
