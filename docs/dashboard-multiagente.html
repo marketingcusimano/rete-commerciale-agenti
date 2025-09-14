@@ -2241,7 +2241,498 @@
         }
 
         function openChartDetailsModal(chartType) {
-            console.log('Opening chart details for:', chartType);
+            const modal = document.getElementById('chartDetailsModal');
+            const title = document.getElementById('chartDetailsTitle');
+            const content = document.getElementById('chartDetailsContent');
+            
+            if (!modal || !title || !content) {
+                // Crea il modal se non exists
+                createChartDetailsModal();
+                return openChartDetailsModal(chartType);
+            }
+
+            // Imposta il titolo
+            const titles = {
+                'performance': 'Performance Agenti - Analisi Dettagliata',
+                'regions': 'Distribuzione Regionale - Analisi Completa', 
+                'scatter': 'Efficienza Commerciale - Analisi Approfondita',
+                'heatmap': 'Matrice Performance - Analisi Completa',
+                'boxplot': 'Distribuzione Performance - Statistiche per Regione'
+            };
+            title.textContent = titles[chartType] || 'Dettagli Grafico';
+
+            // Genera il contenuto
+            switch(chartType) {
+                case 'performance':
+                    content.innerHTML = generatePerformanceDetails();
+                    break;
+                case 'regions':
+                    content.innerHTML = generateRegionDetails();
+                    break;
+                case 'scatter':
+                    content.innerHTML = generateScatterDetails();
+                    break;
+                case 'heatmap':
+                    content.innerHTML = generateHeatmapDetails();
+                    break;
+                case 'boxplot':
+                    content.innerHTML = generateBoxplotDetails();
+                    break;
+                default:
+                    content.innerHTML = '<p>Dettagli non disponibili per questo grafico.</p>';
+            }
+
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function createChartDetailsModal() {
+            const modalHtml = `
+                <div class="modal-overlay" id="chartDetailsModal">
+                    <div class="modal" style="max-width: 1200px; width: 95%;">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="chartDetailsTitle">Dettagli Grafico</h3>
+                            <button class="modal-close" onclick="closeChartDetailsModal()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;" id="chartDetailsContent">
+                            <!-- Contenuto popolato dinamicamente -->
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" onclick="closeChartDetailsModal()">Chiudi</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeChartDetailsModal() {
+            const modal = document.getElementById('chartDetailsModal');
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function generatePerformanceDetails() {
+            const agentData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                
+                return { 
+                    agent, current, previous, growth, clients, regions,
+                    efficiency: clients > 0 ? current / clients : 0
+                };
+            }).sort((a, b) => b.current - a.current);
+
+            return `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                        </svg>
+                        Performance Completa Agenti
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+                        ${agentData.map((item, index) => `
+                            <div style="background: var(--surface-2); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border);">
+                                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text);">${item.agent.nome}</h4>
+                                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Codice: ${item.agent.codice} | Posizione: #${index + 1}</p>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Fatturato 2025</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${formatCurrency(item.current)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Fatturato 2024</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${formatCurrency(item.previous)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Crescita</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: ${item.growth >= 0 ? 'var(--success)' : 'var(--danger)'};">${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Clienti Attivi</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${item.clients}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Efficienza</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${formatCurrency(item.efficiency)}/cliente</span>
+                                </div>
+                                
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted);">Regioni:</span><br>
+                                    <div style="margin-top: 0.5rem;">
+                                        ${item.regions.map(region => `
+                                            <span style="display: inline-block; background: ${getRegionColor(region)}20; color: ${getRegionColor(region)}; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin: 0.25rem 0.25rem 0 0; border: 1px solid ${getRegionColor(region)}40;">
+                                                ${region}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateRegionDetails() {
+            const regionData = {};
+            
+            allData.forEach(agent => {
+                agent.clienti_provincia.forEach(prov => {
+                    const regionName = getRegionFromProvince(prov.Provincia);
+                    if (!regionData[regionName]) {
+                        regionData[regionName] = {
+                            name: regionName,
+                            revenue: 0,
+                            clients: 0,
+                            agents: new Set(),
+                            provinces: new Set(),
+                            agentList: []
+                        };
+                    }
+                    regionData[regionName].revenue += prov.Fatturato || 0;
+                    regionData[regionName].clients += prov.Clienti_Serviti || 0;
+                    regionData[regionName].agents.add(agent.codice);
+                    regionData[regionName].provinces.add(prov.Provincia);
+                    
+                    if (!regionData[regionName].agentList.find(a => a.codice === agent.codice)) {
+                        regionData[regionName].agentList.push({
+                            codice: agent.codice,
+                            nome: agent.nome
+                        });
+                    }
+                });
+            });
+
+            const sortedRegions = Object.values(regionData).sort((a, b) => b.revenue - a.revenue);
+
+            return `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                        Distribuzione Regionale Completa
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+                        ${sortedRegions.map((region, index) => `
+                            <div style="background: var(--surface-2); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border);">
+                                <h4 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text);">
+                                    <span style="width: 12px; height: 12px; border-radius: 50%; background: ${getRegionColor(region.name)};"></span>
+                                    ${region.name}
+                                </h4>
+                                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Posizione: #${index + 1} per fatturato</p>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Fatturato Totale</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${formatCurrency(region.revenue)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Clienti Serviti</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${region.clients}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Numero Agenti</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${region.agents.size}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Province Coperte</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${region.provinces.size}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Media per Agente</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${formatCurrency(region.revenue / region.agents.size)}</span>
+                                </div>
+                                
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted);">Agenti:</span><br>
+                                    ${region.agentList.map(agent => `
+                                        <span style="font-size: 0.75rem; display: block; margin: 0.25rem 0; color: var(--text);">${agent.nome} (${agent.codice})</span>
+                                    `).join('')}
+                                </div>
+                                <div style="margin-top: 0.5rem;">
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted);">Province:</span><br>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">${Array.from(region.provinces).join(', ')}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateScatterDetails() {
+            const scatterData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const efficiency = clients > 0 ? current / clients : 0;
+                const regions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                
+                return { agent, current, clients, growth, efficiency, regions, previous };
+            }).filter(item => item.clients > 0 && item.current > 0)
+              .sort((a, b) => b.efficiency - a.efficiency);
+
+            return `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <circle cx="19" cy="5" r="2"/>
+                            <circle cx="5" cy="19" r="2"/>
+                        </svg>
+                        Analisi Efficienza Commerciale
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+                        ${scatterData.map((item, index) => `
+                            <div style="background: var(--surface-2); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border);">
+                                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text);">${item.agent.nome}</h4>
+                                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Codice: ${item.agent.codice} | Ranking Efficienza: #${index + 1}</p>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Efficienza (€/cliente)</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--primary);">${formatCurrency(item.efficiency)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Fatturato Totale</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${formatCurrency(item.current)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Clienti Gestiti</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${item.clients}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Crescita vs 2024</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: ${item.growth >= 0 ? 'var(--success)' : 'var(--danger)'};">${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Fatturato 2024</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${formatCurrency(item.previous)}</span>
+                                </div>
+                                
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted);">Regioni Operative:</span><br>
+                                    <div style="margin-top: 0.5rem;">
+                                        ${item.regions.map(region => `
+                                            <span style="display: inline-block; background: ${getRegionColor(region)}20; color: ${getRegionColor(region)}; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin: 0.25rem 0.25rem 0 0; border: 1px solid ${getRegionColor(region)}40;">
+                                                ${region}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0.5rem;">
+                                    <span style="background: ${item.efficiency > 50000 ? 'rgba(16, 185, 129, 0.1)' : item.efficiency > 30000 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${item.efficiency > 50000 ? '#059669' : item.efficiency > 30000 ? '#d97706' : '#dc2626'}; padding: 0.375rem 0.875rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; border: 1px solid ${item.efficiency > 50000 ? 'rgba(16, 185, 129, 0.2)' : item.efficiency > 30000 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(239, 68, 68, 0.2)'};">
+                                        ${item.efficiency > 50000 ? 'Alta Efficienza' : item.efficiency > 30000 ? 'Efficienza Media' : 'Efficienza Bassa'}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateHeatmapDetails() {
+            const matrixData = allData.map(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                
+                let category = 'Bassa Performance';
+                let categoryColor = '#dc2626';
+                
+                if (growth >= 20 && current >= 2000000) {
+                    category = 'Star Performer';
+                    categoryColor = '#059669';
+                } else if (growth >= 10 && current >= 1000000) {
+                    category = 'Alto Potenziale';
+                    categoryColor = '#d97706';
+                } else if (growth >= 0 || current >= 500000) {
+                    category = 'Performance Media';
+                    categoryColor = '#d97706';
+                }
+                
+                return { agent, current, previous, growth, clients, category, categoryColor };
+            }).sort((a, b) => b.current - a.current);
+
+            return `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                        Matrice Performance - Classificazione Agenti
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+                        ${matrixData.map((item, index) => `
+                            <div style="background: var(--surface-2); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border);">
+                                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text);">${item.agent.nome}</h4>
+                                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Codice: ${item.agent.codice} | Posizione: #${index + 1}</p>
+                                <div style="margin-bottom: 1rem;">
+                                    <span style="background: ${item.categoryColor}20; color: ${item.categoryColor}; padding: 0.375rem 0.875rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; border: 1px solid ${item.categoryColor}40;">
+                                        ${item.category}
+                                    </span>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Fatturato 2025</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${formatCurrency(item.current)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Fatturato 2024</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${formatCurrency(item.previous)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Crescita</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: ${item.growth >= 0 ? 'var(--success)' : 'var(--danger)'};">${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+                                    <span style="font-size: 0.875rem; color: var(--text-muted);">Clienti Attivi</span>
+                                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${item.clients}</span>
+                                </div>
+                                
+                                <div style="margin-top: 1rem; padding: 1rem; background: var(--surface-3); border-radius: var(--radius); border-left: 3px solid ${item.categoryColor};">
+                                    <span style="font-size: 0.75rem; font-weight: 600;">
+                                        ${item.category === 'Star Performer' ? 'Eccellente combinazione di crescita e volume!' : 
+                                          item.category === 'Alto Potenziale' ? 'Ottima performance, continua così!' : 
+                                          item.category === 'Performance Media' ? 'Buona base, potenziale di crescita' : 
+                                          'Richiede attenzione e supporto'}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateBoxplotDetails() {
+            const regionPerformance = {};
+            
+            allData.forEach(agent => {
+                const general = agent.obiettivi.find(o => o.Provincia === 'Generale');
+                const current = general?.Anno_Corrente || 0;
+                const previous = general?.Anno_Precedente || 0;
+                const growth = previous > 0 ? ((current - previous) / previous * 100) : 0;
+                const clients = general?.Clienti_Anno_Corrente || 0;
+                
+                const agentRegions = [...new Set(agent.clienti_provincia.map(prov => getRegionFromProvince(prov.Provincia)))];
+                const mainRegion = agentRegions[0] || 'Generale';
+                
+                if (!regionPerformance[mainRegion]) {
+                    regionPerformance[mainRegion] = {
+                        name: mainRegion,
+                        agents: [],
+                        growths: []
+                    };
+                }
+                
+                regionPerformance[mainRegion].agents.push({
+                    agent, current, previous, growth, clients
+                });
+                regionPerformance[mainRegion].growths.push(growth);
+            });
+
+            Object.values(regionPerformance).forEach(region => {
+                const sorted = region.growths.sort((a, b) => a - b);
+                const len = sorted.length;
+                region.stats = {
+                    min: sorted[0],
+                    q1: sorted[Math.floor(len * 0.25)],
+                    median: sorted[Math.floor(len * 0.5)],
+                    q3: sorted[Math.floor(len * 0.75)],
+                    max: sorted[len - 1],
+                    average: sorted.reduce((sum, val) => sum + val, 0) / len
+                };
+                
+                region.agents.sort((a, b) => b.growth - a.growth);
+            });
+
+            const sortedRegions = Object.values(regionPerformance).sort((a, b) => b.stats.median - a.stats.median);
+
+            return `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M9 9h6v6H9z"/>
+                        </svg>
+                        Distribuzione Performance per Regione
+                    </h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+                        ${sortedRegions.map((region, index) => `
+                            <div style="background: var(--surface-2); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border);">
+                                <h4 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text);">
+                                    <span style="width: 12px; height: 12px; border-radius: 50%; background: ${getRegionColor(region.name)};"></span>
+                                    ${region.name}
+                                </h4>
+                                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Ranking per crescita mediana: #${index + 1}</p>
+                                
+                                <div style="background: var(--surface-3); padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                                    <h5 style="margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--text);">Statistiche Crescita</h5>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                        <span style="font-size: 0.875rem; color: var(--text-muted);">Crescita Mediana</span>
+                                        <span style="font-size: 0.875rem; font-weight: 600; color: ${region.stats.median >= 0 ? 'var(--success)' : 'var(--danger)'};">${region.stats.median.toFixed(1)}%</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                        <span style="font-size: 0.875rem; color: var(--text-muted);">Crescita Media</span>
+                                        <span style="font-size: 0.875rem; font-weight: 600; color: ${region.stats.average >= 0 ? 'var(--success)' : 'var(--danger)'};">${region.stats.average.toFixed(1)}%</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                        <span style="font-size: 0.875rem; color: var(--text-muted);">Migliore Performance</span>
+                                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--success);">${region.stats.max.toFixed(1)}%</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                                        <span style="font-size: 0.875rem; color: var(--text-muted);">Performance Minima</span>
+                                        <span style="font-size: 0.875rem; font-weight: 600; color: ${region.stats.min >= 0 ? 'var(--success)' : 'var(--danger)'};">${region.stats.min.toFixed(1)}%</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+                                        <span style="font-size: 0.875rem; color: var(--text-muted);">Range (Q3-Q1)</span>
+                                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--text);">${(region.stats.q3 - region.stats.q1).toFixed(1)}%</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h5 style="margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--text);">Agenti della Regione</h5>
+                                    ${region.agents.slice(0, 5).map((item, agentIndex) => `
+                                        <div style="padding: 0.75rem; margin: 0.5rem 0; background: ${agentIndex === 0 ? 'rgba(16, 185, 129, 0.1)' : agentIndex === region.agents.length - 1 && region.agents.length > 1 ? 'rgba(239, 68, 68, 0.1)' : 'var(--surface)'}; border-radius: 6px; font-size: 0.8rem; border: 1px solid var(--border);">
+                                            <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text);">${item.agent.nome} (${item.agent.codice})</div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                                <span>Fatturato: ${formatCurrency(item.current)}</span>
+                                                <span style="color: ${item.growth >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: 600;">${item.growth >= 0 ? '+' : ''}${item.growth.toFixed(1)}%</span>
+                                            </div>
+                                            <div style="color: var(--text-muted); font-size: 0.75rem;">Clienti: ${item.clients}</div>
+                                        </div>
+                                    `).join('')}
+                                    ${region.agents.length > 5 ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;">... e altri ${region.agents.length - 5} agenti</div>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
         }
 
         // Initialize
