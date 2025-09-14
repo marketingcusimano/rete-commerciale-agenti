@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -1242,17 +1243,11 @@
         }
 
         function parseCSV(csvText) {
-            console.log('Inizio parsing CSV...');
             const sections = csvText.split('\n# DATI STATISTICHE AGENTE');
-            console.log('Sezioni trovate:', sections.length);
-            
             const agents = [];
 
-            sections.forEach((section, sectionIndex) => {
-                if (!section.trim()) {
-                    console.log(`Sezione ${sectionIndex} vuota, skip`);
-                    return;
-                }
+            sections.forEach(section => {
+                if (!section.trim()) return;
 
                 const agent = {
                     codice: '', nome: '', periodo: '',
@@ -1263,23 +1258,20 @@
                 const lines = section.split('\n');
                 let headers = [];
 
-                lines.forEach((line, lineIndex) => {
+                lines.forEach(line => {
                     line = line.trim();
                     if (!line || line.startsWith('##')) return;
 
                     if (line.includes('Codice Agente:')) {
                         agent.codice = line.split(':')[1]?.trim() || '';
-                        console.log(`Trovato agente: ${agent.codice}`);
                     } else if (line.includes('Ragione Sociale:')) {
                         agent.nome = line.split(':')[1]?.trim() || '';
-                        console.log(`Nome agente: ${agent.nome}`);
                     } else if (line.includes('Periodo:')) {
                         agent.periodo = line.split(':')[1]?.trim() || '';
                     }
                     
                     if (line.includes('Tipo_Dato,')) {
                         headers = line.split(',').map(h => h.trim());
-                        console.log(`Headers trovati: ${headers.join(', ')}`);
                         return;
                     }
 
@@ -1299,12 +1291,7 @@
                             });
 
                             switch (row.Tipo_Dato) {
-                                case 'OBIETTIVI': 
-                                    agent.obiettivi.push(row); 
-                                    if (row.Provincia === 'Generale') {
-                                        console.log(`Obiettivo generale per ${agent.codice}: ${row.Obiettivo}`);
-                                    }
-                                    break;
+                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
                                 case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
                                 case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
                                 case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
@@ -1316,14 +1303,10 @@
                 });
 
                 if (agent.codice && agent.nome) {
-                    console.log(`Agente completato: ${agent.nome} (${agent.codice}) - Obiettivi: ${agent.obiettivi.length}`);
                     agents.push(agent);
-                } else {
-                    console.log(`Agente incompleto saltato: codice=${agent.codice}, nome=${agent.nome}`);
                 }
             });
 
-            console.log(`Parsing completato. Agenti trovati: ${agents.length}`);
             return agents;
         }
 
@@ -1957,10 +1940,13 @@
                 const mainRegion = agentRegions[0] || 'Generale';
                 const regionColor = getRegionColor(mainRegion);
 
-                // Determina il colore e la classe della progress bar basata sulla performance
+                // Fixed variables
+                const hasObjective = target > 0;
                 let progressClass = 'undefined';
                 let statusColor = 'var(--text-muted)';
                 let statusText = 'Da definire';
+                let objectiveText = hasObjective ? formatCurrency(target) : 'Da definire';
+                let progressWidth = hasObjective ? Math.min(progress, 100) : 0;
                 
                 if (target > 0) {
                     if (progress >= 100) {
