@@ -1254,11 +1254,29 @@
                     
                     if (line.includes('Tipo_Dato,')) {
                         headers = line.split(',').map(h => h.trim());
+                        console.log('Headers trovati:', headers); // Debug
                         return;
                     }
 
                     if (headers.length > 0 && line.includes(',') && !line.startsWith('#')) {
                         const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+                        
+                        // Parsing speciale per riga OBIETTIVI
+                        if (values[0] === 'OBIETTIVI' && values.length >= 5) {
+                            const objRow = {
+                                Tipo_Dato: 'OBIETTIVI',
+                                Provincia: values[1] || '',
+                                Anno_Precedente: parseNumber(values[2]) || 0,
+                                Anno_Corrente: parseNumber(values[3]) || 0,
+                                Obiettivo: parseNumber(values[4]) || 0,
+                                Percentuale_Obiettivo: parseNumber(values[5]) || 0,
+                                Clienti_Anno_Precedente: parseNumber(values[6]) || 0,
+                                Clienti_Anno_Corrente: parseNumber(values[7]) || 0
+                            };
+                            agent.obiettivi.push(objRow);
+                            return;
+                        }
+                        
                         if (values.length >= headers.length) {
                             const row = {};
                             headers.forEach((header, index) => {
@@ -1266,14 +1284,13 @@
                                 
                                 if (['Anno_Precedente', 'Anno_Corrente', 'Obiettivo', 'Fatturato', 
                                      'Clienti_Serviti', 'Importo_Totale', 'Importo', 'Valore',
-                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente'].includes(header)) {
+                                     'Clienti_Anno_Precedente', 'Clienti_Anno_Corrente', 'Percentuale_Obiettivo'].includes(header)) {
                                     value = parseNumber(value);
                                 }
                                 row[header] = value;
                             });
 
                             switch (row.Tipo_Dato) {
-                                case 'OBIETTIVI': agent.obiettivi.push(row); break;
                                 case 'CLIENTI_PROVINCIA': agent.clienti_provincia.push(row); break;
                                 case 'VENDITE_CLIENTE': agent.vendite_cliente.push(row); break;
                                 case 'CATEGORIA_RIEPILOGO': agent.categoria_riepilogo.push(row); break;
@@ -1285,10 +1302,13 @@
                 });
 
                 if (agent.codice && agent.nome) {
+                    // Debug finale per ogni agente
+                    console.log(`Agente ${agent.nome} (${agent.codice}):`, agent.obiettivi);
                     agents.push(agent);
                 }
             });
 
+            console.log('Tutti gli agenti caricati:', agents.length);
             return agents;
         }
 
