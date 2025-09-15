@@ -1310,6 +1310,7 @@
 
             console.log('Tutti gli agenti caricati:', agents.length);
             return agents;
+            return agents;
         }
 
         function getRegionFromProvince(prov) {
@@ -2129,11 +2130,6 @@
                                 <div class="progress-text">
                                     <span>Progresso: ${hasObjective ? Math.round(progress) + '%' : 'N/A'}</span>
                                     <span>${statusText}</span>
-                                </div>
-                                
-                                <!-- DEBUG INFO (rimuovere dopo test) -->
-                                <div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(255,0,0,0.1); border-radius: 4px; font-size: 0.7rem;">
-                                    Debug: Target=${target}, HasGeneral=${!!general}, ObjectivesCount=${agent.obiettivi.length}
                                 </div>
                             </div>
 
