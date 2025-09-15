@@ -2349,8 +2349,88 @@
         }
 
         function openChartDetailsModal(chartType) {
-            // Funzione placeholder per i dettagli grafici
-            console.log('Apertura dettagli per:', chartType);
+            alert('Popup grafico cliccato: ' + chartType); // Test temporaneo
+            
+            const modal = document.getElementById('chartDetailsModal');
+            const title = document.getElementById('chartDetailsTitle');
+            const content = document.getElementById('chartDetailsContent');
+            
+            if (!modal || !title || !content) {
+                // Crea il modal se non esiste
+                createChartDetailsModal();
+                return openChartDetailsModal(chartType);
+            }
+
+            // Imposta il titolo
+            const titles = {
+                'performance': 'Performance Agenti - Analisi Dettagliata',
+                'regions': 'Distribuzione Regionale - Analisi Completa', 
+                'scatter': 'Efficienza Commerciale - Analisi Approfondita',
+                'heatmap': 'Matrice Performance - Analisi Completa',
+                'boxplot': 'Distribuzione Performance - Statistiche per Regione'
+            };
+            title.textContent = titles[chartType] || 'Dettagli Grafico';
+
+            // Genera contenuto di esempio
+            content.innerHTML = `
+                <div style="padding: 2rem; text-align: center;">
+                    <h3>Dettagli per ${titles[chartType] || 'Grafico'}</h3>
+                    <p>Funzionalità in sviluppo - Dettagli completi saranno disponibili presto.</p>
+                </div>
+            `;
+
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function createChartDetailsModal() {
+            const modalHtml = `
+                <div class="modal-overlay" id="chartDetailsModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s ease; backdrop-filter: blur(4px);">
+                    <div class="modal" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); border: 1px solid rgba(226, 232, 240, 0.6); width: 90%; max-width: 800px; max-height: 80vh; overflow: hidden; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+                            <h3 id="chartDetailsTitle" style="font-weight: 600; font-size: 1.125rem;">Dettagli Grafico</h3>
+                            <button onclick="closeChartDetailsModal()" style="background: none; border: none; padding: 0.5rem; cursor: pointer; border-radius: var(--radius); color: var(--text-muted); transition: all 0.2s ease;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="chartDetailsContent" style="padding: 1.5rem; max-height: 60vh; overflow-y: auto;">
+                            <!-- Contenuto popolato dinamicamente -->
+                        </div>
+                        <div style="padding: 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem; justify-content: flex-end;">
+                            <button onclick="closeChartDetailsModal()" style="padding: 0.75rem 1.5rem; border: none; border-radius: var(--radius); cursor: pointer; font-weight: 500; font-size: 0.875rem; transition: all 0.2s ease; background: var(--primary); color: white;">Chiudi</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Aggiungi gli stili per .show
+            const style = document.createElement('style');
+            style.textContent = `
+                .modal-overlay.show {
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                }
+                .modal-overlay.show .modal {
+                    transform: scale(1) !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function closeChartDetailsModal() {
+            const modal = document.getElementById('chartDetailsModal');
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+                setTimeout(() => {
+                    modal.remove();
+                }, 200);
+            }
         }
 
         // Initialize
