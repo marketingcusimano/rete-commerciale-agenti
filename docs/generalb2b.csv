@@ -1,0 +1,2396 @@
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00002
+# Ragione Sociale: BILOTTI ANDREA                                              
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  443.100,21","  372.508,47","  560.000,00"," 66,51%",    62,    67,    65,"103,07%"
+OBIETTIVI,CS,"  443.100,21","  180.836,08","  310.000,00"," 58,33%",    62,    24,    33," 72,72%"
+OBIETTIVI,CZ,"  410.762,33","       54,76","            ","0%",   120,     1,      ,"0%"
+OBIETTIVI,KR,"  302.804,77","   41.521,88","            ","0%",    33,     6,      ,"0%"
+OBIETTIVI,MI,"       28,51","    5.886,00","            ","0%",     1,     1,      ,"0%"
+OBIETTIVI,VV,"   42.227,66","  144.209,75","  250.000,00"," 57,68%",   178,    35,    32,"109,37%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CS,    24,"  180.836,08"
+CLIENTI_PROVINCIA,CZ,     1,"       54,76"
+CLIENTI_PROVINCIA,KR,     6,"   41.521,88"
+CLIENTI_PROVINCIA,MI,     1,"    5.886,00"
+CLIENTI_PROVINCIA,VV,    35,"  144.209,75"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,CS,ALFANO S.P.A.                                               ,"   14.238,57"
+VENDITE_CLIENTE,CS,EDILMARMI DIODATO S.A.S.DI DIODATO.N.&C                     ,"   10.285,67"
+VENDITE_CLIENTE,CS,ORANGES SRL                                                 ,"    5.208,78"
+VENDITE_CLIENTE,CS,OLIVERIO GIUSEPPE                                           ,"      465,60"
+VENDITE_CLIENTE,CS,FAPI DI GINESE M.& C.SAS                                    ,"    4.435,01"
+VENDITE_CLIENTE,CS,MIRABELLI GIANFRANCO                                        ,"    5.409,36"
+VENDITE_CLIENTE,CS,R.B.C. EDILE SRL                                            ,"      943,20"
+VENDITE_CLIENTE,CS,MATERIALE EDILE BITONTI SNC DI CARUSO MODESTINA & C.        ,"    2.703,04"
+VENDITE_CLIENTE,CS,CUCUNATO FRANCESCO E FIGLI SRL                              ,"   60.395,15"
+VENDITE_CLIENTE,CS,F.LLI SPINA S.R.L.                                          ,"      569,27"
+VENDITE_CLIENTE,CS,C.R.P. CALABRIA S.N.C DI CIARDULLO A.& C.                   ,"    2.627,53"
+VENDITE_CLIENTE,CS,EDIL COMMERCIO S.R.L.                                       ,"   14.652,24"
+VENDITE_CLIENTE,CS,FONTANA SRL                                                 ,"    5.481,92"
+VENDITE_CLIENTE,CS,F.LLI CRUSCO SRL                                            ,"    4.301,55"
+VENDITE_CLIENTE,CS,COMEFER S.R.L.                                              ,"      796,82"
+VENDITE_CLIENTE,CS,FILIPPELLI VINCENZO                                         ,"    7.628,00"
+VENDITE_CLIENTE,CS,LA PIETRA SRL                                               ,"   11.728,80"
+VENDITE_CLIENTE,CS,ARLIA SRL                                                   ,"   15.630,56"
+VENDITE_CLIENTE,CS,D'INGIANNA MASSIMO                                          ,"    2.605,10"
+VENDITE_CLIENTE,CS,ARCOBALENO 2016 SRL                                         ,"    1.463,11"
+VENDITE_CLIENTE,CS,IANNI GENIALE SIMONE                                        ,"    1.310,40"
+VENDITE_CLIENTE,CS,MARIO NACCARATO & FIGLI SRL                                 ,"    6.606,95"
+VENDITE_CLIENTE,CS,Biancamano Aldo                                             ,"      138,17"
+VENDITE_CLIENTE,CS,MARRA E PICCOLO SNC                                         ,"    1.211,28"
+VENDITE_CLIENTE,CZ,CANDELIERI VITALIANO                                        ,"       54,76"
+VENDITE_CLIENTE,KR,PISCITELLI CARMELA S.N.C. DEI F.LLI PUGL                    ,"    3.600,60"
+VENDITE_CLIENTE,KR,EDI.SAN.GALLO SRL                                           ,"      583,92"
+VENDITE_CLIENTE,KR,CISAF S.R.L.                                                ,"   21.091,58"
+VENDITE_CLIENTE,KR,FIORITA ANTONIO                                             ,"    2.035,20"
+VENDITE_CLIENTE,KR,CILIBERTO ANTONIO                                           ,"    5.131,37"
+VENDITE_CLIENTE,KR,SAVOIA MARMI DI SAVOIA CAROLINA                             ,"    9.079,21"
+VENDITE_CLIENTE,MI,SUD EDILFERRO SRL U                                         ,"    5.886,00"
+VENDITE_CLIENTE,VV,CALLIPO FRANCESCO                                           ,"    6.529,80"
+VENDITE_CLIENTE,VV,COLACCHIO FILIPPO S.R.L.                                    ,"   14.485,20"
+VENDITE_CLIENTE,VV,EDIL ARENA SNC DI FRANCESCA ARENA & C                       ,"    6.148,61"
+VENDITE_CLIENTE,VV,IMENEO FRANCESCO                                            ,"      862,08"
+VENDITE_CLIENTE,VV,L'EDILIZIA SAS DI TASSONE ERMINIA & C.                      ,"    4.356,84"
+VENDITE_CLIENTE,VV,LA MARCA FRANCESCO                                          ,"      905,21"
+VENDITE_CLIENTE,VV,MESIANO SALVATORE                                           ,"      483,00"
+VENDITE_CLIENTE,VV,CAMPISANO FRANCESCO VINCENZO                                ,"      655,20"
+VENDITE_CLIENTE,VV,EDIL CONTARTESE SAS DI BARLETTA CONCETTA                    ,"    1.458,00"
+VENDITE_CLIENTE,VV,CARRA' DOMENICO                                             ,"   11.030,29"
+VENDITE_CLIENTE,VV,COSTRUIRE SAS DI PANTANO VALERIO & C.                       ,"    4.985,60"
+VENDITE_CLIENTE,VV,NASO MARIA ROSA                                             ,"    1.721,80"
+VENDITE_CLIENTE,VV,SOCIETA' DELTA S.R.L.                                       ,"    3.912,00"
+VENDITE_CLIENTE,VV,COOPER.PO.RO.EDILE S.C.                                     ,"    6.156,00"
+VENDITE_CLIENTE,VV,MORELLO SALVATORE                                           ,"    1.133,56"
+VENDITE_CLIENTE,VV,EMMEDIL SRL                                                 ,"    3.836,04"
+VENDITE_CLIENTE,VV,POLICARO SRL                                                ,"    5.695,01"
+VENDITE_CLIENTE,VV,MARRAMAO SRL                                                ,"    4.660,86"
+VENDITE_CLIENTE,VV,EDILE EXPRESS MAZZOTTA SRL                                  ,"    6.725,95"
+VENDITE_CLIENTE,VV,M.V.SAS DI MAZZEO PASQUALE                                  ,"    2.438,70"
+VENDITE_CLIENTE,VV,SELVAGGIO EDILIZIA SRL                                      ,"      684,93"
+VENDITE_CLIENTE,VV,SIDERURGICA PUNGITORE SRL                                   ,"   10.344,72"
+VENDITE_CLIENTE,VV,COLISTRA SNC DI VINCENZO C.& FIGLI                          ,"      972,00"
+VENDITE_CLIENTE,VV,ATTENTI ANTONELLA                                           ,"      802,24"
+VENDITE_CLIENTE,VV,GURZI' FRANCESCO                                            ,"      692,79"
+VENDITE_CLIENTE,VV,RI.FA.GO SAS DI RIMEDIO SANDRO                              ,"      637,83"
+VENDITE_CLIENTE,VV,NEW ARENA SRL                                               ,"    5.356,97"
+VENDITE_CLIENTE,VV,MASTRO GABRIELE SAS DI TASSONE ANTONIO                      ,"    1.476,00"
+VENDITE_CLIENTE,VV,F.LLI FRANZE' SAS DI FRANZE' VINCENZO F.& C                 ,"      405,00"
+VENDITE_CLIENTE,VV,CUGLIARI FRANCESCO                                          ,"    1.257,00"
+VENDITE_CLIENTE,VV,PURITA VINCENZO                                             ,"    2.881,72"
+VENDITE_CLIENTE,VV,ANCORA CATERINA                                             ,"      333,83"
+VENDITE_CLIENTE,VV,EDILFUSCA SRL                                               ,"    3.784,33"
+VENDITE_CLIENTE,VV,LIDE S.R.L                                                  ,"   23.092,46"
+VENDITE_CLIENTE,VV,VITA MARIA                                                  ,"    3.308,18"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    6.495,00"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"  128.822,70"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    3.347,28"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"   19.059,07"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    2.743,55"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"    1.070,55"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"  106.583,34"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"   34.670,44"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"       66,39"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"   24.659,01"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    5.020,05"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"      357,85"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    5.121,39"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    2.440,81"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    4.973,63"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"   24.882,13"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    2.923,20"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  235.406,04"," 63,07%",
+RIPARTIZIONE,Altro,"  137.830,35"," 36,92%",
+RIPARTIZIONE,Totale,"  373.236,39","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  373.236,39"
+TOTALE,Clienti_Totale,    67
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00044
+# Ragione Sociale: BILOTTI CARLO                                               
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  410.762,33","  381.635,33","  485.000,00"," 78,68%",   120,   112,    82,"136,58%"
+OBIETTIVI,CZ,"  196.913,53","  299.710,97","  380.000,00"," 78,87%",    46,    91,    64,"142,18%"
+OBIETTIVI,KR,"  224.461,02","   81.924,36","  105.000,00"," 78,02%",    19,    21,    18,"116,66%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CZ,    91,"  299.710,97"
+CLIENTI_PROVINCIA,KR,    21,"   81.924,36"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,CZ,ARAGONA MICHELE                                             ,"    6.091,82"
+VENDITE_CLIENTE,CZ,PETRUZZA ANTONIO                                            ,"       53,01"
+VENDITE_CLIENTE,CZ,BIAMONTE CARMELO                                            ,"    1.589,22"
+VENDITE_CLIENTE,CZ,COSTRUZIONI PROCOPIO SRL                                    ,"      317,49"
+VENDITE_CLIENTE,CZ,TALARICO SRL                                                ,"      492,00"
+VENDITE_CLIENTE,CZ,SOLAI FERT DI ESTINI OTTAVIO SAS                            ,"   14.084,08"
+VENDITE_CLIENTE,CZ,CREA MARIA GIOVANNA                                         ,"      534,00"
+VENDITE_CLIENTE,CZ,NUOVO CENTRO EDILE DEI F.LLI CUBELLO SRL                    ,"    4.968,92"
+VENDITE_CLIENTE,CZ,GIOFER S.R.L.                                               ,"      486,00"
+VENDITE_CLIENTE,CZ,LA STADIA DI PROCOPIO SALVATORE                             ,"      602,97"
+VENDITE_CLIENTE,CZ,M.C.D. MANUFATTI DORIA S.R.L.                               ,"    2.287,78"
+VENDITE_CLIENTE,CZ,GIGLIOTTI ETTORE                                            ,"      243,84"
+VENDITE_CLIENTE,CZ,A.B.COSTRUZIONI SRL                                         ,"      936,18"
+VENDITE_CLIENTE,CZ,ANGOTTI SEBASTIANO                                          ,"    2.227,13"
+VENDITE_CLIENTE,CZ,MANNARINO ANTONIO                                           ,"    1.279,00"
+VENDITE_CLIENTE,CZ,NUOVA EDILIZIA DEL GEOM.BUBBA DOMENICO & C. SNC             ,"       66,38"
+VENDITE_CLIENTE,CZ,LOMBARDO INNOCENZA                                          ,"      480,00"
+VENDITE_CLIENTE,CZ,CENTRO COMMERCIALE PREMIATA F.LLI MERCURIO S.N.C.           ,"    1.386,00"
+VENDITE_CLIENTE,CZ,SCUTIERI COSTRUZIONI SRL                                    ,"      242,40"
+VENDITE_CLIENTE,CZ,LACAVA SANTA                                                ,"    2.016,18"
+VENDITE_CLIENTE,CZ,PROCOPIO LEONARDO                                           ,"      315,42"
+VENDITE_CLIENTE,CZ,EDIL PROCOPIO SRL                                           ,"      270,41"
+VENDITE_CLIENTE,CZ,G.I.F.E.  SRL                                               ,"    8.466,53"
+VENDITE_CLIENTE,CZ,SCOZZAFAVA PINO                                             ,"      190,52"
+VENDITE_CLIENTE,CZ,ROTELLA FRANCESCO                                           ,"       79,73"
+VENDITE_CLIENTE,CZ,GRANDE REMO                                                 ,"       25,00"
+VENDITE_CLIENTE,CZ,I.L.E.S. COSTR.SNC DI S.CATRAMBONE E L.COSTA SNC            ,"       93,56"
+VENDITE_CLIENTE,CZ,ROTELLA DOMENICO                                            ,"      138,22"
+VENDITE_CLIENTE,CZ,EDILPALAMARA DI GIUSEPPE PALAMARA                           ,"   12.538,92"
+VENDITE_CLIENTE,CZ,CALABROPARATI U.S.R.L.                                      ,"    2.916,00"
+VENDITE_CLIENTE,CZ,LUCENTE & C. S.A.S. DI LUCENTE ALESSANDRO                   ,"      486,00"
+VENDITE_CLIENTE,CZ,CAM EDILCALCESTRUZZI DI COREA BRUNO & C.SNC                 ,"    3.524,75"
+VENDITE_CLIENTE,CZ,SEREDIL DI SERRATORE M.&C.SAS                               ,"    8.105,92"
+VENDITE_CLIENTE,CZ,CONTE LOREDANA                                              ,"      486,00"
+VENDITE_CLIENTE,CZ,COSTANTINO COSTRUZIONI GENERALI S.R.L.                      ,"    5.473,30"
+VENDITE_CLIENTE,CZ,FRAGALE DOMENICO                                            ,"       39,62"
+VENDITE_CLIENTE,CZ,SCALFARO PIETRO                                             ,"    2.829,60"
+VENDITE_CLIENTE,CZ,SANSEVERO DOMENICO                                          ,"      126,00"
+VENDITE_CLIENTE,CZ,EDILIZIA INNOVATIVA SRL                                     ,"      905,21"
+VENDITE_CLIENTE,CZ,EDIL SERVICE TALARICO SRL                                   ,"      437,03"
+VENDITE_CLIENTE,CZ,F.LLI CAMASTRA S.N.C. DI CAMASTRA GREGORIO E ROCCO          ,"    4.522,62"
+VENDITE_CLIENTE,CZ,RAFFAELE SPA                                                ,"   11.522,77"
+VENDITE_CLIENTE,CZ,PERRI ELIO                                                  ,"      183,00"
+VENDITE_CLIENTE,CZ,TOLOMEO EDILIZIA SRL                                        ,"    4.353,35"
+VENDITE_CLIENTE,CZ,GUGLIOTTI ROBERTO MARZIO                                    ,"    2.821,33"
+VENDITE_CLIENTE,CZ,MANCARUSO L.& FIGLI SRL                                     ,"       92,44"
+VENDITE_CLIENTE,CZ,ITALCANTIERI F.LLI MIRANTE SRL                              ,"   13.524,84"
+VENDITE_CLIENTE,CZ,ARCURI ALESSIO                                              ,"    1.275,00"
+VENDITE_CLIENTE,CZ,ROGU COSTRUZIONI S.R.L.                                     ,"   10.800,00"
+VENDITE_CLIENTE,CZ,EDILIZIA TOTEDA SRL                                         ,"   20.863,84"
+VENDITE_CLIENTE,CZ,R.C.R. TETTO SRL                                            ,"      486,49"
+VENDITE_CLIENTE,CZ,SOLAI COSTANTINO FRANCESCO DI C.GREGORIO ED ELISA & C       ,"    5.849,80"
+VENDITE_CLIENTE,CZ,CASA DESIGN SAS DI GRILLONE G. E C & C.                     ,"      737,04"
+VENDITE_CLIENTE,CZ,EDIL BIANCO SAS DI IVAN E RENATO BIANCO                     ,"      599,96"
+VENDITE_CLIENTE,CZ,EDILIA SRL                                                  ,"    2.645,47"
+VENDITE_CLIENTE,CZ,IDEA SRL                                                    ,"   26.654,85"
+VENDITE_CLIENTE,CZ,MIGLIARESE GIUSEPPE                                         ,"    4.664,72"
+VENDITE_CLIENTE,CZ,EDIL PIASTRELLE SNC DI DOMENICO E TOMMASO BADOLATO          ,"      972,00"
+VENDITE_CLIENTE,CZ,MARINARO SRL                                                ,"    9.469,21"
+VENDITE_CLIENTE,CZ,VALLELONGA LUIGI                                            ,"    1.095,63"
+VENDITE_CLIENTE,CZ,LENTINI ANTONIO                                             ,"   11.199,53"
+VENDITE_CLIENTE,CZ,MOSCA VINCENZO                                              ,"      864,00"
+VENDITE_CLIENTE,CZ,SCAI SRL                                                    ,"    1.991,61"
+VENDITE_CLIENTE,CZ,COSTANTINO TOMMASO                                          ,"      492,00"
+VENDITE_CLIENTE,CZ,EDIL FIVE SRL DI TINO                                       ,"    5.530,45"
+VENDITE_CLIENTE,CZ,2T DI M.TRUGLIA & C.SAS                                     ,"    1.476,00"
+VENDITE_CLIENTE,CZ,COSTRUZIONI DUE SRL                                         ,"      433,21"
+VENDITE_CLIENTE,CZ,ROTELLA NATALE GIUSEPPE                                     ,"      365,73"
+VENDITE_CLIENTE,CZ,SORRENTINO SRL                                              ,"      492,00"
+VENDITE_CLIENTE,CZ,GULLI' GIOVANNI                                             ,"    2.123,94"
+VENDITE_CLIENTE,CZ,LOBELLO LUIGI                                               ,"    7.130,48"
+VENDITE_CLIENTE,CZ,MAGGIAL SRL                                                 ,"    2.596,61"
+VENDITE_CLIENTE,CZ,METROQUADRO CERAMICHE SRL                                   ,"      243,00"
+VENDITE_CLIENTE,CZ,BORELLI COSTRUZIONI  SAS DI BORELLI S.                      ,"      592,60"
+VENDITE_CLIENTE,CZ,LA FENICE SRLS                                              ,"      310,58"
+VENDITE_CLIENTE,CZ,DEDIL DONATO SRL                                            ,"    4.146,00"
+VENDITE_CLIENTE,CZ,ORLANDO DOMENICO                                            ,"      566,18"
+VENDITE_CLIENTE,CZ,RUSSO COSTRUZIONI SRL SEMPLIFICATA CON                      ,"      311,88"
+VENDITE_CLIENTE,CZ,PROGETTO LEGNO SRL                                          ,"    1.454,38"
+VENDITE_CLIENTE,CZ,PULEO DAVIDE FRANCESCO                                      ,"      988,40"
+VENDITE_CLIENTE,CZ,EFFEGI COSTRUZIONI SRL                                      ,"      373,29"
+VENDITE_CLIENTE,CZ,BONOFIGLIO COSTRUZIONI SRL                                  ,"    1.407,00"
+VENDITE_CLIENTE,CZ,LIGATO PROGRESS SRL                                         ,"    5.404,23"
+VENDITE_CLIENTE,CZ,STONEDILGROUP SRL                                           ,"    1.401,14"
+VENDITE_CLIENTE,CZ,SIREDIL SAS DI CRISTIAN MARINO & C                          ,"      366,00"
+VENDITE_CLIENTE,CZ,SP CENTRO EDILE SRL                                         ,"   25.265,66"
+VENDITE_CLIENTE,CZ,GIFRA SRL                                                   ,"      670,68"
+VENDITE_CLIENTE,CZ,TRANSFER NOTARO SRL                                         ,"    4.827,00"
+VENDITE_CLIENTE,CZ,CHIARAVALLOTI PATRIZIO                                      ,"    2.939,38"
+VENDITE_CLIENTE,CZ,ITALEDIL SRL                                                ,"    2.751,09"
+VENDITE_CLIENTE,CZ,Pugliese Lorenzo                                            ,"       30,42"
+VENDITE_CLIENTE,KR,CERAMICHE MARAZZITA SNC DI SALVATORE M.                     ,"    9.059,43"
+VENDITE_CLIENTE,KR,F.LLI MARRAZZO SNC                                          ,"   14.805,22"
+VENDITE_CLIENTE,KR,MUOIO PIETRO                                                ,"      492,00"
+VENDITE_CLIENTE,KR,EDILCEREALI DEI F.LLI CANOBBIO S.E G SNC                    ,"      869,33"
+VENDITE_CLIENTE,KR,LICCIARDI SAS DI ANTONIO L. & C.                            ,"      492,00"
+VENDITE_CLIENTE,KR,F.LLI MUTO S.R.L.                                           ,"    7.641,01"
+VENDITE_CLIENTE,KR,RANIERI FRANCESCO                                           ,"    7.387,19"
+VENDITE_CLIENTE,KR,EDIL MALENA SAS DI FERRARO EMILIA & C                       ,"    4.102,78"
+VENDITE_CLIENTE,KR,IURATO PANTALEONE                                           ,"    5.757,33"
+VENDITE_CLIENTE,KR,AUTOTRASPORTI E COSTRUZIONI RIZZUTI SRL                     ,"    5.957,94"
+VENDITE_CLIENTE,KR,EDILCEM SRL                                                 ,"    2.426,83"
+VENDITE_CLIENTE,KR,NEW EDIL 2000 SRL                                           ,"   11.711,98"
+VENDITE_CLIENTE,KR,G.P.M. GRECO SRL                                            ,"    4.861,16"
+VENDITE_CLIENTE,KR,GARRAFFA GEOM.GIUSEPPE STORE S.R.L.S.                       ,"    1.480,00"
+VENDITE_CLIENTE,KR,GAROFALO PALMO                                              ,"    1.114,52"
+VENDITE_CLIENTE,KR,MARRAZZO GROUP SRL                                          ,"      960,00"
+VENDITE_CLIENTE,KR,CANTELMO HOME SRL                                           ,"       78,98"
+VENDITE_CLIENTE,KR,MAURO EDIL SOLUTIONS SRL                                    ,"    1.350,58"
+VENDITE_CLIENTE,KR,A. FONTANA SNC DI ANTONIO CASTAGNARO & GIOVANNI F.          ,"      729,00"
+VENDITE_CLIENTE,KR,ANANIA VITALIANO                                            ,"      492,00"
+VENDITE_CLIENTE,KR,S.D.E. COSTRUZIONI SRL SEMPLIFICATA                         ,"      155,08"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    4.174,75"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   71.456,75"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"   12.146,50"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"   22.957,62"
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO                         ,"    2.951,06"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    5.104,51"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"  142.235,32"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"   27.720,75"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"       89,35"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"   38.543,44"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    6.529,66"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"    1.071,80"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"      985,36"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"   17.328,39"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"   26.451,45"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    1.460,40"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  213.692,07"," 55,99%",
+RIPARTIZIONE,Altro,"  167.943,26"," 44,00%",
+RIPARTIZIONE,Totale,"  381.635,33","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  381.635,33"
+TOTALE,Clienti_Totale,   112
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00061
+# Ragione Sociale: BARBARO TITO                                                
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  302.804,77","  189.085,41","  350.000,00"," 54,02%",    33,    31,    38," 81,57%"
+OBIETTIVI,BN,"  261.732,25","   46.990,07","  110.000,00"," 42,71%",    34,     5,     8," 62,50%"
+OBIETTIVI,NA,"   68.598,13","    8.012,26","            ","0%",    16,     3,      ,"0%"
+OBIETTIVI,SA,"  254.705,89","  134.083,08","  240.000,00"," 55,86%",    32,    23,    30," 76,66%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,BN,     5,"   46.990,07"
+CLIENTI_PROVINCIA,NA,     3,"    8.012,26"
+CLIENTI_PROVINCIA,SA,    23,"  134.083,08"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,BN,SPALLONE SRL                                                ,"    5.154,80"
+VENDITE_CLIENTE,BN,EDIL APPIA.COM SRL                                          ,"   21.242,69"
+VENDITE_CLIENTE,BN,GIRARDI FIORE SRL                                           ,"    4.657,65"
+VENDITE_CLIENTE,BN,EDILIZZO SRL                                                ,"    8.194,08"
+VENDITE_CLIENTE,BN,EDILIZIA RINALDI SRL                                        ,"    7.740,85"
+VENDITE_CLIENTE,NA,ARRICHIELLO CIRO SRL CERAMICHE                              ,"    4.544,12"
+VENDITE_CLIENTE,NA,EDIL CERULO SRL                                             ,"      825,98"
+VENDITE_CLIENTE,NA,PAI SRL                                                     ,"    2.642,16"
+VENDITE_CLIENTE,SA,SIANI SRL                                                   ,"    5.142,31"
+VENDITE_CLIENTE,SA,ESPOSITO AURELIO & FIGLI SNC DI E.ANGELO                    ,"    5.227,93"
+VENDITE_CLIENTE,SA,ABATE SABATINO                                              ,"    4.815,62"
+VENDITE_CLIENTE,SA,CEMENBLOK SAS DI SANSONE MICHELE & C.                       ,"    8.392,82"
+VENDITE_CLIENTE,SA,DI CAN.CEM SRL                                              ,"    3.037,08"
+VENDITE_CLIENTE,SA,CAPONIGRO EDOARDO                                           ,"    6.015,23"
+VENDITE_CLIENTE,SA,EDIL RIZZO SRL                                              ,"   19.910,14"
+VENDITE_CLIENTE,SA,ADDESSO LIVING SRL                                          ,"   25.200,70"
+VENDITE_CLIENTE,SA,G.& B. COMMERCIALE SRL                                      ,"      774,00"
+VENDITE_CLIENTE,SA,CALDO CASA 2 SHOWROOM SRL                                   ,"    5.465,21"
+VENDITE_CLIENTE,SA,MA.VI MAIOLICHE VIETRESI SRL                                ,"    4.649,00"
+VENDITE_CLIENTE,SA,SUPER BLOC SRL                                              ,"    3.897,63"
+VENDITE_CLIENTE,SA,AR.CE.A SRL HANDMADE DESIGN                                 ,"    4.975,58"
+VENDITE_CLIENTE,SA,EDIL LAMBERTI SRL                                           ,"   16.244,09"
+VENDITE_CLIENTE,SA,CAMMARANO MATTEO SAS DI MASSIMILIANO CAMMARANO & C          ,"    2.516,41"
+VENDITE_CLIENTE,SA,LODATO SRL                                                  ,"    1.710,75"
+VENDITE_CLIENTE,SA,EDIL VALLEPIANA SRL                                         ,"    4.093,03"
+VENDITE_CLIENTE,SA,SANTINI CERAMICHE SAS DI DANIELA SANTINI & C                ,"    1.074,38"
+VENDITE_CLIENTE,SA,FORNACE DE MARTINO SRL                                      ,"    2.370,00"
+VENDITE_CLIENTE,SA,FORNACE DE MARTINO IMPASTI CERAMICI SRL                     ,"    1.625,72"
+VENDITE_CLIENTE,SA,SANTA CATERINA SPA                                          ,"    4.293,60"
+VENDITE_CLIENTE,SA,RI.AL.EDIL SRL                                              ,"      417,14"
+VENDITE_CLIENTE,SA,GRUPPO DI BENEDETTO SRL SEMPLIFICATA                        ,"    2.234,71"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    2.834,78"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   19.012,91"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    4.007,52"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    8.064,60"
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO                         ,"    1.153,04"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    8.944,63"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   68.419,29"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"   23.459,46"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"       88,70"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"   24.260,13"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      899,10"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"   10.873,56"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    1.860,09"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    2.849,43"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"      640,35"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"    4.672,80"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    6.616,80"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   87.432,20"," 46,23%",
+RIPARTIZIONE,Altro,"  101.653,21"," 53,76%",
+RIPARTIZIONE,Totale,"  189.085,41","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  189.085,41"
+TOTALE,Clienti_Totale,    31
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00107
+# Ragione Sociale: LEONARDO DOMENICO                                           
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  196.913,53","  158.971,74","  230.000,00"," 69,11%",    46,    44,    45," 97,77%"
+OBIETTIVI,RC,"   27.307,64","  158.971,74","  230.000,00"," 69,11%",     2,    44,    45," 97,77%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,RC,    44,"  158.971,74"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,RC,PIZZATA SERAFINA                                            ,"    2.419,20"
+VENDITE_CLIENTE,RC,EDILIZIA MINNITI SRL                                        ,"    6.422,76"
+VENDITE_CLIENTE,RC,PERONACE COSIMO                                             ,"    6.001,52"
+VENDITE_CLIENTE,RC,EC EDILIZIA COMMISSO SRL                                    ,"    2.530,64"
+VENDITE_CLIENTE,RC,MERCURI VINCENZO                                            ,"    7.143,26"
+VENDITE_CLIENTE,RC,EDILFURFARO S.A.S. DEL RAG. FLOCCARI DOMENICO & C.          ,"      985,31"
+VENDITE_CLIENTE,RC,EDIL MERICI S.R.L.                                          ,"    5.540,20"
+VENDITE_CLIENTE,RC,CIRILLO CARMELO                                             ,"    1.362,93"
+VENDITE_CLIENTE,RC,EDIL 3A SRL                                                 ,"    2.430,00"
+VENDITE_CLIENTE,RC,ZURZOLO LEONARDI SRL                                        ,"    4.009,54"
+VENDITE_CLIENTE,RC,CRUCITTI S.R.L.                                             ,"    3.602,70"
+VENDITE_CLIENTE,RC,EDIL GI ERRE DI ROCCAMO ANGELO E C.SAS                      ,"    2.265,84"
+VENDITE_CLIENTE,RC,EDILIZIA F.LLI TRIPODI S.A.S.                               ,"    1.418,40"
+VENDITE_CLIENTE,RC,F.LLI CARERE SRL                                            ,"    2.134,10"
+VENDITE_CLIENTE,RC,PUNTILLO LEGNO & EDILIZIA S.R.L.                            ,"    2.334,00"
+VENDITE_CLIENTE,RC,COMMISSO DOMENICO                                           ,"    5.150,71"
+VENDITE_CLIENTE,RC,LATELLA SRL                                                 ,"    2.367,16"
+VENDITE_CLIENTE,RC,ELLESSE EDILIZIA DI LOPREVITE SRL                           ,"    3.461,67"
+VENDITE_CLIENTE,RC,RUSO ROCCO                                                  ,"    4.194,00"
+VENDITE_CLIENTE,RC,BG STONE SRL                                                ,"    1.063,27"
+VENDITE_CLIENTE,RC,EDIL CONDERA CUZZOLA SRL                                    ,"    2.729,70"
+VENDITE_CLIENTE,RC,EDIL CENTER ROCCELLA SRL                                    ,"    8.263,55"
+VENDITE_CLIENTE,RC,BARBARO COSTRUZIONI SRL                                     ,"    2.918,71"
+VENDITE_CLIENTE,RC,ETN SRL                                                     ,"    5.170,82"
+VENDITE_CLIENTE,RC,GIOVINAZZO EDILIZIA SRL                                     ,"    4.599,00"
+VENDITE_CLIENTE,RC,ROCCISANO CERAMICHE SRLS                                    ,"    4.535,34"
+VENDITE_CLIENTE,RC,SABATINO VINCENZO & FIGLI SRL                               ,"    4.572,00"
+VENDITE_CLIENTE,RC,CANGEMI T.E.C. SRL                                          ,"    1.891,20"
+VENDITE_CLIENTE,RC,PARISI FERDINANDO                                           ,"   10.508,35"
+VENDITE_CLIENTE,RC,PR SERVICE SRL                                              ,"    6.250,04"
+VENDITE_CLIENTE,RC,CARDILLO EDDILIZIA SRL U.                                   ,"    1.052,18"
+VENDITE_CLIENTE,RC,TUTTO PER COSTRUIRE SRLS                                    ,"    3.722,97"
+VENDITE_CLIENTE,RC,IELASI BRUNO                                                ,"    1.458,00"
+VENDITE_CLIENTE,RC,EDILFERR SRL                                                ,"    4.990,82"
+VENDITE_CLIENTE,RC,SISTO SRL                                                   ,"      466,80"
+VENDITE_CLIENTE,RC,SERVICE GATTO SRLS U                                        ,"      890,94"
+VENDITE_CLIENTE,RC,MERCURI VINCENZO                                            ,"    8.834,15"
+VENDITE_CLIENTE,RC,FICARA CERAMICHE S.A.S.DI FICARA GIUSEPPE & C.              ,"      343,00"
+VENDITE_CLIENTE,RC,AR.GI. DI GIUSEPPE FOTIA                                    ,"    1.779,00"
+VENDITE_CLIENTE,RC,NOCERA SRL                                                  ,"    4.526,76"
+VENDITE_CLIENTE,RC,BRI.RO SRL                                                  ,"    5.422,84"
+VENDITE_CLIENTE,RC,LA CASCINA S.R.L.                                           ,"    3.969,83"
+VENDITE_CLIENTE,RC,ROSSI NINO                                                  ,"    2.023,53"
+VENDITE_CLIENTE,RC,CARERI ANTONIO SRL                                          ,"    1.215,00"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      191,35"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   16.840,84"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    3.858,29"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    2.077,24"
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO                         ,"       63,18"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    9.816,98"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"    2.512,88"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   53.903,44"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    2.998,10"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"       33,49"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"   11.041,67"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    1.029,03"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"    4.846,45"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    1.963,63"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    4.181,89"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    9.499,75"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"   30.448,89"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    3.664,64"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   70.744,28"," 44,50%",
+RIPARTIZIONE,Altro,"   88.227,46"," 55,49%",
+RIPARTIZIONE,Totale,"  158.971,74","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  158.971,74"
+TOTALE,Clienti_Totale,    44
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00108
+# Ragione Sociale: DG&G DI GRANATA ALFIO MARIA SRL U                           
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  224.461,02","  166.047,40","  235.000,00"," 70,65%",    19,    19,    20," 95,00%"
+OBIETTIVI,ME,"   39.187,68","      803,24","            ","0%",    20,     1,      ,"0%"
+OBIETTIVI,RG,"   42.146,61","  165.244,16","  235.000,00"," 70,31%",    10,    18,    20," 90,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,ME,     1,"      803,24"
+CLIENTI_PROVINCIA,RG,    18,"  165.244,16"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,ME,VITTORIO SABATO SRL                                         ,"      803,24"
+VENDITE_CLIENTE,RG,CAGGIA E BELLASSAI SRL                                      ,"    3.265,00"
+VENDITE_CLIENTE,RG,GAROFALO SRL                                                ,"    3.265,00"
+VENDITE_CLIENTE,RG,F.LLI ARENA GIUSEPPE, GIORGIO & ANTONINO SNC                ,"   13.060,08"
+VENDITE_CLIENTE,RG,ESAGONO DI RAIMONDO ANTONINO E FABIO S.A.S                  ,"    3.364,28"
+VENDITE_CLIENTE,RG,EDIL FORNITURE SRL                                          ,"    5.173,32"
+VENDITE_CLIENTE,RG,EDILIZIA MEDITERRANEA SNC DI SCAPELLATO                     ,"   37.401,50"
+VENDITE_CLIENTE,RG,F.LLI OCCHIPINTI PAOLO E ANTONIO SNC                        ,"    1.772,80"
+VENDITE_CLIENTE,RG,LEADER CEMENTI SRL                                          ,"    2.907,30"
+VENDITE_CLIENTE,RG,SER.COM S.R.L.                                              ,"   13.864,01"
+VENDITE_CLIENTE,RG,L'EDILCASA DI BONOMO GIORGIO & C. SRL                       ,"    3.526,20"
+VENDITE_CLIENTE,RG,ROCCASALVA GIUSEPPE SRL                                     ,"    4.005,20"
+VENDITE_CLIENTE,RG,ABATE SRL                                                   ,"   13.397,76"
+VENDITE_CLIENTE,RG,SAVA' ANGELO SNC DI SAVA' EMILIO, GALANTI B & C.            ,"    7.352,76"
+VENDITE_CLIENTE,RG,TUTTO EDILE SRLS                                            ,"    1.403,88"
+VENDITE_CLIENTE,RG,EDILIZIANDO SRL                                             ,"   30.948,07"
+VENDITE_CLIENTE,RG,MICELI SALVATORE                                            ,"   15.498,67"
+VENDITE_CLIENTE,RG,NAVAL INTERIOR SRL                                          ,"      495,13"
+VENDITE_CLIENTE,RG,IANNIZZOTTO SEBASTIANO SRLS                                 ,"    4.543,20"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    2.076,00"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"  141.681,49"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    1.764,09"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"      489,13"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"      768,24"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   13.459,20"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      655,07"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    3.218,40"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    1.599,78"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"      336,00"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  155.140,69"," 93,43%",
+RIPARTIZIONE,Altro,"   10.906,71","  6,56%",
+RIPARTIZIONE,Totale,"  166.047,40","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  166.047,40"
+TOTALE,Clienti_Totale,    19
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00111
+# Ragione Sociale: SPL SERVICE SNC                                             
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  261.732,25","  215.883,14","  300.000,00"," 71,96%",    34,    35,    35,"100,00%"
+OBIETTIVI,NA,"   45.191,70","  211.381,33","  300.000,00"," 70,46%",     5,    33,    35," 94,28%"
+OBIETTIVI,SA,"  126.379,90","    4.501,81","            ","0%",    13,     2,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,NA,    33,"  211.381,33"
+CLIENTI_PROVINCIA,SA,     2,"    4.501,81"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,NA,EDIL SORRENTINO SRL                                         ,"    8.150,55"
+VENDITE_CLIENTE,NA,CIMES SRL UNIPERSONALE                                      ,"    2.899,20"
+VENDITE_CLIENTE,NA,VINACCIA MARIA SRL                                          ,"   13.191,67"
+VENDITE_CLIENTE,NA,ROMEDIL SRL                                                 ,"    3.811,20"
+VENDITE_CLIENTE,NA,VERDOLIVA SRL                                               ,"    5.559,74"
+VENDITE_CLIENTE,NA,INTERNI D'ELITE SRL                                         ,"    8.560,63"
+VENDITE_CLIENTE,NA,EDILIZIA MEDITERRANEA S.R.L.                                ,"    2.007,60"
+VENDITE_CLIENTE,NA,TROMBETTA SRL                                               ,"   18.614,46"
+VENDITE_CLIENTE,NA,EREDI DI VITIELLO ROSA DI PINTO & C.SAS                     ,"    3.914,40"
+VENDITE_CLIENTE,NA,ITAL.CO.M.ED. SRL                                           ,"    2.346,00"
+VENDITE_CLIENTE,NA,EDILANTONIO RAMETTI S.R.L.                                  ,"    1.022,40"
+VENDITE_CLIENTE,NA,I.CO.RES. SRL                                               ,"    1.475,42"
+VENDITE_CLIENTE,NA,EDILIZIA MARASCA SAS DI MARASCA GAETANO & GRECO FRANCESCO   ,"    1.676,16"
+VENDITE_CLIENTE,NA,EDILCOMM FUSCO SRL                                          ,"    3.505,02"
+VENDITE_CLIENTE,NA,A & C  MATERIALI EDILI SRL                                  ,"   10.203,65"
+VENDITE_CLIENTE,NA,EDILNOVIT SAS DI MASSARO RAFFAELE & C.                      ,"   18.498,01"
+VENDITE_CLIENTE,NA,APREA PER L'EDILIZIA SRL                                    ,"    8.379,22"
+VENDITE_CLIENTE,NA,PAUDICE ANTONIO                                             ,"    3.891,24"
+VENDITE_CLIENTE,NA,EDILDELUCA SAS DI DE LUCA SEBASTIANO & C.                   ,"     -555,00"
+VENDITE_CLIENTE,NA,EDIL BALZANO SRL                                            ,"    9.651,60"
+VENDITE_CLIENTE,NA,EFFETTI SRL                                                 ,"    6.358,86"
+VENDITE_CLIENTE,NA,F.LLI GRANATO SRL                                           ,"    5.845,89"
+VENDITE_CLIENTE,NA,BUILDING SOLUTION SRL                                       ,"   18.167,13"
+VENDITE_CLIENTE,NA,MIFRA SRL                                                   ,"    5.770,80"
+VENDITE_CLIENTE,NA,CASO FRANCESCO SRL                                          ,"    3.712,80"
+VENDITE_CLIENTE,NA,L.V.ROMITO SRL                                              ,"    5.511,42"
+VENDITE_CLIENTE,NA,COSTRUISCI E ARREDA SRL                                     ,"   24.963,68"
+VENDITE_CLIENTE,NA,Gioiello Vittorio                                           ,"       18,65"
+VENDITE_CLIENTE,NA,Russo Raffaele                                              ,"       11,00"
+VENDITE_CLIENTE,NA,Chierchia Nicola                                            ,"        0,01"
+VENDITE_CLIENTE,NA,ORFE' COSTRUZIONI SRL                                       ,"    4.441,79"
+VENDITE_CLIENTE,NA,EDILIZIA AGNANO SRL                                         ,"    4.049,41"
+VENDITE_CLIENTE,NA,MAROTTA EDILIZIA SRL                                        ,"    5.129,41"
+VENDITE_CLIENTE,SA,ALSA SRL                                                    ,"      630,00"
+VENDITE_CLIENTE,SA,GLS UNIPERSONALE SRL                                        ,"    3.871,81"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    1.251,73"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"    8.388,60"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"   16.513,00"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"      605,36"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"        0,01"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   97.136,96"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    8.229,33"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    2.891,90"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      727,86"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"   24.956,05"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"   51.023,12"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    2.251,35"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"      288,16"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"    1.022,40"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  105.525,56"," 49,01%",
+RIPARTIZIONE,Altro,"  109.760,27"," 50,98%",
+RIPARTIZIONE,Totale,"  215.285,83","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  215.285,83"
+TOTALE,Clienti_Totale,    35
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00113
+# Ragione Sociale: FRANZE' PAOLO                                               
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   68.598,13","   78.428,67","  100.000,00"," 78,42%",    16,    15,    15,"100,00%"
+OBIETTIVI,FR,"  286.922,80","    5.099,04","            ","0%",    19,     1,      ,"0%"
+OBIETTIVI,MO,"            ","    7.676,93","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,RM,"  104.402,92","   65.652,70","  100.000,00"," 65,65%",    18,    13,    15," 86,66%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,FR,     1,"    5.099,04"
+CLIENTI_PROVINCIA,MO,     1,"    7.676,93"
+CLIENTI_PROVINCIA,RM,    13,"   65.652,70"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,FR,S.A.P. SOCIETA' AUTOTRASPORTI PALIANO SRL                   ,"    5.099,04"
+VENDITE_CLIENTE,MO,ETERNOO SPA                                                 ,"    7.676,93"
+VENDITE_CLIENTE,RM,BAGAGLINI LELIO                                             ,"    1.248,36"
+VENDITE_CLIENTE,RM,EDIL PALMIERI SRL                                           ,"   10.151,60"
+VENDITE_CLIENTE,RM,EDILNOVELLI SRL                                             ,"    6.534,60"
+VENDITE_CLIENTE,RM,DOMENICUCCI SRL                                             ,"      924,00"
+VENDITE_CLIENTE,RM,FRANZE' PAOLO                                               ,"      118,80"
+VENDITE_CLIENTE,RM,EDILCERAMICHE SRL                                           ,"    7.352,32"
+VENDITE_CLIENTE,RM,SAMOTER SRL SOCIETA' AUTOTRASPORTI MOVIMENTO TERRA          ,"    3.951,65"
+VENDITE_CLIENTE,RM,VERBENI EDILIZIA SRL                                        ,"    2.702,80"
+VENDITE_CLIENTE,RM,TUBANI EDILIZIA SRL                                         ,"    2.756,64"
+VENDITE_CLIENTE,RM,GBUILD SRL                                                  ,"   14.448,00"
+VENDITE_CLIENTE,RM,ENZO MARIANI SRL                                            ,"    6.906,27"
+VENDITE_CLIENTE,RM,EDILMOSTRA GALLI S.R.L.                                     ,"    8.525,20"
+VENDITE_CLIENTE,RM,D'Angelo Gianluca                                           ,"       32,46"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      828,78"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"    3.822,71"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    2.207,52"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   43.321,97"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    7.430,40"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    2.233,45"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    1.400,00"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"            "
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    5.064,96"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"      738,72"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    5.430,98"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"    2.764,80"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    2.756,16"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   47.144,68"," 60,11%",
+RIPARTIZIONE,Altro,"   31.283,99"," 39,88%",
+RIPARTIZIONE,Totale,"   78.428,67","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   78.428,67"
+TOTALE,Clienti_Totale,    15
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00115
+# Ragione Sociale: MACHI' ALESSANDRO                                           
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  254.705,89","  161.238,91","  280.000,00"," 57,58%",    32,    32,    36," 88,88%"
+OBIETTIVI,CT,"            ","    3.591,00","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,ME,"  137.753,57","  157.647,91","  280.000,00"," 56,30%",    11,    31,    36," 86,11%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CT,     1,"    3.591,00"
+CLIENTI_PROVINCIA,ME,    31,"  157.647,91"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,CT,ITALVIE SRL                                                 ,"    3.591,00"
+VENDITE_CLIENTE,ME,ARICO' SRL                                                  ,"   18.703,44"
+VENDITE_CLIENTE,ME,GRUPPO EDILE S.R.L.                                         ,"    8.331,65"
+VENDITE_CLIENTE,ME,SCILIPOTI SNC DI SCILIPOTI C.& C.                           ,"    9.008,40"
+VENDITE_CLIENTE,ME,RUFER SRL                                                   ,"    5.831,19"
+VENDITE_CLIENTE,ME,EDILCENTER SRL                                              ,"    7.324,80"
+VENDITE_CLIENTE,ME,MOLA GAETANO                                                ,"    4.668,28"
+VENDITE_CLIENTE,ME,F.LLI ARICO' SNC DI ARICO' SEBASTIANO E FRANCESCO           ,"    4.408,00"
+VENDITE_CLIENTE,ME,EDILIZIA VALENTI SRL                                        ,"   13.645,08"
+VENDITE_CLIENTE,ME,PIAZZA GIUSEPPE                                             ,"    2.567,40"
+VENDITE_CLIENTE,ME,NIGRONE SRL                                                 ,"      333,81"
+VENDITE_CLIENTE,ME,EDILEONINO SRL                                              ,"    3.725,83"
+VENDITE_CLIENTE,ME,ALIBERTI GIOVANNI SRL                                       ,"    3.567,00"
+VENDITE_CLIENTE,ME,PALANO SRL                                                  ,"      714,87"
+VENDITE_CLIENTE,ME,T.R.EDIL SRL                                                ,"    2.382,00"
+VENDITE_CLIENTE,ME,EVOLUZIONI COSTRUTTIVE SRL                                  ,"    2.430,96"
+VENDITE_CLIENTE,ME,DI MARIO FILIPPO SRL                                        ,"   11.835,70"
+VENDITE_CLIENTE,ME,F.LLI DENARO SRL                                            ,"   11.148,79"
+VENDITE_CLIENTE,ME,EDILTUSA SNC DI TUSA ANTONINO E C.                          ,"      742,58"
+VENDITE_CLIENTE,ME,CALA' LESINA LORENA                                         ,"       -7,74"
+VENDITE_CLIENTE,ME,AL.MA. DI ALESSANDRO MACHI SAS                              ,"      655,07"
+VENDITE_CLIENTE,ME,GUGLIANDOLO GAETANO SRL                                     ,"    8.031,60"
+VENDITE_CLIENTE,ME,CARROCCETTO A & B SRLS                                      ,"      746,00"
+VENDITE_CLIENTE,ME,ARASI SRL                                                   ,"   15.673,16"
+VENDITE_CLIENTE,ME,RUSSO SRLS                                                  ,"    5.683,00"
+VENDITE_CLIENTE,ME,GRUPPO G.F.G. EDILIZIA SRL                                  ,"    7.794,33"
+VENDITE_CLIENTE,ME,PREFABBRICATI SATURNO SRL                                   ,"    2.800,80"
+VENDITE_CLIENTE,ME,TRAS.M.EDIL.DI POLITO C.E G SNC                             ,"    1.974,53"
+VENDITE_CLIENTE,ME,Cafarella Andrea                                            ,"       54,30"
+VENDITE_CLIENTE,ME,GILOVEMA SOCIETA' COOPERATIVA                               ,"      404,03"
+VENDITE_CLIENTE,ME,MAMMANA MICHELANGELO SRL                                    ,"    2.334,00"
+VENDITE_CLIENTE,ME,Curcuruto Giovanni                                          ,"      135,05"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    1.380,87"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   26.675,00"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    5.904,99"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    1.716,40"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    2.872,00"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   91.150,08"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    1.165,93"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    5.913,45"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    4.028,42"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"            "
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"      409,99"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    3.954,18"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"    7.163,60"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    8.904,00"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  117.825,08"," 73,07%",
+RIPARTIZIONE,Altro,"   43.413,83"," 26,92%",
+RIPARTIZIONE,Totale,"  161.238,91","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  161.238,91"
+TOTALE,Clienti_Totale,    32
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00120
+# Ragione Sociale: CINTI DOMENICO                                              
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   99.291,56","   43.197,65","  120.000,00"," 35,99%",    16,     8,    20," 40,00%"
+OBIETTIVI,FR,"   34.613,68","   43.197,65","  120.000,00"," 35,99%",    10,     8,    20," 40,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,FR,     8,"   43.197,65"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,FR,GINO MARIANI & C. S.N.C. - MANUFATTI IN CEMENTO             ,"    9.861,57"
+VENDITE_CLIENTE,FR,MARCONI SANDRO                                              ,"    5.555,60"
+VENDITE_CLIENTE,FR,EDILSTAR SRL                                                ,"    1.193,40"
+VENDITE_CLIENTE,FR,L'ARTE DELLA COSTRUZIONE SRL                                ,"    5.358,45"
+VENDITE_CLIENTE,FR,COMMERCIALE CENTRO ITALIA 2 SRL                             ,"    9.709,16"
+VENDITE_CLIENTE,FR,CESTRA CERAMICHE SRL                                        ,"    4.329,33"
+VENDITE_CLIENTE,FR,BRICOMAG SRL                                                ,"    3.564,14"
+VENDITE_CLIENTE,FR,EDILIZIA STIRPE 2014 SRL                                    ,"    3.626,00"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      353,00"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"      173,52"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"      874,80"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"      790,82"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   19.087,21"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"   12.537,80"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      686,00"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    6.824,24"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    1.870,26"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   19.087,21"," 44,18%",
+RIPARTIZIONE,Altro,"   24.110,44"," 55,81%",
+RIPARTIZIONE,Totale,"   43.197,65","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   43.197,65"
+TOTALE,Clienti_Totale,     8
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00216
+# Ragione Sociale: LICHERI RAPPRESENTANZE SNC DI LICHERI PIETRO E C.           
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","   13.345,85",,,0,     8,,
+OBIETTIVI,NU,"0,00","      953,04","   25.000,00","  3,81%",0,     2,     5," 40,00%"
+OBIETTIVI,OR,"0,00","    3.033,13","            ","0%",0,     1,      ,"0%"
+OBIETTIVI,SS,"0,00","    9.359,68","   25.000,00"," 37,43%",0,     5,     5,"100,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,NU,     2,"      953,04"
+CLIENTI_PROVINCIA,OR,     1,"    3.033,13"
+CLIENTI_PROVINCIA,SS,     5,"    9.359,68"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,NU,LUPINU INNOVART SRL                                         ,"       76,71"
+VENDITE_CLIENTE,NU,F.LLI DETTORI SRL                                           ,"      876,33"
+VENDITE_CLIENTE,OR,LICHERI RAPPRESENTANZE SNC DI LICHERI PIETRO E C.           ,"    3.033,13"
+VENDITE_CLIENTE,SS,TECNICA COSTRUZIONI SOC. COOP.                              ,"            "
+VENDITE_CLIENTE,SS,CENTRO EDILE OLBIA SRL                                      ,"    1.830,32"
+VENDITE_CLIENTE,SS,CER.ART. SRL                                                ,"      682,82"
+VENDITE_CLIENTE,SS,ARGIOLAS SRL                                                ,"    1.130,98"
+VENDITE_CLIENTE,SS,SARDA TEGOLE SRL                                            ,"    5.715,56"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"     -380,22"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"    7.282,18"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    1.811,10"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    2.338,35"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      628,22"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"       47,71"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"       68,36"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"      679,82"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"      870,33"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"    7.282,18"," 54,56%",
+RIPARTIZIONE,Altro,"    6.063,67"," 45,43%",
+RIPARTIZIONE,Totale,"   13.345,85","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   13.345,85"
+TOTALE,Clienti_Totale,     8
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00217
+# Ragione Sociale: CASERTANO FILIPPO                                           
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  240.431,90","  199.366,59","  280.000,00"," 71,20%",    41,    36,    40," 90,00%"
+OBIETTIVI,CE,"  168.188,28","  190.137,33","  280.000,00"," 67,90%",    17,    34,    40," 85,00%"
+OBIETTIVI,NA,"  201.977,95","    9.229,26","            ","0%",    17,     2,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CE,    34,"  190.137,33"
+CLIENTI_PROVINCIA,NA,     2,"    9.229,26"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,CE,LICIBERTO VINCENZO                                          ,"    3.554,94"
+VENDITE_CLIENTE,CE,EDILIZIA SRL                                                ,"    8.928,02"
+VENDITE_CLIENTE,CE,MALATESTA SRL                                               ,"    4.203,25"
+VENDITE_CLIENTE,CE,MARTINO & C. S.R.L.                                         ,"   22.686,93"
+VENDITE_CLIENTE,CE,EDIL FLAGIELLO DUE S.R.L.                                   ,"   17.475,60"
+VENDITE_CLIENTE,CE,AREA EDILE SRL                                              ,"    3.154,01"
+VENDITE_CLIENTE,CE,EDIL TRASPORTI S.N.C. DI NICOLA MENALE E C.                 ,"    3.259,20"
+VENDITE_CLIENTE,CE,F.LLI PAGLIARO SRL                                          ,"    6.763,07"
+VENDITE_CLIENTE,CE,F.LLI COSTANTINO SRL                                        ,"    4.107,01"
+VENDITE_CLIENTE,CE,AERRE CERAMICHE SRL                                         ,"    2.575,20"
+VENDITE_CLIENTE,CE,FDS MATERIALI EDILI SRL                                     ,"    4.284,00"
+VENDITE_CLIENTE,CE,COSTANTINO EDILIZIA SRL                                     ,"   10.433,35"
+VENDITE_CLIENTE,CE,EDILFEOLA TRASPORTI SRL                                     ,"    7.401,01"
+VENDITE_CLIENTE,CE,ARREDI F.LLI NERO S.A.S. DI LUCA NERO & C.                  ,"    4.977,60"
+VENDITE_CLIENTE,CE,ECO EDIL TAMMARESE SRL                                      ,"    2.088,00"
+VENDITE_CLIENTE,CE,D'ANIELLO DESIGN SRL                                        ,"    8.895,11"
+VENDITE_CLIENTE,CE,EDILIZIA TULIPANO SRL                                       ,"    7.705,08"
+VENDITE_CLIENTE,CE,EDIL MARZO SRL                                              ,"    4.496,29"
+VENDITE_CLIENTE,CE,EDIL DI PUORTO SRLS                                         ,"    1.989,00"
+VENDITE_CLIENTE,CE,GRUPPO EDILE IOVINE SRL                                     ,"    1.165,99"
+VENDITE_CLIENTE,CE,PALMA PIETRO & C SAS                                        ,"    3.166,80"
+VENDITE_CLIENTE,CE,EDIL MATTIELLO SRLS                                         ,"    3.870,00"
+VENDITE_CLIENTE,CE,ANTONIO VOZZA EDILIZIA INNOVATIVA SRL                       ,"    4.401,01"
+VENDITE_CLIENTE,CE,GENTILE PASQUALE                                            ,"    1.792,74"
+VENDITE_CLIENTE,CE,FERRO SUD SRL                                               ,"    4.456,09"
+VENDITE_CLIENTE,CE,CENTRO EDILE DI MONACO SRL                                  ,"   10.126,81"
+VENDITE_CLIENTE,CE,DIANA FRANCESCO                                             ,"    4.216,21"
+VENDITE_CLIENTE,CE,AR.NI EDILIZIA SRL                                          ,"    3.542,40"
+VENDITE_CLIENTE,CE,EDILART SRL                                                 ,"    4.440,66"
+VENDITE_CLIENTE,CE,DIVA CERAMICHE 2 SRL                                        ,"    5.706,66"
+VENDITE_CLIENTE,CE,CERAMICA ITALIA SRL                                         ,"    3.465,00"
+VENDITE_CLIENTE,CE,CASA SU MISURA SRL                                          ,"      359,35"
+VENDITE_CLIENTE,CE,COMMERCIO EDILE C.I. SRL                                    ,"    9.495,61"
+VENDITE_CLIENTE,CE,GENTILE PASQUALE EREDI GENTILE PASQUALE                     ,"      955,33"
+VENDITE_CLIENTE,NA,FALK EDIL SRL                                               ,"    6.053,40"
+VENDITE_CLIENTE,NA,CENTRO VENDITE ESAGONO SRL                                  ,"    3.175,86"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      326,14"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   13.459,20"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    1.381,34"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"      646,38"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      842,33"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   94.325,12"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    1.249,21"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    6.833,73"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      949,33"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"            "
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"   68.287,96"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    1.690,31"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    3.521,94"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"            "
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    5.853,60"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  107.784,32"," 54,06%",
+RIPARTIZIONE,Altro,"   91.582,27"," 45,93%",
+RIPARTIZIONE,Totale,"  199.366,59","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  199.366,59"
+TOTALE,Clienti_Totale,    36
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00218
+# Ragione Sociale: MARROCCO PAOLO                                              
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","            ",,,0,     0,,
+OBIETTIVI,AG,"0,00","            ","  480.000,00","0%",0,      ,    20,"0%"
+OBIETTIVI,CL,"0,00","            ","            ","0%",0,      ,    10,"0%"
+OBIETTIVI,EN,"0,00","            ","            ","0%",0,      ,     8,"0%"
+OBIETTIVI,SR,"0,00","            ","            ","0%",0,      ,    10,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AG,      ,"            "
+CLIENTI_PROVINCIA,CL,      ,"            "
+CLIENTI_PROVINCIA,EN,      ,"            "
+CLIENTI_PROVINCIA,SR,      ,"            "
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00219
+# Ragione Sociale: SANO' SALVATORE                                             
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"    3.155,13","      886,64","   50.000,00","  1,77%",     9,     1,    10," 10,00%"
+OBIETTIVI,MI,"            ","      886,64","            ","0%",      ,     1,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,MI,     1,"      886,64"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,MI,AMBROGI SRL                                                 ,"      886,64"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"        6,00"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"      880,64"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"            ","0%",
+RIPARTIZIONE,Altro,"      886,64","100,00%",
+RIPARTIZIONE,Totale,"      886,64","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"      886,64"
+TOTALE,Clienti_Totale,     1
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00220
+# Ragione Sociale: TRAFIERI ANDREA                                             
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"    5.247,46","            ","   25.000,00","0%",     2,     0,    10,"0%"
+OBIETTIVI,VT,"   16.898,76","            ","   25.000,00","0%",     3,      ,    10,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,VT,      ,"            "
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00221
+# Ragione Sociale: SAMELA DOMENICO                                             
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  123.095,13","   69.793,34","  140.000,00"," 49,85%",    26,    22,    30," 73,33%"
+OBIETTIVI,MT,"  110.601,81","   20.040,54","   70.000,00"," 28,62%",    25,     7,    15," 46,66%"
+OBIETTIVI,NA,"            ","      973,38","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,PZ,"   38.320,97","   48.779,42","   70.000,00"," 69,68%",   166,    14,    15," 93,33%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,MT,     7,"   20.040,54"
+CLIENTI_PROVINCIA,NA,     1,"      973,38"
+CLIENTI_PROVINCIA,PZ,    14,"   48.779,42"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,MT,EDIL LOPERFIDO SRL                                          ,"    3.376,80"
+VENDITE_CLIENTE,MT,PLASTIPOL SRL                                               ,"    3.952,37"
+VENDITE_CLIENTE,MT,CERAMICHE LAVIOLA DEI F.LLI CALANDRIELLO & C.SAS            ,"    1.450,32"
+VENDITE_CLIENTE,MT,EDILSUD SNC DI LA CARPIA DOMENICO & C.                      ,"       33,03"
+VENDITE_CLIENTE,MT,LA MODERNA EDILIZIA SRL                                     ,"    5.725,02"
+VENDITE_CLIENTE,MT,EDIL MEA SRL                                                ,"      733,66"
+VENDITE_CLIENTE,MT,D'ERCOLE EDILIZIA SRLS                                      ,"    4.769,34"
+VENDITE_CLIENTE,NA,CEFA SRL                                                    ,"      973,38"
+VENDITE_CLIENTE,PZ,PRO.M.EDIL SRL                                              ,"    3.184,49"
+VENDITE_CLIENTE,PZ,SO.C.EDIL SRL                                               ,"    9.528,60"
+VENDITE_CLIENTE,PZ,EUROCERAMICHE ARENA SRL                                     ,"    6.472,61"
+VENDITE_CLIENTE,PZ,SILCERAMICHE SNC DI SILEO ANTONIO E C.                      ,"       94,99"
+VENDITE_CLIENTE,PZ,SCALDAFERRI GIUSEPPE                                        ,"    5.374,20"
+VENDITE_CLIENTE,PZ,ADL SRL                                                     ,"    5.526,64"
+VENDITE_CLIENTE,PZ,ADIEMME SERVICE SRL                                         ,"    2.412,12"
+VENDITE_CLIENTE,PZ,EDILTRAINER SNC DI M. LATORRACA & C.                        ,"    3.013,35"
+VENDITE_CLIENTE,PZ,BOCHICCHIO GIOVANNI                                         ,"    4.410,00"
+VENDITE_CLIENTE,PZ,VERNETTI ANTONIO SRL                                        ,"    1.880,94"
+VENDITE_CLIENTE,PZ,DOMICA SRL                                                  ,"    2.940,00"
+VENDITE_CLIENTE,PZ,EURO MANUFATTI DI COLANGELO A. & C. SAS                     ,"    1.886,09"
+VENDITE_CLIENTE,PZ,F.LLI LAVIERI SRL                                           ,"    1.483,20"
+VENDITE_CLIENTE,PZ,SOL.M.E.A. DI RENDINA MARTINA & C. SAS                      ,"      572,19"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      334,54"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   13.571,88"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"       62,99"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"      728,69"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    3.226,50"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   25.380,02"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"      768,96"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    6.563,68"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      476,98"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"    2.503,18"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    7.257,60"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    7.177,61"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    1.312,49"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   38.951,90"," 55,81%",
+RIPARTIZIONE,Altro,"   30.841,44"," 44,18%",
+RIPARTIZIONE,Totale,"   69.793,34","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   69.793,34"
+TOTALE,Clienti_Totale,    22
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00224
+# Ragione Sociale: INNEO MICHELE                                               
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   78.718,46","   55.058,67","  100.000,00"," 55,05%",    22,    21,    25," 84,00%"
+OBIETTIVI,BT,"   46.532,25","    7.269,47","            ","0%",     3,     3,      ,"0%"
+OBIETTIVI,FG,"    1.126,40","   34.287,61","  100.000,00"," 34,28%",     1,    17,    25," 68,00%"
+OBIETTIVI,LE,"            ","   13.501,59","            ","0%",      ,     1,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,BT,     3,"    7.269,47"
+CLIENTI_PROVINCIA,FG,    17,"   34.287,61"
+CLIENTI_PROVINCIA,LE,     1,"   13.501,59"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,BT,TUTT'EDILIZIA DI LEONETTI VINCENZO E C.SNC                  ,"      955,33"
+VENDITE_CLIENTE,BT,TECNO ASSISTENZA EDILE SRL                                  ,"    1.939,00"
+VENDITE_CLIENTE,BT,LA EDILDETTO DI DETTO NICOLA & C.S.A.S.                     ,"    4.375,14"
+VENDITE_CLIENTE,FG,EDILARTE PIRACCI SAS DI PIRACCI G.E V.&C                    ,"      223,20"
+VENDITE_CLIENTE,FG,EDILIZIA INTISO SRL                                         ,"    6.629,36"
+VENDITE_CLIENTE,FG,A. FORTAREZZA SRL                                           ,"    4.570,60"
+VENDITE_CLIENTE,FG,BERTHOUD L. SAS DI BERTHOUD VERONICA & C                    ,"    1.436,64"
+VENDITE_CLIENTE,FG,AGRIEDIL SRL DEI F.LLI AMORUSO                              ,"    1.575,62"
+VENDITE_CLIENTE,FG,D'ANTUONO MATTEO                                            ,"    1.071,60"
+VENDITE_CLIENTE,FG,CERAMICHE ORLANDO M. SRL                                    ,"    4.641,60"
+VENDITE_CLIENTE,FG,CAPOBIANCO VITTORIO & F.LLI SRL                             ,"    3.758,41"
+VENDITE_CLIENTE,FG,EDILCOM SRLS                                                ,"    1.529,76"
+VENDITE_CLIENTE,FG,GRIFA COSTANTINO                                            ,"    1.231,33"
+VENDITE_CLIENTE,FG,RUSSO MICHAEL                                               ,"    1.001,16"
+VENDITE_CLIENTE,FG,PEPE GIANNI                                                 ,"     -571,20"
+VENDITE_CLIENTE,FG,RAMES SRL                                                   ,"    2.193,20"
+VENDITE_CLIENTE,FG,PROGETTO CASA SRL                                           ,"    3.933,52"
+VENDITE_CLIENTE,FG,IDEA GIARDINI DI GATTULLI GIUSEPPE & C SAS                  ,"      192,00"
+VENDITE_CLIENTE,FG,EDIL NC SRLS                                                ,"      459,00"
+VENDITE_CLIENTE,FG,STG SERVICE SRLS                                            ,"      411,81"
+VENDITE_CLIENTE,LE,DE PASCALI PANTALEO                                         ,"   13.501,59"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"   -2.202,91"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"    3.740,02"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    5.191,16"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"   13.920,27"
+CATEGORIA_RIEPILOGO,GANCI E ACCESSO                         ,"       31,59"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      856,44"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"    5.545,21"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"   18.222,80"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      949,33"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    3.967,20"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"      729,60"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    3.120,60"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"      987,36"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"    9.285,23"," 16,86%",
+RIPARTIZIONE,Altro,"   45.773,44"," 83,13%",
+RIPARTIZIONE,Totale,"   55.058,67","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   55.058,67"
+TOTALE,Clienti_Totale,    21
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00232
+# Ragione Sociale: RAMPULLA SANTO                                              
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  193.066,68","  177.245,18","  240.000,00"," 73,85%",    46,    40,    50," 80,00%"
+OBIETTIVI,ME,"    1.572,37","    5.067,58","            ","0%",     4,     1,      ,"0%"
+OBIETTIVI,PA,"    1.200,22","  172.177,60","  240.000,00"," 71,74%",     2,    39,    50," 78,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,ME,     1,"    5.067,58"
+CLIENTI_PROVINCIA,PA,    39,"  172.177,60"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,ME,PAOLO CIAVIRELLA SRL                                        ,"    5.067,58"
+VENDITE_CLIENTE,PA,COMMER SAS DI PARTINICO GIUSEPPE E C.                       ,"      615,00"
+VENDITE_CLIENTE,PA,FRATELLI GUERCIO SRL                                        ,"    5.937,60"
+VENDITE_CLIENTE,PA,RIZZO EDILIZIA SRL                                          ,"    4.583,40"
+VENDITE_CLIENTE,PA,CIPOLLA MARIO                                               ,"    1.497,69"
+VENDITE_CLIENTE,PA,FERRERI S.R.L.                                              ,"    4.229,70"
+VENDITE_CLIENTE,PA,FERRANTEINCANNINO SRL                                       ,"    5.041,78"
+VENDITE_CLIENTE,PA,BRUNO GROUP SRL                                             ,"    5.411,89"
+VENDITE_CLIENTE,PA,TAORMINA ERASMO                                             ,"    5.490,80"
+VENDITE_CLIENTE,PA,GIORDANO GIUSEPPE                                           ,"    3.081,60"
+VENDITE_CLIENTE,PA,BRUNO SRL                                                   ,"    9.823,31"
+VENDITE_CLIENTE,PA,TECNO EDILIZIA SRL                                          ,"    1.542,00"
+VENDITE_CLIENTE,PA,VI.SA.GI DI SANTORO SALVATORE & C.SAS                       ,"   11.906,33"
+VENDITE_CLIENTE,PA,DI PASQUALE GIOVANNI                                        ,"    3.418,20"
+VENDITE_CLIENTE,PA,PALAZZOLO NICOLA & C. SRL                                   ,"    1.797,60"
+VENDITE_CLIENTE,PA,CIACCIO SRL                                                 ,"    4.104,00"
+VENDITE_CLIENTE,PA,VENTIMIGLIA GIUSEPPE                                        ,"    1.315,21"
+VENDITE_CLIENTE,PA,MONTEDORO SRL                                               ,"    2.824,80"
+VENDITE_CLIENTE,PA,PRIA GROUP SRL                                              ,"    3.238,21"
+VENDITE_CLIENTE,PA,F.LLI MONTANA SRL                                           ,"   22.509,10"
+VENDITE_CLIENTE,PA,TAMBURELLO GIUSEPPE                                         ,"    3.190,20"
+VENDITE_CLIENTE,PA,CONIGLIARO VINCENZA                                         ,"    1.667,42"
+VENDITE_CLIENTE,PA,EDILIZIA ENEA SRL                                           ,"    1.770,40"
+VENDITE_CLIENTE,PA,D.R. & C SRLS                                               ,"    2.918,10"
+VENDITE_CLIENTE,PA,RINELLA GIUSEPPE                                            ,"    1.080,30"
+VENDITE_CLIENTE,PA,PRISINZANO SRL                                              ,"   10.137,30"
+VENDITE_CLIENTE,PA,EDIL COSTRUZIONE 2002 SRL                                   ,"    5.493,79"
+VENDITE_CLIENTE,PA,FIN.GI. SRLS                                                ,"    1.414,80"
+VENDITE_CLIENTE,PA,EDILIZIA CORSALE SRL                                        ,"    5.062,51"
+VENDITE_CLIENTE,PA,EDILPRUDENZA SNC DI NATALE & CARMELO PRUDENZA               ,"    3.197,21"
+VENDITE_CLIENTE,PA,SICILMANUFATTI GROUP SRL                                    ,"    3.408,60"
+VENDITE_CLIENTE,PA,CICERO VINCENZO                                             ,"    1.615,20"
+VENDITE_CLIENTE,PA,SVG GROUP SRL                                               ,"    2.054,40"
+VENDITE_CLIENTE,PA,IL GAZEBO SRLS                                              ,"            "
+VENDITE_CLIENTE,PA,Pandolfo S.r.l.                                             ,"       34,00"
+VENDITE_CLIENTE,PA,PUNTO EDILE SRLS                                            ,"    6.475,21"
+VENDITE_CLIENTE,PA,SPINOSO ALBERTO                                             ,"    6.905,60"
+VENDITE_CLIENTE,PA,FERRANTE ANGELO                                             ,"    4.360,86"
+VENDITE_CLIENTE,PA,SAGECO COSTRUZIONI SRLS                                     ,"    8.292,48"
+VENDITE_CLIENTE,PA,MISTRETTA GIUSEPPE                                          ,"    4.731,00"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"     -629,06"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"  101.407,18"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"   11.966,91"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    1.410,85"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    1.488,91"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"    3.425,76"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   41.344,85"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"      832,81"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"       40,86"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    7.607,55"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      343,00"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"            "
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    2.537,11"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    1.927,36"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"      115,99"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"    3.425,10"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  142.752,03"," 80,53%",
+RIPARTIZIONE,Altro,"   34.493,15"," 19,46%",
+RIPARTIZIONE,Totale,"  177.245,18","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  177.245,18"
+TOTALE,Clienti_Totale,    40
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00235
+# Ragione Sociale: DE LUCA DOMENICO                                            
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  150.832,73","   88.166,65","  160.000,00"," 55,10%",    33,    25,    33," 75,75%"
+OBIETTIVI,BS,"   55.092,55","    5.820,00","            ","0%",     1,     1,      ,"0%"
+OBIETTIVI,TP,"    3.521,00","   82.346,65","  160.000,00"," 51,46%",     6,    24,    33," 72,72%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,BS,     1,"    5.820,00"
+CLIENTI_PROVINCIA,TP,    24,"   82.346,65"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,BS,LECOFER SRL                                                 ,"    5.820,00"
+VENDITE_CLIENTE,TP,VULTAGGIO SRL                                               ,"    8.409,82"
+VENDITE_CLIENTE,TP,BASILE SRL                                                  ,"    2.742,49"
+VENDITE_CLIENTE,TP,MAGADDINO S.R.L.                                            ,"    6.044,40"
+VENDITE_CLIENTE,TP,BUSCAINO CERAMICHE S.R.L.                                   ,"    3.396,13"
+VENDITE_CLIENTE,TP,PROIA SRL                                                   ,"    1.602,00"
+VENDITE_CLIENTE,TP,GRAMMATICO SRL                                              ,"    3.552,00"
+VENDITE_CLIENTE,TP,PARISI EDILEGNO SRL                                         ,"    3.311,17"
+VENDITE_CLIENTE,TP,EDIL CATANIA S.A.S. DI CATANIA GIADA & C.                   ,"      949,33"
+VENDITE_CLIENTE,TP,BL GROUP SRL                                                ,"    1.314,00"
+VENDITE_CLIENTE,TP,GIEFFE SOLUZIONI EDILI SRL                                  ,"      827,60"
+VENDITE_CLIENTE,TP,TEVING SRL                                                  ,"    9.804,74"
+VENDITE_CLIENTE,TP,F.LLI RENDA DI RENDA SAVERIO & R.CIPRIANO SAS               ,"    1.867,20"
+VENDITE_CLIENTE,TP,PALERMO FRANCESCO                                           ,"    1.658,28"
+VENDITE_CLIENTE,TP,GI & VI CERAMICHE SRL                                       ,"    1.620,00"
+VENDITE_CLIENTE,TP,QUATTROELLE MATERIALI EDILI DI LO TRUGLIO FILIPPO & C.SNC   ,"     -135,00"
+VENDITE_CLIENTE,TP,CATALANO SALERNO VITA                                       ,"      730,86"
+VENDITE_CLIENTE,TP,CM COLORIFICIO MEDITERRANEO DEI F.LLI GENNA SRL             ,"    9.353,23"
+VENDITE_CLIENTE,TP,AGRI CO.MA.C  SRL                                           ,"    2.908,93"
+VENDITE_CLIENTE,TP,DI STEFANO GIORGIO                                          ,"    1.939,06"
+VENDITE_CLIENTE,TP,LE.MI.GI. SNC DEI F.LLI BIAGIO E GASPARE MIRRIONE           ,"    6.867,07"
+VENDITE_CLIENTE,TP,LUPO BENITO SALVATORE & C. SNC                              ,"    1.828,40"
+VENDITE_CLIENTE,TP,PROGETTO LEGNO S.R.L.                                       ,"    8.203,08"
+VENDITE_CLIENTE,TP,ALESI ANTONINO S.R.L.                                       ,"    2.421,68"
+VENDITE_CLIENTE,TP,EDIL COLOR SRLS                                             ,"    1.130,18"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    1.039,40"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   49.915,76"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    1.593,93"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"      653,18"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   14.526,24"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    2.261,04"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"       51,07"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    4.524,65"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    4.173,73"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    3.597,91"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    5.401,52"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   64.442,00"," 73,09%",
+RIPARTIZIONE,Altro,"   23.724,65"," 26,90%",
+RIPARTIZIONE,Totale,"   88.166,65","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   88.166,65"
+TOTALE,Clienti_Totale,    25
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00236
+# Ragione Sociale: MARIANI MASSIMILIANO                                        
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  534.160,28","  539.646,14","  500.000,00","107,92%",    27,    25,    30," 83,33%"
+OBIETTIVI,AN,"1.475.802,25","   21.016,00","            ","0%",    34,     1,      ,"0%"
+OBIETTIVI,AP,"            ","   72.088,51","  166.666,00"," 43,25%",      ,     5,    10," 50,00%"
+OBIETTIVI,AQ,"            ","   97.944,33","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,FM,"            ","   74.203,50","  166.666,00"," 44,52%",      ,     5,    10," 50,00%"
+OBIETTIVI,MC,"            ","  147.321,75","  166.668,00"," 88,39%",      ,    11,    10,"110,00%"
+OBIETTIVI,MO,"            ","  110.620,25","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,PG,"            ","   16.451,80","            ","0%",      ,     1,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AN,     1,"   21.016,00"
+CLIENTI_PROVINCIA,AP,     5,"   72.088,51"
+CLIENTI_PROVINCIA,AQ,     1,"   97.944,33"
+CLIENTI_PROVINCIA,FM,     5,"   74.203,50"
+CLIENTI_PROVINCIA,MC,    11,"  147.321,75"
+CLIENTI_PROVINCIA,MO,     1,"  110.620,25"
+CLIENTI_PROVINCIA,PG,     1,"   16.451,80"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,AN,F.LLI SIMONETTI SPA                                         ,"   21.016,00"
+VENDITE_CLIENTE,AP,LG EDILIZIA S.R.L.                                          ,"   16.961,87"
+VENDITE_CLIENTE,AP,S.G.A. SRL                                                  ,"   34.829,20"
+VENDITE_CLIENTE,AP,EDIL.COM SRL                                                ,"    5.250,00"
+VENDITE_CLIENTE,AP,DESIDERI DI DESIDERI GIUSEPPE & C. SRL                      ,"   15.038,80"
+VENDITE_CLIENTE,AP,Aureli Walter                                               ,"        8,64"
+VENDITE_CLIENTE,AQ,COEDIL 99 SRL                                               ,"   97.944,33"
+VENDITE_CLIENTE,FM,EDILIZIA GIANCARLO SANTARELLI SRL                           ,"    2.104,00"
+VENDITE_CLIENTE,FM,CASCIAROLI DI MARIO CASCIARLI & C. SNC                      ,"    3.590,40"
+VENDITE_CLIENTE,FM,EDILIZIARE SRL                                              ,"   37.061,82"
+VENDITE_CLIENTE,FM,METROQUADRO EDILIZIA SRL                                    ,"   28.864,08"
+VENDITE_CLIENTE,FM,C.I.M.M.E. SRL                                              ,"    2.583,20"
+VENDITE_CLIENTE,MC,EDILCASA CACCAMO SRL                                        ,"   37.330,65"
+VENDITE_CLIENTE,MC,SBAFFI FABIO SRL                                            ,"   15.708,00"
+VENDITE_CLIENTE,MC,ANGELONI EDILIZIA SNC DI ANGELONI ALBERTO & C.              ,"    6.081,20"
+VENDITE_CLIENTE,MC,LA MODERNA EREDI TOZZI REMO SNC DI TOZZI F.                 ,"    6.897,97"
+VENDITE_CLIENTE,MC,BARTOLI BF SRL                                              ,"    4.149,20"
+VENDITE_CLIENTE,MC,METROQUADRO SRL                                             ,"   14.636,40"
+VENDITE_CLIENTE,MC,PERSICHINI STEFANO SRL                                      ,"   33.669,33"
+VENDITE_CLIENTE,MC,K-STORE SRL                                                 ,"   11.214,72"
+VENDITE_CLIENTE,MC,SPEA TECNOLOGIE EDILI SRL                                   ,"    7.354,80"
+VENDITE_CLIENTE,MC,EDILNOVA SRL                                                ,"    6.689,08"
+VENDITE_CLIENTE,MC,CALVANI LUCIANO                                             ,"    3.590,40"
+VENDITE_CLIENTE,MO,ETERNOO SPA                                                 ,"  110.620,25"
+VENDITE_CLIENTE,PG,ALFA SPA                                                    ,"   16.451,80"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"   -8.210,93"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"  127.023,72"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"      328,06"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"    2.569,32"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"  336.601,76"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"   11.888,64"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"   40.584,08"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"   26.372,42"
+CATEGORIA_RIEPILOGO,PROMOZIONALI                            ,"            "
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    2.057,68"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"      431,39"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  463.625,48"," 85,91%",
+RIPARTIZIONE,Altro,"   76.020,66"," 14,08%",
+RIPARTIZIONE,Totale,"  539.646,14","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  539.646,14"
+TOTALE,Clienti_Totale,    25
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00238
+# Ragione Sociale: CARABOT NATALINO                                            
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  121.091,00","  110.369,21","  155.000,00"," 71,20%",    28,    30,    35," 85,71%"
+OBIETTIVI,LT,"            ","  102.459,59","  155.000,00"," 66,10%",      ,    28,    35," 80,00%"
+OBIETTIVI,RM,"            ","    7.909,62","            ","0%",      ,     2,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,LT,    28,"  102.459,59"
+CLIENTI_PROVINCIA,RM,     2,"    7.909,62"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,LT,EDILIZIA SETINA S.R.L.                                      ,"    3.219,62"
+VENDITE_CLIENTE,LT,ROSSETTI EDILIZIA SRL                                       ,"    1.906,38"
+VENDITE_CLIENTE,LT,F.LLI TORA SRL                                              ,"    6.276,00"
+VENDITE_CLIENTE,LT,ADDESSI COMMERCIALE SRL                                     ,"    5.018,56"
+VENDITE_CLIENTE,LT,CENTRO EDILE DE GREGORIS SRL                                ,"    9.318,86"
+VENDITE_CLIENTE,LT,STENI SRL                                                   ,"    1.553,16"
+VENDITE_CLIENTE,LT,MATERIA & COLORI SRL                                        ,"    1.306,80"
+VENDITE_CLIENTE,LT,PAOLO LEO TUTTO PER L'EDILIZIA SRL                          ,"   17.446,70"
+VENDITE_CLIENTE,LT,EDIL. BI. SRL                                               ,"    4.323,74"
+VENDITE_CLIENTE,LT,ROBERTA CERAMICHE SRL                                       ,"    1.063,80"
+VENDITE_CLIENTE,LT,ROSANCOS SRL                                                ,"    2.178,60"
+VENDITE_CLIENTE,LT,EDILCERAMICA SAS DI VEGLIA CRISTIAN & C.                    ,"    1.470,00"
+VENDITE_CLIENTE,LT,D'URSO MAT.DA COSTRUZIONE DI D'URSO S. & C SAS              ,"    4.660,81"
+VENDITE_CLIENTE,LT,MANCINI ANTONIO E C. SNC                                    ,"    3.391,13"
+VENDITE_CLIENTE,LT,EDILIZIA MANCINI LA VECCHIA CAVA SRL                        ,"    2.146,80"
+VENDITE_CLIENTE,LT,DIMED SRL                                                   ,"    1.356,96"
+VENDITE_CLIENTE,LT,BIANCHI INNOCENZO SAS DI BIANCHI ANNA RITA & C              ,"    4.118,01"
+VENDITE_CLIENTE,LT,EDILAPPIA SRL                                               ,"      882,00"
+VENDITE_CLIENTE,LT,EDILIM SRL                                                  ,"    2.400,84"
+VENDITE_CLIENTE,LT,LA CHIAVE INGLESE SNC DI DE SANTIS PAOLO & C.               ,"    1.377,60"
+VENDITE_CLIENTE,LT,EDILIZIA VENDITTI DI VENDITTI GIOVANNI E C. SNC             ,"    5.779,80"
+VENDITE_CLIENTE,LT,L'EMPORIO DI IOZZI SONIA                                    ,"    1.972,56"
+VENDITE_CLIENTE,LT,ADIPIETRO COMMERCIALE SRL                                   ,"      905,76"
+VENDITE_CLIENTE,LT,EDIL PONTINA SRLS                                           ,"    2.090,45"
+VENDITE_CLIENTE,LT,EDILVETRINE SRL                                             ,"    3.612,00"
+VENDITE_CLIENTE,LT,FER.COM. COSTRUZIONI SRL                                    ,"    4.858,37"
+VENDITE_CLIENTE,LT,EDILIZIA PRIMAVERA SRL                                      ,"    3.791,37"
+VENDITE_CLIENTE,LT,LATINA BETON SERVIZI SRL                                    ,"    4.032,91"
+VENDITE_CLIENTE,RM,DOVAL SRL                                                   ,"    1.028,82"
+VENDITE_CLIENTE,RM,COLANTUONO 1918 SRL                                         ,"    6.880,80"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"       28,94"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"    4.453,21"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"      517,46"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    3.496,52"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    2.532,25"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"    1.284,66"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   58.350,25"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"   24.466,18"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    1.240,95"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    1.197,40"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    5.777,82"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    7.023,56"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"        0,01"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   62.803,46"," 56,90%",
+RIPARTIZIONE,Altro,"   47.565,75"," 43,09%",
+RIPARTIZIONE,Totale,"  110.369,21","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  110.369,21"
+TOTALE,Clienti_Totale,    30
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00239
+# Ragione Sociale: GATTO CINZIA                                                
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  232.761,93","  226.332,82","  270.000,00"," 83,82%",    38,    38,    40," 95,00%"
+OBIETTIVI,CT,"            ","  226.332,82","  270.000,00"," 83,82%",      ,    38,    40," 95,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CT,    38,"  226.332,82"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,CT,BELLA PAOLO ANTONINO                                        ,"    2.286,00"
+VENDITE_CLIENTE,CT,PAPPALARDO MARIA                                            ,"    2.605,99"
+VENDITE_CLIENTE,CT,COMAED SRL                                                  ,"    9.969,11"
+VENDITE_CLIENTE,CT,SALVATRICE GAMBINO E SORTINO GIACOMO SAS                    ,"    5.228,00"
+VENDITE_CLIENTE,CT,BRACCHITTA FAUSTO                                           ,"    1.350,00"
+VENDITE_CLIENTE,CT,P.L. FORNITURE EDILI SRL                                    ,"      898,99"
+VENDITE_CLIENTE,CT,PONTURO VINCENZO                                            ,"    1.626,00"
+VENDITE_CLIENTE,CT,PAPPALARDO AURELIA SRL                                      ,"    5.460,00"
+VENDITE_CLIENTE,CT,MATERIALE EDILE DORATA S.R.L.                               ,"    6.860,59"
+VENDITE_CLIENTE,CT,ROMANIA LUCIANO                                             ,"    4.050,00"
+VENDITE_CLIENTE,CT,GIUFFRIDA SRL                                               ,"    8.140,50"
+VENDITE_CLIENTE,CT,ANNARO & C. SRL                                             ,"    2.475,39"
+VENDITE_CLIENTE,CT,L.N.T. TRADE S.R.L.                                         ,"    1.563,09"
+VENDITE_CLIENTE,CT,ATORRISI SRL                                                ,"   11.205,00"
+VENDITE_CLIENTE,CT,LA NUOVA FORNACIAIA SRL                                     ,"    5.901,70"
+VENDITE_CLIENTE,CT,MUSUMECI GERARDO                                            ,"    3.331,00"
+VENDITE_CLIENTE,CT,IL VULCANO DELL' EDILIZIA SRL                               ,"    6.163,50"
+VENDITE_CLIENTE,CT,ADICEM SRL                                                  ,"   16.218,55"
+VENDITE_CLIENTE,CT,VIOLA FRANCESCO                                             ,"      837,60"
+VENDITE_CLIENTE,CT,PULVIRENTI GROUP SRL                                        ,"    4.981,00"
+VENDITE_CLIENTE,CT,LA NUOVA EDILIZIA SRLS                                      ,"    3.987,20"
+VENDITE_CLIENTE,CT,PANDOLFO NUNZIATO SRL                                       ,"    6.200,00"
+VENDITE_CLIENTE,CT,MPS SRL                                                     ,"   18.318,00"
+VENDITE_CLIENTE,CT,I.LA.P. SRL                                                 ,"    3.100,00"
+VENDITE_CLIENTE,CT,CUBEX SRL                                                   ,"   33.110,00"
+VENDITE_CLIENTE,CT,NEW EDIL TRADE SRL                                          ,"    1.950,30"
+VENDITE_CLIENTE,CT,EDIL CORSARO S.R.L.                                         ,"     -361,00"
+VENDITE_CLIENTE,CT,EDIL.VE.TRA. SPA                                            ,"    7.538,43"
+VENDITE_CLIENTE,CT,EDIL CANTONE SRL                                            ,"    2.454,10"
+VENDITE_CLIENTE,CT,VISCARDO OTTONE CARMELO                                     ,"    5.952,00"
+VENDITE_CLIENTE,CT,ED.CA.MA. SRL                                               ,"   10.030,00"
+VENDITE_CLIENTE,CT,EDIL TOMARCHIO S.R.L.                                       ,"    3.029,04"
+VENDITE_CLIENTE,CT,CAPONNETTO EDIL TRASPORTI SRL                               ,"      881,45"
+VENDITE_CLIENTE,CT,GIURANDINO MARIACATENA                                      ,"    2.734,38"
+VENDITE_CLIENTE,CT,UNIEDIL SRL                                                 ,"   21.426,40"
+VENDITE_CLIENTE,CT,MONDO EDILE SRL                                             ,"    1.215,00"
+VENDITE_CLIENTE,CT,AGRIEDIL SRL                                                ,"      876,00"
+VENDITE_CLIENTE,CT,CARTACOLOR HOME SRL                                         ,"    2.739,51"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    2.139,93"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"  159.575,98"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    1.533,72"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    6.848,32"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      642,33"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   36.424,97"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"      374,76"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"       20,43"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    1.530,88"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    4.983,30"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"    2.447,66"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    1.603,28"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    1.906,97"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"    6.300,29"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  196.000,95"," 86,59%",
+RIPARTIZIONE,Altro,"   30.331,87"," 13,40%",
+RIPARTIZIONE,Totale,"  226.332,82","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  226.332,82"
+TOTALE,Clienti_Totale,    38
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00241
+# Ragione Sociale: CAPOTOSTI CARLO                                             
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  312.548,75","  340.733,30","  250.000,00","136,29%",    24,    20,    20,"100,00%"
+OBIETTIVI,AQ,"            ","   38.254,50","   62.500,00"," 61,20%",      ,     3,     5," 60,00%"
+OBIETTIVI,CH,"            ","   42.383,13","   62.500,00"," 67,81%",      ,     6,     5,"120,00%"
+OBIETTIVI,MO,"            ","  196.030,30","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,PE,"            ","   14.046,00","   62.500,00"," 22,47%",      ,     2,     5," 40,00%"
+OBIETTIVI,RM,"            ","    5.712,23","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,TE,"            ","   32.918,10","   62.500,00"," 52,66%",      ,     6,     5,"120,00%"
+OBIETTIVI,VT,"            ","   11.389,04","            ","0%",      ,     1,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AQ,     3,"   38.254,50"
+CLIENTI_PROVINCIA,CH,     6,"   42.383,13"
+CLIENTI_PROVINCIA,MO,     1,"  196.030,30"
+CLIENTI_PROVINCIA,PE,     2,"   14.046,00"
+CLIENTI_PROVINCIA,RM,     1,"    5.712,23"
+CLIENTI_PROVINCIA,TE,     6,"   32.918,10"
+CLIENTI_PROVINCIA,VT,     1,"   11.389,04"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,AQ,EDILFER SRL                                                 ,"   19.044,48"
+VENDITE_CLIENTE,AQ,MARINI CARMINE SRL                                          ,"   11.712,42"
+VENDITE_CLIENTE,AQ,S.I.M.I.C. SRL                                              ,"    7.497,60"
+VENDITE_CLIENTE,CH,F.LLI DI MUZIO & C. SRL                                     ,"   13.114,24"
+VENDITE_CLIENTE,CH,MENNA CAMILLO SRL                                           ,"    9.976,78"
+VENDITE_CLIENTE,CH,UCCI ANTONIO SRL                                            ,"    5.514,73"
+VENDITE_CLIENTE,CH,EDILVOLPE DI VOLPE GIAMPIERO SNC DI VOLPE F. & P.           ,"    1.779,60"
+VENDITE_CLIENTE,CH,DIERRE SRL                                                  ,"    6.417,60"
+VENDITE_CLIENTE,CH,TENAGLIA SRL                                                ,"    5.580,18"
+VENDITE_CLIENTE,MO,ETERNOO SPA                                                 ,"  196.030,30"
+VENDITE_CLIENTE,PE,DI MUZIO LATERIZI SRL                                       ,"   11.352,00"
+VENDITE_CLIENTE,PE,LIFE PROJECT LEGNO SRL                                      ,"    2.694,00"
+VENDITE_CLIENTE,RM,NUOVA EDIL SAS                                              ,"    5.712,23"
+VENDITE_CLIENTE,TE,DE SANCTIS LINDA SRL                                        ,"   16.555,90"
+VENDITE_CLIENTE,TE,ZUCCARINI FILIPPO SRL                                       ,"    2.935,20"
+VENDITE_CLIENTE,TE,VEMAFER SRL                                                 ,"    5.435,00"
+VENDITE_CLIENTE,TE,EDILCOSTRUZIONI GROUP SRL                                   ,"    2.562,00"
+VENDITE_CLIENTE,TE,DOMOSTILE SRL                                               ,"            "
+VENDITE_CLIENTE,TE,T.& T. SRL                                                  ,"    5.430,00"
+VENDITE_CLIENTE,VT,ORSOLINI AMEDEO SPA                                         ,"   11.389,04"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    4.653,24"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"  158.543,76"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    4.029,70"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    2.866,72"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"    2.132,54"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"  151.211,01"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    6.287,71"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    9.749,90"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"      753,20"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    4.059,60"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    1.635,92"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  309.754,77"," 89,54%",
+RIPARTIZIONE,Altro,"   36.168,53"," 10,45%",
+RIPARTIZIONE,Totale,"  345.923,30","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  345.923,30"
+TOTALE,Clienti_Totale,    20
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00243
+# Ragione Sociale: MG SRLS                                                     
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   48.199,24","      428,22","  100.000,00","  0,42%",    14,     1,    20,"  5,00%"
+OBIETTIVI,RM,"            ","      428,22","  100.000,00","  0,42%",      ,     1,    20,"  5,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,RM,     1,"      428,22"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,RM,CANTIANI SRL                                                ,"      428,22"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"            ","0%",
+RIPARTIZIONE,Altro,"      428,22","100,00%",
+RIPARTIZIONE,Totale,"      428,22","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"      428,22"
+TOTALE,Clienti_Totale,     1
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00244
+# Ragione Sociale: COLALILLO CLAUDIO                                           
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   32.100,69","   34.613,68","   50.000,00"," 69,22%",     9,    10,    12," 83,33%"
+OBIETTIVI,CB,"            ","   30.138,05","   25.000,00","120,55%",      ,     8,     6,"133,33%"
+OBIETTIVI,IS,"            ","    4.475,63","   25.000,00"," 17,90%",      ,     2,     6," 33,33%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CB,     8,"   30.138,05"
+CLIENTI_PROVINCIA,IS,     2,"    4.475,63"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,CB,BIGGIO SRL                                                  ,"    8.763,41"
+VENDITE_CLIENTE,CB,STANZIANO SAS DI STANZIANO ENRICO & C                       ,"    7.912,63"
+VENDITE_CLIENTE,CB,COLOCCIA ANNAMARIA                                          ,"    2.151,06"
+VENDITE_CLIENTE,CB,TIS ZARRELLI SNC DI ZARRELLI CARMINE E FRANCESCO            ,"    4.241,66"
+VENDITE_CLIENTE,CB,EDILNIRO SRL                                                ,"    2.107,20"
+VENDITE_CLIENTE,CB,D'ONOFRIO MICHELE ANTONIO                                   ,"    1.760,35"
+VENDITE_CLIENTE,CB,EREDI BELSENO DI BELSENO TOMMASO E C. SAS                   ,"    2.227,34"
+VENDITE_CLIENTE,CB,FERRETTI SAS DI MATTEO STANISCIA E C.                       ,"      974,40"
+VENDITE_CLIENTE,IS,FLEMI 2 DI COLARUSSO G.SRL                                  ,"    3.017,23"
+VENDITE_CLIENTE,IS,EDILVIBRO EDILIZIA SRL                                      ,"    1.458,40"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"     -155,22"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"    7.511,28"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    1.751,35"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    1.089,65"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   10.636,56"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"      565,65"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"    2.418,34"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"      314,93"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    1.548,80"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    6.380,06"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"    2.124,06"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   18.147,84"," 52,42%",
+RIPARTIZIONE,Altro,"   16.465,84"," 47,57%",
+RIPARTIZIONE,Totale,"   34.613,68","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   34.613,68"
+TOTALE,Clienti_Totale,    10
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00251
+# Ragione Sociale: RAPPRESENTANZE PAGLIARULO STEFANIA & C. SAS                 
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   39.187,68","   38.222,52","   50.000,00"," 76,44%",    20,    15,    20," 75,00%"
+OBIETTIVI,BR,"            ","    3.410,34","   25.000,00"," 13,64%",      ,     3,    10," 30,00%"
+OBIETTIVI,TA,"            ","   34.812,18","   25.000,00","139,24%",      ,    12,    10,"120,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,BR,     3,"    3.410,34"
+CLIENTI_PROVINCIA,TA,    12,"   34.812,18"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,BR,EDILCERAMICHE RUGGIERO LUIGI SRL                            ,"    2.400,74"
+VENDITE_CLIENTE,BR,CONTE LINDA IDROTERMOCERAMICHE                              ,"      323,60"
+VENDITE_CLIENTE,BR,RAM CERAMICHE DI NISI ROCCO SAS                             ,"      686,00"
+VENDITE_CLIENTE,TA,EDILSOLAI DI ONDEGGIA FRANCESCO SAVERIO & C. SAS            ,"    5.994,29"
+VENDITE_CLIENTE,TA,EDILMACOTEK SRL                                             ,"    2.077,42"
+VENDITE_CLIENTE,TA,NUOVA EDILIZIA GIGANTE SRL                                  ,"    4.113,58"
+VENDITE_CLIENTE,TA,CENTRO EDILE SRL                                            ,"    2.432,13"
+VENDITE_CLIENTE,TA,SEGUINO AMBROGIO                                            ,"    2.528,29"
+VENDITE_CLIENTE,TA,GL EDILIZIA DI GENCO GIOVANNI E LAERA VITO & C. SNC         ,"    4.054,40"
+VENDITE_CLIENTE,TA,EDILIZIA E FERRAMENTA DI F.G.G. SRL                         ,"    1.827,79"
+VENDITE_CLIENTE,TA,EDIL COMM SRL                                               ,"    1.242,00"
+VENDITE_CLIENTE,TA,DE QUARTO SRL                                               ,"      981,69"
+VENDITE_CLIENTE,TA,FORNERIE LAERTINE SRL                                       ,"    7.109,89"
+VENDITE_CLIENTE,TA,EREDI VALENTINI RITA CARMELA SDF                            ,"      310,72"
+VENDITE_CLIENTE,TA,EDIL PIZZULLI SRL                                           ,"    2.139,98"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"     -914,12"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"    7.138,35"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    1.464,42"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"      291,60"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"            "
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"      361,46"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    1.162,98"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    5.688,00"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    8.323,94"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"   14.705,89"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"    7.138,35"," 18,67%",
+RIPARTIZIONE,Altro,"   31.084,17"," 81,32%",
+RIPARTIZIONE,Totale,"   38.222,52","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   38.222,52"
+TOTALE,Clienti_Totale,    15
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00252
+# Ragione Sociale: CELENTANO ALFREDO                                           
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   42.146,61","   61.768,43","   60.000,00","102,94%",    10,     9,    10," 90,00%"
+OBIETTIVI,AV,"            ","   57.524,62","   60.000,00"," 95,87%",      ,     8,    14," 57,14%"
+OBIETTIVI,NA,"            ","    4.243,81","            ","0%",      ,     1,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AV,     8,"   57.524,62"
+CLIENTI_PROVINCIA,NA,     1,"    4.243,81"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,AV,PAOLO SCOPPETTUOLO SRL                                      ,"   14.360,74"
+VENDITE_CLIENTE,AV,IPPOLITO SRL                                                ,"    2.935,54"
+VENDITE_CLIENTE,AV,EUROPA SERVICE SNC                                          ,"    1.874,38"
+VENDITE_CLIENTE,AV,NITTOLO SRL                                                 ,"    1.130,40"
+VENDITE_CLIENTE,AV,NUOVA EDILE SRL                                             ,"    6.622,90"
+VENDITE_CLIENTE,AV,CENTRO EDILE MAGNOTTA SRL                                   ,"    7.745,53"
+VENDITE_CLIENTE,AV,FIMAN SRLS                                                  ,"   22.112,03"
+VENDITE_CLIENTE,AV,RUGGIERO SRL                                                ,"      743,10"
+VENDITE_CLIENTE,NA,CENTRO CASA SRL                                             ,"    4.243,81"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      -56,98"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"    6.535,71"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"      892,00"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    7.567,36"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"      302,68"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   18.733,41"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    1.005,69"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"      219,26"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    1.262,25"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"   13.577,74"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    9.236,14"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    1.967,95"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"       97,00"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   25.269,12"," 40,90%",
+RIPARTIZIONE,Altro,"   36.499,31"," 59,09%",
+RIPARTIZIONE,Totale,"   61.768,43","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   61.768,43"
+TOTALE,Clienti_Totale,     9
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00253
+# Ragione Sociale: BALDUCCI ADRIANA                                            
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   56.866,06","   58.102,93","   80.000,00"," 72,62%",     9,     6,    15," 40,00%"
+OBIETTIVI,BA,"            ","   58.102,93","   80.000,00"," 72,62%",      ,     6,    15," 40,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,BA,     6,"   58.102,93"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,BA,CENTRO EDILE QUARTARELLA SRL                                ,"   21.711,24"
+VENDITE_CLIENTE,BA,COSTRUZIONI BAROZZI SPA                                     ,"   25.362,20"
+VENDITE_CLIENTE,BA,STEI SRL                                                    ,"    2.219,43"
+VENDITE_CLIENTE,BA,FERRULLI MATERIALI EDILI SRL                                ,"    5.875,88"
+VENDITE_CLIENTE,BA,MARCOSANO MICHELE                                           ,"    2.057,85"
+VENDITE_CLIENTE,BA,EDIL MAIELLARO SNC DEI F.LLI E.F. E G. MAIELLARO            ,"      876,33"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      582,01"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   21.549,56"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"      856,60"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"    1.209,60"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    6.538,13"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    2.327,62"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"   22.747,68"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    1.421,40"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"      870,33"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   22.759,16"," 39,17%",
+RIPARTIZIONE,Altro,"   35.343,77"," 60,82%",
+RIPARTIZIONE,Totale,"   58.102,93","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   58.102,93"
+TOTALE,Clienti_Totale,     6
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00256
+# Ragione Sociale: LONGO LUIGI                                                 
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   45.191,70","   44.861,30","   60.000,00"," 74,76%",     5,     5,    15," 33,33%"
+OBIETTIVI,LE,"            ","   44.861,30","   60.000,00"," 74,76%",      ,     5,    15," 33,33%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,LE,     5,"   44.861,30"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,LE,NICOLI' SPA                                                 ,"    4.400,19"
+VENDITE_CLIENTE,LE,GIORGIANI SRL                                               ,"   21.707,44"
+VENDITE_CLIENTE,LE,DELLE DONNE EDILIZIA SRL                                    ,"   11.798,11"
+VENDITE_CLIENTE,LE,NAPOLI UMBERTO                                              ,"    3.745,16"
+VENDITE_CLIENTE,LE,SOL.EDIL GROUP SRL                                          ,"    3.210,40"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    4.742,12"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   36.671,03"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+CATEGORIA_RIEPILOGO,PEZ.SPEC.COPPI                          ,"      369,38"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"      196,10"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    6.610,79"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   36.671,03"," 74,81%",
+RIPARTIZIONE,Altro,"   12.346,61"," 25,18%",
+RIPARTIZIONE,Totale,"   49.017,64","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   49.017,64"
+TOTALE,Clienti_Totale,     6
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00257
+# Ragione Sociale: MONTANI ANDREA                                              
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  126.379,90","  168.188,28","  130.000,00","129,37%",    13,    17,    15,"113,33%"
+OBIETTIVI,MC,"            ","    6.350,80","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,MO,"            ","   28.576,94","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,PG,"            ","  118.665,88","  650.000,00"," 18,25%",      ,    12,     8,"150,00%"
+OBIETTIVI,TR,"            ","    9.103,46","   65.000,00"," 14,00%",      ,     2,     7," 28,57%"
+OBIETTIVI,VT,"            ","    5.491,20","            ","0%",      ,     1,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,MC,     1,"    6.350,80"
+CLIENTI_PROVINCIA,MO,     1,"   28.576,94"
+CLIENTI_PROVINCIA,PG,    12,"  118.665,88"
+CLIENTI_PROVINCIA,TR,     2,"    9.103,46"
+CLIENTI_PROVINCIA,VT,     1,"    5.491,20"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,MC,EDILCASA CACCAMO SRL                                        ,"    6.350,80"
+VENDITE_CLIENTE,MO,ETERNOO SPA                                                 ,"   28.576,94"
+VENDITE_CLIENTE,PG,EDILTACCONI S.R.L.                                          ,"   12.816,62"
+VENDITE_CLIENTE,PG,ALFA SPA                                                    ,"    4.960,00"
+VENDITE_CLIENTE,PG,EDILIZIA DONATI S.R.L.                                      ,"   29.512,15"
+VENDITE_CLIENTE,PG,EDILIZIA LAUTERI SRL                                        ,"   10.934,00"
+VENDITE_CLIENTE,PG,IN CALTIBER SRL                                             ,"    4.382,82"
+VENDITE_CLIENTE,PG,EDILIZIA RUFFINELLI SRL                                     ,"   12.501,50"
+VENDITE_CLIENTE,PG,REDIL SRL                                                   ,"    1.767,28"
+VENDITE_CLIENTE,PG,PESCIARELLI EDILIZIA SRL                                    ,"   19.930,68"
+VENDITE_CLIENTE,PG,IL CANTIERE SRL                                             ,"    5.650,00"
+VENDITE_CLIENTE,PG,MATERIA KASA SRL                                            ,"    6.648,83"
+VENDITE_CLIENTE,PG,COMMERCIALE 2A SRL                                          ,"    5.053,00"
+VENDITE_CLIENTE,PG,FELC SRL                                                    ,"    4.509,00"
+VENDITE_CLIENTE,TR,ALCINI SANDRO                                               ,"    7.973,46"
+VENDITE_CLIENTE,TR,R.I.M.E. SRL                                                ,"    1.130,00"
+VENDITE_CLIENTE,VT,ORSOLINI AMEDEO SPA                                         ,"    5.491,20"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"    2.405,03"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   58.233,42"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    3.747,36"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      856,44"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   79.772,72"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    1.114,56"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"   20.297,47"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    1.761,28"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  138.006,14"," 82,05%",
+RIPARTIZIONE,Altro,"   30.182,14"," 17,94%",
+RIPARTIZIONE,Totale,"  168.188,28","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  168.188,28"
+TOTALE,Clienti_Totale,    17
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00259
+# Ragione Sociale: TORINO SALVATORE                                            
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  286.922,80","  201.977,95","  300.000,00"," 67,32%",    19,    17,    20," 85,00%"
+OBIETTIVI,SR,"            ","  201.977,95","  300.000,00"," 67,32%",      ,    17,    20," 85,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,SR,    17,"  201.977,95"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,SR,ICA DI GIOMPAOLO PAOLO E SIMONE SNC                         ,"   18.824,56"
+VENDITE_CLIENTE,SR,MAVIC DI TARDONATO SRL                                      ,"    7.264,32"
+VENDITE_CLIENTE,SR,F.LLI ITALIA S.R.L.                                         ,"    7.315,33"
+VENDITE_CLIENTE,SR,F.LLI SINDONI SRL                                           ,"   26.799,16"
+VENDITE_CLIENTE,SR,EDIL MATERIALI DI SANTUCCIO R.& C. SNC                      ,"    7.170,00"
+VENDITE_CLIENTE,SR,F.LLI TINE' SNC DI TINE' ANGELO E SALVATORE                 ,"   13.319,44"
+VENDITE_CLIENTE,SR,CENTRO EDILE CARUSO SRL                                     ,"   15.947,68"
+VENDITE_CLIENTE,SR,ELORO CALCESTRUZZI SRL                                      ,"   15.969,36"
+VENDITE_CLIENTE,SR,A.M.C.M. SRL                                                ,"    7.066,61"
+VENDITE_CLIENTE,SR,LA NUOVA COMMERCIALE DI CARPINO E APARO SNC                 ,"   44.367,19"
+VENDITE_CLIENTE,SR,NUOVA EPICA SNC DEI F.LLI VERONICA CARMELO & ANGELO         ,"    1.567,20"
+VENDITE_CLIENTE,SR,MORALE CORRADO                                              ,"    3.753,00"
+VENDITE_CLIENTE,SR,LUCIANO CATANIA SRL                                         ,"    5.589,00"
+VENDITE_CLIENTE,SR,MICELI SRL                                                  ,"    3.276,60"
+VENDITE_CLIENTE,SR,MAZZARELLA GIANPAOLO SRL                                    ,"    3.369,60"
+VENDITE_CLIENTE,SR,BRICO TOOC SRL                                              ,"   17.518,90"
+VENDITE_CLIENTE,SR,BASILE ORAZIO SAS                                           ,"    2.860,00"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      995,30"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"  163.510,12"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"      380,80"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      428,22"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   22.243,20"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"      314,20"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"            "
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    1.437,64"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    2.009,12"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    2.125,27"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"    8.343,28"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"      190,80"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  185.753,32"," 91,96%",
+RIPARTIZIONE,Altro,"   16.224,63","  8,03%",
+RIPARTIZIONE,Totale,"  201.977,95","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  201.977,95"
+TOTALE,Clienti_Totale,    17
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00260
+# Ragione Sociale: VELLA FRANCESCO                                             
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  104.402,92","   64.279,36","  150.000,00"," 42,85%",    18,    15,    20," 75,00%"
+OBIETTIVI,AG,"            ","   55.957,96","  150.000,00"," 37,30%",      ,    14,    20," 70,00%"
+OBIETTIVI,TP,"            ","    8.321,40","            ","0%",      ,     1,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AG,    14,"   55.957,96"
+CLIENTI_PROVINCIA,TP,     1,"    8.321,40"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,AG,EDIL BURGIO SRL                                             ,"    2.967,60"
+VENDITE_CLIENTE,AG,COMMERCIALE EDILE SRL                                       ,"      422,40"
+VENDITE_CLIENTE,AG,VICARI GIUSEPPE & FIGLI SRL                                 ,"      528,40"
+VENDITE_CLIENTE,AG,F.LLI PIRO SNC DI PIRO GIUSEPPE & C                         ,"    2.349,00"
+VENDITE_CLIENTE,AG,F.LLI GENTILE S.N.C. DI GENTILE MASSIMILIANO & C            ,"    2.669,20"
+VENDITE_CLIENTE,AG,D'AURIA ROSALIA & C.SRL                                     ,"    2.178,00"
+VENDITE_CLIENTE,AG,TODARO VINCENZO                                             ,"    3.886,20"
+VENDITE_CLIENTE,AG,CERAMICHE ARREDOB.DEI F.LLI VACCARO FELICE E G.SNC          ,"      694,80"
+VENDITE_CLIENTE,AG,COMPAGNIA DELLA TERRACOTTA SRL                              ,"    9.363,00"
+VENDITE_CLIENTE,AG,DI MATTEO ANTONINO                                          ,"   14.342,31"
+VENDITE_CLIENTE,AG,PALUMBO & QUARANTA SRL                                      ,"    8.730,40"
+VENDITE_CLIENTE,AG,CASTELLINO S.R.L.                                           ,"      560,20"
+VENDITE_CLIENTE,AG,AGD DI LUMIA ANGELO & C SAS                                 ,"    1.252,86"
+VENDITE_CLIENTE,AG,FORNI DEL SARACENO DI DI PASQUALI ANTONIA LORENA & C. SAS   ,"    6.013,59"
+VENDITE_CLIENTE,TP,MARINO ROSARIO SRL                                          ,"    8.321,40"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      900,06"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   20.875,00"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"    1.891,98"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    9.870,60"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   11.664,00"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    5.296,34"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      727,86"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"            "
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"      228,00"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    6.912,00"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"    2.556,00"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    3.357,52"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   32.539,00"," 50,62%",
+RIPARTIZIONE,Altro,"   31.740,36"," 49,37%",
+RIPARTIZIONE,Totale,"   64.279,36","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   64.279,36"
+TOTALE,Clienti_Totale,    15
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00261
+# Ragione Sociale: LIBERTI ALESSANDRO RAPPRESENTANZE SAS DI  A.LIBERTI & C SAS 
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  137.753,57","   78.587,76","  170.000,00"," 46,22%",    11,     6,    18," 33,33%"
+OBIETTIVI,AG,"            ","    4.194,90","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,CL,"            ","   45.172,71","  100.000,00"," 45,17%",      ,     3,    10," 30,00%"
+OBIETTIVI,EN,"            ","   29.220,15","   70.000,00"," 41,74%",      ,     2,     8," 25,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AG,     1,"    4.194,90"
+CLIENTI_PROVINCIA,CL,     3,"   45.172,71"
+CLIENTI_PROVINCIA,EN,     2,"   29.220,15"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,AG,BUSCEMI EDILIZIA GROUP  SRL                                 ,"    4.194,90"
+VENDITE_CLIENTE,CL,PREDIL SRL                                                  ,"   39.104,71"
+VENDITE_CLIENTE,CL,EDILTEKNICA MARZIANO SOC.COOP.                              ,"    5.198,00"
+VENDITE_CLIENTE,CL,EDIL FERRAMENTA DI DIFRANCESCO S. & C SAS                   ,"      870,00"
+VENDITE_CLIENTE,EN,EDIL CO.NI. SRL                                             ,"   15.750,44"
+VENDITE_CLIENTE,EN,VAEDIL SRL                                                  ,"   13.469,71"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      854,00"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   46.316,26"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"      502,14"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    1.074,96"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   21.636,11"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"      374,76"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"            "
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    3.406,50"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"      559,03"
+CATEGORIA_RIEPILOGO,II SCELTA                               ,"      840,00"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    3.024,00"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   67.952,37"," 86,46%",
+RIPARTIZIONE,Altro,"   10.635,39"," 13,53%",
+RIPARTIZIONE,Totale,"   78.587,76","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   78.587,76"
+TOTALE,Clienti_Totale,     6
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00263
+# Ragione Sociale: G2G TRADE CONSULTING SRL                                    
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"  141.602,50","  148.369,00","  180.000,00"," 82,42%",    15,    13,    30," 43,33%"
+OBIETTIVI,AN,"            ","   86.001,07","   90.000,00"," 95,55%",      ,     8,    15," 53,33%"
+OBIETTIVI,EE,"            ","   33.994,33","            ","0%",      ,     1,      ,"0%"
+OBIETTIVI,PU,"            ","   28.373,60","   90.000,00"," 31,52%",      ,     4,    15," 26,66%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AN,     8,"   86.001,07"
+CLIENTI_PROVINCIA,EE,     1,"   33.994,33"
+CLIENTI_PROVINCIA,PU,     4,"   28.373,60"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,AN,GAGLIARDINI SRL                                             ,"   21.115,99"
+VENDITE_CLIENTE,AN,F.LLI SIMONETTI SPA                                         ,"   15.249,20"
+VENDITE_CLIENTE,AN,EDILMUSONE SRL                                              ,"    3.982,20"
+VENDITE_CLIENTE,AN,TITTARELLI EDILIZIA SRL                                     ,"    4.070,08"
+VENDITE_CLIENTE,AN,FERRAMENTA SARTI SRL                                        ,"    5.047,20"
+VENDITE_CLIENTE,AN,GIACCHE' SRL                                                ,"   24.134,40"
+VENDITE_CLIENTE,AN,B.M. EDILIZIA SRL                                           ,"    9.036,32"
+VENDITE_CLIENTE,AN,NUOVA COMES SRL                                             ,"    3.365,68"
+VENDITE_CLIENTE,EE,KONI ARJAN                                                  ,"   33.994,33"
+VENDITE_CLIENTE,PU,EDILNOVA FRONTONE SRL                                       ,"   10.237,60"
+VENDITE_CLIENTE,PU,EDIL PIEFFE SRL                                             ,"    7.286,40"
+VENDITE_CLIENTE,PU,RI.M.EDIL SRL                                               ,"    5.720,00"
+VENDITE_CLIENTE,PU,EDILIZIA PIERETTI SRL                                       ,"    5.129,60"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"     -391,00"
+CATEGORIA_RIEPILOGO,MATERIALI GENERICI                      ,"            "
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   65.408,32"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"      540,00"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    2.145,60"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    9.097,92"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"            "
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   54.388,24"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    5.108,74"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"    3.755,08"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"      775,20"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"    1.814,40"
+CATEGORIA_RIEPILOGO,OUTLET                                  ,"    5.726,50"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"  119.796,56"," 80,74%",
+RIPARTIZIONE,Altro,"   28.572,44"," 19,25%",
+RIPARTIZIONE,Totale,"  148.369,00","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  148.369,00"
+TOTALE,Clienti_Totale,    13
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00265
+# Ragione Sociale: AMICI ALBERTO                                               
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"   19.777,80","   34.389,68","  100.000,00"," 34,38%",     4,     6,    10," 60,00%"
+OBIETTIVI,CA,"            ","   14.311,51","   50.000,00"," 28,62%",      ,     2,     5," 40,00%"
+OBIETTIVI,OR,"            ","    5.757,63","   50.000,00"," 11,51%",      ,     1,     5," 20,00%"
+OBIETTIVI,SU,"            ","   14.320,54","            ","0%",      ,     3,      ,"0%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,CA,     2,"   14.311,51"
+CLIENTI_PROVINCIA,OR,     1,"    5.757,63"
+CLIENTI_PROVINCIA,SU,     3,"   14.320,54"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,CA,LATERIZI SRL                                                ,"   13.368,89"
+VENDITE_CLIENTE,CA,ANTONIO PUDDU IMPRESA COSTRUZIONI EDILI SRL                 ,"      942,62"
+VENDITE_CLIENTE,OR,CABIDDU AGOSTINO                                            ,"    5.757,63"
+VENDITE_CLIENTE,SU,EREDI MUSA CARMELO DI MUSA RENZO & C.SNC                    ,"    2.321,43"
+VENDITE_CLIENTE,SU,BIASIOLI SRL                                                ,"    6.501,76"
+VENDITE_CLIENTE,SU,DEIDDA FORNITURE EDILI SRL                                  ,"    5.497,35"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"     -951,05"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   17.653,89"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"      790,82"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"    1.284,66"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"   10.780,00"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"      942,62"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"    2.312,43"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"      870,33"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"      705,98"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   17.653,89"," 51,33%",
+RIPARTIZIONE,Altro,"   16.735,79"," 48,66%",
+RIPARTIZIONE,Totale,"   34.389,68","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   34.389,68"
+TOTALE,Clienti_Totale,     6
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00266
+# Ragione Sociale: LUCARONI MIRCO                                              
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"    8.363,86","   16.898,76","   60.000,00"," 28,16%",     3,     3,    10," 30,00%"
+OBIETTIVI,AR,"            ","    9.557,40","   20.000,00"," 47,78%",      ,     2,     3," 66,66%"
+OBIETTIVI,GR,"            ","            ","   20.000,00","0%",      ,      ,     3,"0%"
+OBIETTIVI,SI,"            ","    7.341,36","   20.000,00"," 36,70%",      ,     1,     4," 25,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,AR,     2,"    9.557,40"
+CLIENTI_PROVINCIA,GR,      ,"            "
+CLIENTI_PROVINCIA,SI,     1,"    7.341,36"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,AR,EDILIZIA CASTIGLIONESE SRL                                  ,"    7.696,20"
+VENDITE_CLIENTE,AR,SGREVI UGO SRL                                              ,"    1.861,20"
+VENDITE_CLIENTE,SI,FALCHI RICCARDO                                             ,"    7.341,36"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      297,00"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    3.150,00"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"    6.110,40"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"    6.909,36"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"      432,00"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"    6.110,40"," 36,15%",
+RIPARTIZIONE,Altro,"   10.788,36"," 63,84%",
+RIPARTIZIONE,Totale,"   16.898,76","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"   16.898,76"
+TOTALE,Clienti_Totale,     3
+
+# DATI STATISTICHE AGENTE
+# Codice Agente: 631.00271
+# Ragione Sociale: EMME ELLE EDILIZIA GREEN 5.0 SRLS                           
+# Periodo: 01/01/2025 - 02/10/2025
+
+## SEZIONE 1: VERIFICA OBIETTIVI
+Tipo_Dato,Provincia,Anno_Precedente,Anno_Corrente,Obiettivo,Percentuale_Obiettivo,Clienti_Anno_Precedente,Clienti_Anno_Corrente,Obiettivo_Clienti,Percentuale_Obiettivo_Clienti
+OBIETTIVI,Generale,"0,00","  110.601,81",,,0,    25,,
+OBIETTIVI,MI,"0,00","    3.632,18","            ","0%",0,     1,      ,"0%"
+OBIETTIVI,PG,"0,00","      872,05","            ","0%",0,     1,      ,"0%"
+OBIETTIVI,RI,"0,00","            ","  666.680,00","0%",0,      ,    10,"0%"
+OBIETTIVI,RM,"0,00","   96.237,74","   66.660,00","144,37%",0,    21,    10,"210,00%"
+OBIETTIVI,TR,"0,00","    5.225,88","            ","0%",0,     1,      ,"0%"
+OBIETTIVI,VT,"0,00","    4.633,96","   66.660,00","  6,95%",0,     1,    10," 10,00%"
+
+## SEZIONE 2: CLIENTI SERVITI PER PROVINCIA
+Tipo_Dato,Provincia,Clienti_Serviti,Fatturato
+CLIENTI_PROVINCIA,MI,     1,"    3.632,18"
+CLIENTI_PROVINCIA,PG,     1,"      872,05"
+CLIENTI_PROVINCIA,RI,      ,"            "
+CLIENTI_PROVINCIA,RM,    21,"   96.237,74"
+CLIENTI_PROVINCIA,TR,     1,"    5.225,88"
+CLIENTI_PROVINCIA,VT,     1,"    4.633,96"
+
+## SEZIONE 3: DETTAGLIO VENDITE PER CLIENTE
+Tipo_Dato,Provincia,Ragione_Sociale_Cliente,Fatturato
+VENDITE_CLIENTE,MI,AMARANTA BUILDING SRL                                       ,"    3.632,18"
+VENDITE_CLIENTE,PG,ALFA SPA                                                    ,"      872,05"
+VENDITE_CLIENTE,RM,COLAMARIANI E PODUTI SRL                                    ,"    8.427,65"
+VENDITE_CLIENTE,RM,COMMERCIALE R.A.N. S.R.L.                                   ,"    5.742,94"
+VENDITE_CLIENTE,RM,SPIRIDIGLIOZZI SRL                                          ,"    2.026,77"
+VENDITE_CLIENTE,RM,EDILFER FABRIZI SRL                                         ,"    3.307,03"
+VENDITE_CLIENTE,RM,EDILTUTTO SPA                                               ,"    7.152,00"
+VENDITE_CLIENTE,RM,EUROFER SRL                                                 ,"    7.439,04"
+VENDITE_CLIENTE,RM,DITTA GROTTA 1873 SRL                                       ,"    3.376,80"
+VENDITE_CLIENTE,RM,CANTIANI SRL                                                ,"    6.971,31"
+VENDITE_CLIENTE,RM,ECOS SRL                                                    ,"    9.113,97"
+VENDITE_CLIENTE,RM,EDILIZIA MASTRACCI SRL                                      ,"    4.962,41"
+VENDITE_CLIENTE,RM,MD ITALIA SPA                                               ,"    5.673,58"
+VENDITE_CLIENTE,RM,EDIL PIEMME SRL                                             ,"    1.411,29"
+VENDITE_CLIENTE,RM,VIDUALE SRL                                                 ,"   10.432,99"
+VENDITE_CLIENTE,RM,EDILIZIA OGGI SRL                                           ,"    1.736,03"
+VENDITE_CLIENTE,RM,EMPORIO EDIL 3M SRL                                         ,"    4.362,97"
+VENDITE_CLIENTE,RM,MASSI SRLS                                                  ,"    1.267,32"
+VENDITE_CLIENTE,RM,S.I.M.E. SRL                                                ,"    2.253,65"
+VENDITE_CLIENTE,RM,C.S.E. CRISTIANO SBORDONI EDILIZIA SRL                      ,"    2.380,22"
+VENDITE_CLIENTE,RM,MILIUCCI SNC DI MILIUCCI EDOARDO                            ,"    3.979,20"
+VENDITE_CLIENTE,RM,LA NUOVA DFD EDILE S.R.L                                    ,"    3.524,84"
+VENDITE_CLIENTE,RM,SAFEDIL DI MATTEI GUIDO E LUCIANO E C. SNC                  ,"      695,73"
+VENDITE_CLIENTE,TR,FALSINI GROUP SRL                                           ,"    5.225,88"
+VENDITE_CLIENTE,VT,SILCA RAPPRESENTANZE SRL                                    ,"    4.633,96"
+
+## SEZIONE 4: RIEPILOGO PER CATEGORIA
+Tipo_Dato,Categoria,Importo_Totale
+CATEGORIA_RIEPILOGO,                                        ,"      321,56"
+CATEGORIA_RIEPILOGO,COPERTURE                               ,"   10.929,32"
+CATEGORIA_RIEPILOGO,CORRIM.COPRIM.                          ,"      294,72"
+CATEGORIA_RIEPILOGO,FACCIAVISTA                             ,"    3.298,68"
+CATEGORIA_RIEPILOGO,LINEA ARCHEO                            ,"    3.798,30"
+CATEGORIA_RIEPILOGO,MAT.ESPOSIZIONI                         ,"      628,22"
+CATEGORIA_RIEPILOGO,MATTONE PIENO                           ,"   33.255,73"
+CATEGORIA_RIEPILOGO,PAVIMENTAZIONE POLIS                    ,"    6.066,94"
+CATEGORIA_RIEPILOGO,PIASTRELLE                              ,"    8.911,90"
+CATEGORIA_RIEPILOGO,PRODOTTI FORNO                          ,"    2.203,84"
+CATEGORIA_RIEPILOGO,COTTO A MANO ANTICHE TERRE              ,"    2.519,04"
+CATEGORIA_RIEPILOGO,TAVELLONI                               ,"    3.112,10"
+CATEGORIA_RIEPILOGO,REFRATTARI RETTIFICATI                  ,"    6.925,74"
+CATEGORIA_RIEPILOGO,REFRATTARI                              ,"   28.335,72"
+
+## SEZIONE 5: RIPARTIZIONE FATTURATO
+Tipo_Dato,Categoria_Prodotto,Importo,Percentuale
+RIPARTIZIONE,Pieni e Coppi,"   44.185,05"," 39,94%",
+RIPARTIZIONE,Altro,"   66.416,76"," 60,05%",
+RIPARTIZIONE,Totale,"  110.601,81","100%",
+
+## RIEPILOGHI FINALI
+Tipo_Dato,Descrizione,Valore
+TOTALE,Fatturato_Totale,"  110.601,81"
+TOTALE,Clienti_Totale,    25
+
